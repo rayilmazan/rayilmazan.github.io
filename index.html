@@ -3,58 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoş Geldiniz!</title>
+    <title>Rayılmazan Terminal</title>
     <style>
+        /* CSS Tasarımı */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+            background: radial-gradient(circle at 50% 50%, #3d352b 0%, #1a1512 100%);
+            color: #c0a080;
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-            text-align: center;
+            padding: 40px 15px;
+            display: flex;
+            justify-content: center;
         }
-        header {
-            background: #2c3e50;
-            color: #ffffff;
-            padding: 2rem 0;
+
+        .main-chassis {
+            max-width: 950px;
+            width: 100%;
+            background: linear-gradient(135deg, #4a3b2a 0%, #2e241c 100%);
+            border: 10px solid #5d4d3d;
+            border-radius: 6px;
+            padding: 35px 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 100px rgba(0,0,0,0.5);
+            position: relative;
         }
-        .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
-            padding: 20px;
+
+        .id-plate {
+            position: absolute;
+            top: -30px; right: 40px;
+            background: linear-gradient(180deg, #7c9082 0%, #4a5c54 100%);
+            border: 3px solid #2d3632;
+            padding: 10px 30px;
+            color: #e8d0b5;
+            font-weight: 900;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px #000;
         }
-        .content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        footer {
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #777;
-        }
+
+        .control-deck { background: #3d352b; border: 4px solid #5d4d3d; padding: 20px; margin-bottom: 25px; display: flex; gap: 20px; }
+        .sw-switch { flex: 1; background: #4a3b2a; border: 3px solid #2e241c; padding: 10px; text-align: center; color: #d4a373; text-decoration: none; }
+        
+        .switch-light { width: 40px; height: 8px; margin: 0 auto 8px auto; border-radius: 2px; }
+        .light-blue { background: #3498db; box-shadow: 0 0 12px #3498db; }
+        .light-green { background: #2ecc71; box-shadow: 0 0 12px #2ecc71; }
+        .light-amber { background: #f1c40f; box-shadow: 0 0 12px #f1c40f; }
+        .light-red { background: #e74c3c; box-shadow: 0 0 12px #e74c3c; }
+
+        .post-log { border-left: 6px solid #b87333; background: #2e241c; padding: 15px; margin-bottom: 20px; }
+        .footer-tech { margin-top: 25px; font-size: 10px; color: #75624e; text-align: center; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Merhaba, Siteme Hoş Geldin!</h1>
-    </header>
+<div class='main-chassis'>
+    <div class='id-plate'>RAYILMAZAN</div>
 
-    <div class="container">
-        <div class="content">
-            <h2>Hakkımda</h2>
-            <p>Bu site GitHub Pages kullanılarak oluşturulmuştur. Burası benim dijital dünyadaki yerim.</p>
-            <p>Yakında burada projelerimi ve paylaşımlarımı görebileceksin.</p>
+    <div class='control-deck'>
+        <div class='sw-switch'><div class='switch-light light-blue'></div>SYSTEM</div>
+        <div class='sw-switch'><div class='switch-light light-green'></div>POWER</div>
+        <div class='sw-switch'><div class='switch-light light-amber'></div>DATA</div>
+        <div class='sw-switch'><div class='switch-light light-red'></div>CRITICAL</div>
+    </div>
+
+    <div class='content-area'>
+        <div class='post-log'>
+            <h2>Sistem Başlatıldı</h2>
+            <p>GitHub Pages üzerinde terminal arayüzü başarıyla yapılandırıldı.</p>
         </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 - GitHub Pages ile Hazırlanmıştır.</p>
-    </footer>
+    <div class='footer-tech'>OXIDIZED COPPER TERMINAL V7.1 // OPERATOR ID: RAYILMAZAN</div>
+</div>
 
 </body>
 </html>
