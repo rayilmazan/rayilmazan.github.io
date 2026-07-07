@@ -22,7 +22,6 @@
             border: 2px solid #5a4234; /* Metal birleşim yerleri */
             padding: 30px;
             position: relative;
-            /* Pas dokusunu destekleyen hafif mikro ızgara */
             background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), 
                               linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
             background-size: 20px 20px;
@@ -74,7 +73,7 @@
             box-sizing: border-box;
         }
 
-        /* Gecikmeli yüklemelerde kaymayı önleyen yeni esnek satır mimarisi */
+        /* Gecikmeli yüklemelerde kaymayı önleyen esnek satır mimarisi */
         .data-row {
             display: flex;
             justify-content: space-between;
@@ -160,7 +159,6 @@
             .content-container { grid-template-columns: 1fr; gap: 15px; }
             .side-bar { border-left: none; border-top: 1px solid #4a3528; padding-left: 0; padding-top: 15px; }
             
-            /* Mobilde veriler alt alta gelsin ki API'den uzun yazı gelince ekran sağa sola fırlamasın */
             .data-row {
                 flex-direction: column;
                 align-items: flex-start;
@@ -178,7 +176,7 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[sys_v7.9_rust]</span>
+            <span>[sys_v8.0_rust]</span>
             <span>[uptime: online]</span>
             <span>[hardware_scan]</span>
         </div>
@@ -201,8 +199,16 @@
                 <span id="dev-screen" class="highlight">Tarama yapılıyor...</span>
             </div>
             <div class="data-row">
+                <span class="label">>> Ekran kartı (Gpu)</span>
+                <span id="dev-gpu" class="highlight">Hesaplanıyor...</span>
+            </div>
+            <div class="data-row">
                 <span class="label">>> Ip & yaklaşık konum</span>
                 <span id="dev-ip" class="highlight">Sorgulanıyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> Enlem & boylam</span>
+                <span id="dev-coords" class="highlight">Sorgulanıyor...</span>
             </div>
             <div class="data-row">
                 <span class="label">>> Batarya durumu</span>
@@ -276,21 +282,49 @@
         const pixelRatio = window.devicePixelRatio;
         document.getElementById("dev-screen").innerText = `${width}x${height} (Piksel oranı: ${pixelRatio}x)`;
 
-        // 3. IP Adresi ve Konum
+        // 3. Ekran Kartı (GPU) Tespiti
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    const gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                    document.getElementById("dev-gpu").innerText = gpuRenderer || "[Sürücü ismi okunamadı]";
+                } else {
+                    document.getElementById("dev-gpu").innerText = "[WebGL kısıtlı bilgi]";
+                }
+            } else {
+                document.getElementById("dev-gpu").innerText = "[WebGL desteği yok]";
+            }
+        } catch (e) {
+            document.getElementById("dev-gpu").innerText = "[Donanım erişim hatası]";
+        }
+
+        // 4. IP, Konum ve Koordinat Verileri
         fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
                 if(data.ip) {
                     document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'Bilinmiyor'}, ${data.country_name || 'Bilinmiyor'}`;
+                    
+                    // Enlem & Boylam verisini basıyoruz
+                    if (data.latitude && data.longitude) {
+                        document.getElementById("dev-coords").innerText = `Lat: ${data.latitude} // Long: ${data.longitude}`;
+                    } else {
+                        document.getElementById("dev-coords").innerText = "[Koordinat eşleşmedi]";
+                    }
                 } else {
                     document.getElementById("dev-ip").innerText = "[Korumalı / erişilemedi]";
+                    document.getElementById("dev-coords").innerText = "[Bilinmiyor]";
                 }
             })
             .catch(() => {
                 document.getElementById("dev-ip").innerText = "[Ağ kısıtlaması / ad-blocker]";
+                document.getElementById("dev-coords").innerText = "[Erişim engellendi]";
             });
 
-        // 4. Batarya Durumu
+        // 5. Batarya Durumu
         if (navigator.getBattery) {
             navigator.getBattery().then(function(battery) {
                 function updateBatteryInfo() {
@@ -306,12 +340,12 @@
             document.getElementById("dev-battery").innerText = "[Tarayıcı desteklemiyor]";
         }
 
-        // 5. Donanım Kapasitesi
+        // 6. Donanım Kapasitesi
         const cores = navigator.hardwareConcurrency || "Bilinmiyor";
         const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Bilinmiyor (Gizlilik kısıtlaması)";
         document.getElementById("dev-hardware").innerText = `Cpu: ${cores} çekirdek // Tahmini ram: ${ram}`;
 
-        // 6. Hareket Sensörleri
+        // 7. Hareket Sensörleri
         if ('DeviceOrientationEvent' in window || 'DeviceMotionEvent' in window) {
             document.getElementById("dev-sensors").innerText = "Mevcut [Donanım hazır]";
         } else {
