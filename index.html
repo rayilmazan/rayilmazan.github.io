@@ -41,12 +41,12 @@
 
         .logo-tag {
             background: #3d4147;
-            color: #ff9f1c; 
+            color: #00e676; /* Taktik Terminal Yeşili */
             padding: 4px 10px;
             font-size: 14px;
             font-weight: bold;
             letter-spacing: 2px;
-            border-left: 4px solid #ff9f1c;
+            border-left: 4px solid #00e676;
             white-space: nowrap;
         }
 
@@ -102,14 +102,13 @@
             position: relative;
             box-shadow: inset -2px -2px 0px #1c1d20, inset 1px 1px 0px #6c727c;
             box-sizing: border-box;
-            /* text-transform: uppercase; silindi - büyük harf zorlaması kalktı */
         }
 
         .greeble-btn:hover {
             background: #41454c;
-            color: #ff9f1c;
-            border-color: #ff9f1c;
-            box-shadow: inset -1px -1px 0px #1c1d20, 0 0 6px rgba(255, 159, 28, 0.2);
+            color: #00e676;
+            border-color: #00e676;
+            box-shadow: inset -1px -1px 0px #1c1d20, 0 0 8px rgba(0, 230, 118, 0.2);
         }
 
         .greeble-btn:active {
@@ -126,21 +125,21 @@
         }
 
         .greeble-btn:hover::before {
-            color: #ff9f1c;
+            color: #00e676; /* Yeşil LED efekti */
         }
 
         .footer-line {
             margin-top: 30px;
             height: 2px;
-            background: linear-gradient(90deg, #ff9f1c, #3d4147);
+            background: linear-gradient(90deg, #00e676, #3d4147);
         }
 
-        /* İki noktadan sonraki bilgileri turuncu yapan sınıf */
+        /* İki noktadan sonraki bilgileri yeşil yapan sınıf */
         .highlight {
-            color: #ff9f1c;
+            color: #00e676;
         }
 
-        /* MOBİL UYUMLULUK KATMANI */
+        /* MOBİL UYUMLULUK KATMANI (RESPONSIVE GRID) */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .chassis { padding: 15px; }
@@ -156,7 +155,7 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[sys_v7.7_diag]</span>
+            <span>[sys_v7.8_grn]</span>
             <span>[uptime: online]</span>
             <span>[hardware_scan]</span>
         </div>
@@ -164,7 +163,7 @@
 
     <div class="content-container">
         <div class="main-log">
-            <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> Bu Cihaz Hakkında</h2>
+            <h2 style="font-size: 16px; margin-top:0; color: #00e676;">> Bu Cihaz Hakkında</h2>
             
             <p>>> Cihaz tipi........: <span id="dev-type" class="highlight">Tarama yapılıyor...</span></p>
             <p>>> İşletim sistemi...: <span id="dev-os" class="highlight">Tarama yapılıyor...</span></p>
@@ -192,7 +191,7 @@
     </div>
 
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">id_ref: 0x4492-a // live_diagnostics // rayilmazan_terminal</div>
+    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">id_ref: 0x4492-a // green_diagnostics // rayilmazan_terminal</div>
 </div>
 
 <script>
