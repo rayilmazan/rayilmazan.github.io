@@ -6,8 +6,8 @@
     <title>rayılmazan // Terminal</title>
     <style>
         body {
-            background: #4e3629; /* Oksitlenmiş, paslı endüstriyel kahverengi dış zemin */
-            color: #e0d7d3; /* Pas tonlarıyla uyumlu sıcak mat gri */
+            background: #4e3629;
+            color: #e0d7d3;
             font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             display: flex;
@@ -18,8 +18,8 @@
         .chassis {
             max-width: 900px;
             width: 100%;
-            background: #33241b; /* Daha koyu, yıpranmış metal panel kahvesi */
-            border: 2px solid #5a4234; /* Metal birleşim yerleri */
+            background: #33241b;
+            border: 2px solid #5a4234;
             padding: 30px;
             position: relative;
             background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), 
@@ -29,7 +29,6 @@
             box-sizing: border-box;
         }
 
-        /* Başlık Kısmı */
         .header-section {
             display: flex;
             align-items: center;
@@ -41,7 +40,7 @@
 
         .logo-tag {
             background: #4a3528;
-            color: #00e676; /* Taktik Terminal Yeşili */
+            color: #00e676;
             padding: 4px 10px;
             font-size: 14px;
             font-weight: bold;
@@ -58,7 +57,6 @@
             flex-wrap: wrap;
         }
 
-        /* Ana Düzen Veri Kabini */
         .content-container {
             display: grid;
             grid-template-columns: 1fr 220px;
@@ -66,7 +64,7 @@
         }
 
         .main-log {
-            background: #1a110d; /* İç konsol ekranı - Yanık koyu amber/kahve zemin */
+            background: #1a110d;
             border: 1px solid #291b15;
             padding: 20px;
             box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
@@ -96,7 +94,6 @@
             color: #a8958b;
         }
 
-        /* Used Future Mekanik Butonlar */
         .greeble-btn {
             display: block;
             width: 100%;
@@ -320,7 +317,7 @@
             - /root/debris<br><br>
 
             [Mekanik arabirim]<br>
-            <button class="greeble-btn" onclick="switchToDeviceInfo()">prm_exec_01 [Ana Ekran]</button>
+            <button class="greeble-btn" onclick="switchToDeviceInfo()">Ana Ekran</button>
             <button class="greeble-btn" onclick="switchToSpeedTest()">İnternet Hızın</button>
             <button class="greeble-btn" onclick="switchToBenchmark()">Cihaz Değerlendir</button>
         </div>
