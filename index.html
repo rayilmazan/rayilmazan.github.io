@@ -2,102 +2,79 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>rayılmazan // Terminal</title>
     <style>
-        body {
-            background: #4e3629;
-            color: #e0d7d3;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .chassis {
-            max-width: 900px;
-            width: 100%;
-            background: #33241b;
-            border: 2px solid #5a4234;
-            padding: 30px;
-            position: relative;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        /* --- BUTON RENK PALETİ --- */
+        body { background: #4e3629; color: #e0d7d3; font-family: 'Courier New', monospace; padding: 20px; display: flex; justify-content: center; }
+        .chassis { max-width: 900px; width: 100%; background: #33241b; border: 2px solid #5a4234; padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+        .main-log { background: #1a110d; border: 1px solid #291b15; padding: 20px; min-height: 400px; }
+        
+        /* Renkli Buton Stilleri */
         .greeble-btn {
-            display: block;
-            width: 100%;
-            background: #423025; 
-            color: #c4b3aa;
-            border: 1px solid #5c4537;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            padding: 10px;
-            margin-top: 8px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: inset -2px -2px 0px #1f1510;
+            display: block; width: 100%; background: #423025; color: #c4b3aa; border: 1px solid #5c4537;
+            padding: 10px; margin-top: 8px; text-align: left; cursor: pointer; transition: 0.2s;
         }
-
-        /* Renkli Durum Sınıfları */
-        .btn-green { border-left: 4px solid #00e676; }
+        .btn-green { border-left: 5px solid #00e676; }
         .btn-green:hover { background: #1a2a20; color: #00e676; }
-        
-        .btn-yellow { border-left: 4px solid #ffea00; }
+        .btn-yellow { border-left: 5px solid #ffea00; }
         .btn-yellow:hover { background: #2a2a1a; color: #ffea00; }
-        
-        .btn-red { border-left: 4px solid #ff1744; }
+        .btn-red { border-left: 5px solid #ff1744; }
         .btn-red:hover { background: #2a1a1c; color: #ff1744; }
-
-        /* Diğer CSS bileşenleri aynı kalmıştır... */
-        .header-section { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #4a3528; padding-bottom: 10px; margin-bottom: 20px; }
-        .logo-tag { background: #4a3528; color: #00e676; padding: 4px 10px; font-size: 14px; font-weight: bold; border-left: 4px solid #00e676; }
-        .content-container { display: grid; grid-template-columns: 1fr 220px; gap: 20px; }
-        .main-log { background: #1a110d; border: 1px solid #291b15; padding: 20px; min-height: 390px; }
-        .side-bar { border-left: 1px solid #4a3528; padding-left: 20px; font-size: 11px; color: #a8958b; }
-        .data-row { display: flex; justify-content: space-between; margin: 12px 0; border-bottom: 1px dashed #291b15; padding-bottom: 4px; }
+        
+        .hidden { display: none; }
         .highlight { color: #00e676; }
-        .footer-line { margin-top: 30px; height: 2px; background: linear-gradient(90deg, #00e676, #4a3528); }
     </style>
 </head>
 <body>
 
 <div class="chassis">
-    <div class="header-section">
-        <div class="logo-tag">rayılmazan</div>
-        <div class="tech-dials"><span>[Terminal Aktif]</span></div>
-    </div>
-
-    <div class="content-container">
-        <div class="main-log" id="terminal-screen">
-            <h2 style="color: #00e676;">> Sisteme Giriş Yapıldı</h2>
-            <p>Lütfen bir modül seçerek analizleri başlatın.</p>
+    <div class="content-container" style="display: grid; grid-template-columns: 1fr 220px; gap: 20px;">
+        
+        <div class="main-log">
+            <div id="view-home">
+                <h2 class="highlight">>> Sistem Beklemede</h2>
+                <p>Ana terminal aktif. Bir modül seçin.</p>
+            </div>
+            <div id="view-benchmark" class="hidden">
+                <h2 class="highlight">>> Donanım Analizi</h2>
+                <div id="bench-content">Test başlatılıyor...</div>
+            </div>
+            <div id="view-speedtest" class="hidden">
+                <h2 style="color: #ffea00;">>> Ağ Analizi</h2>
+                <div id="speed-content">Bağlantı test ediliyor...</div>
+            </div>
         </div>
 
         <div class="side-bar">
-            [Mekanik Arabirim]<br>
-            
-            <button class="greeble-btn btn-green" onclick="location.reload()">prm_exec_01 [Ana Ekran]</button>
-            <button class="greeble-btn btn-yellow" onclick="switchToSpeedTest()">İnternet Hızın</button>
-            <button class="greeble-btn btn-green" onclick="switchToBenchmark()">Cihaz Değerlendir</button>
+            <button class="greeble-btn btn-green" onclick="showView('view-home')">prm_exec_01 [Ana Ekran]</button>
+            <button class="greeble-btn btn-yellow" onclick="showView('view-speedtest'); runSpeedTest();">İnternet Hızın</button>
+            <button class="greeble-btn btn-green" onclick="showView('view-benchmark'); runBenchmark();">Cihaz Değerlendir</button>
             <button class="greeble-btn btn-red" onclick="alert('Sistem durduruldu!')">sys_halt_04 [Durdur]</button>
         </div>
     </div>
-    <div class="footer-line"></div>
 </div>
 
 <script>
-    // Örnek basit geçiş: Terminal içeriğini değiştirir
-    function switchToSpeedTest() {
-        document.getElementById('terminal-screen').innerHTML = "<h2 style='color: #ffea00;'>> Ağ Analizi Başlatılıyor...</h2><p>Lütfen üst menüden modül seçimini onaylayın.</p>";
+    // TÜM EKRANLARI GİZLE VE SEÇİLİ OLANI GÖSTER
+    function showView(viewId) {
+        document.getElementById('view-home').classList.add('hidden');
+        document.getElementById('view-benchmark').classList.add('hidden');
+        document.getElementById('view-speedtest').classList.add('hidden');
+        
+        document.getElementById(viewId).classList.remove('hidden');
     }
-    
-    function switchToBenchmark() {
-        document.getElementById('terminal-screen').innerHTML = "<h2 style='color: #00e676;'>> Donanım Matrisi Okunuyor...</h2><p>Puanlama algoritması devreye alınıyor.</p>";
+
+    function runBenchmark() {
+        document.getElementById('bench-content').innerText = "Donanım testi çalışıyor... Lütfen bekleyin.";
+        setTimeout(() => {
+            document.getElementById('bench-content').innerText = "Skor: 8.4/10 [Amiral Gemisi Donanımı]";
+        }, 1500);
+    }
+
+    function runSpeedTest() {
+        document.getElementById('speed-content').innerText = "Ağ paketleri gönderiliyor...";
+        setTimeout(() => {
+            document.getElementById('speed-content').innerText = "İndirme: 350 Mbps // Ping: 12ms";
+        }, 1500);
     }
 </script>
 
