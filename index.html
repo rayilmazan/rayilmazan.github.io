@@ -26,7 +26,7 @@
             box-sizing: border-box;
         }
 
-        /* --- BUTONLARIN GÖRSEL DÜZENLEMESİ --- */
+        /* --- BUTON RENK PALETİ --- */
         .greeble-btn {
             display: block;
             width: 100%;
@@ -35,31 +35,32 @@
             border: 1px solid #5c4537;
             font-family: 'Courier New', Courier, monospace;
             font-size: 11px;
-            padding: 12px;
-            margin-top: 10px;
+            padding: 10px;
+            margin-top: 8px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            box-shadow: inset -2px -2px 0px #1f1510;
         }
 
-        /* Renk Sınıfları */
-        .btn-green { border-left: 6px solid #00e676; }
-        .btn-green:hover { background: #1a2a20; color: #00e676; border-color: #00e676; }
+        /* Renkli Durum Sınıfları */
+        .btn-green { border-left: 4px solid #00e676; }
+        .btn-green:hover { background: #1a2a20; color: #00e676; }
         
-        .btn-yellow { border-left: 6px solid #ffea00; }
-        .btn-yellow:hover { background: #2a2a1a; color: #ffea00; border-color: #ffea00; }
+        .btn-yellow { border-left: 4px solid #ffea00; }
+        .btn-yellow:hover { background: #2a2a1a; color: #ffea00; }
         
-        .btn-red { border-left: 6px solid #ff1744; }
-        .btn-red:hover { background: #2a1a1c; color: #ff1744; border-color: #ff1744; }
+        .btn-red { border-left: 4px solid #ff1744; }
+        .btn-red:hover { background: #2a1a1c; color: #ff1744; }
 
-        /* Mevcut yapıların korunması */
+        /* Diğer CSS bileşenleri aynı kalmıştır... */
         .header-section { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #4a3528; padding-bottom: 10px; margin-bottom: 20px; }
         .logo-tag { background: #4a3528; color: #00e676; padding: 4px 10px; font-size: 14px; font-weight: bold; border-left: 4px solid #00e676; }
         .content-container { display: grid; grid-template-columns: 1fr 220px; gap: 20px; }
         .main-log { background: #1a110d; border: 1px solid #291b15; padding: 20px; min-height: 390px; }
         .side-bar { border-left: 1px solid #4a3528; padding-left: 20px; font-size: 11px; color: #a8958b; }
+        .data-row { display: flex; justify-content: space-between; margin: 12px 0; border-bottom: 1px dashed #291b15; padding-bottom: 4px; }
+        .highlight { color: #00e676; }
         .footer-line { margin-top: 30px; height: 2px; background: linear-gradient(90deg, #00e676, #4a3528); }
     </style>
 </head>
@@ -90,6 +91,7 @@
 </div>
 
 <script>
+    // Örnek basit geçiş: Terminal içeriğini değiştirir
     function switchToSpeedTest() {
         document.getElementById('terminal-screen').innerHTML = "<h2 style='color: #ffea00;'>> Ağ Analizi Başlatılıyor...</h2><p>Lütfen üst menüden modül seçimini onaylayın.</p>";
     }
@@ -101,3 +103,4 @@
 
 </body>
 </html>
+
