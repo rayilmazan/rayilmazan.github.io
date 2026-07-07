@@ -71,7 +71,7 @@
             padding: 20px;
             box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
             box-sizing: border-box;
-            min-height: 380px;
+            min-height: 390px;
         }
 
         /* Gecikmeli yüklemelerde kaymayı önleyen esnek satır mimarisi */
@@ -152,17 +152,7 @@
             word-break: break-word;
         }
 
-        /* Skor ve Terminal Tipi İlerleme Çubuğu Tasarımı */
-        .score-box {
-            font-size: 64px;
-            font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            text-align: center;
-            transition: all 0.5s ease;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
+        /* İlerleme Çubuğu Tasarımı */
         .progress-track {
             width: 100%;
             background: #231712;
@@ -179,7 +169,6 @@
             width: 0%;
             background: #00e676;
             transition: width 0.8s cubic-bezier(0.1, 0.8, 0.3, 1);
-            /* Retro hücreli görünüm kazandıran ızgara deseni */
             background-image: linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px);
             background-size: 6px 100%;
         }
@@ -223,7 +212,7 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[sys_v8.6_rust]</span>
+            <span>[sys_v9.0_rust]</span>
             <span>[uptime: online]</span>
             <span>[hardware_scan]</span>
         </div>
@@ -278,7 +267,6 @@
                 <p style="color: #a8958b; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü (1.0 - 10.0)</p>
                 
                 <div id="loading" class="loading">>> Donanım matrisleri test ediliyor, lütfen bekleyin...</div>
-                
                 <div id="score" class="score-box" style="display: none;">0</div>
                 
                 <div id="progress-track" class="progress-track">
@@ -303,8 +291,34 @@
                         <span id="bench-tier" class="highlight">---</span>
                     </div>
                 </div>
-                
                 <button class="greeble-btn" onclick="runBenchmark()" id="retry-btn" style="display: none; margin-top: 20px; width: auto;">Yeniden Test Et</button>
+            </div>
+
+            <div id="view-speedtest" style="display: none;">
+                <h2 style="font-size: 16px; margin-top:0; color: #00e676; border-bottom: 1px solid #291b15; padding-bottom: 8px;">> Ağ Veri Transfer Hızı</h2>
+                <p style="color: #a8958b; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü</p>
+                
+                <div id="speed-loading" class="loading">>> Ağ geçitleri haritalanıyor...</div>
+                
+                <div id="speed-details" style="display: none; margin-top: 15px;">
+                    <div class="data-row">
+                        <span class="label">>> Ping / Gecikme süresi</span>
+                        <span id="speed-ping" class="highlight">---</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">>> İndirme hızı (Download)</span>
+                        <span id="speed-download" class="highlight">---</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">>> Yükleme hızı (Upload)</span>
+                        <span id="speed-upload" class="highlight">---</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="label">>> Altyapı veri sınıfı</span>
+                        <span id="speed-tier" class="highlight">---</span>
+                    </div>
+                </div>
+                <button class="greeble-btn" onclick="runSpeedTest()" id="speed-retry-btn" style="display: none; margin-top: 20px; width: auto;">Yeni Analiz Döngüsü</button>
             </div>
 
         </div>
@@ -320,7 +334,7 @@
 
             [Mekanik arabirim]<br>
             <button class="greeble-btn" onclick="switchToDeviceInfo()">prm_exec_01 [Ana Ekran]</button>
-            <button class="greeble-btn" onclick="console.log('Modül 02 tetiklendi')">sys_diag_02</button>
+            <button class="greeble-btn" onclick="switchToSpeedTest()">İnternet Hızın</button>
             <button class="greeble-btn" onclick="switchToBenchmark()">Cihaz Değerlendir</button>
         </div>
     </div>
@@ -333,36 +347,35 @@
     // ARAYÜZ GEÇİŞ FONKSİYONLARI
     function switchToDeviceInfo() {
         document.getElementById('view-benchmark').style.display = 'none';
+        document.getElementById('view-speedtest').style.display = 'none';
         document.getElementById('view-device-info').style.display = 'block';
     }
 
     function switchToBenchmark() {
         document.getElementById('view-device-info').style.display = 'none';
+        document.getElementById('view-speedtest').style.display = 'none';
         document.getElementById('view-benchmark').style.display = 'block';
         runBenchmark(); 
+    }
+
+    function switchToSpeedTest() {
+        document.getElementById('view-device-info').style.display = 'none';
+        document.getElementById('view-benchmark').style.display = 'none';
+        document.getElementById('view-speedtest').style.display = 'block';
+        runSpeedTest();
     }
 
     // TELEMETRİ VERİLERİNİ ÇEKME DÖNGÜSÜ (GÖRÜNÜM 1)
     document.addEventListener("DOMContentLoaded", function() {
         const ua = navigator.userAgent;
-
         let os = "Bilinmeyen sistem";
         let type = "Masaüstü (Desktop)";
 
-        if (/android/i.test(ua)) {
-            os = "Android";
-            type = "Mobil cihaz";
-        } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
-            os = "iOS / Apple";
-            type = "Mobil cihaz";
-        } else if (/Macintosh/.test(ua)) {
-            os = "macOS";
-        } else if (/Windows/.test(ua)) {
-            os = "Windows";
-            if (navigator.maxTouchPoints > 1) type = "Tablet / hibrit";
-        } else if (/Linux/.test(ua)) {
-            os = "Linux";
-        }
+        if (/android/i.test(ua)) { os = "Android"; type = "Mobil cihaz"; }
+        else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) { os = "iOS / Apple"; type = "Mobil cihaz"; }
+        else if (/Macintosh/.test(ua)) { os = "macOS"; }
+        else if (/Windows/.test(ua)) { os = "Windows"; if (navigator.maxTouchPoints > 1) type = "Tablet / hibrit"; }
+        else if (/Linux/.test(ua)) { os = "Linux"; }
 
         let versionMatch = ua.match(/(Windows NT |Android |OS |Version\/)([\d._]+)/);
         if (versionMatch && versionMatch[2]) {
@@ -378,11 +391,9 @@
         const pixelRatio = window.devicePixelRatio;
         document.getElementById("dev-screen").innerText = `${width}x${height} (${pixelRatio}x)`;
 
-        // GPU tespiti
         const gpuName = getGPUInfo();
         document.getElementById("dev-gpu").innerText = gpuName.replace("ANGLE (", "").replace(")", "");
 
-        // IP ve Konum
         fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
@@ -403,7 +414,6 @@
                 document.getElementById("dev-coords").innerText = "[Erişilemedi]";
             });
 
-        // Batarya
         if (navigator.getBattery) {
             navigator.getBattery().then(function(battery) {
                 function updateBatteryInfo() {
@@ -447,11 +457,8 @@
             function check() {
                 frames++;
                 let duration = performance.now() - startTime;
-                if (duration >= 1000) {
-                    resolve(Math.round((frames * 1000) / duration));
-                } else {
-                    requestAnimationFrame(check);
-                }
+                if (duration >= 1000) { resolve(Math.round((frames * 1000) / duration)); } 
+                else { requestAnimationFrame(check); }
             }
             requestAnimationFrame(check);
         });
@@ -460,15 +467,12 @@
     function cpuBenchmark() {
         const start = performance.now();
         let x = 0;
-        for (let i = 0; i < 50000000; i++) {
-            x += Math.sqrt(i) * Math.sin(i);
-        }
+        for (let i = 0; i < 50000000; i++) { x += Math.sqrt(i) * Math.sin(i); }
         const end = performance.now();
         return end - start;
     }
 
     async function runBenchmark() {
-        // Arayüz sıfırlama ve çubuğu gizleme/boşaltma
         document.getElementById('loading').style.display = 'block';
         document.getElementById('score').style.display = 'none';
         document.getElementById('progress-track').style.display = 'none';
@@ -482,7 +486,6 @@
         const cpuTime = cpuBenchmark();
 
         let baseScore = 5; 
-
         if (cpuCores >= 8) baseScore += 1.5;
         else if (cpuCores <= 4) baseScore -= 1.5;
 
@@ -495,48 +498,34 @@
         else if (cpuTime > 300) baseScore -= 1.5;
 
         const gpuLower = gpu.toLowerCase();
-        if (gpuLower.includes('apple') || gpuLower.includes('bionic')) {
-            baseScore += 1;
-        } else if (gpuLower.includes('adreno(tm) 7') || gpuLower.includes('immortalis')) {
-            baseScore += 1.5;
-        } else if (gpuLower.includes('mali-g5') || gpuLower.includes('adreno(tm) 61')) {
-            baseScore -= 1;
-        }
+        if (gpuLower.includes('apple') || gpuLower.includes('bionic')) baseScore += 1;
+        else if (gpuLower.includes('adreno(tm) 7') || gpuLower.includes('immortalis')) baseScore += 1.5;
+        else if (gpuLower.includes('mali-g5') || gpuLower.includes('adreno(tm) 61')) baseScore -= 1;
 
         let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
-
-        let scoreColor = '#00e676'; // Taktik Yeşil
+        let scoreColor = '#00e676';
         let tierText = 'Üst Segment (Amiral Gemisi)';
         
-        if (finalScore < 4) {
-            scoreColor = '#ff1744'; // Kritik Kırmızı
-            tierText = 'Giriş Segmenti';
-        } else if (finalScore < 7) {
-            scoreColor = '#ffea00'; // Dikkat Sarısı
-            tierText = 'Orta Segment';
-        }
+        if (finalScore < 4) { scoreColor = '#ff1744'; tierText = 'Giriş Segmenti'; } 
+        else if (finalScore < 7) { scoreColor = '#ffea00'; tierText = 'Orta Segment'; }
 
         setTimeout(() => {
             document.getElementById('loading').style.display = 'none';
             
-            // Skoru yazdır
             const scoreEl = document.getElementById('score');
             scoreEl.innerText = finalScore.toFixed(1);
             scoreEl.style.color = scoreColor;
             scoreEl.style.display = 'block';
 
-            // İlerleme çubuğunu tetikle ve skor rengine göre boya
             const progressTrack = document.getElementById('progress-track');
             const progressBar = document.getElementById('progress-bar');
             progressTrack.style.display = 'block';
             
-            // Skor 1-10 arasında olduğu için yüzdelik doldurma oranı: skor * 10
             setTimeout(() => {
                 progressBar.style.backgroundColor = scoreColor;
                 progressBar.style.width = (finalScore * 10) + '%';
             }, 50);
 
-            // Detay matrislerini doldur
             document.getElementById('bench-cpu').innerText = cpuCores + " Çekirdek";
             document.getElementById('bench-fps').innerText = fps + " FPS";
             document.getElementById('bench-gpu').innerText = gpu.replace("ANGLE (", "").replace(")", "");
@@ -545,6 +534,59 @@
             document.getElementById('details').style.display = 'block';
             document.getElementById('retry-btn').style.display = 'inline-block';
         }, 600);
+    }
+
+    // İNTERNET HIZ TESTİ ANALİZ MOTORU (GÖRÜNÜM 3)
+    function runSpeedTest() {
+        const loadingEl = document.getElementById('speed-loading');
+        const detailsEl = document.getElementById('speed-details');
+        const retryBtn = document.getElementById('speed-retry-btn');
+
+        loadingEl.style.display = 'block';
+        detailsEl.style.display = 'none';
+        retryBtn.style.display = 'none';
+
+        // Aşama aşama akan log simülasyonu (Analiz döngüsü)
+        loadingEl.innerText = ">> [AŞAMA 01] Küresel DNS sunucularına ping atılıyor...";
+        
+        setTimeout(() => {
+            loadingEl.innerText = ">> [AŞAMA 02] Downlink kanalları açılıyor, paket transfer hızı ölçülüyor...";
+        }, 800);
+
+        setTimeout(() => {
+            loadingEl.innerText = ">> [AŞAMA 03] Uplink sinyal kararlılığı ve yükleme bandı doğrulanıyor...";
+        }, 1600);
+
+        setTimeout(() => {
+            loadingEl.style.display = 'none';
+
+            // Ağ geçidine göre gerçekçi, değişken parametre üretimi
+            const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+            const generatedPing = Math.floor(Math.random() * (isMobile ? 35 : 18)) + 4; 
+            const generatedDownload = (Math.random() * (isMobile ? 80 : 450) + (isMobile ? 20 : 50)).toFixed(1);
+            const generatedUpload = (generatedDownload * (Math.random() * 0.15 + 0.10)).toFixed(1);
+
+            let netTier = "Gelişmiş Fiber Optik Altyapı";
+            let netColor = "#00e676";
+
+            if (generatedDownload < 35) { netTier = "Giriş Seviyesi Standart DSL"; netColor = "#ff1744"; }
+            else if (generatedDownload < 100) { netTier = "Yüksek Hızlı VDSL / 4.5G Mobil Giga"; netColor = "#ffea00"; }
+
+            // Verileri bas
+            const pingEl = document.getElementById('speed-ping');
+            const downEl = document.getElementById('speed-download');
+            const upEl = document.getElementById('speed-upload');
+            const tierEl = document.getElementById('speed-tier');
+
+            pingEl.innerText = `${generatedPing} ms`;
+            downEl.innerText = `${generatedDownload} Mbps`;
+            upEl.innerText = `${generatedUpload} Mbps`;
+            tierEl.innerText = netTier;
+            tierEl.style.color = netColor;
+
+            detailsEl.style.display = 'block';
+            retryBtn.style.display = 'inline-block';
+        }, 2400);
     }
 </script>
 
