@@ -152,14 +152,36 @@
             word-break: break-word;
         }
 
-        /* Entegre Edilen Skor Modülü CSS Ayarları */
+        /* Skor ve Terminal Tipi İlerleme Çubuğu Tasarımı */
         .score-box {
             font-size: 64px;
             font-weight: bold;
-            margin: 15px 0;
+            margin-top: 15px;
+            margin-bottom: 5px;
             text-align: center;
             transition: all 0.5s ease;
             text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .progress-track {
+            width: 100%;
+            background: #231712;
+            border: 1px solid #4a3528;
+            height: 16px;
+            margin: 15px 0 25px 0;
+            padding: 2px;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #00e676;
+            transition: width 0.8s cubic-bezier(0.1, 0.8, 0.3, 1);
+            /* Retro hücreli görünüm kazandıran ızgara deseni */
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px);
+            background-size: 6px 100%;
         }
 
         .loading {
@@ -201,7 +223,7 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[sys_v8.5_rust]</span>
+            <span>[sys_v8.6_rust]</span>
             <span>[uptime: online]</span>
             <span>[hardware_scan]</span>
         </div>
@@ -256,7 +278,12 @@
                 <p style="color: #a8958b; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü (1.0 - 10.0)</p>
                 
                 <div id="loading" class="loading">>> Donanım matrisleri test ediliyor, lütfen bekleyin...</div>
+                
                 <div id="score" class="score-box" style="display: none;">0</div>
+                
+                <div id="progress-track" class="progress-track">
+                    <div id="progress-bar" class="progress-fill"></div>
+                </div>
                 
                 <div id="details" style="display: none; margin-top: 15px;">
                     <div class="data-row">
@@ -294,7 +321,7 @@
             [Mekanik arabirim]<br>
             <button class="greeble-btn" onclick="switchToDeviceInfo()">prm_exec_01 [Ana Ekran]</button>
             <button class="greeble-btn" onclick="console.log('Modül 02 tetiklendi')">sys_diag_02</button>
-            <button class="greeble-btn" onclick="switchToBenchmark()">net_fltr_03 [Performans]</button>
+            <button class="greeble-btn" onclick="switchToBenchmark()">Cihaz Değerlendir</button>
         </div>
     </div>
 
@@ -312,7 +339,7 @@
     function switchToBenchmark() {
         document.getElementById('view-device-info').style.display = 'none';
         document.getElementById('view-benchmark').style.display = 'block';
-        runBenchmark(); // Sekme açıldığı gibi testi tetikle
+        runBenchmark(); 
     }
 
     // TELEMETRİ VERİLERİNİ ÇEKME DÖNGÜSÜ (GÖRÜNÜM 1)
@@ -441,8 +468,11 @@
     }
 
     async function runBenchmark() {
+        // Arayüz sıfırlama ve çubuğu gizleme/boşaltma
         document.getElementById('loading').style.display = 'block';
         document.getElementById('score').style.display = 'none';
+        document.getElementById('progress-track').style.display = 'none';
+        document.getElementById('progress-bar').style.width = '0%';
         document.getElementById('details').style.display = 'none';
         document.getElementById('retry-btn').style.display = 'none';
 
@@ -489,11 +519,24 @@
         setTimeout(() => {
             document.getElementById('loading').style.display = 'none';
             
+            // Skoru yazdır
             const scoreEl = document.getElementById('score');
             scoreEl.innerText = finalScore.toFixed(1);
             scoreEl.style.color = scoreColor;
             scoreEl.style.display = 'block';
 
+            // İlerleme çubuğunu tetikle ve skor rengine göre boya
+            const progressTrack = document.getElementById('progress-track');
+            const progressBar = document.getElementById('progress-bar');
+            progressTrack.style.display = 'block';
+            
+            // Skor 1-10 arasında olduğu için yüzdelik doldurma oranı: skor * 10
+            setTimeout(() => {
+                progressBar.style.backgroundColor = scoreColor;
+                progressBar.style.width = (finalScore * 10) + '%';
+            }, 50);
+
+            // Detay matrislerini doldur
             document.getElementById('bench-cpu').innerText = cpuCores + " Çekirdek";
             document.getElementById('bench-fps').innerText = fps + " FPS";
             document.getElementById('bench-gpu').innerText = gpu.replace("ANGLE (", "").replace(")", "");
