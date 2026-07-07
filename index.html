@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan</title>
+    <title>rayılmazan // Terminal</title>
     <style>
         body {
             background: #222327; /* Yıpranmış dış zemin grisi */
@@ -55,7 +55,7 @@
             gap: 10px;
             font-size: 10px;
             color: #6c727c;
-            flex-wrap: wrap; /* Küçük ekranlarda alt satıra geçebilsin */
+            flex-wrap: wrap;
         }
 
         /* Ana Düzen Veri Kabini */
@@ -70,7 +70,12 @@
             border: 1px solid #282a2e;
             padding: 20px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-            word-wrap: break-word; /* Uzun yazılar ekrandan taşmasın */
+            word-wrap: break-word;
+        }
+
+        .main-log p {
+            margin: 8px 0;
+            line-height: 1.6;
         }
 
         .side-bar {
@@ -130,35 +135,17 @@
             background: linear-gradient(90deg, #ff9f1c, #3d4147);
         }
 
-        /* ==========================================================================
-           MOBİL UYUMLULUK KATMANI (RESPONSIVE GRID)
-           ========================================================================== */
+        .highlight {
+            color: #ff9f1c;
+        }
+
+        /* MOBİL UYUMLULUK KATMANI */
         @media (max-width: 768px) {
-            body {
-                padding: 10px; /* Telefon ekranları için dış boşluğu daralt */
-            }
-
-            .chassis {
-                padding: 15px; /* İç boşluğu optimize et */
-            }
-
-            .header-section {
-                flex-direction: column; /* Logo ve sistem bilgileri üst üste gelsin */
-                align-items: flex-start;
-                gap: 8px;
-            }
-
-            .content-container {
-                grid-template-columns: 1fr; /* Sağ paneli ana ekranın altına taşı (Tek sütun) */
-                gap: 15px;
-            }
-
-            .side-bar {
-                border-left: none; /* Sol çizgiyi kaldır */
-                border-top: 1px solid #3d4147; /* Alt panele dönüştüğü için üst çizgi ekle */
-                padding-left: 0;
-                padding-top: 15px;
-            }
+            body { padding: 10px; }
+            .chassis { padding: 15px; }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .content-container { grid-template-columns: 1fr; gap: 15px; }
+            .side-bar { border-left: none; border-top: 1px solid #3d4147; padding-left: 0; padding-top: 15px; }
         }
     </style>
 </head>
@@ -168,26 +155,28 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[SYS_V7.5_RSP]</span>
-            <span>[UPTIME: 04:02]</span>
-            <span>[MOBILE_READY]</span>
+            <span>[SYS_V7.6_DIAG]</span>
+            <span>[UPTIME: ONLINE]</span>
+            <span>[HARDWARE_SCAN]</span>
         </div>
     </div>
 
     <div class="content-container">
         <div class="main-log">
-            <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> KONSOL_GİRİŞİ</h2>
-            <p>Sistem terminali yapılandırıldı.<br>
-            Responsive [MOBİL_UYUM] protokolleri devreye alındı.<br>
-            <br>
-            >> Ekran genişliği dinamik olarak izleniyor.<br>
-            >> Grid mimarisi 768px altında tek sütuna geçecek.<br>
-            >> Arayüz tasarımı tamamlandı. İçerik yüklemesi için bekleniyor...</p>
+            <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> BU CİHAZ HAKKINDA</h2>
+            
+            <p>>> CİHAZ TİPİ........: <span id="dev-type" class="highlight">Tarama Yapılıyor...</span></p>
+            <p>>> İŞLETİM SİSTEMİ...: <span id="dev-os">Tarama Yapılıyor...</span></p>
+            <p>>> EKRAN ÇÖZÜNÜRLÜĞÜ.: <span id="dev-screen">Tarama Yapılıyor...</span></p>
+            <p>>> IP & YAKLAŞIK KONUM: <span id="dev-ip">Sorgulanıyor...</span></p>
+            <p>>> BATARYA DURUMU....: <span id="dev-battery">Okunuyor...</span></p>
+            <p>>> DONANIM KAPASİTESİ.: <span id="dev-hardware">Hesaplanıyor...</span></p>
+            <p>>> HAREKET SENSÖRÜ...: <span id="dev-sensors">Test Ediliyor...</span></p>
         </div>
 
         <div class="side-bar">
             [DURUM]<br>
-            - AKTİF // RESPONSIVE<br><br>
+            - TELEMETRİ AKTİF<br><br>
             
             [DİZİN]<br>
             - /ROOT/LOGS<br>
@@ -202,8 +191,93 @@
     </div>
 
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">ID_REF: 0X4492-A // RESPONSIVE_GREY // RAYILMAZAN_TERMINAL</div>
+    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">ID_REF: 0X4492-A // LIVE_DIAGNOSTICS // RAYILMAZAN_TERMINAL</div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ua = navigator.userAgent;
+
+        // 1. Cihaz Tipi ve İşletim Sistemi Tespiti
+        let os = "Bilinmeyen Sistem";
+        let type = "Masaüstü (Desktop)";
+
+        if (/android/i.test(ua)) {
+            os = "Android";
+            type = "Mobil Cihaz";
+        } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+            os = "iOS / Apple";
+            type = "Mobil Cihaz";
+        } else if (/Macintosh/.test(ua)) {
+            os = "macOS";
+        } else if (/Windows/.test(ua)) {
+            os = "Windows";
+            // Windows dokunmatik cihaz kontrolü
+            if (navigator.maxTouchPoints > 1) type = "Tablet / Hibrit";
+        } else if (/Linux/.test(ua)) {
+            os = "Linux";
+        }
+
+        // Sürüm numarasını yakalamaya çalışalım
+        let versionMatch = ua.match(/(Windows NT |Android |OS |Version\/)([\d._]+)/);
+        if (versionMatch && versionMatch[2]) {
+            let ver = versionMatch[2].replace(/_/g, '.');
+            os += ` [v${ver}]`;
+        }
+
+        document.getElementById("dev-type").innerText = type;
+        document.getElementById("dev-os").innerText = os;
+
+        // 2. Ekran Çözünürlüğü ve Boyutu
+        const width = window.screen.width;
+        const height = window.screen.height;
+        const pixelRatio = window.devicePixelRatio;
+        document.getElementById("dev-screen").innerText = `${width}x${height} (Piksel Oranı: ${pixelRatio}x)`;
+
+        // 3. IP Adresi ve Konum (Ücretsiz Güvenli API)
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                if(data.ip) {
+                    document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'Bilinmiyor'}, ${data.country_name || 'Bilinmiyor'}`;
+                } else {
+                    document.getElementById("dev-ip").innerText = "[KORUMALI / ERİŞİLEMEDİ]";
+                }
+            })
+            .catch(() => {
+                document.getElementById("dev-ip").innerText = "[AĞ KISITLAMASI / AD-BLOCKER]";
+            });
+
+        // 4. Batarya Durumu
+        if (navigator.getBattery) {
+            navigator.getBattery().then(function(battery) {
+                function updateBatteryInfo() {
+                    const level = Math.round(battery.level * 100);
+                    const charging = battery.charging ? "Şarj Ediliyor" : "Güç Kaynağına Bağlı Değil";
+                    document.getElementById("dev-battery").innerText = `%${level} [${charging}]`;
+                }
+                updateBatteryInfo();
+                battery.addEventListener('levelchange', updateBatteryInfo);
+                battery.addEventListener('chargingchange', updateBatteryInfo);
+            });
+        } else {
+            document.getElementById("dev-battery").innerText = "[TARAYICI DESTEKLEMİYOR]";
+        }
+
+        // 5. Donanım Kapasitesi (Özet)
+        const cores = navigator.hardwareConcurrency || "Bilinmiyor";
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Bilinmiyor (Gizlilik Kısıtlaması)";
+        document.getElementById("dev-hardware").innerText = `CPU: ${cores} Çekirdek // Tahmini RAM: ${ram}`;
+
+        // 6. Hareket Sensörleri (Jiroskop ve İvmeölçer)
+        if ('DeviceOrientationEvent' in window || 'DeviceMotionEvent' in window) {
+            // Modern tarayıcılarda var mı kontrolü
+            document.getElementById("dev-sensors").innerText = "Mevcut [Donanım Hazır]";
+        } else {
+            document.getElementById("dev-sensors").innerText = "[DONANIM YOK VEYA KISITLI]";
+        }
+    });
+</script>
 
 </body>
 </html>
