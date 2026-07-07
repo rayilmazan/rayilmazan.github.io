@@ -3,32 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan // Terminal</title>
+    <title>rayılmazan</title>
     <style>
         body {
-            background: #222327; /* Yıpranmış, mat endüstriyel dış zemin grisi */
-            color: #caccce; /* Hafif kirli açık gri metin */
+            background: #222327; /* Yıpranmış dış zemin grisi */
+            color: #caccce; 
             font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             display: flex;
             justify-content: center;
+            margin: 0;
         }
 
         .chassis {
             max-width: 900px;
             width: 100%;
             background: #2e3035; /* Mekanik Panel Grisi */
-            border: 2px solid #464a51; /* Kalın metal birleşim çizgisi */
+            border: 2px solid #464a51; 
             padding: 30px;
             position: relative;
-            /* Yıpranmış metalik doku hissi veren ince ızgara */
             background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
                               linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
             background-size: 20px 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+            box-sizing: border-box;
         }
 
-        /* Başlık Kısmı - Mekanik Panel */
+        /* Başlık Kısmı */
         .header-section {
             display: flex;
             align-items: center;
@@ -40,22 +41,24 @@
 
         .logo-tag {
             background: #3d4147;
-            color: #ff9f1c; /* Endüstriyel Uyarı Turuncusu */
+            color: #ff9f1c; /* Endüstriyel Turuncu */
             padding: 4px 10px;
             font-size: 14px;
             font-weight: bold;
             letter-spacing: 2px;
             border-left: 4px solid #ff9f1c;
+            white-space: nowrap;
         }
 
-        /* Greeble Detayları */
         .tech-dials {
             display: flex;
             gap: 10px;
             font-size: 10px;
             color: #6c727c;
+            flex-wrap: wrap; /* Küçük ekranlarda alt satıra geçebilsin */
         }
 
+        /* Ana Düzen Veri Kabini */
         .content-container {
             display: grid;
             grid-template-columns: 1fr 220px;
@@ -63,10 +66,11 @@
         }
 
         .main-log {
-            background: #181a1d; /* İç konsol ekranı - Koyu Karbon Gri */
+            background: #181a1d; /* İç konsol ekranı */
             border: 1px solid #282a2e;
             padding: 20px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+            word-wrap: break-word; /* Uzun yazılar ekrandan taşmasın */
         }
 
         .side-bar {
@@ -80,7 +84,7 @@
         .greeble-btn {
             display: block;
             width: 100%;
-            background: #383b41; /* Buton gövde grisi */
+            background: #383b41; 
             color: #aeb4be;
             border: 1px solid #525760;
             font-family: 'Courier New', Courier, monospace;
@@ -92,8 +96,8 @@
             transition: all 0.1s ease;
             text-transform: uppercase;
             position: relative;
-            /* Mekanik derinlik hissi */
             box-shadow: inset -2px -2px 0px #1c1d20, inset 1px 1px 0px #6c727c;
+            box-sizing: border-box;
         }
 
         .greeble-btn:hover {
@@ -109,7 +113,6 @@
             padding-top: 9px;
         }
 
-        /* Yapay LED Gösterge */
         .greeble-btn::before {
             content: "■ ";
             color: #525760;
@@ -126,6 +129,37 @@
             height: 2px;
             background: linear-gradient(90deg, #ff9f1c, #3d4147);
         }
+
+        /* ==========================================================================
+           MOBİL UYUMLULUK KATMANI (RESPONSIVE GRID)
+           ========================================================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px; /* Telefon ekranları için dış boşluğu daralt */
+            }
+
+            .chassis {
+                padding: 15px; /* İç boşluğu optimize et */
+            }
+
+            .header-section {
+                flex-direction: column; /* Logo ve sistem bilgileri üst üste gelsin */
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .content-container {
+                grid-template-columns: 1fr; /* Sağ paneli ana ekranın altına taşı (Tek sütun) */
+                gap: 15px;
+            }
+
+            .side-bar {
+                border-left: none; /* Sol çizgiyi kaldır */
+                border-top: 1px solid #3d4147; /* Alt panele dönüştüğü için üst çizgi ekle */
+                padding-left: 0;
+                padding-top: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -134,9 +168,9 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[SYS_V7.4_GRY]</span>
-            <span>[UPTIME: 03:10]</span>
-            <span>[SECURE_LINK]</span>
+            <span>[SYS_V7.5_RSP]</span>
+            <span>[UPTIME: 04:02]</span>
+            <span>[MOBILE_READY]</span>
         </div>
     </div>
 
@@ -144,16 +178,16 @@
         <div class="main-log">
             <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> KONSOL_GİRİŞİ</h2>
             <p>Sistem terminali yapılandırıldı.<br>
-            Zemin ve Şasi: [USED_FUTURE_GRİSİ] optimizasyonu tamamlandı.<br>
+            Responsive [MOBİL_UYUM] protokolleri devreye alındı.<br>
             <br>
-            >> Katmanlı gri palet aktif edildi.<br>
-            >> Sağ panel kontrol butonları entegre edildi.<br>
-            >> Yeni web sitesi tasarım yönergeleri veya linkleri bekleniyor...</p>
+            >> Ekran genişliği dinamik olarak izleniyor.<br>
+            >> Grid mimarisi 768px altında tek sütuna geçecek.<br>
+            >> Arayüz tasarımı tamamlandı. İçerik yüklemesi için bekleniyor...</p>
         </div>
 
         <div class="side-bar">
             [DURUM]<br>
-            - AKTİF // GREY_MODE<br><br>
+            - AKTİF // RESPONSIVE<br><br>
             
             [DİZİN]<br>
             - /ROOT/LOGS<br>
@@ -161,7 +195,6 @@
             - /ROOT/DEBRIS<br><br>
 
             [MEKANİK_ARABİRİM]<br>
-            <!-- Sağ Taraftaki 3 Adet Greeble Butonu -->
             <button class="greeble-btn" onclick="console.log('Modül 01 tetiklendi')">PRM_EXEC_01</button>
             <button class="greeble-btn" onclick="console.log('Modül 02 tetiklendi')">SYS_DIAG_02</button>
             <button class="greeble-btn" onclick="console.log('Modül 03 tetiklendi')">NET_FLTR_03</button>
@@ -169,7 +202,7 @@
     </div>
 
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">ID_REF: 0X4492-A // FULL_GREY_EDITION // RAYILMAZAN_TERMINAL</div>
+    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">ID_REF: 0X4492-A // RESPONSIVE_GREY // RAYILMAZAN_TERMINAL</div>
 </div>
 
 </body>
