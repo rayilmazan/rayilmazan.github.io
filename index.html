@@ -41,7 +41,7 @@
 
         .logo-tag {
             background: #3d4147;
-            color: #ff9f1c; /* Endüstriyel Turuncu */
+            color: #ff9f1c; 
             padding: 4px 10px;
             font-size: 14px;
             font-weight: bold;
@@ -99,10 +99,10 @@
             text-align: left;
             cursor: pointer;
             transition: all 0.1s ease;
-            text-transform: uppercase;
             position: relative;
             box-shadow: inset -2px -2px 0px #1c1d20, inset 1px 1px 0px #6c727c;
             box-sizing: border-box;
+            /* text-transform: uppercase; silindi - büyük harf zorlaması kalktı */
         }
 
         .greeble-btn:hover {
@@ -135,6 +135,7 @@
             background: linear-gradient(90deg, #ff9f1c, #3d4147);
         }
 
+        /* İki noktadan sonraki bilgileri turuncu yapan sınıf */
         .highlight {
             color: #ff9f1c;
         }
@@ -155,43 +156,43 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[SYS_V7.6_DIAG]</span>
-            <span>[UPTIME: ONLINE]</span>
-            <span>[HARDWARE_SCAN]</span>
+            <span>[sys_v7.7_diag]</span>
+            <span>[uptime: online]</span>
+            <span>[hardware_scan]</span>
         </div>
     </div>
 
     <div class="content-container">
         <div class="main-log">
-            <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> BU CİHAZ HAKKINDA</h2>
+            <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> Bu Cihaz Hakkında</h2>
             
-            <p>>> CİHAZ TİPİ........: <span id="dev-type" class="highlight">Tarama Yapılıyor...</span></p>
-            <p>>> İŞLETİM SİSTEMİ...: <span id="dev-os">Tarama Yapılıyor...</span></p>
-            <p>>> EKRAN ÇÖZÜNÜRLÜĞÜ.: <span id="dev-screen">Tarama Yapılıyor...</span></p>
-            <p>>> IP & YAKLAŞIK KONUM: <span id="dev-ip">Sorgulanıyor...</span></p>
-            <p>>> BATARYA DURUMU....: <span id="dev-battery">Okunuyor...</span></p>
-            <p>>> DONANIM KAPASİTESİ.: <span id="dev-hardware">Hesaplanıyor...</span></p>
-            <p>>> HAREKET SENSÖRÜ...: <span id="dev-sensors">Test Ediliyor...</span></p>
+            <p>>> Cihaz tipi........: <span id="dev-type" class="highlight">Tarama yapılıyor...</span></p>
+            <p>>> İşletim sistemi...: <span id="dev-os" class="highlight">Tarama yapılıyor...</span></p>
+            <p>>> Ekran çözünürlüğü.: <span id="dev-screen" class="highlight">Tarama yapılıyor...</span></p>
+            <p>>> Ip & yaklaşık konum: <span id="dev-ip" class="highlight">Sorgulanıyor...</span></p>
+            <p>>> Batarya durumu....: <span id="dev-battery" class="highlight">Okunuyor...</span></p>
+            <p>>> Donanım kapasitesi.: <span id="dev-hardware" class="highlight">Hesaplanıyor...</span></p>
+            <p>>> Hareket sensörü...: <span id="dev-sensors" class="highlight">Test ediliyor...</span></p>
         </div>
 
         <div class="side-bar">
-            [DURUM]<br>
-            - TELEMETRİ AKTİF<br><br>
+            [Durum]<br>
+            - telemetri aktif<br><br>
             
-            [DİZİN]<br>
-            - /ROOT/LOGS<br>
-            - /ROOT/SCRIPTS<br>
-            - /ROOT/DEBRIS<br><br>
+            [Dizin]<br>
+            - /root/logs<br>
+            - /root/scripts<br>
+            - /root/debris<br><br>
 
-            [MEKANİK_ARABİRİM]<br>
-            <button class="greeble-btn" onclick="console.log('Modül 01 tetiklendi')">PRM_EXEC_01</button>
-            <button class="greeble-btn" onclick="console.log('Modül 02 tetiklendi')">SYS_DIAG_02</button>
-            <button class="greeble-btn" onclick="console.log('Modül 03 tetiklendi')">NET_FLTR_03</button>
+            [Mekanik arabirim]<br>
+            <button class="greeble-btn" onclick="console.log('Modül 01 tetiklendi')">prm_exec_01</button>
+            <button class="greeble-btn" onclick="console.log('Modül 02 tetiklendi')">sys_diag_02</button>
+            <button class="greeble-btn" onclick="console.log('Modül 03 tetiklendi')">net_fltr_03</button>
         </div>
     </div>
 
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">ID_REF: 0X4492-A // LIVE_DIAGNOSTICS // RAYILMAZAN_TERMINAL</div>
+    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">id_ref: 0x4492-a // live_diagnostics // rayilmazan_terminal</div>
 </div>
 
 <script>
@@ -199,26 +200,24 @@
         const ua = navigator.userAgent;
 
         // 1. Cihaz Tipi ve İşletim Sistemi Tespiti
-        let os = "Bilinmeyen Sistem";
+        let os = "Bilinmeyen sistem";
         let type = "Masaüstü (Desktop)";
 
         if (/android/i.test(ua)) {
             os = "Android";
-            type = "Mobil Cihaz";
+            type = "Mobil cihaz";
         } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
             os = "iOS / Apple";
-            type = "Mobil Cihaz";
+            type = "Mobil cihaz";
         } else if (/Macintosh/.test(ua)) {
             os = "macOS";
         } else if (/Windows/.test(ua)) {
             os = "Windows";
-            // Windows dokunmatik cihaz kontrolü
-            if (navigator.maxTouchPoints > 1) type = "Tablet / Hibrit";
+            if (navigator.maxTouchPoints > 1) type = "Tablet / hibrit";
         } else if (/Linux/.test(ua)) {
             os = "Linux";
         }
 
-        // Sürüm numarasını yakalamaya çalışalım
         let versionMatch = ua.match(/(Windows NT |Android |OS |Version\/)([\d._]+)/);
         if (versionMatch && versionMatch[2]) {
             let ver = versionMatch[2].replace(/_/g, '.');
@@ -228,24 +227,24 @@
         document.getElementById("dev-type").innerText = type;
         document.getElementById("dev-os").innerText = os;
 
-        // 2. Ekran Çözünürlüğü ve Boyutu
+        // 2. Ekran Çözünürlüğü
         const width = window.screen.width;
         const height = window.screen.height;
         const pixelRatio = window.devicePixelRatio;
-        document.getElementById("dev-screen").innerText = `${width}x${height} (Piksel Oranı: ${pixelRatio}x)`;
+        document.getElementById("dev-screen").innerText = `${width}x${height} (Piksel oranı: ${pixelRatio}x)`;
 
-        // 3. IP Adresi ve Konum (Ücretsiz Güvenli API)
+        // 3. IP Adresi ve Konum
         fetch('https://ipapi.co/json/')
             .then(response => response.json())
             .then(data => {
                 if(data.ip) {
                     document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'Bilinmiyor'}, ${data.country_name || 'Bilinmiyor'}`;
                 } else {
-                    document.getElementById("dev-ip").innerText = "[KORUMALI / ERİŞİLEMEDİ]";
+                    document.getElementById("dev-ip").innerText = "[Korumalı / erişilemedi]";
                 }
             })
             .catch(() => {
-                document.getElementById("dev-ip").innerText = "[AĞ KISITLAMASI / AD-BLOCKER]";
+                document.getElementById("dev-ip").innerText = "[Ağ kısıtlaması / ad-blocker]";
             });
 
         // 4. Batarya Durumu
@@ -253,7 +252,7 @@
             navigator.getBattery().then(function(battery) {
                 function updateBatteryInfo() {
                     const level = Math.round(battery.level * 100);
-                    const charging = battery.charging ? "Şarj Ediliyor" : "Güç Kaynağına Bağlı Değil";
+                    const charging = battery.charging ? "Şarj ediliyor" : "Güç kaynağına bağlı değil";
                     document.getElementById("dev-battery").innerText = `%${level} [${charging}]`;
                 }
                 updateBatteryInfo();
@@ -261,20 +260,19 @@
                 battery.addEventListener('chargingchange', updateBatteryInfo);
             });
         } else {
-            document.getElementById("dev-battery").innerText = "[TARAYICI DESTEKLEMİYOR]";
+            document.getElementById("dev-battery").innerText = "[Tarayıcı desteklemiyor]";
         }
 
-        // 5. Donanım Kapasitesi (Özet)
+        // 5. Donanım Kapasitesi
         const cores = navigator.hardwareConcurrency || "Bilinmiyor";
-        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Bilinmiyor (Gizlilik Kısıtlaması)";
-        document.getElementById("dev-hardware").innerText = `CPU: ${cores} Çekirdek // Tahmini RAM: ${ram}`;
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Bilinmiyor (Gizlilik kısıtlaması)";
+        document.getElementById("dev-hardware").innerText = `Cpu: ${cores} çekirdek // Tahmini ram: ${ram}`;
 
-        // 6. Hareket Sensörleri (Jiroskop ve İvmeölçer)
+        // 6. Hareket Sensörleri
         if ('DeviceOrientationEvent' in window || 'DeviceMotionEvent' in window) {
-            // Modern tarayıcılarda var mı kontrolü
-            document.getElementById("dev-sensors").innerText = "Mevcut [Donanım Hazır]";
+            document.getElementById("dev-sensors").innerText = "Mevcut [Donanım hazır]";
         } else {
-            document.getElementById("dev-sensors").innerText = "[DONANIM YOK VEYA KISITLI]";
+            document.getElementById("dev-sensors").innerText = "[Donanım yok veya kısıtlı]";
         }
     });
 </script>
