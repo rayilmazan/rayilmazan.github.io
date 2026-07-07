@@ -6,8 +6,8 @@
     <title>rayılmazan</title>
     <style>
         body {
-            background: #222327; /* Yıpranmış dış zemin grisi */
-            color: #caccce; 
+            background: #4e3629; /* Oksitlenmiş, paslı endüstriyel kahverengi dış zemin */
+            color: #e0d7d3; /* Pas tonlarıyla uyumlu sıcak mat gri */
             font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             display: flex;
@@ -18,14 +18,15 @@
         .chassis {
             max-width: 900px;
             width: 100%;
-            background: #2e3035; /* Mekanik Panel Grisi */
-            border: 2px solid #464a51; 
+            background: #33241b; /* Daha koyu, yıpranmış metal panel kahvesi */
+            border: 2px solid #5a4234; /* Metal birleşim yerleri */
             padding: 30px;
             position: relative;
-            background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            /* Pas dokusunu destekleyen hafif mikro ızgara */
+            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
             background-size: 20px 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.5);
             box-sizing: border-box;
         }
 
@@ -34,13 +35,13 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            border-bottom: 2px solid #3d4147;
+            border-bottom: 2px solid #4a3528;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
         .logo-tag {
-            background: #3d4147;
+            background: #4a3528;
             color: #00e676; /* Taktik Terminal Yeşili */
             padding: 4px 10px;
             font-size: 14px;
@@ -54,7 +55,7 @@
             display: flex;
             gap: 10px;
             font-size: 10px;
-            color: #6c727c;
+            color: #8c7365;
             flex-wrap: wrap;
         }
 
@@ -66,32 +67,43 @@
         }
 
         .main-log {
-            background: #181a1d; /* İç konsol ekranı */
-            border: 1px solid #282a2e;
+            background: #1a110d; /* İç konsol ekranı - Yanık koyu amber/kahve zemin */
+            border: 1px solid #291b15;
             padding: 20px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-            word-wrap: break-word;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
+            box-sizing: border-box;
         }
 
-        .main-log p {
-            margin: 8px 0;
-            line-height: 1.6;
+        /* Gecikmeli yüklemelerde kaymayı önleyen yeni esnek satır mimarisi */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 15px;
+            margin: 12px 0;
+            border-bottom: 1px dashed #291b15;
+            padding-bottom: 4px;
+        }
+
+        .data-row .label {
+            color: #a8958b;
+            white-space: nowrap;
         }
 
         .side-bar {
-            border-left: 1px solid #3d4147;
+            border-left: 1px solid #4a3528;
             padding-left: 20px;
             font-size: 11px;
-            color: #888e96;
+            color: #a8958b;
         }
 
-        /* Greeble Tarzı Mekanik Butonlar */
+        /* Mekanik Butonlar */
         .greeble-btn {
             display: block;
             width: 100%;
-            background: #383b41; 
-            color: #aeb4be;
-            border: 1px solid #525760;
+            background: #423025; 
+            color: #c4b3aa;
+            border: 1px solid #5c4537;
             font-family: 'Courier New', Courier, monospace;
             font-size: 11px;
             padding: 8px 10px;
@@ -100,52 +112,63 @@
             cursor: pointer;
             transition: all 0.1s ease;
             position: relative;
-            box-shadow: inset -2px -2px 0px #1c1d20, inset 1px 1px 0px #6c727c;
+            box-shadow: inset -2px -2px 0px #1f1510, inset 1px 1px 0px #6e5444;
             box-sizing: border-box;
         }
 
         .greeble-btn:hover {
-            background: #41454c;
+            background: #4d382b;
             color: #00e676;
             border-color: #00e676;
-            box-shadow: inset -1px -1px 0px #1c1d20, 0 0 8px rgba(0, 230, 118, 0.2);
+            box-shadow: inset -1px -1px 0px #1f1510, 0 0 8px rgba(0, 230, 118, 0.2);
         }
 
         .greeble-btn:active {
-            box-shadow: inset 2px 2px 0px #1c1d20;
+            box-shadow: inset 2px 2px 0px #1f1510;
             padding-left: 11px;
             padding-top: 9px;
         }
 
         .greeble-btn::before {
             content: "■ ";
-            color: #525760;
+            color: #5c4537;
             font-size: 9px;
             transition: color 0.1s ease;
         }
 
         .greeble-btn:hover::before {
-            color: #00e676; /* Yeşil LED efekti */
+            color: #00e676;
         }
 
         .footer-line {
             margin-top: 30px;
             height: 2px;
-            background: linear-gradient(90deg, #00e676, #3d4147);
+            background: linear-gradient(90deg, #00e676, #4a3528);
         }
 
-        /* İki noktadan sonraki bilgileri yeşil yapan sınıf */
         .highlight {
             color: #00e676;
+            text-align: right;
+            word-break: break-word; /* Mobilde taşmayı önler */
         }
 
-        /* MOBİL UYUMLULUK KATMANI (RESPONSIVE GRID) */
+        /* MOBİL UYUMLULUK VE KAYMA ÖNLEME KATMANI */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .chassis { padding: 15px; }
             .header-section { flex-direction: column; align-items: flex-start; gap: 8px; }
             .content-container { grid-template-columns: 1fr; gap: 15px; }
-            .side-bar { border-left: none; border-top: 1px solid #3d4147; padding-left: 0; padding-top: 15px; }
+            .side-bar { border-left: none; border-top: 1px solid #4a3528; padding-left: 0; padding-top: 15px; }
+            
+            /* Mobilde veriler alt alta gelsin ki API'den uzun yazı gelince ekran sağa sola fırlamasın */
+            .data-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            .highlight {
+                text-align: left;
+            }
         }
     </style>
 </head>
@@ -155,7 +178,7 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[sys_v7.8_grn]</span>
+            <span>[sys_v7.9_rust]</span>
             <span>[uptime: online]</span>
             <span>[hardware_scan]</span>
         </div>
@@ -163,15 +186,36 @@
 
     <div class="content-container">
         <div class="main-log">
-            <h2 style="font-size: 16px; margin-top:0; color: #00e676;">> Bu Cihaz Hakkında</h2>
+            <h2 style="font-size: 16px; margin-top:0; color: #00e676; border-bottom: 1px solid #291b15; padding-bottom: 8px;">> Bu Cihaz Hakkında</h2>
             
-            <p>>> Cihaz tipi........: <span id="dev-type" class="highlight">Tarama yapılıyor...</span></p>
-            <p>>> İşletim sistemi...: <span id="dev-os" class="highlight">Tarama yapılıyor...</span></p>
-            <p>>> Ekran çözünürlüğü.: <span id="dev-screen" class="highlight">Tarama yapılıyor...</span></p>
-            <p>>> Ip & yaklaşık konum: <span id="dev-ip" class="highlight">Sorgulanıyor...</span></p>
-            <p>>> Batarya durumu....: <span id="dev-battery" class="highlight">Okunuyor...</span></p>
-            <p>>> Donanım kapasitesi.: <span id="dev-hardware" class="highlight">Hesaplanıyor...</span></p>
-            <p>>> Hareket sensörü...: <span id="dev-sensors" class="highlight">Test ediliyor...</span></p>
+            <div class="data-row">
+                <span class="label">>> Cihaz tipi</span>
+                <span id="dev-type" class="highlight">Tarama yapılıyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> İşletim sistemi</span>
+                <span id="dev-os" class="highlight">Tarama yapılıyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> Ekran çözünürlüğü</span>
+                <span id="dev-screen" class="highlight">Tarama yapılıyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> Ip & yaklaşık konum</span>
+                <span id="dev-ip" class="highlight">Sorgulanıyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> Batarya durumu</span>
+                <span id="dev-battery" class="highlight">Okunuyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> Donanım kapasitesi</span>
+                <span id="dev-hardware" class="highlight">Hesaplanıyor...</span>
+            </div>
+            <div class="data-row">
+                <span class="label">>> Hareket sensörü</span>
+                <span id="dev-sensors" class="highlight">Test ediliyor...</span>
+            </div>
         </div>
 
         <div class="side-bar">
@@ -191,7 +235,7 @@
     </div>
 
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #6c727c;">id_ref: 0x4492-a // green_diagnostics // rayilmazan_terminal</div>
+    <div style="font-size: 9px; margin-top: 5px; color: #8c7365;">id_ref: 0x4492-a // rust_diagnostics // rayilmazan_terminal</div>
 </div>
 
 <script>
