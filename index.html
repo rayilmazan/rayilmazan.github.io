@@ -97,13 +97,13 @@
             color: #a8958b;
         }
 
-        /* Mekanik Butonlar - Used Future Stil */
+        /* Mekanik Butonlar (Used Future - Endüstriyel Turuncu/Krem) */
         .greeble-btn {
             display: block;
             width: 100%;
-            background: #5c3b24; /* Mat yanık turuncu/kahve */
-            color: #d1c4bc;
-            border: 1px solid #7d5438;
+            background: #8b5a2b; /* Soluk endüstriyel turuncu */
+            color: #f4e9d3;      /* Eskimiş kağıt/krem rengi */
+            border: 1px solid #5c4537;
             font-family: 'Courier New', Courier, monospace;
             font-size: 11px;
             padding: 8px 10px;
@@ -112,26 +112,25 @@
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
-            box-shadow: inset -2px -2px 0px #3d2719, inset 1px 1px 0px #8f674d;
+            box-shadow: inset -2px -2px 0px #4d3319, inset 1px 1px 0px #a67c52;
             box-sizing: border-box;
         }
 
         .greeble-btn:hover {
-            background: #cc6600; /* Uyarı turuncusu */
+            background: #a67c52; /* Daha parlak bir endüstriyel ton */
             color: #ffffff;
-            border-color: #ff9933;
-            box-shadow: inset -1px -1px 0px #3d2719, 0 0 10px rgba(204, 102, 0, 0.4);
+            border-color: #f4e9d3;
         }
 
         .greeble-btn:active {
-            box-shadow: inset 2px 2px 0px #3d2719;
+            box-shadow: inset 2px 2px 0px #4d3319;
             padding-left: 11px;
             padding-top: 9px;
         }
 
         .greeble-btn::before {
-            content: "▲ ";
-            color: #a8958b;
+            content: "■ ";
+            color: #d1b28d;
             font-size: 9px;
             transition: color 0.1s ease;
         }
@@ -365,7 +364,7 @@
         runSpeedTest();
     }
 
-    // TELEMETRİ VERİLERİNİ ÇEKME DÖNGÜSÜ (GÖRÜNÜM 1)
+    // TELEMETRİ VERİLERİNİ ÇEKME DÖNGÜSÜ
     document.addEventListener("DOMContentLoaded", function() {
         const ua = navigator.userAgent;
         let os = "Bilinmeyen sistem";
@@ -440,7 +439,7 @@
         }
     });
 
-    // GELİŞMİŞ DONANIM VE BENCHMARK MOTORU (GÖRÜNÜM 2)
+    // GELİŞMİŞ DONANIM VE BENCHMARK MOTORU
     function getGPUInfo() {
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -536,7 +535,7 @@
         }, 600);
     }
 
-    // İNTERNET HIZ TESTİ ANALİZ MOTORU (GÖRÜNÜM 3)
+    // İNTERNET HIZ TESTİ ANALİZ MOTORU
     function runSpeedTest() {
         const loadingEl = document.getElementById('speed-loading');
         const detailsEl = document.getElementById('speed-details');
@@ -546,7 +545,6 @@
         detailsEl.style.display = 'none';
         retryBtn.style.display = 'none';
 
-        // Aşama aşama akan log simülasyonu (Analiz döngüsü)
         loadingEl.innerText = ">> [AŞAMA 01] Küresel DNS sunucularına ping atılıyor...";
         
         setTimeout(() => {
@@ -560,7 +558,6 @@
         setTimeout(() => {
             loadingEl.style.display = 'none';
 
-            // Ağ geçidine göre gerçekçi, değişken parametre üretimi
             const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
             const generatedPing = Math.floor(Math.random() * (isMobile ? 35 : 18)) + 4; 
             const generatedDownload = (Math.random() * (isMobile ? 80 : 450) + (isMobile ? 20 : 50)).toFixed(1);
@@ -572,7 +569,6 @@
             if (generatedDownload < 35) { netTier = "Giriş Seviyesi Standart DSL"; netColor = "#ff1744"; }
             else if (generatedDownload < 100) { netTier = "Yüksek Hızlı VDSL / 4.5G Mobil Giga"; netColor = "#ffea00"; }
 
-            // Verileri bas
             const pingEl = document.getElementById('speed-ping');
             const downEl = document.getElementById('speed-download');
             const upEl = document.getElementById('speed-upload');
