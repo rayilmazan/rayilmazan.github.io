@@ -97,47 +97,47 @@
             color: #a8958b;
         }
 
-        /* Mekanik Butonlar (Güncellendi) */
+        /* Mekanik Butonlar - Used Future Stil */
         .greeble-btn {
             display: block;
             width: 100%;
-            background: #2a3a4a; 
-            color: #b0c4de;
-            border: 1px solid #4682b4;
+            background: #5c3b24; /* Mat yanık turuncu/kahve */
+            color: #d1c4bc;
+            border: 1px solid #7d5438;
             font-family: 'Courier New', Courier, monospace;
             font-size: 11px;
             padding: 8px 10px;
             margin-top: 8px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.1s ease;
+            transition: all 0.2s ease;
             position: relative;
-            box-shadow: inset -2px -2px 0px #1a242e, inset 1px 1px 0px #5f9ea0;
+            box-shadow: inset -2px -2px 0px #3d2719, inset 1px 1px 0px #8f674d;
             box-sizing: border-box;
         }
 
         .greeble-btn:hover {
-            background: #364f6b;
-            color: #00d4ff;
-            border-color: #00d4ff;
-            box-shadow: inset -1px -1px 0px #1a242e, 0 0 8px rgba(0, 212, 255, 0.2);
+            background: #cc6600; /* Uyarı turuncusu */
+            color: #ffffff;
+            border-color: #ff9933;
+            box-shadow: inset -1px -1px 0px #3d2719, 0 0 10px rgba(204, 102, 0, 0.4);
         }
 
         .greeble-btn:active {
-            box-shadow: inset 2px 2px 0px #1a242e;
+            box-shadow: inset 2px 2px 0px #3d2719;
             padding-left: 11px;
             padding-top: 9px;
         }
 
         .greeble-btn::before {
-            content: "■ ";
-            color: #4682b4;
+            content: "▲ ";
+            color: #a8958b;
             font-size: 9px;
             transition: color 0.1s ease;
         }
 
         .greeble-btn:hover::before {
-            color: #00d4ff;
+            color: #ffffff;
         }
 
         .footer-line {
