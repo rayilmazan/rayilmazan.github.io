@@ -5,193 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>rayılmazan // Terminal</title>
     <style>
-        body {
-            background: #4e3629;
-            color: #e0d7d3;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            margin: 0;
-        }
-
-        .chassis {
-            max-width: 900px;
-            width: 100%;
-            background: #33241b;
-            border: 2px solid #5a4234;
-            padding: 30px;
-            position: relative;
-            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
-            background-size: 20px 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-        }
-
-        .header-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border-bottom: 2px solid #4a3528;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .logo-tag {
-            background: #4a3528;
-            color: #00e676;
-            padding: 4px 10px;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            border-left: 4px solid #00e676;
-            white-space: nowrap;
-        }
-
-        .tech-dials {
-            display: flex;
-            gap: 10px;
-            font-size: 10px;
-            color: #8c7365;
-            flex-wrap: wrap;
-        }
-
-        .content-container {
-            display: grid;
-            grid-template-columns: 1fr 220px;
-            gap: 20px;
-        }
-
-        .main-log {
-            background: #1a110d;
-            border: 1px solid #291b15;
-            padding: 20px;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
-            box-sizing: border-box;
-            min-height: 390px;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 15px;
-            margin: 12px 0;
-            border-bottom: 1px dashed #291b15;
-            padding-bottom: 4px;
-        }
-
-        .data-row .label {
-            color: #a8958b;
-            white-space: nowrap;
-        }
-
-        .side-bar {
-            border-left: 1px solid #4a3528;
-            padding-left: 20px;
-            font-size: 11px;
-            color: #a8958b;
-        }
-
-        /* --- GÜNCELLENEN BUTON STİLLERİ --- */
-        .greeble-btn {
-            display: block;
-            width: 100%;
-            background: #2a1f18; /* Daha derin bir zemin */
-            color: #d1c4bc;
-            border: 1px solid #7a5e4d; /* Daha belirgin çerçeve */
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 10px 12px;
-            margin-top: 10px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            box-shadow: 2px 2px 0px #1a110d;
-        }
-
-        .greeble-btn:hover {
-            background: #4a3528; /* Üzerine gelince belirginleşen renk */
-            color: #ffffff; /* Yazı rengini beyazlatarak öne çıkardım */
-            border-color: #00e676; /* Çerçeveyi terminal yeşili yap */
-            box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
-        }
-
-        .greeble-btn:active {
-            background: #00e676;
-            color: #000;
-            border-color: #000;
-            transform: translateY(2px);
-            box-shadow: none;
-        }
-
-        .greeble-btn::before {
-            content: "▶ ";
-            color: #00e676;
-            margin-right: 5px;
-        }
-        /* ------------------------------------ */
-
-        .footer-line {
-            margin-top: 30px;
-            height: 2px;
-            background: linear-gradient(90deg, #00e676, #4a3528);
-        }
-
-        .highlight {
-            color: #00e676;
-            text-align: right;
-            word-break: break-word;
-        }
-
-        .progress-track {
-            width: 100%;
-            background: #231712;
-            border: 1px solid #4a3528;
-            height: 16px;
-            margin: 15px 0 25px 0;
-            padding: 2px;
-            box-sizing: border-box;
-            display: none;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: #00e676;
-            transition: width 0.8s cubic-bezier(0.1, 0.8, 0.3, 1);
-            background-image: linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px);
-            background-size: 6px 100%;
-        }
-
-        .loading {
-            font-size: 14px;
-            color: #a8958b;
-            text-align: center;
-            padding: 40px 0;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .chassis { padding: 15px; }
-            .header-section { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .content-container { grid-template-columns: 1fr; gap: 15px; }
-            .side-bar { border-left: none; border-top: 1px solid #4a3528; padding-left: 0; padding-top: 15px; }
-            .data-row { flex-direction: column; align-items: flex-start; gap: 4px; }
-            .highlight { text-align: left; }
-        }
+        body { background: #4e3629; color: #e0d7d3; font-family: 'Courier New', Courier, monospace; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        .chassis { max-width: 900px; width: 100%; background: #33241b; border: 2px solid #5a4234; padding: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
+        .header-section { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #4a3528; padding-bottom: 10px; margin-bottom: 20px; }
+        .logo-tag { background: #4a3528; color: #00e676; padding: 4px 10px; font-weight: bold; border-left: 4px solid #00e676; }
+        .content-container { display: grid; grid-template-columns: 1fr 220px; gap: 20px; }
+        .main-log { background: #1a110d; border: 1px solid #291b15; padding: 20px; min-height: 390px; }
+        .data-row { display: flex; justify-content: space-between; margin: 12px 0; border-bottom: 1px dashed #291b15; padding-bottom: 4px; }
+        .side-bar { border-left: 1px solid #4a3528; padding-left: 20px; font-size: 11px; }
+        
+        /* Buton Stilleri */
+        .greeble-btn { display: block; width: 100%; background: #2a1f18; color: #d1c4bc; border: 1px solid #7a5e4d; font-family: inherit; font-size: 11px; font-weight: bold; padding: 10px; margin-top: 10px; cursor: pointer; transition: all 0.2s; }
+        .greeble-btn:hover { background: #4a3528; color: #ffffff; border-color: #00e676; box-shadow: 0 0 10px rgba(0, 230, 118, 0.4); }
+        .highlight { color: #00e676; }
+        .loading { color: #a8958b; padding: 40px 0; }
+        
+        @media (max-width: 768px) { .content-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    </body>
+
+<div class="chassis">
+    <div class="header-section">
+        <div class="logo-tag">rayılmazan</div>
+        <div class="tech-dials"><span>[system_online]</span></div>
+    </div>
+
+    <div class="content-container">
+        <div class="main-log">
+            <div id="view-device-info">
+                <h2>> Sistem Bilgisi</h2>
+                <div class="data-row"><span>Cihaz:</span> <span id="dev-type" class="highlight">Bekleniyor...</span></div>
+                <div class="data-row"><span>OS:</span> <span id="dev-os" class="highlight">Bekleniyor...</span></div>
+            </div>
+        </div>
+        <div class="side-bar">
+            <button class="greeble-btn" onclick="alert('Sistem Aktif')">SİSTEMİ BAŞLAT</button>
+            <button class="greeble-btn" onclick="location.reload()">YENİLE</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sayfa yüklendiğinde çalışacak temel fonksiyon
+    window.onload = function() {
+        document.getElementById("dev-type").innerText = "Web Terminal V1";
+        document.getElementById("dev-os").innerText = navigator.platform;
+    };
+</script>
+
+</body>
 </html>
