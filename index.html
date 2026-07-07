@@ -6,8 +6,8 @@
     <title>rayılmazan // Terminal</title>
     <style>
         body {
-            background: #0f0f0f;
-            color: #b09e8a;
+            background: #141416; /* Derin endüstriyel koyu gri */
+            color: #c5c6c7; /* Mat metalik gri text */
             font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             display: flex;
@@ -17,34 +17,35 @@
         .chassis {
             max-width: 900px;
             width: 100%;
-            background: #1a1a1a;
-            border: 1px solid #333;
+            background: #1f2023; /* Panel yüzeyi grisi */
+            border: 1px solid #3a3b40; /* Mekanik ek yeri çizgisi */
             padding: 30px;
             position: relative;
-            /* Hafif ızgara dokusu */
-            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+            /* Katot ışınlı tüp / Izgara dokusu geliştirildi */
+            background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), 
+                              linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 20px 20px;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
         }
 
-        /* Başlık Kısmı - Küçük ve Teknik */
+        /* Başlık Kısmı - Teknik Panel */
         .header-section {
             display: flex;
             align-items: center;
             gap: 15px;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid #2d2e33;
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
 
         .logo-tag {
-            background: #333;
-            color: #d4a373;
+            background: #3a3b40;
+            color: #ff9f1c; /* Used Future klasiği: Endüstriyel Uyarı Turuncusu */
             padding: 4px 10px;
             font-size: 14px;
             font-weight: bold;
             letter-spacing: 2px;
-            border-left: 4px solid #d4a373;
+            border-left: 4px solid #ff9f1c;
         }
 
         /* Grebles Detayları */
@@ -52,32 +53,78 @@
             display: flex;
             gap: 10px;
             font-size: 10px;
-            color: #555;
+            color: #5a5c61;
         }
 
         .content-container {
             display: grid;
-            grid-template-columns: 1fr 200px;
+            grid-template-columns: 1fr 220px; /* Butonlar için genişlik biraz artırıldı */
             gap: 20px;
         }
 
         .main-log {
-            background: #121212;
-            border: 1px solid #222;
+            background: #161719; /* İç konsol ekranı */
+            border: 1px solid #2d2e33;
             padding: 20px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.7);
         }
 
         .side-bar {
-            border-left: 1px solid #333;
+            border-left: 1px solid #2d2e33;
             padding-left: 20px;
             font-size: 11px;
-            color: #666;
+            color: #7e828a;
+        }
+
+        /* Greeble Tarzı Endüstriyel Butonlar */
+        .greeble-btn {
+            display: block;
+            width: 100%;
+            background: #28292e;
+            color: #a0a2a6;
+            border: 1px solid #42444a;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            padding: 8px 10px;
+            margin-top: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            position: relative;
+            /* Mekanik basma hissi için iç gölge */
+            box-shadow: inset -2px -2px 0px #141416, inset 1px 1px 0px #5a5c61;
+        }
+
+        .greeble-btn:hover {
+            background: #34353b;
+            color: #ff9f1c;
+            border-color: #ff9f1c;
+            box-shadow: inset -1px -1px 0px #141416, 0 0 8px rgba(255, 159, 28, 0.2);
+        }
+
+        .greeble-btn:active {
+            box-shadow: inset 2px 2px 0px #141416;
+            padding-left: 11px;
+            padding-top: 9px;
+        }
+
+        /* Butonların yanındaki minik yapay LED gösterge */
+        .greeble-btn::before {
+            content: "■ ";
+            color: #5a5c61;
+            font-size: 9px;
+            transition: color 0.15s ease;
+        }
+
+        .greeble-btn:hover::before {
+            color: #ff9f1c; /* Aktifleşen LED efekti */
         }
 
         .footer-line {
             margin-top: 30px;
             height: 2px;
-            background: linear-gradient(90deg, #d4a373, #333);
+            background: linear-gradient(90deg, #ff9f1c, #2d2e33);
         }
     </style>
 </head>
@@ -87,33 +134,40 @@
     <div class="header-section">
         <div class="logo-tag">rayılmazan</div>
         <div class="tech-dials">
-            <span>[SYS_V7.1]</span>
-            <span>[UPTIME: 00:44]</span>
+            <span>[SYS_V7.2_GRY]</span>
+            <span>[UPTIME: 01:12]</span>
             <span>[SECURE_LINK]</span>
         </div>
     </div>
 
     <div class="content-container">
         <div class="main-log">
-            <h2 style="font-size: 16px; margin-top:0;">> KONSOL_GİRİŞİ</h2>
-            <p>Sistem terminali yapılandırıldı. Used Future estetiği aktif edildi.<br>
+            <h2 style="font-size: 16px; margin-top:0; color: #ff9f1c;">> KONSOL_GİRİŞİ</h2>
+            <p>Sistem terminali yapılandırıldı. Used Future metalik gri teması aktif edildi.<br>
             <br>
-            >> Veri blokları dizinleniyor...<br>
-            >> Grebles modülleri senkronize edildi.</p>
+            >> Veri blokları gri şasi üzerinde dizinleniyor...<br>
+            >> Sağ panel kontrol modülleri [GREEBLES_V1] yüklendi.<br>
+            >> Sistem girdileri bekleniyor...</p>
         </div>
 
         <div class="side-bar">
             [DURUM]<br>
-            - AKTİF<br><br>
+            - AKTİF // KARBON_MOD<br><br>
+            
             [DİZİN]<br>
             - /ROOT/LOGS<br>
             - /ROOT/SCRIPTS<br>
-            - /ROOT/DEBRIS
+            - /ROOT/DEBRIS<br><br>
+
+            [MEKANİK_ARABİRİM]<br>
+            <button class="greeble-btn" onclick="console.log('Modül 01 tetiklendi')">PRM_EXEC_01</button>
+            <button class="greeble-btn" onclick="console.log('Modül 02 tetiklendi')">SYS_DIAG_02</button>
+            <button class="greeble-btn" onclick="console.log('Modül 03 tetiklendi')">NET_FLTR_03</button>
         </div>
     </div>
 
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #444;">ID_REF: 0X4492-A // RAYILMAZAN_TERMINAL</div>
+    <div style="font-size: 9px; margin-top: 5px; color: #5a5c61;">ID_REF: 0X4492-A // GRAY_EDITION // RAYILMAZAN_TERMINAL</div>
 </div>
 
 </body>
