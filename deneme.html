@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi-Radar Sinyal Analizörü</title>
+    <title>Siber Bluetooth Radarı</title>
     <style>
         :root {
             --neon-green: #00ff66;
@@ -56,7 +56,6 @@
             gap: 15px;
         }
 
-        /* Radar Ekranı */
         .radar-screen {
             position: relative;
             width: 280px;
@@ -76,7 +75,6 @@
             height: 100%;
         }
 
-        /* Seçili Ağ Detay Kartı */
         .details-card {
             width: 100%;
             background-color: var(--panel-bg);
@@ -104,7 +102,6 @@
             font-size: 0.9rem;
         }
 
-        /* Grafik Alanı */
         .graph-container {
             width: 100%;
             height: 100px;
@@ -121,7 +118,6 @@
             display: block;
         }
 
-        /* WiFi Listesi */
         .control-panel {
             width: 100%;
             background-color: var(--panel-bg);
@@ -138,33 +134,24 @@
             background-color: transparent;
             color: var(--neon-green);
             border: 1px solid var(--neon-green);
-            padding: 10px;
+            padding: 12px;
             font-family: inherit;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             border-radius: 4px;
             transition: all 0.2s;
+            text-shadow: 0 0 5px rgba(0, 255, 102, 0.5);
+            box-shadow: inset 0 0 10px rgba(0, 255, 102, 0.1);
         }
 
         .btn:hover {
             background-color: var(--neon-green);
             color: var(--dark-bg);
-            box-shadow: 0 0 15px var(--neon-green);
+            box-shadow: 0 0 20px var(--neon-green);
         }
 
-        .btn-stop {
-            color: var(--neon-red);
-            border-color: var(--neon-red);
-        }
-
-        .btn-stop:hover {
-            background-color: var(--neon-red);
-            color: white;
-            box-shadow: 0 0 15px var(--neon-red);
-        }
-
-        .wifi-list {
+        .device-list {
             font-size: 0.8rem;
             width: 100%;
             display: flex;
@@ -178,22 +165,33 @@
             border: 1px solid rgba(0, 255, 102, 0.1);
         }
 
-        .wifi-row {
+        .device-row {
             display: flex;
             justify-content: space-between;
-            padding: 4px 6px;
+            padding: 6px;
             cursor: pointer;
             border-radius: 3px;
             transition: background 0.2s;
+            border-bottom: 1px solid rgba(0, 255, 102, 0.05);
         }
 
-        .wifi-row:hover {
+        .device-row:hover {
             background: rgba(0, 255, 102, 0.1);
         }
 
-        .wifi-row.selected {
-            background: rgba(0, 255, 102, 0.2);
-            border-left: 3px solid var(--neon-green);
+        .device-row.selected {
+            background: rgba(0, 255, 102, 0.15);
+            border-left: 3px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .device-type-real {
+            color: var(--neon-blue);
+            font-weight: bold;
+        }
+
+        .device-type-sim {
+            color: rgba(0, 255, 102, 0.5);
         }
 
         .status-message {
@@ -202,11 +200,10 @@
             color: #888;
         }
 
-        /* Özel İnce Scrollbar */
-        .wifi-list::-webkit-scrollbar {
+        .device-list::-webkit-scrollbar {
             width: 4px;
         }
-        .wifi-list::-webkit-scrollbar-thumb {
+        .device-list::-webkit-scrollbar-thumb {
             background: var(--neon-green);
             border-radius: 2px;
         }
@@ -215,22 +212,21 @@
 <body>
 
     <header>
-        <h1>WIFI-RADAR SCANNER</h1>
-        <div class="status-message" id="status-text">WiFi Alıcısı Pasif. Taramayı Başlatın.</div>
+        <h1>BLUE-RADAR SCANNER</h1>
+        <div class="status-message" id="status-text">Web Bluetooth Sistemi Aktif. Aramayı Başlatın.</div>
     </header>
 
     <div class="main-container">
-        
         <div class="radar-screen">
             <canvas id="radar-canvas"></canvas>
         </div>
 
         <div class="details-card">
-            <div class="details-title">Seçili İstasyon Detayları</div>
-            <div class="details-row"><span>SSID (Ağ Adı):</span><span id="det-ssid" style="color: var(--neon-blue);">Seçim Yok</span></div>
-            <div class="details-row"><span>Kanal / Sıklık:</span><span id="det-chan">--</span></div>
-            <div class="details-row"><span>Sinyal Gücü:</span><span id="det-signal">-- dBm</span></div>
-            <div class="details-row"><span>Güvenlik Protokolü:</span><span id="det-sec">--</span></div>
+            <div class="details-title">Hedef Sinyal Analizi</div>
+            <div class="details-row"><span>Cihaz Adı:</span><span id="det-name" style="color: var(--neon-blue);">Seçim Yok</span></div>
+            <div class="details-row"><span>Cihaz Tipi:</span><span id="det-type">--</span></div>
+            <div class="details-row"><span>Sinyal Gücü (RSSI):</span><span id="det-rssi">-- dBm</span></div>
+            <div class="details-row"><span>Bağlantı Durumu:</span><span id="det-status">--</span></div>
         </div>
 
         <div class="graph-container">
@@ -238,21 +234,17 @@
         </div>
 
         <div class="control-panel">
-            <button class="btn" id="scan-btn">WiFi Sinyallerini Tara</button>
-            
-            <div class="wifi-list" id="wifi-list-container">
-                </div>
+            <button class="btn" id="scan-btn">⚡ Bluetooth Cihazı Ara</button>
+            <div class="device-list" id="device-list-container"></div>
         </div>
-
     </div>
 
-    <script>
+        <script>
         const radarCanvas = document.getElementById('radar-canvas');
         const radarCtx = radarCanvas.getContext('2d');
         const graphCanvas = document.getElementById('graph-canvas');
         const graphCtx = graphCanvas.getContext('2d');
 
-        // Canvanları Boyutlandır
         function initCanvases() {
             radarCanvas.width = radarCanvas.parentElement.clientWidth;
             radarCanvas.height = radarCanvas.parentElement.clientHeight;
@@ -261,36 +253,25 @@
         }
         initCanvases();
 
-        // Gerçekçi Simüle Edilen WiFi Ağları Listesi (Mesafe dbm ile ters orantılı)
-        const simulatedNetworks = [
-            { id: 1, ssid: "TURKTELEKOM_G5HG", dbm: -42, channel: 6, security: "WPA3-Personal", angle: 50, blipAlpha: 0, history: [] },
-            { id: 2, ssid: "Superonline_WiFi_2.4GHz", dbm: -68, channel: 11, security: "WPA2-PSK", angle: 140, blipAlpha: 0, history: [] },
-            { id: 3, ssid: "Zyxel_Modem_Komsu", dbm: -82, channel: 1, security: "WPA2-PSK", angle: 220, blipAlpha: 0, history: [] },
-            { id: 4, ssid: "Turkcell_Superbox_LTE", dbm: -55, channel: 9, security: "WPA3", angle: 290, blipAlpha: 0, history: [] },
-            { id: 5, ssid: "Belediye_FREE_WiFi", dbm: -89, channel: 13, security: "Open (Şifresiz)", angle: 15, blipAlpha: 0, history: [] }
+        const activeDevices = [
+            { id: "sim-1", name: "Bilinmeyen BLE Beacon", rssi: -82, type: "Simüle", angle: 60, blipAlpha: 0, history: Array(50).fill(-82) },
+            { id: "sim-2", name: "Smart TV v4.2", rssi: -65, type: "Simüle", angle: 160, blipAlpha: 0, history: Array(50).fill(-65) },
+            { id: "sim-3", name: "Akıllı Saat (M6)", rssi: -45, type: "Simüle", angle: 280, blipAlpha: 0, history: Array(50).fill(-45) }
         ];
 
-        // Geçmiş veriyi doldur
-        simulatedNetworks.forEach(net => {
-            net.history = Array(50).fill(net.dbm);
-        });
-
-        let active = false;
         let sweepAngle = 0;
-        let selectedNetworkId = 1; // Varsayılan seçili ağ
+        let selectedDeviceId = "sim-3";
         let lastUpdateTime = 0;
 
-        // Dom Elementleri
         const scanBtn = document.getElementById('scan-btn');
         const statusText = document.getElementById('status-text');
-        const wifiListContainer = document.getElementById('wifi-list-container');
+        const deviceListContainer = document.getElementById('device-list-container');
         
-        const detSsid = document.getElementById('det-ssid');
-        const detChan = document.getElementById('det-chan');
-        const detSignal = document.getElementById('det-signal');
-        const detSec = document.getElementById('det-sec');
+        const detName = document.getElementById('det-name');
+        const detType = document.getElementById('det-type');
+        const detRssi = document.getElementById('det-rssi');
+        const detStatus = document.getElementById('det-status');
 
-        // Ses Efekti (Web Audio API ile Sonar Bip Sesi)
         let audioCtx = null;
         function playSonarBeep(frequency, volume) {
             try {
@@ -303,112 +284,123 @@
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
                 
-                gain.gain.setValueAtTime(volume * 0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(volume * 0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
 
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {
-                console.log("Audio hatası:", e);
-            }
+                osc.stop(audioCtx.currentTime + 0.25);
+            } catch (e) {}
         }
 
-        // WiFi Listesini Arayüze Bas
-        function renderWiFiList() {
-            wifiListContainer.innerHTML = '';
-            simulatedNetworks.forEach(net => {
+        function renderDeviceList() {
+            deviceListContainer.innerHTML = '';
+            activeDevices.forEach(dev => {
                 const row = document.createElement('div');
-                row.className = `wifi-row ${net.id === selectedNetworkId ? 'selected' : ''}`;
+                row.className = `device-row ${dev.id === selectedDeviceId ? 'selected' : ''}`;
+                
+                const isReal = dev.type === "Gerçek Cihaz";
+                const typeBadge = isReal ? `<span class="device-type-real">[GERÇEK]</span>` : `<span class="device-type-sim">[MOCK]</span>`;
+
                 row.innerHTML = `
-                    <span>⚡ ${net.ssid}</span>
-                    <span>${net.dbm} dBm</span>
+                    <span>📡 ${dev.name} ${typeBadge}</span>
+                    <span>${dev.rssi} dBm</span>
                 `;
                 row.addEventListener('click', () => {
-                    selectedNetworkId = net.id;
-                    renderWiFiList();
+                    selectedDeviceId = dev.id;
+                    renderDeviceList();
                     updateDetailCard();
                 });
-                wifiListContainer.appendChild(row);
+                deviceListContainer.appendChild(row);
             });
         }
 
-        // Kart Detaylarını Güncelle
         function updateDetailCard() {
-            const net = simulatedNetworks.find(n => n.id === selectedNetworkId);
-            if (net) {
-                detSsid.textContent = net.ssid;
-                detChan.textContent = `Ch ${net.channel} (2.4 GHz)`;
-                detSignal.textContent = `${net.dbm} dBm`;
-                detSec.textContent = net.security;
+            const dev = activeDevices.find(d => d.id === selectedDeviceId);
+            if (dev) {
+                detName.textContent = dev.name;
+                detType.textContent = dev.type;
+                detRssi.textContent = `${dev.rssi} dBm`;
+                detStatus.textContent = dev.type === "Gerçek Cihaz" ? "Eşleştirildi / Canlı" : "Sinyal Dinleniyor";
 
-                // Sinyal gücüne göre rengi değiştir
-                if (net.dbm >= -60) detSignal.style.color = "var(--neon-green)";
-                else if (net.dbm >= -80) detSignal.style.color = "var(--neon-blue)";
-                else detSignal.style.color = "var(--neon-red)";
+                if (dev.rssi >= -60) detRssi.style.color = "var(--neon-green)";
+                else if (dev.rssi >= -80) detRssi.style.color = "var(--neon-blue)";
+                else detRssi.style.color = "var(--neon-red)";
             }
         }
 
-        // Başlat / Durdur Butonu
-        scanBtn.addEventListener('click', () => {
-            if (!active) {
-                active = true;
-                scanBtn.textContent = "Tarayıcıyı Kapat";
-                scanBtn.classList.add('btn-stop');
-                statusText.textContent = "Çevredeki kablosuz yayınlar taranıyor...";
+        scanBtn.addEventListener('click', async () => {
+            if (!navigator.bluetooth) {
+                alert("Tarayıcınız Web Bluetooth API'sini destekmiyor. Lütfen HTTPS protokolü kullanan Chrome, Edge veya Opera tarayıcısı ile deneyin.");
+                statusText.textContent = "Hata: Tarayıcı Bluetooth desteği sunmuyor.";
+                statusText.style.color = "var(--neon-red)";
+                return;
+            }
+
+            statusText.textContent = "Bluetooth penceresi açılıyor... Cihaz seçin.";
+            statusText.style.color = "var(--neon-blue)";
+
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true
+                });
+
+                statusText.textContent = `Yeni cihaz bağlandı: ${device.name || "İsimsiz Cihaz"}`;
                 statusText.style.color = "var(--neon-green)";
-                renderWiFiList();
-                updateDetailCard();
-                animate();
-            } else {
-                active = false;
-                scanBtn.textContent = "WiFi Sinyallerini Tara";
-                scanBtn.classList.remove('btn-stop');
-                statusText.textContent = "Tarama durduruldu.";
+
+                const exists = activeDevices.find(d => d.id === device.id);
+                if (!exists) {
+                    const newDevice = {
+                        id: device.id,
+                        name: device.name || "İsimsiz BLE Cihazı",
+                        rssi: -50,
+                        type: "Gerçek Cihaz",
+                        angle: Math.floor(Math.random() * 360),
+                        blipAlpha: 0,
+                        history: Array(50).fill(-50)
+                    };
+                    activeDevices.push(newDevice);
+                    selectedDeviceId = newDevice.id;
+                    renderDeviceList();
+                    updateDetailCard();
+                }
+
+            } catch (error) {
+                console.log(error);
+                statusText.textContent = "Tarama iptal edildi veya cihaz bulunamadı.";
                 statusText.style.color = "#888";
             }
         });
 
-        // WiFi Sinyal Güçlerinde Rastgele Küçük Dalgalanmalar Yarat (Gerçekçilik için)
-        function simulateSignalFluctuations() {
-            simulatedNetworks.forEach(net => {
-                // Sinyali hafifçe oynat (+- 2 dBm)
-                const change = Math.round((Math.random() - 0.5) * 3);
-                let newDbm = net.dbm + change;
-                // Mantıklı sınırlar içinde tut (-30 ile -95 arası)
-                newDbm = Math.max(-95, Math.min(-30, newDbm));
-                net.dbm = newDbm;
+                    function updateSignals() {
+            activeDevices.forEach(dev => {
+                const fluctuation = Math.round((Math.random() - 0.5) * 4);
+                let newRssi = dev.rssi + fluctuation;
+                newRssi = Math.max(-95, Math.min(-35, newRssi));
+                dev.rssi = newRssi;
 
-                // Geçmiş veriyi güncelle (Grafik için)
-                net.history.push(newDbm);
-                net.history.shift();
+                dev.history.push(newRssi);
+                dev.history.shift();
             });
-            renderWiFiList();
+            renderDeviceList();
             updateDetailCard();
         }
 
-        // Ana Döngü
         function animate() {
-            if (!active) return;
+            sweepAngle = (sweepAngle + 1.5) % 360;
 
-            // Radar açısını döndür (Yavaş, kontrollü bir tarama)
-            sweepAngle = (sweepAngle + 1.2) % 360;
-
-            // Radar iğnesi her ağın açısından geçerken onu tetikle
-            simulatedNetworks.forEach(net => {
-                if (Math.abs(sweepAngle - net.angle) < 1.2) {
-                    net.blipAlpha = 1.0; // Parlama tetiklendi!
-                    // Sinyal gücü yüksekse daha tiz, zayıfsa daha pes bir ses çal
-                    const pitch = 300 + (Math.abs(net.dbm) * -4); // Örn: -40 dbm -> 140Hz, -90 dbm -> 60Hz
-                    playSonarBeep(pitch, (100 - Math.abs(net.dbm)) / 100);
+            activeDevices.forEach(dev => {
+                if (Math.abs(sweepAngle - dev.angle) < 1.5) {
+                    dev.blipAlpha = 1.0;
+                    const frequency = 400 + (Math.abs(dev.rssi) * -3);
+                    playSonarBeep(frequency, (100 - Math.abs(dev.rssi)) / 100);
                 }
             });
 
-            // Belirli aralıklarla sinyal verilerini dalgalandır (Saniyede 1 kez)
             const now = performance.now();
-            if (now - lastUpdateTime > 1000) {
-                simulateSignalFluctuations();
+            if (now - lastUpdateTime > 800) {
+                updateSignals();
                 lastUpdateTime = now;
             }
 
@@ -418,7 +410,6 @@
             requestAnimationFrame(animate);
         }
 
-        // Radar Ekranını Çiz
         function drawRadar() {
             const w = radarCanvas.width;
             const h = radarCanvas.height;
@@ -428,35 +419,30 @@
 
             radarCtx.clearRect(0, 0, w, h);
 
-            // 1. Grid Halkaları (Uzaklık / Sinyal Seviyeleri)
             radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.12)';
             radarCtx.lineWidth = 1;
-            const levelLabels = ["-30 dBm", "-50 dBm", "-70 dBm", "-90 dBm"];
+            const rssiLabels = ["-35 dBm (Çok Yakın)", "-55 dBm", "-75 dBm", "-95 dBm (Uzak)"];
             let idx = 0;
             for (let r = maxRadius; r > 0; r -= maxRadius / 4) {
                 radarCtx.beginPath();
                 radarCtx.arc(cx, cy, r, 0, Math.PI * 2);
                 radarCtx.stroke();
                 
-                // Seviye Etiketleri
                 radarCtx.fillStyle = 'rgba(0, 255, 102, 0.3)';
                 radarCtx.font = '7px monospace';
-                radarCtx.fillText(levelLabels[idx++], cx + 5, cy - r + 10);
+                radarCtx.fillText(rssiLabels[idx++], cx + 5, cy - r + 10);
             }
 
-            // 2. Çapraz Yön Çizgileri
             radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.08)';
             radarCtx.beginPath();
             radarCtx.moveTo(cx - maxRadius, cy); radarCtx.lineTo(cx + maxRadius, cy);
             radarCtx.moveTo(cx, cy - maxRadius); radarCtx.lineTo(cx, cy + maxRadius);
             radarCtx.stroke();
 
-            // 3. Dönen Radar Tarama İğnesi (Sweep)
             const radAngle = (sweepAngle * Math.PI) / 180;
             const sweepX = cx + maxRadius * Math.cos(radAngle);
             const sweepY = cy + maxRadius * Math.sin(radAngle);
 
-            // Radar Sweep Solma Kuyruğu
             const sweepGrad = radarCtx.createLinearGradient(cx, cy, sweepX, sweepY);
             sweepGrad.addColorStop(0, 'rgba(0, 255, 102, 0.25)');
             sweepGrad.addColorStop(1, 'rgba(0, 255, 102, 0)');
@@ -464,11 +450,10 @@
             radarCtx.fillStyle = sweepGrad;
             radarCtx.beginPath();
             radarCtx.moveTo(cx, cy);
-            radarCtx.arc(cx, cy, maxRadius, radAngle, radAngle - 0.25 * Math.PI, true);
+            radarCtx.arc(cx, cy, maxRadius, radAngle, radAngle - 0.3 * Math.PI, true);
             radarCtx.closePath();
             radarCtx.fill();
 
-            // Tarama Çizgisi
             radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.7)';
             radarCtx.lineWidth = 1.2;
             radarCtx.beginPath();
@@ -476,53 +461,43 @@
             radarCtx.lineTo(sweepX, sweepY);
             radarCtx.stroke();
 
-            // 4. WiFi Ağ Noktalarını (Blips) Ekrana Çiz
-            simulatedNetworks.forEach(net => {
-                const angleRad = (net.angle * Math.PI) / 180;
-
-                // dBm'i merkez uzaklığına eşle: -30dBm en yakın, -100dBm en uzak sınır
-                const distanceRatio = (Math.abs(net.dbm) - 30) / (100 - 30); // 0 (merkez) ile 1 (kenar) arası
+            activeDevices.forEach(dev => {
+                const angleRad = (dev.angle * Math.PI) / 180;
+                const distanceRatio = (Math.abs(dev.rssi) - 35) / (100 - 35);
                 const r = Math.max(15, distanceRatio * maxRadius);
 
                 const blipX = cx + r * Math.cos(angleRad);
                 const blipY = cy + r * Math.sin(angleRad);
 
-                if (net.blipAlpha > 0) {
-                    net.blipAlpha -= 0.008; // Yavaşça söndür
+                if (dev.blipAlpha > 0) {
+                    dev.blipAlpha -= 0.008;
                 }
 
-                // Sinyal gücüne göre renk seç
-                let colorString = `rgba(0, 255, 102, ${Math.max(net.blipAlpha, 0.2)})`; // Güçlü / Normal
-                if (net.dbm < -75) {
-                    colorString = `rgba(255, 51, 51, ${Math.max(net.blipAlpha, 0.2)})`; // Zayıf
-                } else if (net.id === selectedNetworkId) {
-                    colorString = `rgba(0, 255, 255, ${Math.max(net.blipAlpha, 0.4)})`; // Seçili Ağ
+                let colorString = `rgba(0, 255, 102, ${Math.max(dev.blipAlpha, 0.2)})`;
+                if (dev.id === selectedDeviceId) {
+                    colorString = `rgba(0, 255, 255, ${Math.max(dev.blipAlpha, 0.5)})`;
+                } else if (dev.type === "Gerçek Cihaz") {
+                    colorString = `rgba(0, 210, 255, ${Math.max(dev.blipAlpha, 0.3)})`;
                 }
 
-                // Parlama Efekti (Büyük Halka)
                 radarCtx.fillStyle = colorString;
                 radarCtx.beginPath();
-                radarCtx.arc(blipX, blipY, 14 * net.blipAlpha, 0, Math.PI * 2);
+                radarCtx.arc(blipX, blipY, 15 * dev.blipAlpha, 0, Math.PI * 2);
                 radarCtx.fill();
 
-                // Merkez Nokta
-                radarCtx.fillStyle = colorString;
                 radarCtx.beginPath();
-                radarCtx.arc(blipX, blipY, 4, 0, Math.PI * 2);
+                radarCtx.arc(blipX, blipY, 5, 0, Math.PI * 2);
                 radarCtx.fill();
 
-                // Ağ İsmi Etiketi
-                radarCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                radarCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                 radarCtx.font = '8px monospace';
-                radarCtx.fillText(net.ssid.substring(0, 10) + '..', blipX + 8, blipY + 3);
+                radarCtx.fillText(dev.name.substring(0, 12), blipX + 8, blipY + 3);
             });
         }
 
-        // Seçili WiFi Sinyal Geçmiş Grafiği (Zaman Analizi)
         function drawGraph() {
             graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
 
-            // Arka Plan Grid Çizimi
             graphCtx.strokeStyle = 'rgba(0, 255, 102, 0.05)';
             graphCtx.lineWidth = 1;
             for (let i = 0; i < graphCanvas.width; i += 40) {
@@ -531,20 +506,18 @@
                 graphCtx.stroke();
             }
 
-            const selectedNet = simulatedNetworks.find(n => n.id === selectedNetworkId);
-            if (!selectedNet || selectedNet.history.length < 2) return;
+            const activeDev = activeDevices.find(d => d.id === selectedDeviceId);
+            if (!activeDev || activeDev.history.length < 2) return;
 
-            // Sinyal Çizgisi
-            graphCtx.strokeStyle = selectedNet.dbm > -75 ? 'var(--neon-green)' : 'var(--neon-red)';
+            graphCtx.strokeStyle = activeDev.id.startsWith('sim') ? 'var(--neon-green)' : 'var(--neon-blue)';
             graphCtx.lineWidth = 2;
             graphCtx.beginPath();
 
-            const step = graphCanvas.width / (selectedNet.history.length - 1);
-            for (let i = 0; i < selectedNet.history.length; i++) {
-                const val = selectedNet.history[i]; // -30 ile -100 arası
-                // Grafiği dikey eksende dikey sığdır (-30 üstte, -100 altta)
-                const ratio = (Math.abs(val) - 30) / 70;
-                const y = 10 + ratio * (graphCanvas.height - 20);
+            const step = graphCanvas.width / (activeDev.history.length - 1);
+            for (let i = 0; i < activeDev.history.length; i++) {
+                const val = activeDev.history[i];
+                const ratio = (Math.abs(val) - 35) / 65;
+                const y = 15 + ratio * (graphCanvas.height - 30);
                 const x = i * step;
 
                 if (i === 0) {
@@ -555,16 +528,16 @@
             }
             graphCtx.stroke();
 
-            // Grafik Bilgisi Yazısı
             graphCtx.fillStyle = 'rgba(0, 255, 102, 0.7)';
             graphCtx.font = '9px monospace';
-            graphCtx.fillText(`TAKIP: ${selectedNet.ssid} | SİNYAL ANALİZİ (dBm)`, 10, 15);
+            graphCtx.fillText(`TAKİPTEKİ SİNYAL: ${activeDev.name}`, 10, 15);
         }
 
-        // Başlangıç Kurulumları
-        renderWiFiList();
+        renderDeviceList();
         updateDetailCard();
-        drawRadar();
+        animate();
     </script>
 </body>
 </html>
+
+    
