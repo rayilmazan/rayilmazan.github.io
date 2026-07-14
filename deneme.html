@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanal Lazer Metre</title>
+    <title>Sade Kamera Ölçüm Aracı</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #0d0d0d;
-            color: #00ffcc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -20,10 +20,11 @@
         }
 
         h1 {
-            font-size: 1.1rem;
-            letter-spacing: 3px;
+            font-size: 1rem;
             margin: 10px 0;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: #aaa;
         }
 
         #container {
@@ -31,10 +32,10 @@
             width: 95vw;
             max-width: 500px;
             aspect-ratio: 3/4;
-            border: 2px solid #00ffcc;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 0 25px rgba(0, 255, 204, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #000;
         }
 
         video {
@@ -54,77 +55,45 @@
             width: 100%;
             height: 100%;
             z-index: 2;
-            cursor: crosshair;
         }
 
-        /* Sci-Fi HUD Katmanı */
-        .hud {
+        /* Bilgi Paneli */
+        .info-panel {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            z-index: 3;
-            pointer-events: none;
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            text-shadow: 1px 1px 3px #000;
-        }
-
-        /* Ortadaki Hedef Noktası */
-        .crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            border: 1px solid rgba(0, 255, 204, 0.6);
-            border-radius: 50%;
-            z-index: 3;
-            pointer-events: none;
-        }
-        .crosshair::before, .crosshair::after {
-            content: '';
-            position: absolute;
-            background: #00ffcc;
-        }
-        .crosshair::before { top: 50%; left: -5px; width: 40px; height: 1px; transform: translateY(-50%); }
-        .crosshair::after { left: 50%; top: -5px; height: 40px; width: 1px; transform: translateX(-50%); }
-
-        /* Ölçüm Sonuç Paneli */
-        .result-panel {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            right: 15px;
-            background: rgba(13, 13, 13, 0.85);
-            border: 1px solid #00ffcc;
-            border-radius: 8px;
-            padding: 12px;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
             z-index: 3;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .measurement {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px #00ffcc;
-            margin-bottom: 5px;
+        .result {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00ff66;
+            margin-bottom: 4px;
         }
 
-        /* Kontrol Paneli */
+        .instruction {
+            font-size: 11px;
+            color: #ccc;
+        }
+
+        /* Kontroller */
         .controls {
             width: 95vw;
             max-width: 500px;
             margin-top: 15px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
             box-sizing: border-box;
         }
 
@@ -135,67 +104,73 @@
 
         button {
             flex: 1;
-            background: transparent;
-            border: 1px solid #00ffcc;
-            color: #00ffcc;
-            padding: 12px;
+            background: #222;
+            border: 1px solid #44;
+            color: #fff;
+            padding: 14px;
             cursor: pointer;
-            font-weight: bold;
-            border-radius: 6px;
+            font-weight: 600;
+            border-radius: 10px;
+            font-size: 0.9rem;
             transition: all 0.2s;
-            text-transform: uppercase;
-            font-size: 0.8rem;
         }
 
         button:active {
-            background: #00ffcc;
-            color: #000;
+            background: #333;
+            transform: scale(0.98);
+        }
+
+        #startBtn {
+            background: #007aff;
+            border-color: #007aff;
+        }
+
+        #startBtn:active {
+            background: #0056b3;
         }
 
         .slider-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
-            gap: 10px;
+            font-size: 13px;
+            color: #aaa;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
         }
 
         input[type="range"] {
             flex: 1;
-            accent-color: #00ffcc;
+            accent-color: #007aff;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h1>[ TELEMETRİK ÖLÇÜM SİSTEMİ ]</h1>
+    <h1>KAMERALI ÖLÇÜM ARACI</h1>
     
     <div id="container">
         <video id="webcam" autoplay playsinline muted></video>
         <canvas id="measureCanvas"></canvas>
         
-        <div class="hud">
-            <div>MOD: MANUEL ÖLÇÜM</div>
-            <div id="telemetry">MERKEZ TELEMETRİ: -- cm</div>
-        </div>
-
-        <div class="crosshair"></div>
-
-        <div class="result-panel">
-            <div class="measurement" id="resultText">0.00 cm</div>
-            <div style="font-size: 10px; opacity: 0.7;">Ekrandaki iki noktaya dokunarak ölçün</div>
+        <div class="info-panel">
+            <div class="result" id="resultText">0.00 cm</div>
+            <div class="instruction" id="helperText">Başlamak için kamerayı açın ve ekrana dokunun</div>
         </div>
     </div>
 
     <div class="controls">
         <div class="btn-row">
             <button id="startBtn">Kamerayı Aç</button>
-            <button id="clearBtn">Sıfırla</button>
+            <button id="clearBtn">Temizle</button>
         </div>
         <div class="slider-container">
             <span>Kalibrasyon (Ölçek):</span>
-            <input type="range" id="scaleSlider" min="0.05" max="2.00" step="0.01" value="0.25">
-            <span id="scaleValue">0.25</span>
+            <input type="range" id="scaleSlider" min="0.05" max="1.50" step="0.01" value="0.25">
+            <span id="scaleValue" style="font-weight: bold; color: #fff;">0.25</span>
         </div>
     </div>
 
@@ -208,17 +183,17 @@
         const scaleSlider = document.getElementById('scaleSlider');
         const scaleValue = document.getElementById('scaleValue');
         const resultText = document.getElementById('resultText');
-        const telemetryText = document.getElementById('telemetry');
+        const helperText = document.getElementById('helperText');
 
         let stream = null;
-        let points = []; // Kullanıcının tıkladığı koordinatlar [{x, y}]
-        let scaleFactor = 0.25; // Pikseli santimetreye çevirme katsayısı
+        let points = []; 
+        let scaleFactor = 0.25; // Pikseli santimetreye dönüştürme katsayısı
 
-        // Sürgüyü dinle (Kalibrasyon ayarı)
+        // Kalibrasyon ayarı
         scaleSlider.addEventListener('input', (e) => {
             scaleFactor = parseFloat(e.target.value);
             scaleValue.textContent = scaleFactor.toFixed(2);
-            calculateDistance();
+            updateMeasurement();
         });
 
         startBtn.addEventListener('click', async () => {
@@ -232,23 +207,25 @@
         clearBtn.addEventListener('click', () => {
             points = [];
             resultText.textContent = "0.00 cm";
+            if (stream) helperText.textContent = "Ölçmek istediğiniz ilk noktaya dokunun";
             drawScene();
         });
 
         async function startCamera() {
             try {
+                // Arka kamerayı açar
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } 
+                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } 
                 });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
                     resizeCanvas();
                     startBtn.textContent = "Kamerayı Kapat";
-                    requestAnimationFrame(updateTelemetry);
+                    helperText.textContent = "Ölçmek istediğiniz ilk noktaya dokunun";
                 };
             } catch (err) {
-                alert("Kamera başlatılamadı. İzin verdiğinizden emin olun.");
+                alert("Kamera başlatılamadı. Lütfen izin verdiğinizden emin olun.");
             }
         }
 
@@ -259,7 +236,10 @@
             }
             video.srcObject = null;
             startBtn.textContent = "Kamerayı Aç";
-            telemetryText.textContent = "MERKEZ TELEMETRİ: -- cm";
+            helperText.textContent = "Başlamak için kamerayı açın ve ekrana dokunun";
+            points = [];
+            resultText.textContent = "0.00 cm";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
         function resizeCanvas() {
@@ -270,7 +250,7 @@
 
         window.addEventListener('resize', resizeCanvas);
 
-        // Dokunma / Tıklama Olayını Yakalama
+        // Ekran dokunuşlarını yakalama
         canvas.addEventListener('click', (e) => {
             if (!stream) return;
 
@@ -278,80 +258,88 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
+            // 2 nokta zaten varsa, yeni tıklamada ekranı sıfırla ve yeni başlangıç noktası yap
             if (points.length >= 2) {
-                points = []; // 2 noktadan sonra yeni tıklamada sıfırla
+                points = [];
             }
 
             points.push({ x, y });
-            calculateDistance();
+            updateMeasurement();
             drawScene();
         });
 
-        // İki nokta arasındaki mesafeyi hesaplama
-        function calculateDistance() {
-            if (points.length < 2) return;
+        function updateMeasurement() {
+            if (points.length === 1) {
+                helperText.textContent = "Şimdi ikinci noktaya dokunun";
+                resultText.textContent = "0.00 cm";
+            } else if (points.length === 2) {
+                const p1 = points[0];
+                const p2 = points[1];
 
-            const p1 = points[0];
-            const p2 = points[1];
-
-            // Öklid Bağıntısı ile piksel mesafesini bul
-            const pixelDist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-            
-            // Piksel mesafesini ölçek katsayısıyla cm'ye çevir
-            const realDist = pixelDist * scaleFactor;
-            
-            resultText.textContent = `${realDist.toFixed(2)} cm`;
+                // Matematiksel mesafe hesabı
+                const pixelDist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+                const realDist = pixelDist * scaleFactor;
+                
+                resultText.textContent = `${realDist.toFixed(2)} cm`;
+                helperText.textContent = "Yeni bir ölçüm için tekrar dokunabilirsiniz";
+            }
         }
 
-        // Çizim İşlemleri (Noktalar ve Çizgiler)
+        // Çizim fonksiyonu
         function drawScene() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (points.length === 0) return;
 
-            // Nokta 1
+            // 1. Nokta (Başlangıç)
             ctx.beginPath();
-            ctx.arc(points[0].x, points[0].y, 6, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff0055';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ff0055';
+            ctx.arc(points[0].x, points[0].y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#007aff';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
             ctx.fill();
+            ctx.stroke();
 
             if (points.length === 1) return;
 
-            // Nokta 2
+            // 2. Nokta (Bitiş)
             ctx.beginPath();
-            ctx.arc(points[1].x, points[1].y, 6, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff0055';
+            ctx.arc(points[1].x, points[1].y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#007aff';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
             ctx.fill();
+            ctx.stroke();
 
-            // Aradaki Kesikli Çizgi
+            // İki nokta arasındaki çizgi
             ctx.beginPath();
             ctx.moveTo(points[0].x, points[0].y);
             ctx.lineTo(points[1].x, points[1].y);
-            ctx.strokeStyle = '#00ffcc';
+            ctx.strokeStyle = '#00ff66';
             ctx.lineWidth = 3;
-            ctx.setLineDash([5, 5]);
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = '#00ffcc';
             ctx.stroke();
-            ctx.setLineDash([]); // Çizgiyi sıfırla
-            ctx.shadowBlur = 0; // Gölgeyi sıfırla
-        }
 
-        // Simüle Edilmiş Lazer Telemetri (Ortadaki hedef mesafesi)
-        // Kameradaki merkez piksellerin odak/parlaklık verisine göre değişir
-        function updateTelemetry() {
-            if (!stream) return;
+            // Çizginin üzerine mesafe etiketi yazma
+            const midX = (points[0].x + points[1].x) / 2;
+            const midY = (points[0].y + points[1].y) / 2;
+            const pixelDist = Math.sqrt(Math.pow(points[1].x - points[0].x, 2) + Math.pow(points[1].y - points[0].y, 2));
+            const realDist = pixelDist * scaleFactor;
 
-            // Arka plandaki video karesinden merkez pikseli analiz etme (Simülasyon amaçlı)
-            // Kamera görüntüsü üzerinden dinamik ve hareketli bir telemetri değeri üretir
-            const randomVariance = Math.sin(Date.now() / 500) * 2;
-            const estimatedBaseDist = 45 + randomVariance; // varsayılan odak mesafesi
-
-            telemetryText.textContent = `MERKEZ TELEMETRİ: ~${estimatedBaseDist.toFixed(1)} cm`;
-
-            requestAnimationFrame(updateTelemetry);
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.font = 'bold 14px sans-serif';
+            const text = `${realDist.toFixed(1)} cm`;
+            const textWidth = ctx.measureText(text).width;
+            
+            // Yazı arkasına küçük siyah bir kutu (okunabilirliği artırmak için)
+            ctx.fillRect(midX - (textWidth/2) - 6, midY - 12, textWidth + 12, 24);
+            
+            // Yazıyı yaz
+            ctx.fillStyle = '#00ff66';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, midX, midY);
+            ctx.restore();
         }
     </script>
 </body>
