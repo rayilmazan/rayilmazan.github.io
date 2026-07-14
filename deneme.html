@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akıllı Renk Dedektörü</title>
+    <title>Akıllı Güvenlik Kamerası</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #121212;
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #080808;
+            color: #ff3b30;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -21,141 +21,199 @@
 
         h1 {
             font-size: 1.1rem;
-            font-weight: 600;
+            letter-spacing: 2px;
             margin: 10px 0;
-            letter-spacing: 1px;
-            color: #eee;
+            text-align: center;
+            color: #00ff66;
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
         }
 
         #container {
             position: relative;
             width: 90vw;
             max-width: 450px;
-            aspect-ratio: 1/1;
-            border-radius: 20px;
+            aspect-ratio: 4/3;
+            border: 2px solid #333;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 3px solid #333;
+            background: #000;
         }
 
         video {
-            display: none; /* Arka planda işleyeceğiz */
-        }
-
-        canvas {
             width: 100%;
             height: 100%;
-            display: block;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            transform: scaleX(-1); /* Ayna efekti */
         }
 
-        /* Ekranın ortasındaki hedef dairesi */
-        .target-ring {
+        /* Alarm durumunda ekranı kırmızı flaş yaptırmak için */
+        #alarmOverlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 0, 0, 0.3);
+            z-index: 2;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+        }
+
+        /* HUD Göstergeleri */
+        .hud {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            z-index: 3;
+            pointer-events: none;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            color: #00ff66;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .motion-bar-container {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            z-index: 3;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #motionBar {
+            height: 100%;
+            width: 0%;
+            background: #ff3b30;
+            transition: width 0.1s ease;
+        }
+
+        #statusText {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            pointer-events: none;
             z-index: 3;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #ff3b30;
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 59, 48, 0.5);
+            text-align: center;
         }
 
-        /* Renk Bilgi Kartı */
-        .color-card {
+        /* Kontroller */
+        .controls {
             width: 90vw;
             max-width: 450px;
-            background: #1e1e1e;
             margin-top: 15px;
-            border-radius: 16px;
-            padding: 15px;
-            box-sizing: border-box;
             display: flex;
-            align-items: center;
-            gap: 15px;
-            border: 1px solid #333;
-        }
-
-        .color-preview {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            border: 2px solid #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: background-color 0.1s ease;
-        }
-
-        .color-details {
-            flex: 1;
-        }
-
-        .color-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .color-code {
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #aaa;
+            flex-direction: column;
+            gap: 10px;
+            box-sizing: border-box;
         }
 
         button {
-            width: 90vw;
-            max-width: 450px;
-            margin-top: 15px;
-            background: #007aff;
-            border: none;
-            color: #fff;
-            padding: 15px;
+            background: #111;
+            border: 1px solid #00ff66;
+            color: #00ff66;
+            padding: 14px;
             cursor: pointer;
-            font-weight: 600;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: background 0.2s;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            transition: all 0.2s;
         }
 
         button:active {
-            background: #0056b3;
+            background: #00ff66;
+            color: #000;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #aaa;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: #ff3b30;
         }
     </style>
 </head>
 <body>
 
-    <h1>AKILLI RENK DEDEKTÖRÜ</h1>
+    <h1>[ GÜVENLİK SİSTEMİ ACTIVE ]</h1>
     
     <div id="container">
         <video id="webcam" autoplay playsinline muted></video>
-        <canvas id="cameraCanvas"></canvas>
-        <div class="target-ring"></div>
-    </div>
+        <div id="alarmOverlay"></div>
+        
+        <div class="hud">
+            <div>CAM: ACTIVE</div>
+            <div id="motionPercent">HAREKET: 0.0%</div>
+        </div>
 
-    <div class="color-card">
-        <div class="color-preview" id="colorPreview" style="background-color: #333;"></div>
-        <div class="color-details">
-            <div class="color-name" id="colorName">Siyah / Koyu</div>
-            <div class="color-code" id="colorHex">#000000</div>
-            <div class="color-code" id="colorRgb">RGB: 0, 0, 0</div>
+        <div id="statusText">⚠️ HAREKET ALGILANDI!</div>
+
+        <div class="motion-bar-container">
+            <div id="motionBar"></div>
         </div>
     </div>
 
-    <button id="startBtn">Kamerayı Başlat</button>
+    <canvas id="analyseCanvas" style="display:none;"></canvas>
+
+    <div class="controls">
+        <button id="startBtn">Sistemi Başlat</button>
+        <div class="slider-container">
+            <span>Hassasiyet (Düşük = Daha Hassas):</span>
+            <input type="range" id="sensitivitySlider" min="10" max="80" value="35">
+            <span id="sensValue" style="color: #ff3b30; font-weight: bold;">35</span>
+        </div>
+    </div>
 
     <script>
         const video = document.getElementById('webcam');
-        const canvas = document.getElementById('cameraCanvas');
+        const canvas = document.getElementById('analyseCanvas');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const startBtn = document.getElementById('startBtn');
-        const colorPreview = document.getElementById('colorPreview');
-        const colorName = document.getElementById('colorName');
-        const colorHex = document.getElementById('colorHex');
-        const colorRgb = document.getElementById('colorRgb');
+        const alarmOverlay = document.getElementById('alarmOverlay');
+        const statusText = document.getElementById('statusText');
+        const motionBar = document.getElementById('motionBar');
+        const motionPercent = document.getElementById('motionPercent');
+        const sensitivitySlider = document.getElementById('sensitivitySlider');
+        const sensValue = document.getElementById('sensValue');
 
         let stream = null;
         let animationId = null;
+        let prevFrameData = null;
+        let sensitivity = 35; // Piksel değişim eşiği
+        let lastSoundTime = 0; // Sesin sürekli çalıp kasmaması için kontrol
+
+        // Hassasiyet Sürgüsü
+        sensitivitySlider.addEventListener('input', (e) => {
+            sensitivity = parseInt(e.target.value);
+            sensValue.textContent = sensitivity;
+        });
 
         startBtn.addEventListener('click', async () => {
             if (stream) {
@@ -168,19 +226,21 @@
         async function startCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } } 
+                    video: { facingMode: 'environment', width: { ideal: 320 }, height: { ideal: 240 } } 
                 });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
-                    canvas.width = 400;
-                    canvas.height = 400;
-                    startBtn.textContent = "Kamerayı Kapat";
-                    startBtn.style.background = "#ff3b30";
+                    // İşlemciyi yormamak için analizi 160x120 çözünürlüğünde yapıyoruz (Çok hızlı çalışır)
+                    canvas.width = 160;
+                    canvas.height = 120;
+                    startBtn.textContent = "Sistemi Kapat";
+                    startBtn.style.borderColor = "#ff3b30";
+                    startBtn.style.color = "#ff3b30";
                     tick();
                 };
             } catch (err) {
-                alert("Kameraya erişilemedi. İzin verdiğinizden emin olun.");
+                alert("Kamera başlatılamadı. İzin verdiğinizden emin olun.");
             }
         }
 
@@ -191,83 +251,81 @@
             }
             if (animationId) cancelAnimationFrame(animationId);
             video.srcObject = null;
-            startBtn.textContent = "Kamerayı Başlat";
-            startBtn.style.background = "#007aff";
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            startBtn.textContent = "Sistemi Başlat";
+            startBtn.style.borderColor = "#00ff66";
+            startBtn.style.color = "#00ff66";
+            statusText.style.display = 'none';
+            alarmOverlay.style.opacity = 0;
+            motionBar.style.width = '0%';
+            motionPercent.textContent = "HAREKET: 0.0%";
+            prevFrameData = null;
+        }
+
+        // Web Audio API ile yapay alarm sesi üretme (Dışarıdan müzik yüklemeye gerek kalmaz)
+        function playBeep() {
+            const now = Date.now();
+            if (now - lastSoundTime < 400) return; // 400ms'de bir en fazla 1 kez çal
+            lastSoundTime = now;
+
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.type = 'sawtooth'; // Keskin alarm sesi
+            oscillator.frequency.setValueAtTime(950, audioCtx.currentTime); // Yüksek frekans
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Ses şiddeti
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.15); // Kısa bir bip sesi
         }
 
         function tick() {
             if (!stream) return;
 
-            // Video karesini kare şeklinde Canvas'a çiz (merkez odaklı kırpma)
-            const size = Math.min(video.videoWidth, video.videoHeight);
-            const sx = (video.videoWidth - size) / 2;
-            const sy = (video.videoHeight - size) / 2;
-            
-            ctx.drawImage(video, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
+            // Kameradaki görüntüyü analiz tuvaline çiz
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const currentFrame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = currentFrame.data;
 
-            // Tam ortadaki pikselin (200, 200) koordinatını oku
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const pixel = ctx.getImageData(centerX, centerY, 1, 1).data;
+            if (prevFrameData) {
+                let changedPixels = 0;
+                const totalPixels = canvas.width * canvas.height;
 
-            const r = pixel[0];
-            const g = pixel[1];
-            const b = pixel[2];
+                // Tüm pikselleri tek tek önceki kareyle karşılaştır
+                for (let i = 0; i < data.length; i += 4) {
+                    const rDiff = Math.abs(data[i] - prevFrameData[i]);
+                    const gDiff = Math.abs(data[i+1] - prevFrameData[i+1]);
+                    const bDiff = Math.abs(data[i+2] - prevFrameData[i+2]);
+                    
+                    // Eğer renk farkı hassasiyet eşiğinden büyükse hareket var demektir
+                    if (rDiff + gDiff + bDiff > sensitivity * 3) {
+                        changedPixels++;
+                    }
+                }
 
-            // Arayüzü güncelle
-            const hex = rgbToHex(r, g, b);
-            colorPreview.style.backgroundColor = hex;
-            colorHex.textContent = hex.toUpperCase();
-            colorRgb.textContent = `RGB: ${r}, ${g}, ${b}`;
-            colorName.textContent = getColorName(r, g, b);
+                // Değişen piksel yüzdesini hesapla
+                const motionRatio = (changedPixels / totalPixels) * 100;
+                motionPercent.textContent = `HAREKET: ${motionRatio.toFixed(1)}%`;
+                motionBar.style.width = `${Math.min(motionRatio * 3, 100)}%`;
+
+                // Eğer ekrandaki hareket %4'ün üzerindeyse alarmı tetikle
+                if (motionRatio > 4.0) {
+                    alarmOverlay.style.opacity = 1;
+                    statusText.style.display = 'block';
+                    playBeep();
+                } else {
+                    alarmOverlay.style.opacity = 0;
+                    statusText.style.display = 'none';
+                }
+            }
+
+            // Mevcut kareyi, bir sonraki kareyle karşılaştırmak üzere kaydet
+            prevFrameData = data;
 
             animationId = requestAnimationFrame(tick);
-        }
-
-        function rgbToHex(r, g, b) {
-            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-        }
-
-        // Basit renk eşleştirme algoritması
-        function getColorName(r, g, b) {
-            const colors = [
-                { name: "Kırmızı", r: 255, g: 0, b: 0 },
-                { name: "Yeşil", r: 0, g: 255, b: 0 },
-                { name: "Mavi", r: 0, g: 0, b: 255 },
-                { name: "Sarı", r: 255, g: 255, b: 0 },
-                { name: "Turuncu", r: 255, g: 165, b: 0 },
-                { name: "Mor", r: 128, g: 0, b: 128 },
-                { name: "Siyah", r: 15, g: 15, b: 15 },
-                { name: "Beyaz", r: 240, g: 240, b: 240 },
-                { name: "Gri", r: 128, g: 128, b: 128 },
-                { name: "Kahverengi", r: 139, g: 69, b: 19 },
-                { name: "Turkuaz", r: 64, g: 224, b: 208 },
-                { name: "Pembe", r: 255, g: 192, b: 203 }
-            ];
-
-            let closestColor = colors[0];
-            let minDistance = Infinity;
-
-            // 3 Boyutlu RGB uzayında en yakın rengi bul (Öklid mesafesi)
-            colors.forEach(color => {
-                const distance = Math.sqrt(
-                    Math.pow(r - color.r, 2) +
-                    Math.pow(g - color.g, 2) +
-                    Math.pow(b - color.b, 2)
-                );
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestColor = color;
-                }
-            });
-
-            // Eğer çok karanlıksa siyah, çok parlaksa beyaz de
-            const brightness = (r + g + b) / 3;
-            if (brightness < 35) return "Siyah / Çok Koyu";
-            if (brightness > 230) return "Beyaz / Çok Parlak";
-
-            return closestColor.name;
         }
     </script>
 </body>
