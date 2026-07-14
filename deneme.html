@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Net-Radar Ağ Teşhis</title>
+    <title>WiFi-Radar Sinyal Analizörü</title>
     <style>
         :root {
             --neon-green: #00ff66;
@@ -76,33 +76,32 @@
             height: 100%;
         }
 
-        /* Bilgi Panelleri */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+        /* Seçili Ağ Detay Kartı */
+        .details-card {
             width: 100%;
-        }
-
-        .stat-card {
             background-color: var(--panel-bg);
             border: 1px solid rgba(0, 255, 102, 0.2);
             border-radius: 6px;
-            padding: 10px;
-            text-align: center;
+            padding: 10px 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        .stat-label {
-            font-size: 0.75rem;
+        .details-title {
+            font-size: 0.8rem;
             text-transform: uppercase;
             opacity: 0.7;
-            margin-bottom: 5px;
+            border-bottom: 1px dashed rgba(0, 255, 102, 0.2);
+            padding-bottom: 3px;
+            margin-bottom: 3px;
         }
 
-        .stat-val {
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-shadow: 0 0 8px var(--neon-green);
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
         }
 
         /* Grafik Alanı */
@@ -122,7 +121,7 @@
             display: block;
         }
 
-        /* Kontrol Paneli */
+        /* WiFi Listesi */
         .control-panel {
             width: 100%;
             background-color: var(--panel-bg);
@@ -165,21 +164,36 @@
             box-shadow: 0 0 15px var(--neon-red);
         }
 
-        .node-list {
-            font-size: 0.75rem;
+        .wifi-list {
+            font-size: 0.8rem;
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
             background: rgba(0, 255, 102, 0.02);
             padding: 8px;
             border-radius: 4px;
             border: 1px solid rgba(0, 255, 102, 0.1);
         }
 
-        .node-row {
+        .wifi-row {
             display: flex;
             justify-content: space-between;
+            padding: 4px 6px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+
+        .wifi-row:hover {
+            background: rgba(0, 255, 102, 0.1);
+        }
+
+        .wifi-row.selected {
+            background: rgba(0, 255, 102, 0.2);
+            border-left: 3px solid var(--neon-green);
         }
 
         .status-message {
@@ -187,13 +201,22 @@
             text-align: center;
             color: #888;
         }
+
+        /* Özel İnce Scrollbar */
+        .wifi-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .wifi-list::-webkit-scrollbar-thumb {
+            background: var(--neon-green);
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>NET-RADAR v1.0</h1>
-        <div class="status-message" id="status-text">Sistem hazır. Taramayı başlatın.</div>
+        <h1>WIFI-RADAR SCANNER</h1>
+        <div class="status-message" id="status-text">WiFi Alıcısı Pasif. Taramayı Başlatın.</div>
     </header>
 
     <div class="main-container">
@@ -202,15 +225,12 @@
             <canvas id="radar-canvas"></canvas>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Ort. Gecikme (Ping)</div>
-                <div class="stat-val" id="avg-ping">-- ms</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Dalgalanma (Jitter)</div>
-                <div class="stat-val" id="jitter-val" style="color: var(--neon-blue); text-shadow: 0 0 8px var(--neon-blue);">-- ms</div>
-            </div>
+        <div class="details-card">
+            <div class="details-title">Seçili İstasyon Detayları</div>
+            <div class="details-row"><span>SSID (Ağ Adı):</span><span id="det-ssid" style="color: var(--neon-blue);">Seçim Yok</span></div>
+            <div class="details-row"><span>Kanal / Sıklık:</span><span id="det-chan">--</span></div>
+            <div class="details-row"><span>Sinyal Gücü:</span><span id="det-signal">-- dBm</span></div>
+            <div class="details-row"><span>Güvenlik Protokolü:</span><span id="det-sec">--</span></div>
         </div>
 
         <div class="graph-container">
@@ -218,14 +238,10 @@
         </div>
 
         <div class="control-panel">
-            <button class="btn" id="scan-btn">Ağ Taramasını Başlat</button>
+            <button class="btn" id="scan-btn">WiFi Sinyallerini Tara</button>
             
-            <div class="node-list">
-                <div class="node-row"><span>[1] Cloudflare (1.1.1.1)</span><span id="node-0">Bekliyor...</span></div>
-                <div class="node-row"><span>[2] Google DNS (8.8.8.8)</span><span id="node-1">Bekliyor...</span></div>
-                <div class="node-row"><span>[3] GitHub Server</span><span id="node-2">Bekliyor...</span></div>
-                <div class="node-row"><span>[4] Microsoft Web</span><span id="node-3">Bekliyor...</span></div>
-            </div>
+            <div class="wifi-list" id="wifi-list-container">
+                </div>
         </div>
 
     </div>
@@ -236,7 +252,7 @@
         const graphCanvas = document.getElementById('graph-canvas');
         const graphCtx = graphCanvas.getContext('2d');
 
-        // Canlı Boyutlandırma
+        // Canvanları Boyutlandır
         function initCanvases() {
             radarCanvas.width = radarCanvas.parentElement.clientWidth;
             radarCanvas.height = radarCanvas.parentElement.clientHeight;
@@ -245,119 +261,156 @@
         }
         initCanvases();
 
-        // Teşhis Düğümleri (Gerçek web adresleri üzerinden ping testi yapacağız)
-        const targetNodes = [
-            { name: "Cloudflare", url: "https://1.1.1.1/favicon.ico", angle: 45, ping: null, blipAlpha: 0 },
-            { name: "Google", url: "https://www.google.com/favicon.ico", angle: 135, ping: null, blipAlpha: 0 },
-            { name: "GitHub", url: "https://github.com/favicon.ico", angle: 225, ping: null, blipAlpha: 0 },
-            { name: "Microsoft", url: "https://www.microsoft.com/favicon.ico", angle: 315, ping: null, blipAlpha: 0 }
+        // Gerçekçi Simüle Edilen WiFi Ağları Listesi (Mesafe dbm ile ters orantılı)
+        const simulatedNetworks = [
+            { id: 1, ssid: "TURKTELEKOM_G5HG", dbm: -42, channel: 6, security: "WPA3-Personal", angle: 50, blipAlpha: 0, history: [] },
+            { id: 2, ssid: "Superonline_WiFi_2.4GHz", dbm: -68, channel: 11, security: "WPA2-PSK", angle: 140, blipAlpha: 0, history: [] },
+            { id: 3, ssid: "Zyxel_Modem_Komsu", dbm: -82, channel: 1, security: "WPA2-PSK", angle: 220, blipAlpha: 0, history: [] },
+            { id: 4, ssid: "Turkcell_Superbox_LTE", dbm: -55, channel: 9, security: "WPA3", angle: 290, blipAlpha: 0, history: [] },
+            { id: 5, ssid: "Belediye_FREE_WiFi", dbm: -89, channel: 13, security: "Open (Şifresiz)", angle: 15, blipAlpha: 0, history: [] }
         ];
+
+        // Geçmiş veriyi doldur
+        simulatedNetworks.forEach(net => {
+            net.history = Array(50).fill(net.dbm);
+        });
 
         let active = false;
         let sweepAngle = 0;
-        let pingHistory = [];
-        let lastPingTime = 0;
+        let selectedNetworkId = 1; // Varsayılan seçili ağ
+        let lastUpdateTime = 0;
 
-        // Butonlar ve Arayüz Güncellemeleri
+        // Dom Elementleri
         const scanBtn = document.getElementById('scan-btn');
         const statusText = document.getElementById('status-text');
-        const avgPingText = document.getElementById('avg-ping');
-        const jitterText = document.getElementById('jitter-val');
+        const wifiListContainer = document.getElementById('wifi-list-container');
+        
+        const detSsid = document.getElementById('det-ssid');
+        const detChan = document.getElementById('det-chan');
+        const detSignal = document.getElementById('det-signal');
+        const detSec = document.getElementById('det-sec');
 
-        // CORS Engeline Takılmadan Ping Süresi Ölçme Metodu (HTTP/HTTPS üzerinden)
-        async function measurePing(node, index) {
-            const start = performance.now();
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 sn sınır
-
+        // Ses Efekti (Web Audio API ile Sonar Bip Sesi)
+        let audioCtx = null;
+        function playSonarBeep(frequency, volume) {
             try {
-                // cache: 'no-store' kullanarak tarayıcının önbellekten çekmesini engelliyoruz
-                await fetch(node.url, { 
-                    mode: 'no-cors', 
-                    cache: 'no-store',
-                    signal: controller.signal
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(volume * 0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {
+                console.log("Audio hatası:", e);
+            }
+        }
+
+        // WiFi Listesini Arayüze Bas
+        function renderWiFiList() {
+            wifiListContainer.innerHTML = '';
+            simulatedNetworks.forEach(net => {
+                const row = document.createElement('div');
+                row.className = `wifi-row ${net.id === selectedNetworkId ? 'selected' : ''}`;
+                row.innerHTML = `
+                    <span>⚡ ${net.ssid}</span>
+                    <span>${net.dbm} dBm</span>
+                `;
+                row.addEventListener('click', () => {
+                    selectedNetworkId = net.id;
+                    renderWiFiList();
+                    updateDetailCard();
                 });
-                const duration = Math.round(performance.now() - start);
-                clearTimeout(timeoutId);
-                return duration;
-            } catch (err) {
-                // no-cors modunda sunucudan hata dönse bile el sıkışma süresini yakalayabiliriz
-                const duration = Math.round(performance.now() - start);
-                clearTimeout(timeoutId);
-                return duration < 1900 ? duration : 999; // 999ms = Zaman Aşımı
+                wifiListContainer.appendChild(row);
+            });
+        }
+
+        // Kart Detaylarını Güncelle
+        function updateDetailCard() {
+            const net = simulatedNetworks.find(n => n.id === selectedNetworkId);
+            if (net) {
+                detSsid.textContent = net.ssid;
+                detChan.textContent = `Ch ${net.channel} (2.4 GHz)`;
+                detSignal.textContent = `${net.dbm} dBm`;
+                detSec.textContent = net.security;
+
+                // Sinyal gücüne göre rengi değiştir
+                if (net.dbm >= -60) detSignal.style.color = "var(--neon-green)";
+                else if (net.dbm >= -80) detSignal.style.color = "var(--neon-blue)";
+                else detSignal.style.color = "var(--neon-red)";
             }
         }
 
-        // Seçilen Düğümü Tetikle
-        async function triggerNodePing(index) {
-            const node = targetNodes[index];
-            document.getElementById(`node-${index}`).textContent = "Taranıyor...";
-            document.getElementById(`node-${index}`).style.color = "var(--neon-blue)";
-
-            const result = await measurePing(node, index);
-            node.ping = result;
-            node.blipAlpha = 1.0; // Radar noktasını parlat
-
-            // Geçmiş veriyi güncelle
-            if (result < 999) {
-                pingHistory.push(result);
-                if (pingHistory.length > 50) pingHistory.shift();
-                calculateStats();
-                document.getElementById(`node-${index}`).textContent = `${result} ms`;
-                document.getElementById(`node-${index}`).style.color = "var(--neon-green)";
-            } else {
-                document.getElementById(`node-${index}`).textContent = "Zaman Aşımı";
-                document.getElementById(`node-${index}`).style.color = "var(--neon-red)";
-            }
-        }
-
-        // İstatistikleri (Ortalama & Jitter) Hesapla
-        function calculateStats() {
-            if (pingHistory.length === 0) return;
-            const avg = Math.round(pingHistory.reduce((a, b) => a + b, 0) / pingHistory.length);
-            avgPingText.textContent = `${avg} ms`;
-
-            // Jitter (Gecikme Sapması): Peş peşe gelen ping farklarının ortalamasıdır
-            let totalDiff = 0;
-            for (let i = 1; i < pingHistory.length; i++) {
-                totalDiff += Math.abs(pingHistory[i] - pingHistory[i - 1]);
-            }
-            const jitter = pingHistory.length > 1 ? Math.round(totalDiff / (pingHistory.length - 1)) : 0;
-            jitterText.textContent = `${jitter} ms`;
-        }
-
-        // Başlat/Durdur
+        // Başlat / Durdur Butonu
         scanBtn.addEventListener('click', () => {
             if (!active) {
                 active = true;
-                scanBtn.textContent = "Taramayı Durdur";
+                scanBtn.textContent = "Tarayıcıyı Kapat";
                 scanBtn.classList.add('btn-stop');
-                statusText.textContent = "Ağ paketleri gönderiliyor... Canlı ping ölçümü aktif.";
+                statusText.textContent = "Çevredeki kablosuz yayınlar taranıyor...";
                 statusText.style.color = "var(--neon-green)";
+                renderWiFiList();
+                updateDetailCard();
                 animate();
             } else {
                 active = false;
-                scanBtn.textContent = "Ağ Taramasını Başlat";
+                scanBtn.textContent = "WiFi Sinyallerini Tara";
                 scanBtn.classList.remove('btn-stop');
                 statusText.textContent = "Tarama durduruldu.";
                 statusText.style.color = "#888";
             }
         });
 
-        // Ana Animasyon Döngüsü
+        // WiFi Sinyal Güçlerinde Rastgele Küçük Dalgalanmalar Yarat (Gerçekçilik için)
+        function simulateSignalFluctuations() {
+            simulatedNetworks.forEach(net => {
+                // Sinyali hafifçe oynat (+- 2 dBm)
+                const change = Math.round((Math.random() - 0.5) * 3);
+                let newDbm = net.dbm + change;
+                // Mantıklı sınırlar içinde tut (-30 ile -95 arası)
+                newDbm = Math.max(-95, Math.min(-30, newDbm));
+                net.dbm = newDbm;
+
+                // Geçmiş veriyi güncelle (Grafik için)
+                net.history.push(newDbm);
+                net.history.shift();
+            });
+            renderWiFiList();
+            updateDetailCard();
+        }
+
+        // Ana Döngü
         function animate() {
             if (!active) return;
 
-            // Radar Tarama Açısını Güncelle (Dönüş hızı)
-            sweepAngle = (sweepAngle + 1.5) % 360;
+            // Radar açısını döndür (Yavaş, kontrollü bir tarama)
+            sweepAngle = (sweepAngle + 1.2) % 360;
 
-            // Radar çizgisi her 90 derecelik dilime geldiğinde ilgili sunucuyu pinglesin
-            targetNodes.forEach((node, idx) => {
-                // Açı eşleştiğinde (ufak bir toleransla) ping gönder
-                if (Math.abs(sweepAngle - node.angle) < 1.5) {
-                    triggerNodePing(idx);
+            // Radar iğnesi her ağın açısından geçerken onu tetikle
+            simulatedNetworks.forEach(net => {
+                if (Math.abs(sweepAngle - net.angle) < 1.2) {
+                    net.blipAlpha = 1.0; // Parlama tetiklendi!
+                    // Sinyal gücü yüksekse daha tiz, zayıfsa daha pes bir ses çal
+                    const pitch = 300 + (Math.abs(net.dbm) * -4); // Örn: -40 dbm -> 140Hz, -90 dbm -> 60Hz
+                    playSonarBeep(pitch, (100 - Math.abs(net.dbm)) / 100);
                 }
             });
+
+            // Belirli aralıklarla sinyal verilerini dalgalandır (Saniyede 1 kez)
+            const now = performance.now();
+            if (now - lastUpdateTime > 1000) {
+                simulateSignalFluctuations();
+                lastUpdateTime = now;
+            }
 
             drawRadar();
             drawGraph();
@@ -365,7 +418,7 @@
             requestAnimationFrame(animate);
         }
 
-        // Radar Ekranı Çizimi
+        // Radar Ekranını Çiz
         function drawRadar() {
             const w = radarCanvas.width;
             const h = radarCanvas.height;
@@ -375,93 +428,101 @@
 
             radarCtx.clearRect(0, 0, w, h);
 
-            // 1. Grid Çemberleri Çizimi
-            radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.15)';
+            // 1. Grid Halkaları (Uzaklık / Sinyal Seviyeleri)
+            radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.12)';
             radarCtx.lineWidth = 1;
+            const levelLabels = ["-30 dBm", "-50 dBm", "-70 dBm", "-90 dBm"];
+            let idx = 0;
             for (let r = maxRadius; r > 0; r -= maxRadius / 4) {
                 radarCtx.beginPath();
                 radarCtx.arc(cx, cy, r, 0, Math.PI * 2);
                 radarCtx.stroke();
+                
+                // Seviye Etiketleri
+                radarCtx.fillStyle = 'rgba(0, 255, 102, 0.3)';
+                radarCtx.font = '7px monospace';
+                radarCtx.fillText(levelLabels[idx++], cx + 5, cy - r + 10);
             }
 
-            // 2. Çapraz Eksen Çizgileri
-            radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.1)';
+            // 2. Çapraz Yön Çizgileri
+            radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.08)';
             radarCtx.beginPath();
             radarCtx.moveTo(cx - maxRadius, cy); radarCtx.lineTo(cx + maxRadius, cy);
             radarCtx.moveTo(cx, cy - maxRadius); radarCtx.lineTo(cx, cy + maxRadius);
             radarCtx.stroke();
 
-            // 3. Dönüp Duran Tarama İğnesi (Sweep line)
+            // 3. Dönen Radar Tarama İğnesi (Sweep)
             const radAngle = (sweepAngle * Math.PI) / 180;
             const sweepX = cx + maxRadius * Math.cos(radAngle);
             const sweepY = cy + maxRadius * Math.sin(radAngle);
 
-            // Tarama izinin arkasında kalan solma efekti (gradient)
-            radarCtx.fillStyle = radarCtx.createRadialGradient(cx, cy, 0, cx, cy, maxRadius);
+            // Radar Sweep Solma Kuyruğu
+            const sweepGrad = radarCtx.createLinearGradient(cx, cy, sweepX, sweepY);
+            sweepGrad.addColorStop(0, 'rgba(0, 255, 102, 0.25)');
+            sweepGrad.addColorStop(1, 'rgba(0, 255, 102, 0)');
             
+            radarCtx.fillStyle = sweepGrad;
             radarCtx.beginPath();
             radarCtx.moveTo(cx, cy);
             radarCtx.arc(cx, cy, maxRadius, radAngle, radAngle - 0.25 * Math.PI, true);
             radarCtx.closePath();
-            
-            const sweepGrad = radarCtx.createLinearGradient(cx, cy, sweepX, sweepY);
-            sweepGrad.addColorStop(0, 'rgba(0, 255, 102, 0.2)');
-            sweepGrad.addColorStop(1, 'rgba(0, 255, 102, 0)');
-            radarCtx.fillStyle = sweepGrad;
             radarCtx.fill();
 
-            // Ana Tarama Çizgisi
-            radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.8)';
-            radarCtx.lineWidth = 1.5;
+            // Tarama Çizgisi
+            radarCtx.strokeStyle = 'rgba(0, 255, 102, 0.7)';
+            radarCtx.lineWidth = 1.2;
             radarCtx.beginPath();
             radarCtx.moveTo(cx, cy);
             radarCtx.lineTo(sweepX, sweepY);
             radarCtx.stroke();
 
-            // 4. Sunucu Noktaları (Blips) Çizimi
-            targetNodes.forEach(node => {
-                if (node.ping !== null) {
-                    const nodeRad = (node.angle * Math.PI) / 180;
-                    
-                    // Ping değerini mesafeye ölçekle (Merkez = 0ms, Kenar = 300ms+)
-                    const clampedPing = Math.min(node.ping, 300);
-                    // Düşük ping merkeze yakın olsun, yüksek ping kenara gitsin
-                    const distRatio = clampedPing / 300;
-                    const r = 20 + distRatio * (maxRadius - 35); 
+            // 4. WiFi Ağ Noktalarını (Blips) Ekrana Çiz
+            simulatedNetworks.forEach(net => {
+                const angleRad = (net.angle * Math.PI) / 180;
 
-                    const blipX = cx + r * Math.cos(nodeRad);
-                    const blipY = cy + r * Math.sin(nodeRad);
+                // dBm'i merkez uzaklığına eşle: -30dBm en yakın, -100dBm en uzak sınır
+                const distanceRatio = (Math.abs(net.dbm) - 30) / (100 - 30); // 0 (merkez) ile 1 (kenar) arası
+                const r = Math.max(15, distanceRatio * maxRadius);
 
-                    // Noktanın parlaması ve solması
-                    if (node.blipAlpha > 0) {
-                        node.blipAlpha -= 0.005; // Yavaşça sönme efekti
-                    }
+                const blipX = cx + r * Math.cos(angleRad);
+                const blipY = cy + r * Math.sin(angleRad);
 
-                    // Blip Dışı Halka
-                    radarCtx.fillStyle = node.ping > 150 ? `rgba(255, 51, 51, ${node.blipAlpha * 0.3})` : `rgba(0, 255, 102, ${node.blipAlpha * 0.3})`;
-                    radarCtx.beginPath();
-                    radarCtx.arc(blipX, blipY, 12, 0, Math.PI * 2);
-                    radarCtx.fill();
-
-                    // Merkez Noktası
-                    radarCtx.fillStyle = node.ping > 150 ? `rgba(255, 51, 51, ${node.blipAlpha})` : `rgba(0, 255, 102, ${node.blipAlpha})`;
-                    radarCtx.beginPath();
-                    radarCtx.arc(blipX, blipY, 5, 0, Math.PI * 2);
-                    radarCtx.fill();
-
-                    // Etiket (İsim ve Ping değeri)
-                    radarCtx.fillStyle = `rgba(0, 255, 102, ${Math.max(node.blipAlpha, 0.4)})`;
-                    radarCtx.font = '8px monospace';
-                    radarCtx.fillText(`${node.name}: ${node.ping}ms`, blipX + 8, blipY + 3);
+                if (net.blipAlpha > 0) {
+                    net.blipAlpha -= 0.008; // Yavaşça söndür
                 }
+
+                // Sinyal gücüne göre renk seç
+                let colorString = `rgba(0, 255, 102, ${Math.max(net.blipAlpha, 0.2)})`; // Güçlü / Normal
+                if (net.dbm < -75) {
+                    colorString = `rgba(255, 51, 51, ${Math.max(net.blipAlpha, 0.2)})`; // Zayıf
+                } else if (net.id === selectedNetworkId) {
+                    colorString = `rgba(0, 255, 255, ${Math.max(net.blipAlpha, 0.4)})`; // Seçili Ağ
+                }
+
+                // Parlama Efekti (Büyük Halka)
+                radarCtx.fillStyle = colorString;
+                radarCtx.beginPath();
+                radarCtx.arc(blipX, blipY, 14 * net.blipAlpha, 0, Math.PI * 2);
+                radarCtx.fill();
+
+                // Merkez Nokta
+                radarCtx.fillStyle = colorString;
+                radarCtx.beginPath();
+                radarCtx.arc(blipX, blipY, 4, 0, Math.PI * 2);
+                radarCtx.fill();
+
+                // Ağ İsmi Etiketi
+                radarCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                radarCtx.font = '8px monospace';
+                radarCtx.fillText(net.ssid.substring(0, 10) + '..', blipX + 8, blipY + 3);
             });
         }
 
-        // Ağ Gecikme Geçmişi Grafiği
+        // Seçili WiFi Sinyal Geçmiş Grafiği (Zaman Analizi)
         function drawGraph() {
             graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
 
-            // Arka Plan İnce Grid
+            // Arka Plan Grid Çizimi
             graphCtx.strokeStyle = 'rgba(0, 255, 102, 0.05)';
             graphCtx.lineWidth = 1;
             for (let i = 0; i < graphCanvas.width; i += 40) {
@@ -470,18 +531,20 @@
                 graphCtx.stroke();
             }
 
-            if (pingHistory.length < 2) return;
+            const selectedNet = simulatedNetworks.find(n => n.id === selectedNetworkId);
+            if (!selectedNet || selectedNet.history.length < 2) return;
 
-            // Çizgi Grafiği
-            graphCtx.strokeStyle = 'var(--neon-green)';
-            graphCtx.lineWidth = 1.5;
+            // Sinyal Çizgisi
+            graphCtx.strokeStyle = selectedNet.dbm > -75 ? 'var(--neon-green)' : 'var(--neon-red)';
+            graphCtx.lineWidth = 2;
             graphCtx.beginPath();
 
-            const step = graphCanvas.width / (pingHistory.length - 1);
-            for (let i = 0; i < pingHistory.length; i++) {
-                const val = pingHistory[i];
-                // 0ms - 200ms aralığını dikey eksene sığdır
-                const y = graphCanvas.height - (Math.min(val, 200) / 200) * (graphCanvas.height - 10) - 5;
+            const step = graphCanvas.width / (selectedNet.history.length - 1);
+            for (let i = 0; i < selectedNet.history.length; i++) {
+                const val = selectedNet.history[i]; // -30 ile -100 arası
+                // Grafiği dikey eksende dikey sığdır (-30 üstte, -100 altta)
+                const ratio = (Math.abs(val) - 30) / 70;
+                const y = 10 + ratio * (graphCanvas.height - 20);
                 const x = i * step;
 
                 if (i === 0) {
@@ -491,9 +554,16 @@
                 }
             }
             graphCtx.stroke();
+
+            // Grafik Bilgisi Yazısı
+            graphCtx.fillStyle = 'rgba(0, 255, 102, 0.7)';
+            graphCtx.font = '9px monospace';
+            graphCtx.fillText(`TAKIP: ${selectedNet.ssid} | SİNYAL ANALİZİ (dBm)`, 10, 15);
         }
 
-        // Sayfa ilk yüklendiğinde bir tur boş radar çizilsin
+        // Başlangıç Kurulumları
+        renderWiFiList();
+        updateDetailCard();
         drawRadar();
     </script>
 </body>
