@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sade Kamera Ölçüm Aracı</title>
+    <title>Akıllı Renk Dedektörü</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #111;
+            background-color: #121212;
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
@@ -20,181 +20,142 @@
         }
 
         h1 {
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             margin: 10px 0;
-            font-weight: 500;
             letter-spacing: 1px;
-            color: #aaa;
+            color: #eee;
         }
 
         #container {
             position: relative;
-            width: 95vw;
-            max-width: 500px;
-            aspect-ratio: 3/4;
-            border-radius: 16px;
+            width: 90vw;
+            max-width: 450px;
+            aspect-ratio: 1/1;
+            border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            background: #000;
+            border: 3px solid #333;
         }
 
         video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            display: none; /* Arka planda işleyeceğiz */
         }
 
         canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2;
+            display: block;
         }
 
-        /* Bilgi Paneli */
-        .info-panel {
+        /* Ekranın ortasındaki hedef dairesi */
+        .target-ring {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 15px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none;
             z-index: 3;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .result {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #00ff66;
+        /* Renk Bilgi Kartı */
+        .color-card {
+            width: 90vw;
+            max-width: 450px;
+            background: #1e1e1e;
+            margin-top: 15px;
+            border-radius: 16px;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #333;
+        }
+
+        .color-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: background-color 0.1s ease;
+        }
+
+        .color-details {
+            flex: 1;
+        }
+
+        .color-name {
+            font-size: 1.2rem;
+            font-weight: bold;
             margin-bottom: 4px;
         }
 
-        .instruction {
-            font-size: 11px;
-            color: #ccc;
-        }
-
-        /* Kontroller */
-        .controls {
-            width: 95vw;
-            max-width: 500px;
-            margin-top: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
+        .color-code {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #aaa;
         }
 
         button {
-            flex: 1;
-            background: #222;
-            border: 1px solid #44;
+            width: 90vw;
+            max-width: 450px;
+            margin-top: 15px;
+            background: #007aff;
+            border: none;
             color: #fff;
-            padding: 14px;
+            padding: 15px;
             cursor: pointer;
             font-weight: 600;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: background 0.2s;
         }
 
         button:active {
-            background: #333;
-            transform: scale(0.98);
-        }
-
-        #startBtn {
-            background: #007aff;
-            border-color: #007aff;
-        }
-
-        #startBtn:active {
             background: #0056b3;
-        }
-
-        .slider-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #aaa;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 15px;
-            border-radius: 10px;
-        }
-
-        input[type="range"] {
-            flex: 1;
-            accent-color: #007aff;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h1>KAMERALI ÖLÇÜM ARACI</h1>
+    <h1>AKILLI RENK DEDEKTÖRÜ</h1>
     
     <div id="container">
         <video id="webcam" autoplay playsinline muted></video>
-        <canvas id="measureCanvas"></canvas>
-        
-        <div class="info-panel">
-            <div class="result" id="resultText">0.00 cm</div>
-            <div class="instruction" id="helperText">Başlamak için kamerayı açın ve ekrana dokunun</div>
+        <canvas id="cameraCanvas"></canvas>
+        <div class="target-ring"></div>
+    </div>
+
+    <div class="color-card">
+        <div class="color-preview" id="colorPreview" style="background-color: #333;"></div>
+        <div class="color-details">
+            <div class="color-name" id="colorName">Siyah / Koyu</div>
+            <div class="color-code" id="colorHex">#000000</div>
+            <div class="color-code" id="colorRgb">RGB: 0, 0, 0</div>
         </div>
     </div>
 
-    <div class="controls">
-        <div class="btn-row">
-            <button id="startBtn">Kamerayı Aç</button>
-            <button id="clearBtn">Temizle</button>
-        </div>
-        <div class="slider-container">
-            <span>Kalibrasyon (Ölçek):</span>
-            <input type="range" id="scaleSlider" min="0.05" max="1.50" step="0.01" value="0.25">
-            <span id="scaleValue" style="font-weight: bold; color: #fff;">0.25</span>
-        </div>
-    </div>
+    <button id="startBtn">Kamerayı Başlat</button>
 
     <script>
         const video = document.getElementById('webcam');
-        const canvas = document.getElementById('measureCanvas');
-        const ctx = canvas.getContext('2d');
+        const canvas = document.getElementById('cameraCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const startBtn = document.getElementById('startBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const scaleSlider = document.getElementById('scaleSlider');
-        const scaleValue = document.getElementById('scaleValue');
-        const resultText = document.getElementById('resultText');
-        const helperText = document.getElementById('helperText');
+        const colorPreview = document.getElementById('colorPreview');
+        const colorName = document.getElementById('colorName');
+        const colorHex = document.getElementById('colorHex');
+        const colorRgb = document.getElementById('colorRgb');
 
         let stream = null;
-        let points = []; 
-        let scaleFactor = 0.25; // Pikseli santimetreye dönüştürme katsayısı
-
-        // Kalibrasyon ayarı
-        scaleSlider.addEventListener('input', (e) => {
-            scaleFactor = parseFloat(e.target.value);
-            scaleValue.textContent = scaleFactor.toFixed(2);
-            updateMeasurement();
-        });
+        let animationId = null;
 
         startBtn.addEventListener('click', async () => {
             if (stream) {
@@ -204,28 +165,22 @@
             }
         });
 
-        clearBtn.addEventListener('click', () => {
-            points = [];
-            resultText.textContent = "0.00 cm";
-            if (stream) helperText.textContent = "Ölçmek istediğiniz ilk noktaya dokunun";
-            drawScene();
-        });
-
         async function startCamera() {
             try {
-                // Arka kamerayı açar
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 960 } } 
+                    video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 640 } } 
                 });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
-                    resizeCanvas();
+                    canvas.width = 400;
+                    canvas.height = 400;
                     startBtn.textContent = "Kamerayı Kapat";
-                    helperText.textContent = "Ölçmek istediğiniz ilk noktaya dokunun";
+                    startBtn.style.background = "#ff3b30";
+                    tick();
                 };
             } catch (err) {
-                alert("Kamera başlatılamadı. Lütfen izin verdiğinizden emin olun.");
+                alert("Kameraya erişilemedi. İzin verdiğinizden emin olun.");
             }
         }
 
@@ -234,112 +189,85 @@
                 stream.getTracks().forEach(track => track.stop());
                 stream = null;
             }
+            if (animationId) cancelAnimationFrame(animationId);
             video.srcObject = null;
-            startBtn.textContent = "Kamerayı Aç";
-            helperText.textContent = "Başlamak için kamerayı açın ve ekrana dokunun";
-            points = [];
-            resultText.textContent = "0.00 cm";
+            startBtn.textContent = "Kamerayı Başlat";
+            startBtn.style.background = "#007aff";
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        function resizeCanvas() {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-            drawScene();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-
-        // Ekran dokunuşlarını yakalama
-        canvas.addEventListener('click', (e) => {
+        function tick() {
             if (!stream) return;
 
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            // Video karesini kare şeklinde Canvas'a çiz (merkez odaklı kırpma)
+            const size = Math.min(video.videoWidth, video.videoHeight);
+            const sx = (video.videoWidth - size) / 2;
+            const sy = (video.videoHeight - size) / 2;
+            
+            ctx.drawImage(video, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
 
-            // 2 nokta zaten varsa, yeni tıklamada ekranı sıfırla ve yeni başlangıç noktası yap
-            if (points.length >= 2) {
-                points = [];
-            }
+            // Tam ortadaki pikselin (200, 200) koordinatını oku
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const pixel = ctx.getImageData(centerX, centerY, 1, 1).data;
 
-            points.push({ x, y });
-            updateMeasurement();
-            drawScene();
-        });
+            const r = pixel[0];
+            const g = pixel[1];
+            const b = pixel[2];
 
-        function updateMeasurement() {
-            if (points.length === 1) {
-                helperText.textContent = "Şimdi ikinci noktaya dokunun";
-                resultText.textContent = "0.00 cm";
-            } else if (points.length === 2) {
-                const p1 = points[0];
-                const p2 = points[1];
+            // Arayüzü güncelle
+            const hex = rgbToHex(r, g, b);
+            colorPreview.style.backgroundColor = hex;
+            colorHex.textContent = hex.toUpperCase();
+            colorRgb.textContent = `RGB: ${r}, ${g}, ${b}`;
+            colorName.textContent = getColorName(r, g, b);
 
-                // Matematiksel mesafe hesabı
-                const pixelDist = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-                const realDist = pixelDist * scaleFactor;
-                
-                resultText.textContent = `${realDist.toFixed(2)} cm`;
-                helperText.textContent = "Yeni bir ölçüm için tekrar dokunabilirsiniz";
-            }
+            animationId = requestAnimationFrame(tick);
         }
 
-        // Çizim fonksiyonu
-        function drawScene() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
 
-            if (points.length === 0) return;
+        // Basit renk eşleştirme algoritması
+        function getColorName(r, g, b) {
+            const colors = [
+                { name: "Kırmızı", r: 255, g: 0, b: 0 },
+                { name: "Yeşil", r: 0, g: 255, b: 0 },
+                { name: "Mavi", r: 0, g: 0, b: 255 },
+                { name: "Sarı", r: 255, g: 255, b: 0 },
+                { name: "Turuncu", r: 255, g: 165, b: 0 },
+                { name: "Mor", r: 128, g: 0, b: 128 },
+                { name: "Siyah", r: 15, g: 15, b: 15 },
+                { name: "Beyaz", r: 240, g: 240, b: 240 },
+                { name: "Gri", r: 128, g: 128, b: 128 },
+                { name: "Kahverengi", r: 139, g: 69, b: 19 },
+                { name: "Turkuaz", r: 64, g: 224, b: 208 },
+                { name: "Pembe", r: 255, g: 192, b: 203 }
+            ];
 
-            // 1. Nokta (Başlangıç)
-            ctx.beginPath();
-            ctx.arc(points[0].x, points[0].y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#007aff';
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.fill();
-            ctx.stroke();
+            let closestColor = colors[0];
+            let minDistance = Infinity;
 
-            if (points.length === 1) return;
+            // 3 Boyutlu RGB uzayında en yakın rengi bul (Öklid mesafesi)
+            colors.forEach(color => {
+                const distance = Math.sqrt(
+                    Math.pow(r - color.r, 2) +
+                    Math.pow(g - color.g, 2) +
+                    Math.pow(b - color.b, 2)
+                );
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestColor = color;
+                }
+            });
 
-            // 2. Nokta (Bitiş)
-            ctx.beginPath();
-            ctx.arc(points[1].x, points[1].y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#007aff';
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
-            ctx.fill();
-            ctx.stroke();
+            // Eğer çok karanlıksa siyah, çok parlaksa beyaz de
+            const brightness = (r + g + b) / 3;
+            if (brightness < 35) return "Siyah / Çok Koyu";
+            if (brightness > 230) return "Beyaz / Çok Parlak";
 
-            // İki nokta arasındaki çizgi
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            ctx.lineTo(points[1].x, points[1].y);
-            ctx.strokeStyle = '#00ff66';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
-            // Çizginin üzerine mesafe etiketi yazma
-            const midX = (points[0].x + points[1].x) / 2;
-            const midY = (points[0].y + points[1].y) / 2;
-            const pixelDist = Math.sqrt(Math.pow(points[1].x - points[0].x, 2) + Math.pow(points[1].y - points[0].y, 2));
-            const realDist = pixelDist * scaleFactor;
-
-            ctx.save();
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            ctx.font = 'bold 14px sans-serif';
-            const text = `${realDist.toFixed(1)} cm`;
-            const textWidth = ctx.measureText(text).width;
-            
-            // Yazı arkasına küçük siyah bir kutu (okunabilirliği artırmak için)
-            ctx.fillRect(midX - (textWidth/2) - 6, midY - 12, textWidth + 12, 24);
-            
-            // Yazıyı yaz
-            ctx.fillStyle = '#00ff66';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, midX, midY);
-            ctx.restore();
+            return closestColor.name;
         }
     </script>
 </body>
