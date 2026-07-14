@@ -1,1 +1,696 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görüntü Dönüştürme & Piksel Laboratuvarı</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --text-color: #f8fafc;
+            --border-color: #334155;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sol Kontrol Paneli */
+        #sidebar {
+            width: 360px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.3rem;
+            margin: 0;
+            color: var(--accent-color);
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-header p {
+            margin: 5px 0 0 0;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+        }
+
+        select, input[type="number"], input[type="range"] {
+            width: 100%;
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #334155;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .range-val {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            float: right;
+            font-family: monospace;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Sağ Önizleme Alanı */
+        #preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            background-color: #0b0f19;
+            position: relative;
+        }
+
+        #drop-zone {
+            border: 2px dashed #475569;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 16/9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: rgba(30, 41, 59, 0.2);
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #drop-zone.dragover {
+            border-color: var(--accent-color);
+            background-color: rgba(56, 189, 248, 0.05);
+        }
+
+        #drop-zone svg {
+            width: 60px;
+            height: 60px;
+            fill: #64748b;
+            margin-bottom: 15px;
+            transition: fill 0.3s;
+        }
+
+        #drop-zone:hover svg, #drop-zone.dragover svg {
+            fill: var(--accent-color);
+        }
+
+        #preview-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;
+            max-height: 100%;
+            gap: 15px;
+        }
+
+        #canvas-wrapper {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 70vh;
+            display: block;
+        }
+
+        #ascii-preview {
+            display: none;
+            font-family: monospace;
+            white-space: pre;
+            background-color: #020617;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 8px;
+            line-height: 1;
+            overflow: auto;
+            max-width: 90vw;
+            max-height: 70vh;
+            border: 1px solid var(--border-color);
+        }
+
+        /* İşlem Butonları */
+        .btn-container {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--panel-bg);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: #0f172a;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .dimensions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        #reset-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0;
+            text-decoration: underline;
+        }
+
+        #reset-btn:hover {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h1>Piksel Laboratuvarı</h1>
+            <p>Sıfır Sunucu, %100 Yerel Dönüştürücü</p>
+        </div>
+
+        <div class="scrollable-content">
+            <div class="section">
+                <div class="section-title">
+                    Boyut Ayarları
+                    <button id="reset-btn" onclick="resetDimensions()">Sıfırla</button>
+                </div>
+                <div class="control-group dimensions-row">
+                    <div>
+                        <label for="imgWidth">Genişlik (px)</label>
+                        <input type="number" id="imgWidth" oninput="changeDimension('width')">
+                    </div>
+                    <div>
+                        <label for="imgHeight">Yükseklik (px)</label>
+                        <input type="number" id="imgHeight" oninput="changeDimension('height')">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="aspectRatio" checked> En-Boy Oranını Koru
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Piksel Filtreleri</div>
+                
+                <label class="checkbox-group">
+                    <input type="checkbox" id="filterGrayscale" onchange="processImage()"> Gri Tonlama (B&W)
+                </label>
+
+                <label class="checkbox-group">
+                    <input type="checkbox" id="filterInvert" onchange="processImage()"> Renkleri Ters Çevir (Invert)
+                </label>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+
+                <label class="checkbox-group">
+                    <input type="checkbox" id="filterPixelate" onchange="togglePixelate(this)"> Piksel Sanatı (Pixelate)
+                </label>
+                <div class="control-group" id="pixelSizeContainer" style="display:none; margin-top: 10px;">
+                    <label for="pixelSize">Piksel Boyutu <span class="range-val" id="pixelSizeVal">8px</span></label>
+                    <input type="range" id="pixelSize" min="2" max="32" value="8" oninput="updatePixelSize(this.value)">
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
+
+                <label class="checkbox-group" style="color: #10b981;">
+                    <input type="checkbox" id="filterAscii" onchange="toggleAscii(this)"> ASCII Karakter Sanatı
+                </label>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Çıktı Formatı</div>
+                <div class="control-group">
+                    <label for="outputFormat">Format Seçimi</label>
+                    <select id="outputFormat" onchange="toggleQualitySlider()">
+                        <option value="image/png">PNG (Kayıpsız)</option>
+                        <option value="image/jpeg">JPEG (Sıkıştırılmış)</option>
+                        <option value="image/webp">WebP (Modern & Hafif)</option>
+                        <option value="image/avif">AVIF (Yeni Nesil & Güçlü Sıkıştırma)</option>
+                        <option value="image/gif">GIF (Retro & 256 Renk)</option>
+                        <option value="image/bmp">BMP (Sıkıştırmasız / Ham)</option>
+                        <option value="image/x-icon">ICO (Favicon / Web İkonu)</option>
+                    </select>
+                </div>
+                <div class="control-group" id="qualityContainer" style="display: none;">
+                    <label for="outputQuality">Sıkıştırma Kalitesi <span class="range-val" id="qualityVal">85%</span></label>
+                    <input type="range" id="outputQuality" min="10" max="100" value="85" oninput="updateQuality(this.value)">
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-secondary" onclick="triggerFileSelect()">Yeni Görsel Seç</button>
+            <button class="btn btn-primary" onclick="downloadImage()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4M7 10l5 5 5-5M12 15V3"/></svg>
+                Şimdi İndir
+            </button>
+        </div>
+    </div>
+
+    <div id="preview-area">
+        <div id="drop-zone" onclick="triggerFileSelect()" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)" ondrop="dropHandler(event)">
+            <svg viewBox="0 0 24 24">
+                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+            </svg>
+            <h3>Görseli Sürükleyip Bırakın</h3>
+            <p>Veya bilgisayarınızdan seçmek için tıklayın</p>
+            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="fileSelectHandler(event)">
+        </div>
+
+        <div id="preview-container">
+            <div id="canvas-wrapper">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+            <div id="ascii-preview"></div>
+            <div id="imgSpecs" style="font-size: 0.85rem; color: #64748b; font-family: monospace;"></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const dropZone = document.getElementById('drop-zone');
+        const previewContainer = document.getElementById('preview-container');
+        const fileInput = document.getElementById('fileInput');
+        const asciiPreview = document.getElementById('ascii-preview');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+        const imgSpecs = document.getElementById('imgSpecs');
+
+        let originalImage = null;
+        let originalWidth = 0;
+        let originalHeight = 0;
+        let currentWidth = 0;
+        let currentHeight = 0;
+
+        // Dosya Seçim Tetikleme
+        function triggerFileSelect() {
+            fileInput.click();
+        }
+
+        function fileSelectHandler(e) {
+            const file = e.target.files[0];
+            if (file) loadImage(file);
+        }
+
+        // Drag & Drop Fonksiyonları
+        function dragOverHandler(e) {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        }
+
+        function dragLeaveHandler() {
+            dropZone.classList.remove('dragover');
+        }
+
+        function dropHandler(e) {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        }
+
+        // Görseli Canvas'a Yükleme
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                originalImage = new Image();
+                originalImage.onload = function() {
+                    originalWidth = originalImage.width;
+                    originalHeight = originalImage.height;
+                    currentWidth = originalWidth;
+                    currentHeight = originalHeight;
+
+                    // Giriş alanlarını doldur
+                    document.getElementById('imgWidth').value = originalWidth;
+                    document.getElementById('imgHeight').value = originalHeight;
+
+                    dropZone.style.display = 'none';
+                    previewContainer.style.display = 'flex';
+
+                    processImage();
+                };
+                originalImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Boyut Değişimi Kontrolü
+        function changeDimension(type) {
+            if (!originalImage) return;
+
+            const widthInput = document.getElementById('imgWidth');
+            const heightInput = document.getElementById('imgHeight');
+            const keepAspect = document.getElementById('aspectRatio').checked;
+
+            let w = parseInt(widthInput.value) || 1;
+            let h = parseInt(heightInput.value) || 1;
+
+            if (keepAspect) {
+                const ratio = originalWidth / originalHeight;
+                if (type === 'width') {
+                    h = Math.round(w / ratio);
+                    heightInput.value = h;
+                } else {
+                    w = Math.round(h * ratio);
+                    widthInput.value = w;
+                }
+            }
+
+            currentWidth = w;
+            currentHeight = h;
+            processImage();
+        }
+
+        function resetDimensions() {
+            if (!originalImage) return;
+            currentWidth = originalWidth;
+            currentHeight = originalHeight;
+            document.getElementById('imgWidth').value = originalWidth;
+            document.getElementById('imgHeight').value = originalHeight;
+            processImage();
+        }
+
+        // Sıkıştırma Kalitesi Sürgüsü Görünürlüğü
+        function toggleQualitySlider() {
+            const format = document.getElementById('outputFormat').value;
+            const container = document.getElementById('qualityContainer');
+            // JPEG, WebP ve AVIF formatları kalite kayıplı sıkıştırmayı destekler
+            if (format === 'image/jpeg' || format === 'image/webp' || format === 'image/avif') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function updateQuality(val) {
+            document.getElementById('qualityVal').textContent = val + '%';
+        }
+
+        function togglePixelate(checkbox) {
+            const container = document.getElementById('pixelSizeContainer');
+            container.style.display = checkbox.checked ? 'block' : 'none';
+            processImage();
+        }
+
+        function updatePixelSize(val) {
+            document.getElementById('pixelSizeVal').textContent = val + 'px';
+            processImage();
+        }
+
+        function toggleAscii(checkbox) {
+            if (checkbox.checked) {
+                canvasWrapper.style.display = 'none';
+                asciiPreview.style.display = 'block';
+            } else {
+                canvasWrapper.style.display = 'flex';
+                asciiPreview.style.display = 'none';
+            }
+            processImage();
+        }
+
+        // Görüntü İşleme Motoru
+        function processImage() {
+            if (!originalImage) return;
+
+            canvas.width = currentWidth;
+            canvas.height = currentHeight;
+
+            ctx.drawImage(originalImage, 0, 0, currentWidth, currentHeight);
+
+            const imgData = ctx.getImageData(0, 0, currentWidth, currentHeight);
+            const data = imgData.data;
+
+            const grayscale = document.getElementById('filterGrayscale').checked;
+            const invert = document.getElementById('filterInvert').checked;
+            const pixelate = document.getElementById('filterPixelate').checked;
+            const ascii = document.getElementById('filterAscii').checked;
+
+            // 1. Pikselleştirme
+            if (pixelate) {
+                const size = parseInt(document.getElementById('pixelSize').value);
+                for (let y = 0; y < currentHeight; y += size) {
+                    for (let x = 0; x < currentWidth; x += size) {
+                        const rIdx = (y * currentWidth + x) * 4;
+                        const r = data[rIdx];
+                        const g = data[rIdx + 1];
+                        const b = data[rIdx + 2];
+                        const a = data[rIdx + 3];
+
+                        for (let py = 0; py < size && (y + py) < currentHeight; py++) {
+                            for (let px = 0; px < size && (x + px) < currentWidth; px++) {
+                                const idx = ((y + py) * currentWidth + (x + px)) * 4;
+                                data[idx] = r;
+                                data[idx + 1] = g;
+                                data[idx + 2] = b;
+                                data[idx + 3] = a;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Gri Tonlama ve Ters Çevirme
+            if (grayscale || invert) {
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i];
+                    let g = data[i + 1];
+                    let b = data[i + 2];
+
+                    if (grayscale) {
+                        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                        r = g = b = gray;
+                    }
+                    if (invert) {
+                        r = 255 - r;
+                        g = 255 - g;
+                        b = 255 - b;
+                    }
+
+                    data[i] = r;
+                    data[i + 1] = g;
+                    data[i + 2] = b;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+
+            if (ascii) {
+                generateAsciiArt();
+            }
+
+            imgSpecs.textContent = `Mevcut Boyut: ${currentWidth} x ${currentHeight} px`;
+        }
+
+        // ASCII Sanatı Oluşturucu
+        function generateAsciiArt() {
+            const asciiWidth = 100;
+            const asciiHeight = Math.round(currentHeight * (asciiWidth / currentWidth) * 0.52);
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = asciiWidth;
+            tempCanvas.height = asciiHeight;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0, asciiWidth, asciiHeight);
+
+            const imgData = tempCtx.getImageData(0, 0, asciiWidth, asciiHeight);
+            const data = imgData.data;
+
+            const chars = '@#W$9876543210?!abc;:+=-,._ ';
+            let asciiStr = '';
+
+            for (let y = 0; y < asciiHeight; y++) {
+                for (let x = 0; x < asciiWidth; x++) {
+                    const idx = (y * asciiWidth + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx+1];
+                    const b = data[idx+2];
+                    
+                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                    const charIdx = Math.floor((gray / 255) * (chars.length - 1));
+                    asciiStr += chars[charIdx];
+                }
+                asciiStr += '\n';
+            }
+            asciiPreview.textContent = asciiStr;
+        }
+
+        // Dosyayı İndirme Fonksiyonu (Uzantı Eşleştirmeli)
+        function downloadImage() {
+            if (!originalImage) return;
+
+            const format = document.getElementById('outputFormat').value;
+            const quality = parseFloat(document.getElementById('outputQuality').value) / 100;
+            const isAscii = document.getElementById('filterAscii').checked;
+
+            if (isAscii) {
+                const blob = new Blob([asciiPreview.textContent], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.download = 'ascii_sanati.txt';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            } else {
+                const link = document.createElement('a');
+                
+                // Format MIME türlerini düzgün dosya uzantılarına eşliyoruz
+                const extensionMap = {
+                    'image/png': 'png',
+                    'image/jpeg': 'jpg',
+                    'image/webp': 'webp',
+                    'image/avif': 'avif',
+                    'image/gif': 'gif',
+                    'image/bmp': 'bmp',
+                    'image/x-icon': 'ico'
+                };
+                
+                const extension = extensionMap[format] || 'png';
+                link.download = `piksel_laboratuvari.${extension}`;
+                link.href = canvas.toDataURL(format, quality);
+                link.click();
+            }
+        }
+    </script>
+</body>
+</html>
 
