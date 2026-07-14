@@ -3,85 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siber Fırtına Avcısı Radarı</title>
+    <title>Siber Deprem Takip ve Mesafe Radarı</title>
     <style>
         :root {
-            --green: #00ff66;
-            --orange: #ffaa00;
             --red: #ff3333;
-            --bg: #040806;
-            --panel: #0a140f;
-            --theme-color: var(--green);
+            --orange: #ffaa00;
+            --yellow: #ffff00;
+            --blue: #00e5ff;
+            --bg: #05080c;
+            --panel: #0b1118;
+            --border: #1e2d3d;
         }
         body {
-            margin: 0; background: var(--bg); color: var(--theme-color);
-            font-family: monospace; display: flex; flex-direction: column;
+            margin: 0; background: var(--bg); color: #fff;
+            font-family: 'Courier New', monospace; display: flex; flex-direction: column;
             align-items: center; min-height: 100vh; padding: 15px; box-sizing: border-box;
-            transition: color 0.5s;
         }
-        header { text-align: center; border-bottom: 1px solid rgba(0,255,102,0.2); width: 100%; padding-bottom: 10px; }
-        .container { max-width: 450px; width: 100%; display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        header { text-align: center; border-bottom: 1px solid var(--border); width: 100%; padding-bottom: 10px; }
+        .container { max-width: 600px; width: 100%; display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
         .radar-box {
-            position: relative; width: 280px; height: 280px; 
-            border: 2px solid var(--theme-color); border-radius: 50%; 
+            position: relative; width: 300px; height: 300px; 
+            border: 2px solid var(--blue); border-radius: 50%; 
             margin: 0 auto; overflow: hidden; 
-            background: radial-gradient(circle, rgba(0,255,102,0.02) 0%, #000 100%);
-            transition: border-color 0.5s;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.03) 0%, #000 100%);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
         }
         canvas { width: 100%; height: 100%; display: block; }
+        .controls {
+            display: flex; gap: 10px; justify-content: center; align-items: center;
+        }
+        select, .btn {
+            background: var(--panel); color: var(--blue); border: 1px solid var(--blue);
+            padding: 8px 12px; font-family: inherit; font-weight: bold; border-radius: 4px;
+            cursor: pointer; outline: none; transition: 0.2s;
+        }
+        select:hover, .btn:hover {
+            background: var(--blue); color: var(--bg);
+            box-shadow: 0 0 10px var(--blue);
+        }
         .card { 
-            background: var(--panel); border: 1px solid rgba(0,255,102,0.2); 
+            background: var(--panel); border: 1px solid var(--border); 
             padding: 12px; border-radius: 6px; font-size: 0.9rem;
-            box-shadow: inset 0 0 10px rgba(0,255,102,0.05);
         }
-        .row { display: flex; justify-content: space-between; margin: 5px 0; }
-        .btn { 
-            background: transparent; color: var(--theme-color); border: 1px solid var(--theme-color); 
-            padding: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; 
-            border-radius: 4px; transition: 0.2s; font-family: inherit;
+        .table-container {
+            max-height: 200px; overflow-y: auto; border: 1px solid var(--border);
+            border-radius: 4px; margin-top: 10px;
         }
-        .btn:hover { 
-            background: var(--theme-color); color: var(--bg); 
-            box-shadow: 0 0 15px var(--theme-color); 
+        table {
+            width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;
         }
-        .report-box {
-            background: rgba(0, 0, 0, 0.4); border-left: 3px solid var(--theme-color);
-            padding: 8px; margin-top: 10px; font-size: 0.8rem; line-height: 1.4;
-            max-height: 100px; overflow-y: auto; color: #fff;
-        }
+        th, td { padding: 8px; border-bottom: 1px solid var(--border); }
+        th { background: rgba(0, 229, 255, 0.05); color: var(--blue); position: sticky; top: 0; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
+        .mag-high { color: var(--red); font-weight: bold; }
+        .mag-mid { color: var(--orange); }
+        .mag-low { color: var(--yellow); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1 style="margin:0; font-size:1.3rem; letter-spacing: 2px;">STORM CHASER RADAR</h1>
-        <div id="status" style="font-size:0.8rem; color:#888; margin-top:5px;">Konum bekleniyor...</div>
+        <h1 style="margin:0; font-size:1.4rem; color: var(--blue); letter-spacing: 2px;">EARTHQUAKE TELEMETRY RADAR</h1>
+        <div id="status" style="font-size:0.8rem; color:#888; margin-top:5px;">Sistem başlatılıyor...</div>
     </header>
 
     <div class="container">
-        <div class="radar-box" id="radar-border">
+        <div class="radar-box">
             <canvas id="radarCanvas"></canvas>
         </div>
 
-        <div class="card">
-            <div style="border-bottom: 1px dashed rgba(0,255,102,0.3); font-weight:bold; margin-bottom:8px;">METEOROLOJİK ANALİZ MOTORU</div>
-            <div class="row"><span>Hedef Koordinat:</span><span id="val-coords" style="color: #00ffff;">--</span></div>
-            <div class="row"><span>Yağış İhtimali:</span><span id="val-prob" style="font-weight:bold;">--</span></div>
-            <div class="row"><span>Anlık Yağış:</span><span id="val-rain">--</span></div>
-            <div class="row"><span>Rüzgar Hızı:</span><span id="val-wind-speed">--</span></div>
-            <div class="row"><span>Rüzgar Yönü:</span><span id="val-wind-dir">--</span></div>
-            
-            <div style="margin-top:12px; font-weight:bold; font-size:0.8rem;">SİBER TAKTİK RAPORU:</div>
-            <div class="report-box" id="val-report">Veriler yükleniyor...</div>
+        <div class="controls">
+            <label for="range-select" style="font-size:0.8rem; color:var(--blue);">Maksimum Menzil:</label>
+            <select id="range-select">
+                <option value="500">500 km</option>
+                <option value="1000" selected>1000 km</option>
+                <option value="3000">3000 km</option>
+                <option value="10000">10000 km (Global)</option>
+            </select>
+            <button class="btn" id="geo-btn">🛰️ Konum Güncelle</button>
         </div>
 
-        <button class="btn" id="geo-btn">🛰️ Konumumu Al ve Tara</button>
+        <div class="card">
+            <div style="border-bottom: 1px dashed var(--border); font-weight:bold; margin-bottom:8px; color: var(--blue);">
+                AKTİF DEPREM ANALİZ RAPORU
+            </div>
+            <div>Konumunuz: <span id="val-coords" style="color:var(--blue)">--</span></div>
+            <div style="margin-top: 5px;">Menzildeki Deprem Sayısı: <span id="val-count" style="font-weight:bold;">0</span></div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Büyüklük</th>
+                            <th>Mesafe (km)</th>
+                            <th>Konum</th>
+                            <th>Derinlik</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eq-list">
+                        <tr>
+                            <td colspan="4" style="text-align:center; color:#666;">Veri aranıyor...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('radarCanvas');
         const ctx = canvas.getContext('2d');
-        const radarBorder = document.getElementById('radar-border');
 
         function resize() {
             canvas.width = canvas.parentElement.clientWidth;
@@ -89,32 +120,25 @@
         }
         resize();
 
-        // Varsayılan Koordinat: Kahramanmaraş Merkez
-        let lat = 37.58;
-        let lon = 36.93;
+        // Varsayılan Konum: Kahramanmaraş Merkez
+        let userLat = 37.58;
+        let userLon = 36.93;
+        let maxRange = 1000; // km cinsinden varsayılan radar menzili
 
-        // Gerçek Hava Durumu Parametreleri (API ile güncellenecek)
-        let rainProb = 0;       // % Yağış İhtimali
-        let rainAmount = 0;     // mm Yağış Miktarı
-        let windSpeed = 5;      // km/s Rüzgar Hızı
-        let windDir = 180;      // Derece Rüzgar Yönü
-        
+        let earthquakes = [];
         let sweepAngle = 0;
-        let stormCells = [];     // Ekranda akacak yağış hücre parçacıkları
         let audioCtx = null;
 
-        // UI Elemanları
-        const valCoords = document.getElementById('val-coords');
-        const valProb = document.getElementById('val-prob');
-        const valRain = document.getElementById('val-rain');
-        const valWindSpeed = document.getElementById('val-wind-speed');
-        const valWindDir = document.getElementById('val-wind-dir');
-        const valReport = document.getElementById('val-report');
-        const geoBtn = document.getElementById('geo-btn');
+        // UI Bağlantıları
         const statusDiv = document.getElementById('status');
+        const coordsSpan = document.getElementById('val-coords');
+        const countSpan = document.getElementById('val-count');
+        const eqListBody = document.getElementById('eq-list');
+        const rangeSelect = document.getElementById('range-select');
+        const geoBtn = document.getElementById('geo-btn');
 
-        // Bip Sesi Üretici
-        function playRadarPing(freq, vol) {
+        // Klasik Radar Ping Ses Efekti (Web Audio API)
+        function playPing(freq, vol, duration = 0.3) {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -122,217 +146,212 @@
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(vol * 0.08, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(vol * 0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
             } catch(e){}
         }
 
-        // Open-Meteo API Veri Çekme
-        async function fetchWeatherData(latitude, longitude) {
-            statusDiv.textContent = "Canlı hava durumu verileri indiriliyor...";
-            valCoords.textContent = `${latitude.toFixed(2)}°N, ${longitude.toFixed(2)}°E`;
+        // Küresel Mesafe (Haversine) Hesabı
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Dünya yarıçapı (km)
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
 
+        // Küresel Yön Açısı (Bearing) Hesabı
+        function getBearing(lat1, lon1, lat2, lon2) {
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const lat1Rad = lat1 * Math.PI / 180;
+            const lat2Rad = lat2 * Math.PI / 180;
+            const y = Math.sin(dLon) * Math.cos(lat2Rad);
+            const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) -
+                      Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
+            const brng = Math.atan2(y, x);
+            return (brng * 180 / Math.PI + 360) % 360;
+        }
+
+        // USGS API'sinden Canlı Deprem Verilerini Çekme
+        async function fetchEarthquakeData() {
+            statusDiv.textContent = "USGS sunucularından son depremler çekiliyor...";
+            coordsSpan.textContent = `${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E`;
+            
             try {
-                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=precipitation,rain,wind_speed_10m,wind_direction_10m&hourly=precipitation_probability&timezone=auto`);
+                // Son 24 saatteki tüm depremleri (büyüklük sınırı olmaksızın) çeker
+                const response = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson');
                 const data = await response.json();
+                
+                earthquakes = data.features.map(feat => {
+                    const coords = feat.geometry.coordinates; // [boylam, enlem, derinlik]
+                    const lon = coords[0];
+                    const lat = coords[1];
+                    const depth = coords[2];
+                    const mag = feat.properties.mag;
+                    const place = feat.properties.place;
+                    const time = feat.properties.time;
 
-                // API verilerini değişkenlere ata
-                rainAmount = data.current.precipitation || 0;
-                windSpeed = data.current.wind_speed_10m || 5;
-                windDir = data.current.wind_direction_10m || 0;
+                    const distance = getDistance(userLat, userLon, lat, lon);
+                    const bearing = getBearing(userLat, userLon, lat, lon);
 
-                // Anlık saate en yakın yağış ihtimalini bul
-                const currentHour = new Date().getHours();
-                rainProb = data.hourly.precipitation_probability[currentHour] || 0;
-
-                updateUI();
-                generateStormCells();
-                statusDiv.textContent = "Radar Taraması Aktif.";
-            } catch (err) {
-                console.error("API Bağlantı Hatası:", err);
-                statusDiv.textContent = "Hata: Canlı veriler alınamadı, yerel simülasyon aktif.";
-            }
-        }
-
-        // UI ve Tema Güncelleme (Yeşil / Sarı / Kırmızı)
-        function updateUI() {
-            valProb.textContent = `%${rainProb}`;
-            valRain.textContent = `${rainAmount} mm`;
-            valWindSpeed.textContent = `${windSpeed} km/s`;
-            valWindDir.textContent = `${windDir}°`;
-
-            let themeColor = "var(--green)";
-            let threatLevel = "TEMİZ / GÜVENLİ";
-            let reportText = "";
-
-            if (rainProb >= 50 || rainAmount > 1) {
-                // KIRMIZI ALARM (Yoğun fırtına/yağmur)
-                themeColor = "var(--red)";
-                threatLevel = "⚠️ ACİL / FIRTINA ALARMI";
-                reportText = `DOPPLER UYARISI: Bölgede ${rainAmount} mm gücünde aktif bir fırtına hücresi hareket ediyor. Rüzgar gücü ${windSpeed} km/s hızla esiyor. Açık alanlarda bulunulması tehlikeli olabilir.`;
-            } else if (rainProb >= 20) {
-                // SARI ALARM (Hafif yağmur ihtimali)
-                themeColor = "var(--orange)";
-                threatLevel = "⚡ HAREKETLİ / BULUTLU";
-                reportText = `Atmosferik hareketlilik saptandı. Yağış ihtimali %${rainProb}. Yaklaşan hafif yağış geçişleri radar ekranında izleniyor. Rüzgar yönü: ${windDir} derece.`;
-            } else {
-                // YEŞİL (Sorun yok)
-                themeColor = "var(--green)";
-                threatLevel = "GÜVENLİ / KARARLI";
-                reportText = `Hava sahası temiz. Aktif bir yağış veya fırtına hücresi tespit edilmedi. Rüzgar sakin (${windSpeed} km/s). Seyir ve açık hava etkinlikleri için ideal durum.`;
-            }
-
-            // CSS Değişkenlerini Güncelle
-            document.documentElement.style.setProperty('--theme-color', themeColor);
-            radarBorder.style.borderColor = themeColor;
-            valReport.innerHTML = `<strong>[${threatLevel}]</strong><br>${reportText}`;
-        }
-
-        // Yağış İhtimaline Göre Hücre (Bulut) Üretimi
-        function generateStormCells() {
-            stormCells = [];
-            if (rainProb < 10) return; // Yağış ihtimali yoksa boş bulut çizme
-
-            // Yağış ihtimali ne kadar yüksekse o kadar çok parça oluştur
-            const cellCount = Math.floor(rainProb / 2);
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            const maxR = canvas.width / 2 - 10;
-
-            for (let i = 0; i < cellCount; i++) {
-                // Bulutları rüzgarın geldiği yöne göre radarın dış sınırlarına yerleştir
-                // Rüzgar yönünün tersine doğru hareket edecekler (merkeze doğru)
-                const baseAngle = (windDir + 180 + (Math.random() * 40 - 20)) * Math.PI / 180;
-                const r = maxR * (0.4 + Math.random() * 0.6); // Çevreye dağıt
-
-                stormCells.push({
-                    x: cx + r * Math.cos(baseAngle),
-                    y: cy + r * Math.sin(baseAngle),
-                    size: Math.random() * 20 + 8,
-                    opacity: 0,
-                    // Hız vektörleri (Rüzgar yönü ve hızına göre)
-                    vx: -Math.cos(windDir * Math.PI / 180) * (windSpeed / 12 + 0.1),
-                    vy: -Math.sin(windDir * Math.PI / 180) * (windSpeed / 12 + 0.1)
+                    return { mag, place, depth, time, distance, bearing, lat, lon };
                 });
+
+                filterAndDisplayEarthquakes();
+                statusDiv.textContent = "Radar Taraması Canlı Olarak Aktif.";
+            } catch (err) {
+                console.error("API Hatası:", err);
+                statusDiv.textContent = "Bağlantı Hatası: Veriler alınamadı.";
             }
         }
 
-        // Kullanıcı Konumu İsteme
-        geoBtn.addEventListener('click', () => {
-            if (navigator.geolocation) {
-                statusDiv.textContent = "Uydudan GPS koordinatları aranıyor...";
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        lat = position.coords.latitude;
-                        lon = position.coords.longitude;
-                        fetchWeatherData(lat, lon);
-                    },
-                    (error) => {
-                        console.log("GPS reddedildi, Kahramanmaraş varsayılan seçildi.");
-                        fetchWeatherData(lat, lon);
-                    }
-                );
-            } else {
-                fetchWeatherData(lat, lon);
-            }
-        });
+        // Seçilen Menzile Göre Filtreleme ve Listeleme
+        function filterAndDisplayEarthquakes() {
+            // Menzile giren depremleri filtrele ve mesafeye göre sırala
+            const filtered = earthquakes
+                .filter(eq => eq.distance <= maxRange)
+                .sort((a, b) => a.distance - b.distance);
 
-        // Çizim Döngüsü (Animasyon)
+            countSpan.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                eqListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">Menzilinizde deprem saptanmadı.</td></tr>`;
+                return;
+            }
+
+            eqListBody.innerHTML = filtered.map(eq => {
+                let magClass = "mag-low";
+                if (eq.mag >= 5.0) magClass = "mag-high";
+                else if (eq.mag >= 3.5) magClass = "mag-mid";
+
+                return `
+                    <tr>
+                        <td class="${magClass}">${eq.mag.toFixed(1)}</td>
+                        <td>${Math.round(eq.distance)} km</td>
+                        <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${eq.place}">${eq.place}</td>
+                        <td>${Math.round(eq.depth)} km</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Radar Çizim Döngüsü
         function draw() {
-            sweepAngle = (sweepAngle + 1.5) % 360;
+            sweepAngle = (sweepAngle + 1) % 360;
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
             const maxR = canvas.width / 2 - 10;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Grid Çemberleri
-            ctx.strokeStyle = 'rgba(0, 255, 102, 0.08)';
+            // Arka Plan Sabit Grid Çemberleri
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.08)';
             ctx.lineWidth = 1;
             for (let r = maxR; r > 0; r -= maxR / 4) {
                 ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
             }
 
-            // Radar Tarama İğnesi (Sweep)
+            // Radar Tarama İğnesi (Yarım Dairelik Işık)
             const rad = (sweepAngle * Math.PI) / 180;
             const sweepX = cx + maxR * Math.cos(rad);
             const sweepY = cy + maxR * Math.sin(rad);
 
             const sweepGrad = ctx.createLinearGradient(cx, cy, sweepX, sweepY);
-            sweepGrad.addColorStop(0, 'rgba(0, 255, 102, 0.25)');
-            sweepGrad.addColorStop(1, 'rgba(0, 200, 100, 0)');
+            sweepGrad.addColorStop(0, 'rgba(0, 229, 255, 0.2)');
+            sweepGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = sweepGrad;
             ctx.beginPath();
             ctx.moveTo(cx, cy);
             ctx.arc(cx, cy, maxR, rad, rad - 0.3 * Math.PI, true);
             ctx.closePath(); ctx.fill();
 
-            ctx.strokeStyle = 'var(--theme-color)';
-            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = 'var(--blue)';
+            ctx.lineWidth = 1.2;
             ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sweepX, sweepY); ctx.stroke();
 
-            // Yağış Hücrelerini Güncelle ve Çiz
-            let activeCellsInSweep = false;
-            stormCells.forEach(cell => {
-                // Parçacıkları rüzgara göre hareket ettir
-                cell.x += cell.vx;
-                cell.y += cell.vy;
+            // Sadece Menzildeki Depremleri Çiz
+            const filtered = earthquakes.filter(eq => eq.distance <= maxRange);
 
-                // Sınır dışına çıkanları tekrar başa sar
-                const dx = cell.x - cx;
-                const dy = cell.y - cy;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist > maxR || dist < 10) {
-                    const baseAngle = (windDir + 180 + (Math.random() * 40 - 20)) * Math.PI / 180;
-                    cell.x = cx + maxR * Math.cos(baseAngle);
-                    cell.y = cy + maxR * Math.sin(baseAngle);
-                }
-
-                // Tarama iğnesinin fırtına hücresine değip değmediğini hesapla
-                const cellAngle = Math.atan2(dy, dx);
-                let diff = Math.abs(rad - cellAngle);
-                if (diff > Math.PI) diff = Math.PI * 2 - diff;
-
-                if (diff < 0.15) {
-                    cell.opacity = 1.0; // Tarandığında parlasın
-                    activeCellsInSweep = true;
-                } else {
-                    cell.opacity -= 0.005; // Yavaşça sönerek kaybolsun
-                    if (cell.opacity < 0.15) cell.opacity = 0.15;
-                }
-
-                // Yağış Hücresi (Doppler Isı Görselleştirmesi)
-                const cellGrad = ctx.createRadialGradient(cell.x, cell.y, 2, cell.x, cell.y, cell.size);
-                const color = rainProb >= 50 ? '255, 50, 50' : (rainProb >= 20 ? '255, 170, 0' : '0, 255, 100');
+            filtered.forEach(eq => {
+                // Mesafeyi radara oranla
+                const r = (eq.distance / maxRange) * maxR;
                 
-                cellGrad.addColorStop(0, `rgba(${color}, ${cell.opacity})`);
+                // Kerteriz açısını canvas koordinat düzlemine çevir (Üst taraf Kuzey = -90 derece)
+                const angleRad = (eq.bearing - 90) * Math.PI / 180;
+
+                const tx = cx + r * Math.cos(angleRad);
+                const ty = cy + r * Math.sin(angleRad);
+
+                // Tarama iğnesi hedefin üzerinden geçerken parlasın
+                const diff = Math.abs(rad - angleRad);
+                let opacity = 0.2;
+                if (diff < 0.1) {
+                    opacity = 1.0;
+                    // Büyüklüğe göre değişen bip sesi
+                    if (Math.abs(sweepAngle - eq.bearing) < 2) {
+                        const freq = 400 + (eq.mag * 100);
+                        playPing(freq, 0.15, 0.4);
+                    }
+                }
+
+                // Deprem şiddet rengi
+                let color = '255, 255, 0'; // Sarı (Küçük)
+                if (eq.mag >= 5.0) color = '255, 51, 51'; // Kırmızı (Büyük)
+                else if (eq.mag >= 3.5) color = '255, 170, 0'; // Turuncu (Orta)
+
+                // Deprem Hücresi Çizimi (Büyüklükle orantılı boyut)
+                const size = 3 + (eq.mag * 2);
+                const cellGrad = ctx.createRadialGradient(tx, ty, 1, tx, ty, size * 2);
+                cellGrad.addColorStop(0, `rgba(${color}, ${opacity})`);
                 cellGrad.addColorStop(1, `rgba(${color}, 0)`);
-                
-                ctx.fillStyle = cellGrad;
-                ctx.beginPath(); ctx.arc(cell.x, cell.y, cell.size, 0, Math.PI * 2); ctx.fill();
-            });
 
-            // Ses Motoru Tetikleyici
-            if (activeCellsInSweep && Math.abs(sweepAngle % 45) < 1.5) {
-                // Fırtına varken daha tiz ve uyarıcı çift ses
-                playRadarPing(rainProb >= 50 ? 900 : 600, 0.2);
-            } else if (Math.abs(sweepAngle % 90) < 1.5) {
-                // Hava temizken sakin derin sonar sesi
-                playRadarPing(280, 0.05);
-            }
+                ctx.fillStyle = cellGrad;
+                ctx.beginPath(); ctx.arc(tx, ty, size * 2, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = `rgba(${color}, ${opacity})`;
+                ctx.beginPath(); ctx.arc(tx, ty, size / 2, 0, Math.PI * 2); ctx.fill();
+            });
 
             requestAnimationFrame(draw);
         }
 
-        // Sayfa açıldığında varsayılan olarak Maraş hava durumunu çek
-        fetchWeatherData(lat, lon);
-        animate();
+        // Dinamik Menzil Değişimi
+        rangeSelect.addEventListener('change', (e) => {
+            maxRange = parseInt(e.target.value);
+            filterAndDisplayEarthquakes();
+        });
 
-        function animate() {
-            draw();
-        }
+        // Kullanıcı Konum Güncelleme
+        geoBtn.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                statusDiv.textContent = "Uydudan GPS koordinatları talep ediliyor...";
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLat = position.coords.latitude;
+                        userLon = position.coords.longitude;
+                        fetchEarthquakeData();
+                    },
+                    (error) => {
+                        console.log("GPS reddedildi, varsayılan koordinata dönülüyor.");
+                        statusDiv.textContent = "GPS Reddedildi. Kahramanmaraş baz alınıyor.";
+                        fetchEarthquakeData();
+                    }
+                );
+            } else {
+                fetchEarthquakeData();
+            }
+        });
+
+        // Başlangıç Kurulumu
+        fetchEarthquakeData();
+        // Her 5 dakikada bir verileri otomatik yenile
+        setInterval(fetchEarthquakeData, 300000);
+        draw();
     </script>
 </body>
 </html>
