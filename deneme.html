@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Görüntü Dönüştürme & Piksel Laboratuvarı</title>
+    <title>Güvenli PDF & OCR Word Araç Kutusu</title>
+    
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <script>
+        // PDF.js arka plan işçisini ayarla
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
     <style>
         :root {
             --bg-color: #0f172a;
@@ -12,6 +22,8 @@
             --accent-hover: #0284c7;
             --text-color: #f8fafc;
             --border-color: #334155;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
         }
 
         body {
@@ -25,28 +37,25 @@
             overflow: hidden;
         }
 
-        /* Sol Kontrol Paneli */
+        /* Sol Navigasyon Menüsü */
         #sidebar {
-            width: 360px;
+            width: 300px;
             background-color: var(--panel-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             height: 100%;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
-            z-index: 10;
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 25px 20px;
             border-bottom: 1px solid var(--border-color);
         }
 
         .sidebar-header h1 {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             margin: 0;
             color: var(--accent-color);
-            letter-spacing: 0.5px;
         }
 
         .sidebar-header p {
@@ -55,640 +64,786 @@
             color: #94a3b8;
         }
 
-        .scrollable-content {
+        .menu-items {
             flex: 1;
-            overflow-y: auto;
-            padding: 20px;
+            padding: 20px 10px;
         }
 
-        .section {
-            margin-bottom: 25px;
-            background: rgba(15, 23, 42, 0.4);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .section-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
+        .menu-btn {
+            width: 100%;
+            background: none;
+            border: none;
             color: #94a3b8;
+            text-align: left;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn:hover, .menu-btn.active {
+            color: #fff;
+            background-color: rgba(56, 189, 248, 0.1);
+        }
+
+        .menu-btn.active {
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Sağ İçerik Alanı */
+        #main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tab-content {
+            width: 100%;
+            max-width: 700px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        /* Yükleme ve Dosya Alanları */
+        .drop-zone {
+            border: 2px dashed #475569;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: rgba(30, 41, 59, 0.3);
+            cursor: pointer;
+            transition: border-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--accent-color);
+        }
+
+        .drop-zone p {
+            margin: 10px 0 0 0;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* Liste Elemanları (Birleştirme için) */
+        .pdf-list {
+            background-color: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .pdf-item {
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .control-group {
-            margin-bottom: 15px;
+        .pdf-item:last-child {
+            border-bottom: none;
         }
 
-        .control-group:last-child {
-            margin-bottom: 0;
+        .pdf-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            background-color: #334155;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #475569;
+        }
+
+        .action-btn.delete {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        .action-btn.delete:hover {
+            background-color: var(--danger-hover);
+            color: #fff;
+        }
+
+        /* Form Elemanları */
+        .form-group {
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
-            font-size: 0.85rem;
-            margin-bottom: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
             color: #cbd5e1;
         }
 
-        select, input[type="number"], input[type="range"] {
+        input[type="text"], select {
             width: 100%;
             background-color: #0f172a;
             border: 1px solid var(--border-color);
             color: #fff;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 0.9rem;
-        }
-
-        input[type="range"] {
-            padding: 0;
-            height: 6px;
-            -webkit-appearance: none;
-            background: #334155;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            cursor: pointer;
-        }
-
-        .range-val {
-            font-size: 0.8rem;
-            color: var(--accent-color);
-            float: right;
-            font-family: monospace;
+            font-size: 0.95rem;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             cursor: pointer;
         }
 
         .checkbox-group input {
+            width: 18px;
+            height: 18px;
             cursor: pointer;
-            width: 16px;
-            height: 16px;
         }
 
-        /* Sağ Önizleme Alanı */
-        #preview-area {
-            flex: 1;
+        .file-info-badge {
+            background-color: rgba(56, 189, 248, 0.15);
+            color: var(--accent-color);
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px;
-            background-color: #0b0f19;
-            position: relative;
+            justify-content: space-between;
         }
 
-        #drop-zone {
-            border: 2px dashed #475569;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 600px;
-            aspect-ratio: 16/9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background-color: rgba(30, 41, 59, 0.2);
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        #drop-zone.dragover {
-            border-color: var(--accent-color);
-            background-color: rgba(56, 189, 248, 0.05);
-        }
-
-        #drop-zone svg {
-            width: 60px;
-            height: 60px;
-            fill: #64748b;
-            margin-bottom: 15px;
-            transition: fill 0.3s;
-        }
-
-        #drop-zone:hover svg, #drop-zone.dragover svg {
-            fill: var(--accent-color);
-        }
-
-        #preview-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            max-width: 100%;
-            max-height: 100%;
-            gap: 15px;
-        }
-
-        #canvas-wrapper {
-            max-width: 100%;
-            max-height: 70vh;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            background-color: #1e293b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        canvas {
-            max-width: 100%;
-            max-height: 70vh;
-            display: block;
-        }
-
-        #ascii-preview {
-            display: none;
-            font-family: monospace;
-            white-space: pre;
-            background-color: #020617;
-            color: #10b981;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 8px;
-            line-height: 1;
-            overflow: auto;
-            max-width: 90vw;
-            max-height: 70vh;
-            border: 1px solid var(--border-color);
-        }
-
-        /* İşlem Butonları */
-        .btn-container {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--panel-bg);
-        }
-
-        .btn {
+        /* Ana Buton */
+        .btn-submit {
             width: 100%;
             padding: 14px;
+            background-color: var(--accent-color);
+            color: #0f172a;
             border: none;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
         }
 
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: #0f172a;
-        }
-
-        .btn-primary:hover {
+        .btn-submit:hover {
             background-color: var(--accent-hover);
         }
 
-        .btn-secondary {
+        .btn-submit:disabled {
             background-color: #334155;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
-
-        .dimensions-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        #reset-btn {
-            background: none;
-            border: none;
             color: #64748b;
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 0;
-            text-decoration: underline;
+            cursor: not-allowed;
         }
 
-        #reset-btn:hover {
-            color: var(--accent-color);
+        /* Yükleme Bildirimi (Overlay) */
+        #loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.85);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border-left-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loader p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 0;
+            text-align: center;
+            max-width: 80%;
         }
     </style>
 </head>
 <body>
 
+    <div id="loader">
+        <div class="spinner"></div>
+        <p id="loader-text">İşleminiz yapılıyor, lütfen bekleyin...</p>
+    </div>
+
     <div id="sidebar">
         <div class="sidebar-header">
-            <h1>Piksel Laboratuvarı</h1>
-            <p>Sıfır Sunucu, %100 Yerel Dönüştürücü</p>
+            <h1>PDF & OCR Kutusu</h1>
+            <p>Çevrimdışı ve Güvenli İşlemler</p>
         </div>
-
-        <div class="scrollable-content">
-            <div class="section">
-                <div class="section-title">
-                    Boyut Ayarları
-                    <button id="reset-btn" onclick="resetDimensions()">Sıfırla</button>
-                </div>
-                <div class="control-group dimensions-row">
-                    <div>
-                        <label for="imgWidth">Genişlik (px)</label>
-                        <input type="number" id="imgWidth" oninput="changeDimension('width')">
-                    </div>
-                    <div>
-                        <label for="imgHeight">Yükseklik (px)</label>
-                        <input type="number" id="imgHeight" oninput="changeDimension('height')">
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="checkbox-group">
-                        <input type="checkbox" id="aspectRatio" checked> En-Boy Oranını Koru
-                    </label>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Piksel Filtreleri</div>
-                
-                <label class="checkbox-group">
-                    <input type="checkbox" id="filterGrayscale" onchange="processImage()"> Gri Tonlama (B&W)
-                </label>
-
-                <label class="checkbox-group">
-                    <input type="checkbox" id="filterInvert" onchange="processImage()"> Renkleri Ters Çevir (Invert)
-                </label>
-
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-
-                <label class="checkbox-group">
-                    <input type="checkbox" id="filterPixelate" onchange="togglePixelate(this)"> Piksel Sanatı (Pixelate)
-                </label>
-                <div class="control-group" id="pixelSizeContainer" style="display:none; margin-top: 10px;">
-                    <label for="pixelSize">Piksel Boyutu <span class="range-val" id="pixelSizeVal">8px</span></label>
-                    <input type="range" id="pixelSize" min="2" max="32" value="8" oninput="updatePixelSize(this.value)">
-                </div>
-
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 15px 0;">
-
-                <label class="checkbox-group" style="color: #10b981;">
-                    <input type="checkbox" id="filterAscii" onchange="toggleAscii(this)"> ASCII Karakter Sanatı
-                </label>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Çıktı Formatı</div>
-                <div class="control-group">
-                    <label for="outputFormat">Format Seçimi</label>
-                    <select id="outputFormat" onchange="toggleQualitySlider()">
-                        <option value="image/png">PNG (Kayıpsız)</option>
-                        <option value="image/jpeg">JPEG (Sıkıştırılmış)</option>
-                        <option value="image/webp">WebP (Modern & Hafif)</option>
-                        <option value="image/avif">AVIF (Yeni Nesil & Güçlü Sıkıştırma)</option>
-                        <option value="image/gif">GIF (Retro & 256 Renk)</option>
-                        <option value="image/bmp">BMP (Sıkıştırmasız / Ham)</option>
-                        <option value="image/x-icon">ICO (Favicon / Web İkonu)</option>
-                    </select>
-                </div>
-                <div class="control-group" id="qualityContainer" style="display: none;">
-                    <label for="outputQuality">Sıkıştırma Kalitesi <span class="range-val" id="qualityVal">85%</span></label>
-                    <input type="range" id="outputQuality" min="10" max="100" value="85" oninput="updateQuality(this.value)">
-                </div>
-            </div>
-        </div>
-
-        <div class="btn-container">
-            <button class="btn btn-secondary" onclick="triggerFileSelect()">Yeni Görsel Seç</button>
-            <button class="btn btn-primary" onclick="downloadImage()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4M7 10l5 5 5-5M12 15V3"/></svg>
-                Şimdi İndir
+        <div class="menu-items">
+            <button class="menu-btn active" onclick="switchTab('tab-merge')">
+                <span>📂</span> PDF Birleştir
+            </button>
+            <button class="menu-btn" onclick="switchTab('tab-split')">
+                <span>✂️</span> PDF Böl / Sayfa Ayıkla
+            </button>
+            <button class="menu-btn" onclick="switchTab('tab-rotate')">
+                <span>🔄</span> PDF Döndür
+            </button>
+            <button class="menu-btn" onclick="switchTab('tab-word')" style="color: #10b981;">
+                <span>📝</span> PDF'ten Word'e (OCR)
             </button>
         </div>
     </div>
 
-    <div id="preview-area">
-        <div id="drop-zone" onclick="triggerFileSelect()" ondragover="dragOverHandler(event)" ondragleave="dragLeaveHandler(event)" ondrop="dropHandler(event)">
-            <svg viewBox="0 0 24 24">
-                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-            </svg>
-            <h3>Görseli Sürükleyip Bırakın</h3>
-            <p>Veya bilgisayarınızdan seçmek için tıklayın</p>
-            <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="fileSelectHandler(event)">
+    <div id="main-content">
+        
+        <div id="tab-merge" class="tab-content active">
+            <h2>PDF Dosyalarını Birleştir</h2>
+            <p class="description">Birden fazla PDF yükle, sıralarını dilediğin gibi ayarla ve tek bir PDF dosyası olarak birleştir.</p>
+            
+            <div class="drop-zone" onclick="triggerFileInput('merge-input')">
+                <span style="font-size: 2.5rem;">📥</span>
+                <p>Birleştirmek istediğiniz PDF'leri sürükleyin veya seçin</p>
+                <input type="file" id="merge-input" accept="application/pdf" multiple style="display:none" onchange="handleMergeFiles(event)">
+            </div>
+
+            <div class="pdf-list" id="mergeList">
+                <p style="text-align:center; color:#64748b; padding:20px; margin:0;">Henüz dosya yüklenmedi.</p>
+            </div>
+
+            <button class="btn-submit" id="btn-merge" disabled onclick="executeMerge()">Dosyaları Birleştir ve İndir</button>
         </div>
 
-        <div id="preview-container">
-            <div id="canvas-wrapper">
-                <canvas id="mainCanvas"></canvas>
+        <div id="tab-split" class="tab-content">
+            <h2>PDF Böl ve Sayfa Ayıkla</h2>
+            <p class="description">Büyük bir PDF dosyasından sadece istediğin sayfaları veya sayfa aralıklarını ayıklayarak yeni bir PDF oluştur.</p>
+
+            <div class="drop-zone" onclick="triggerFileInput('split-input')">
+                <span style="font-size: 2.5rem;">📥</span>
+                <p>Bölmek istediğiniz PDF dosyasını sürükleyin veya seçin</p>
+                <input type="file" id="split-input" accept="application/pdf" style="display:none" onchange="handleSplitFile(event)">
             </div>
-            <div id="ascii-preview"></div>
-            <div id="imgSpecs" style="font-size: 0.85rem; color: #64748b; font-family: monospace;"></div>
+
+            <div id="split-file-info" style="display: none;" class="file-info-badge">
+                <span id="split-name">Dosya: yok</span>
+                <span id="split-pages">0 Sayfa</span>
+            </div>
+
+            <div class="form-group">
+                <label for="page-range">Çıkartılacak Sayfalar</label>
+                <input type="text" id="page-range" placeholder="Örn: 1-3, 5, 7-10">
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">
+                    Sayfaları virgülle ayırın. Aralık belirtmek için tire (-) kullanın.
+                </p>
+            </div>
+
+            <button class="btn-submit" id="btn-split" disabled onclick="executeSplit()">Seçilen Sayfaları Ayıkla ve İndir</button>
         </div>
+
+        <div id="tab-rotate" class="tab-content">
+            <h2>PDF Sayfalarını Döndür</h2>
+            <p class="description">Ters veya yan duran PDF belgelerinin tüm sayfalarını dilediğin açıda döndür.</p>
+
+            <div class="drop-zone" onclick="triggerFileInput('rotate-input')">
+                <span style="font-size: 2.5rem;">📥</span>
+                <p>Döndürmek istediğiniz PDF dosyasını sürükleyin veya seçin</p>
+                <input type="file" id="rotate-input" accept="application/pdf" style="display:none" onchange="handleRotateFile(event)">
+            </div>
+
+            <div id="rotate-file-info" style="display: none;" class="file-info-badge">
+                <span id="rotate-name">Dosya: yok</span>
+                <span id="rotate-pages">0 Sayfa</span>
+            </div>
+
+            <div class="form-group">
+                <label for="rotate-angle">Döndürme Açısı</label>
+                <select id="rotate-angle">
+                    <option value="90">90° Sağa Döndür (Saat Yönü)</option>
+                    <option value="180">180° Döndür (Baş Aşağı)</option>
+                    <option value="270">90° Sola Döndür (Saat Yönünün Tersi)</option>
+                </select>
+            </div>
+
+            <button class="btn-submit" id="btn-rotate" disabled onclick="executeRotate()">Döndür ve İndir</button>
+        </div>
+
+        <div id="tab-word" class="tab-content">
+            <h2 style="color: #10b981;">PDF'ten Word'e Dönüştür (OCR Destekli)</h2>
+            <p class="description">PDF belgenizi düzenlenebilir Word (.doc) belgesine çevirin. Taranmış, resim formatındaki PDF'ler için akıllı Türkçe OCR özelliğini açabilirsiniz.</p>
+
+            <div class="drop-zone" style="border-color: #10b981;" onclick="triggerFileInput('word-input')">
+                <span style="font-size: 2.5rem;">📥</span>
+                <p>Word'e çevirmek istediğiniz PDF dosyasını sürükleyin veya seçin</p>
+                <input type="file" id="word-input" accept="application/pdf" style="display:none" onchange="handleWordFile(event)">
+            </div>
+
+            <div id="word-file-info" style="display: none;" class="file-info-badge">
+                <span id="word-name">Dosya: yok</span>
+                <span id="word-pages">0 Sayfa</span>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="use-ocr"> 
+                    <span><strong>Gelişmiş OCR'ı Etkinleştir (Türkçe Karakter Desteği)</strong></span>
+                </label>
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -5px; margin-left: 28px;">
+                    Eğer PDF'iniz bir kitaptan veya belgeden çekilmiş <strong>fotoğraflardan (taranmış)</strong> oluşuyorsa bu seçeneği işaretleyin. Normal (seçilebilir yazılı) PDF'ler için işaretsiz bırakmanız çok daha hızlı sonuç verir.
+                </p>
+            </div>
+
+            <button class="btn-submit" style="background-color: #10b981; color: #0f172a;" id="btn-word" disabled onclick="executeWordConversion()">
+                Word Dosyasına Dönüştür ve İndir
+            </button>
+        </div>
+
     </div>
 
     <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const dropZone = document.getElementById('drop-zone');
-        const previewContainer = document.getElementById('preview-container');
-        const fileInput = document.getElementById('fileInput');
-        const asciiPreview = document.getElementById('ascii-preview');
-        const canvasWrapper = document.getElementById('canvas-wrapper');
-        const imgSpecs = document.getElementById('imgSpecs');
+        let mergeFilesList = [];
+        let splitFile = null;
+        let rotateFile = null;
+        let wordFile = null;
 
-        let originalImage = null;
-        let originalWidth = 0;
-        let originalHeight = 0;
-        let currentWidth = 0;
-        let currentHeight = 0;
+        let splitPageCount = 0;
+        let rotatePageCount = 0;
+        let wordPageCount = 0;
+        let wordFileDataBytes = null;
 
-        // Dosya Seçim Tetikleme
-        function triggerFileSelect() {
-            fileInput.click();
+        // Sekme Değiştirme
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        function fileSelectHandler(e) {
-            const file = e.target.files[0];
-            if (file) loadImage(file);
+        // Gizli dosya girişlerini tetikleme
+        function triggerFileInput(id) {
+            document.getElementById(id).click();
         }
 
-        // Drag & Drop Fonksiyonları
-        function dragOverHandler(e) {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
+        // Yükleme ekranı yönetimi
+        function showLoader(text) {
+            document.getElementById('loader-text').innerText = text;
+            document.getElementById('loader').style.display = 'flex';
         }
 
-        function dragLeaveHandler() {
-            dropZone.classList.remove('dragover');
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
         }
 
-        function dropHandler(e) {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                loadImage(file);
-            }
-        }
-
-        // Görseli Canvas'a Yükleme
-        function loadImage(file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                originalImage = new Image();
-                originalImage.onload = function() {
-                    originalWidth = originalImage.width;
-                    originalHeight = originalImage.height;
-                    currentWidth = originalWidth;
-                    currentHeight = originalHeight;
-
-                    // Giriş alanlarını doldur
-                    document.getElementById('imgWidth').value = originalWidth;
-                    document.getElementById('imgHeight').value = originalHeight;
-
-                    dropZone.style.display = 'none';
-                    previewContainer.style.display = 'flex';
-
-                    processImage();
-                };
-                originalImage.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Boyut Değişimi Kontrolü
-        function changeDimension(type) {
-            if (!originalImage) return;
-
-            const widthInput = document.getElementById('imgWidth');
-            const heightInput = document.getElementById('imgHeight');
-            const keepAspect = document.getElementById('aspectRatio').checked;
-
-            let w = parseInt(widthInput.value) || 1;
-            let h = parseInt(heightInput.value) || 1;
-
-            if (keepAspect) {
-                const ratio = originalWidth / originalHeight;
-                if (type === 'width') {
-                    h = Math.round(w / ratio);
-                    heightInput.value = h;
-                } else {
-                    w = Math.round(h * ratio);
-                    widthInput.value = w;
+        // --- BİRLEŞTİRME İŞLEMLERİ ---
+        function handleMergeFiles(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                if (file.type === "application/pdf") {
+                    mergeFilesList.push(file);
                 }
+            });
+            renderMergeList();
+            checkMergeButton();
+            event.target.value = '';
+        }
+
+        function renderMergeList() {
+            const list = document.getElementById('mergeList');
+            if (mergeFilesList.length === 0) {
+                list.innerHTML = '<p style="text-align:center; color:#64748b; padding:20px; margin:0;">Henüz dosya yüklenmedi.</p>';
+                return;
             }
 
-            currentWidth = w;
-            currentHeight = h;
-            processImage();
+            list.innerHTML = '';
+            mergeFilesList.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'pdf-item';
+                item.innerHTML = `
+                    <span class="pdf-name">${file.name}</span>
+                    <div class="pdf-actions">
+                        <button class="action-btn" onclick="moveMergeItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                        <button class="action-btn" onclick="moveMergeItem(${index}, 1)" ${index === mergeFilesList.length - 1 ? 'disabled' : ''}>▼</button>
+                        <button class="action-btn delete" onclick="deleteMergeItem(${index})">✕</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
         }
 
-        function resetDimensions() {
-            if (!originalImage) return;
-            currentWidth = originalWidth;
-            currentHeight = originalHeight;
-            document.getElementById('imgWidth').value = originalWidth;
-            document.getElementById('imgHeight').value = originalHeight;
-            processImage();
+        function moveMergeItem(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= mergeFilesList.length) return;
+            const temp = mergeFilesList[index];
+            mergeFilesList[index] = mergeFilesList[targetIndex];
+            mergeFilesList[targetIndex] = temp;
+            renderMergeList();
         }
 
-        // Sıkıştırma Kalitesi Sürgüsü Görünürlüğü
-        function toggleQualitySlider() {
-            const format = document.getElementById('outputFormat').value;
-            const container = document.getElementById('qualityContainer');
-            // JPEG, WebP ve AVIF formatları kalite kayıplı sıkıştırmayı destekler
-            if (format === 'image/jpeg' || format === 'image/webp' || format === 'image/avif') {
-                container.style.display = 'block';
-            } else {
-                container.style.display = 'none';
+        function deleteMergeItem(index) {
+            mergeFilesList.splice(index, 1);
+            renderMergeList();
+            checkMergeButton();
+        }
+
+        function checkMergeButton() {
+            const btn = document.getElementById('btn-merge');
+            btn.disabled = mergeFilesList.length < 2;
+        }
+
+        async function executeMerge() {
+            showLoader("PDF dosyaları birleştiriliyor...");
+            try {
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+
+                for (const file of mergeFilesList) {
+                    const bytes = await file.arrayBuffer();
+                    const pdf = await PDFDocument.load(bytes);
+                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                    copiedPages.forEach(page => mergedPdf.addPage(page));
+                }
+
+                const mergedPdfBytes = await mergedPdf.save();
+                downloadFile(mergedPdfBytes, "birlesmis_belge.pdf");
+            } catch (error) {
+                alert("PDF Birleştirme sırasında bir hata oluştu: " + error.message);
+            } finally {
+                hideLoader();
             }
         }
 
-        function updateQuality(val) {
-            document.getElementById('qualityVal').textContent = val + '%';
-        }
 
-        function togglePixelate(checkbox) {
-            const container = document.getElementById('pixelSizeContainer');
-            container.style.display = checkbox.checked ? 'block' : 'none';
-            processImage();
-        }
+        // --- BÖLME İŞLEMLERİ ---
+        async function handleSplitFile(event) {
+            const file = event.target.files[0];
+            if (!file || file.type !== "application/pdf") return;
 
-        function updatePixelSize(val) {
-            document.getElementById('pixelSizeVal').textContent = val + 'px';
-            processImage();
-        }
+            splitFile = file;
+            showLoader("Dosya analiz ediliyor...");
 
-        function toggleAscii(checkbox) {
-            if (checkbox.checked) {
-                canvasWrapper.style.display = 'none';
-                asciiPreview.style.display = 'block';
-            } else {
-                canvasWrapper.style.display = 'flex';
-                asciiPreview.style.display = 'none';
+            try {
+                const { PDFDocument } = PDFLib;
+                const bytes = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(bytes);
+                splitPageCount = pdf.getPageCount();
+
+                document.getElementById('split-name').innerText = `Dosya: ${file.name}`;
+                document.getElementById('split-pages').innerText = `${splitPageCount} Sayfa`;
+                document.getElementById('split-file-info').style.display = 'flex';
+                document.getElementById('btn-split').disabled = false;
+            } catch (error) {
+                alert("Dosya okunurken bir hata oluştu.");
+                splitFile = null;
+                document.getElementById('btn-split').disabled = true;
+            } finally {
+                hideLoader();
             }
-            processImage();
         }
 
-        // Görüntü İşleme Motoru
-        function processImage() {
-            if (!originalImage) return;
-
-            canvas.width = currentWidth;
-            canvas.height = currentHeight;
-
-            ctx.drawImage(originalImage, 0, 0, currentWidth, currentHeight);
-
-            const imgData = ctx.getImageData(0, 0, currentWidth, currentHeight);
-            const data = imgData.data;
-
-            const grayscale = document.getElementById('filterGrayscale').checked;
-            const invert = document.getElementById('filterInvert').checked;
-            const pixelate = document.getElementById('filterPixelate').checked;
-            const ascii = document.getElementById('filterAscii').checked;
-
-            // 1. Pikselleştirme
-            if (pixelate) {
-                const size = parseInt(document.getElementById('pixelSize').value);
-                for (let y = 0; y < currentHeight; y += size) {
-                    for (let x = 0; x < currentWidth; x += size) {
-                        const rIdx = (y * currentWidth + x) * 4;
-                        const r = data[rIdx];
-                        const g = data[rIdx + 1];
-                        const b = data[rIdx + 2];
-                        const a = data[rIdx + 3];
-
-                        for (let py = 0; py < size && (y + py) < currentHeight; py++) {
-                            for (let px = 0; px < size && (x + px) < currentWidth; px++) {
-                                const idx = ((y + py) * currentWidth + (x + px)) * 4;
-                                data[idx] = r;
-                                data[idx + 1] = g;
-                                data[idx + 2] = b;
-                                data[idx + 3] = a;
-                            }
+        function parsePageRange(rangeStr, maxPages) {
+            const pages = [];
+            const parts = rangeStr.split(',');
+            for (let part of parts) {
+                part = part.trim();
+                if (part.includes('-')) {
+                    const [startStr, endStr] = part.split('-');
+                    const start = parseInt(startStr, 10);
+                    const end = parseInt(endStr, 10);
+                    if (!isNaN(start) && !isNaN(end)) {
+                        const s = Math.max(1, Math.min(start, maxPages));
+                        const e = Math.max(1, Math.min(end, maxPages));
+                        const step = s <= e ? 1 : -1;
+                        for (let i = s; s <= e ? i <= e : i >= e; i += step) {
+                            pages.push(i - 1);
                         }
                     }
+                } else {
+                    const pageNum = parseInt(part, 10);
+                    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxPages) {
+                        pages.push(pageNum - 1);
+                    }
                 }
             }
-
-            // 2. Gri Tonlama ve Ters Çevirme
-            if (grayscale || invert) {
-                for (let i = 0; i < data.length; i += 4) {
-                    let r = data[i];
-                    let g = data[i + 1];
-                    let b = data[i + 2];
-
-                    if (grayscale) {
-                        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-                        r = g = b = gray;
-                    }
-                    if (invert) {
-                        r = 255 - r;
-                        g = 255 - g;
-                        b = 255 - b;
-                    }
-
-                    data[i] = r;
-                    data[i + 1] = g;
-                    data[i + 2] = b;
-                }
-            }
-
-            ctx.putImageData(imgData, 0, 0);
-
-            if (ascii) {
-                generateAsciiArt();
-            }
-
-            imgSpecs.textContent = `Mevcut Boyut: ${currentWidth} x ${currentHeight} px`;
+            return pages;
         }
 
-        // ASCII Sanatı Oluşturucu
-        function generateAsciiArt() {
-            const asciiWidth = 100;
-            const asciiHeight = Math.round(currentHeight * (asciiWidth / currentWidth) * 0.52);
-
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = asciiWidth;
-            tempCanvas.height = asciiHeight;
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.drawImage(canvas, 0, 0, asciiWidth, asciiHeight);
-
-            const imgData = tempCtx.getImageData(0, 0, asciiWidth, asciiHeight);
-            const data = imgData.data;
-
-            const chars = '@#W$9876543210?!abc;:+=-,._ ';
-            let asciiStr = '';
-
-            for (let y = 0; y < asciiHeight; y++) {
-                for (let x = 0; x < asciiWidth; x++) {
-                    const idx = (y * asciiWidth + x) * 4;
-                    const r = data[idx];
-                    const g = data[idx+1];
-                    const b = data[idx+2];
-                    
-                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-                    const charIdx = Math.floor((gray / 255) * (chars.length - 1));
-                    asciiStr += chars[charIdx];
-                }
-                asciiStr += '\n';
+        async function executeSplit() {
+            const rangeStr = document.getElementById('page-range').value.trim();
+            if (!rangeStr) {
+                alert("Lütfen ayıklamak istediğiniz sayfaları belirtin.");
+                return;
             }
-            asciiPreview.textContent = asciiStr;
+
+            const targetPages = parsePageRange(rangeStr, splitPageCount);
+            if (targetPages.length === 0) {
+                alert("Geçersiz sayfa aralığı belirtildi.");
+                return;
+            }
+
+            showLoader("Sayfalar ayıklanıyor...");
+            try {
+                const { PDFDocument } = PDFLib;
+                const bytes = await splitFile.arrayBuffer();
+                const pdf = await PDFDocument.load(bytes);
+                const splitPdf = await PDFDocument.create();
+
+                const copiedPages = await splitPdf.copyPages(pdf, targetPages);
+                copiedPages.forEach(page => splitPdf.addPage(page));
+
+                const splitPdfBytes = await splitPdf.save();
+                downloadFile(splitPdfBytes, "ayiklanmis_sayfalar.pdf");
+            } catch (error) {
+                alert("Bölme işlemi sırasında hata: " + error.message);
+            } finally {
+                hideLoader();
+            }
         }
 
-        // Dosyayı İndirme Fonksiyonu (Uzantı Eşleştirmeli)
-        function downloadImage() {
-            if (!originalImage) return;
 
-            const format = document.getElementById('outputFormat').value;
-            const quality = parseFloat(document.getElementById('outputQuality').value) / 100;
-            const isAscii = document.getElementById('filterAscii').checked;
+        // --- DÖNDÜRME İŞLEMLERİ ---
+        async function handleRotateFile(event) {
+            const file = event.target.files[0];
+            if (!file || file.type !== "application/pdf") return;
 
-            if (isAscii) {
-                const blob = new Blob([asciiPreview.textContent], { type: 'text/plain' });
+            rotateFile = file;
+            showLoader("Dosya analiz ediliyor...");
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const bytes = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(bytes);
+                rotatePageCount = pdf.getPageCount();
+
+                document.getElementById('rotate-name').innerText = `Dosya: ${file.name}`;
+                document.getElementById('rotate-pages').innerText = `${rotatePageCount} Sayfa`;
+                document.getElementById('rotate-file-info').style.display = 'flex';
+                document.getElementById('btn-rotate').disabled = false;
+            } catch (error) {
+                alert("Dosya okunurken bir hata oluştu.");
+                rotateFile = null;
+                document.getElementById('btn-rotate').disabled = true;
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function executeRotate() {
+            showLoader("PDF sayfaları döndürülüyor...");
+            try {
+                const { PDFDocument, degrees } = PDFLib;
+                const bytes = await rotateFile.arrayBuffer();
+                const pdf = await PDFDocument.load(bytes);
+                const pages = pdf.getPages();
+                
+                const angleInput = parseInt(document.getElementById('rotate-angle').value, 10);
+
+                pages.forEach(page => {
+                    const currentRotation = page.getRotation().angle;
+                    page.setRotation(degrees(currentRotation + angleInput));
+                });
+
+                const rotatedPdfBytes = await pdf.save();
+                downloadFile(rotatedPdfBytes, "dondurulmus_belge.pdf");
+            } catch (error) {
+                alert("Döndürme işlemi sırasında hata: " + error.message);
+            } finally {
+                hideLoader();
+            }
+        }
+
+
+        // --- WORD DÖNÜŞTÜRME & OCR İŞLEMLERİ ---
+        async function handleWordFile(event) {
+            const file = event.target.files[0];
+            if (!file || file.type !== "application/pdf") return;
+
+            wordFile = file;
+            showLoader("PDF belgesi yükleniyor...");
+
+            try {
+                wordFileDataBytes = await file.arrayBuffer();
+                // PDFJS kullanarak sayfa sayısını alalım
+                const pdf = await pdfjsLib.getDocument({ data: wordFileDataBytes }).promise;
+                wordPageCount = pdf.numPages;
+
+                document.getElementById('word-name').innerText = `Dosya: ${file.name}`;
+                document.getElementById('word-pages').innerText = `${wordPageCount} Sayfa`;
+                document.getElementById('word-file-info').style.display = 'flex';
+                document.getElementById('btn-word').disabled = false;
+            } catch (error) {
+                alert("Dosya yüklenirken bir hata oluştu: " + error.message);
+                wordFile = null;
+                document.getElementById('btn-word').disabled = true;
+            } finally {
+                hideLoader();
+            }
+        }
+
+        async function executeWordConversion() {
+            if (!wordFileDataBytes) return;
+
+            const useOcr = document.getElementById('use-ocr').checked;
+            showLoader("PDF okunuyor...");
+
+            try {
+                const pdf = await pdfjsLib.getDocument({ data: wordFileDataBytes }).promise;
+                let fullText = "";
+
+                if (useOcr) {
+                    // OCR Modu: Sayfaları resme çevirip Tesseract ile Türkçe okutuyoruz
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        showLoader(`Sayfa ${i}/${pdf.numPages} resme dönüştürülüyor...`);
+                        const page = await pdf.getPage(i);
+                        
+                        // Kaliteyi artırmak için 2.0 ölçekle render alıyoruz (OCR başarısı için önemli)
+                        const viewport = page.getViewport({ scale: 2.0 });
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+                        showLoader(`Türkçe OCR İşleniyor: Sayfa ${i}/${pdf.numPages}...`);
+                        
+                        // Tesseract.js Türkçe (tur) motoru çağrısı
+                        const result = await Tesseract.recognize(
+                            canvas,
+                            'tur',
+                            {
+                                logger: m => {
+                                    if (m.status === 'recognizing text') {
+                                        showLoader(`Sayfa ${i}/${pdf.numPages} OCR yapılıyor: %${Math.round(m.progress * 100)}`);
+                                    }
+                                }
+                            }
+                        );
+                        
+                        fullText += result.data.text + "\n\n";
+                    }
+                } else {
+                    // Dijital Metin Ayıklama Modu (Çok hızlıdır)
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        showLoader(`Metin ayıklanıyor: Sayfa ${i}/${pdf.numPages}`);
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        
+                        // Satırları düzgün gruplayıp metne döküyoruz
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + "\n\n";
+                    }
+                }
+
+                if (!fullText.trim()) {
+                    alert("Uyarı: Belgeden hiç metin ayıklanamadı. PDF taranmış bir resim olabilir, lütfen 'OCR' seçeneğini işaretleyerek tekrar deneyin.");
+                    return;
+                }
+
+                // Word Uyumlu HTML belgesi oluşturma (UTF-8 BOM ile Türkçe karakterleri koruyoruz)
+                const docTemplate = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Dönüştürülen PDF Belgesi</title>
+                    <style>
+                        body {
+                            font-family: 'Calibri', 'Arial', sans-serif;
+                            font-size: 11pt;
+                            line-height: 1.5;
+                        }
+                        p {
+                            margin: 0 0 12pt 0;
+                            text-align: justify;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${fullText.replace(/\n/g, '<br>')}
+                </body>
+                </html>`;
+
+                // UTF-8 BOM ekleyerek Word'ün Türkçe karakterleri (ş, ç, ğ, ı, ö, ü) düzgün okumasını kesinleştiriyoruz
+                const blob = new Blob(['\ufeff' + docTemplate], { type: 'application/msword;charset=utf-8' });
                 const link = document.createElement('a');
-                link.download = 'ascii_sanati.txt';
                 link.href = URL.createObjectURL(blob);
+                link.download = wordFile.name.replace('.pdf', '') + "_donusturulen.doc";
                 link.click();
-            } else {
-                const link = document.createElement('a');
-                
-                // Format MIME türlerini düzgün dosya uzantılarına eşliyoruz
-                const extensionMap = {
-                    'image/png': 'png',
-                    'image/jpeg': 'jpg',
-                    'image/webp': 'webp',
-                    'image/avif': 'avif',
-                    'image/gif': 'gif',
-                    'image/bmp': 'bmp',
-                    'image/x-icon': 'ico'
-                };
-                
-                const extension = extensionMap[format] || 'png';
-                link.download = `piksel_laboratuvari.${extension}`;
-                link.href = canvas.toDataURL(format, quality);
-                link.click();
+
+            } catch (error) {
+                alert("Dönüştürme başarısız oldu: " + error.message);
+            } finally {
+                hideLoader();
             }
+        }
+
+
+        // Genel İndirme Yardımcısı
+        function downloadFile(bytes, filename) {
+            const blob = new Blob([bytes], { type: "application/pdf" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
         }
     </script>
 </body>
