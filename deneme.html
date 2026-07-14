@@ -33,11 +33,12 @@
             color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
+            flex-direction: row;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* Sol Navigasyon Menüsü */
+        /* Sol Navigasyon Menüsü (Masaüstü) */
         #sidebar {
             width: 300px;
             background-color: var(--panel-bg);
@@ -45,6 +46,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
@@ -85,6 +87,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .menu-btn:hover, .menu-btn.active {
@@ -126,9 +129,10 @@
             color: #94a3b8;
             font-size: 0.95rem;
             margin-bottom: 30px;
+            line-height: 1.5;
         }
 
-        /* Yükleme ve Dosya Alanları */
+        /* Sürükle Bırak / Yükleme Alanı */
         .drop-zone {
             border: 2px dashed #475569;
             border-radius: 12px;
@@ -138,6 +142,7 @@
             cursor: pointer;
             transition: border-color 0.3s;
             margin-bottom: 20px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .drop-zone:hover {
@@ -175,7 +180,7 @@
         .pdf-name {
             font-size: 0.9rem;
             font-weight: 500;
-            max-width: 70%;
+            max-width: 60%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -191,8 +196,8 @@
             color: #fff;
             border: none;
             border-radius: 4px;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             cursor: pointer;
             font-size: 0.8rem;
             display: flex;
@@ -232,42 +237,56 @@
             background-color: #0f172a;
             border: 1px solid var(--border-color);
             color: #fff;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border-radius: 6px;
             box-sizing: border-box;
             font-size: 0.95rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--accent-color);
         }
 
         .checkbox-group {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            align-items: flex-start;
+            gap: 12px;
             margin-bottom: 15px;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .checkbox-group input {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-group span {
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
 
         .file-info-badge {
             background-color: rgba(56, 189, 248, 0.15);
             color: var(--accent-color);
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 6px;
             font-size: 0.9rem;
             margin-bottom: 20px;
             border: 1px solid rgba(56, 189, 248, 0.3);
             display: flex;
             justify-content: space-between;
+            gap: 10px;
         }
 
         /* Ana Buton */
         .btn-submit {
             width: 100%;
-            padding: 14px;
+            padding: 16px;
             background-color: var(--accent-color);
             color: #0f172a;
             border: none;
@@ -276,6 +295,7 @@
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-submit:hover {
@@ -296,11 +316,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(15, 23, 42, 0.85);
+            background-color: rgba(15, 23, 42, 0.9);
             z-index: 1000;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .spinner {
@@ -310,7 +332,7 @@
             border-radius: 50%;
             border-left-color: var(--accent-color);
             animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         @keyframes spin {
@@ -323,7 +345,88 @@
             font-weight: 500;
             margin: 0;
             text-align: center;
-            max-width: 80%;
+            max-width: 100%;
+            line-height: 1.5;
+        }
+
+        /* -------------------------------------------------- */
+        /* MOBİL UYUMLULUK CSS (RESPONSIVE MEDIA QUERIES)     */
+        /* -------------------------------------------------- */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column; /* Yan yana yerleşimi dikey yerleşime çevir */
+            }
+
+            /* Sidebar'ı üst tarafa yatay menü barına dönüştür */
+            #sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .sidebar-header {
+                padding: 15px;
+                text-align: center;
+            }
+
+            .sidebar-header p {
+                display: none; /* Mobilde dikey alanı kurtarmak için alt başlığı gizle */
+            }
+
+            /* Sekmeleri yatayda kaydırılabilir yap */
+            .menu-items {
+                display: flex;
+                padding: 5px 10px;
+                overflow-x: auto;
+                gap: 8px;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch; /* iOS pürüzsüz kaydırma */
+                scrollbar-width: none; /* Firefox için scrollbar gizleme */
+            }
+
+            .menu-items::-webkit-scrollbar {
+                display: none; /* Chrome/Safari için scrollbar gizleme */
+            }
+
+            .menu-btn {
+                width: auto;
+                margin-bottom: 0;
+                padding: 10px 16px;
+                flex-shrink: 0; /* Butonların sıkışıp küçülmesini engelle */
+                font-size: 0.9rem;
+            }
+
+            .menu-btn.active {
+                border-left: none;
+                border-bottom: 3px solid var(--accent-color);
+                border-radius: 8px 8px 0 0;
+            }
+
+            /* Ana İçerik Alanı Mobilde Tam Otursun */
+            #main-content {
+                padding: 20px;
+                flex: 1; /* Kalan ekran boşluğunu doldur */
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            .description {
+                font-size: 0.85rem;
+                margin-bottom: 20px;
+            }
+
+            .drop-zone {
+                padding: 30px 15px;
+            }
+
+            .file-info-badge {
+                flex-direction: column;
+                gap: 5px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -344,13 +447,13 @@
                 <span>📂</span> PDF Birleştir
             </button>
             <button class="menu-btn" onclick="switchTab('tab-split')">
-                <span>✂️</span> PDF Böl / Sayfa Ayıkla
+                <span>✂️</span> PDF Böl
             </button>
             <button class="menu-btn" onclick="switchTab('tab-rotate')">
                 <span>🔄</span> PDF Döndür
             </button>
             <button class="menu-btn" onclick="switchTab('tab-word')" style="color: #10b981;">
-                <span>📝</span> PDF'ten Word'e (OCR)
+                <span>📝</span> Word'e Çevir (OCR)
             </button>
         </div>
     </div>
@@ -363,7 +466,7 @@
             
             <div class="drop-zone" onclick="triggerFileInput('merge-input')">
                 <span style="font-size: 2.5rem;">📥</span>
-                <p>Birleştirmek istediğiniz PDF'leri sürükleyin veya seçin</p>
+                <p>PDF seçin veya buraya sürükleyin</p>
                 <input type="file" id="merge-input" accept="application/pdf" multiple style="display:none" onchange="handleMergeFiles(event)">
             </div>
 
@@ -380,7 +483,7 @@
 
             <div class="drop-zone" onclick="triggerFileInput('split-input')">
                 <span style="font-size: 2.5rem;">📥</span>
-                <p>Bölmek istediğiniz PDF dosyasını sürükleyin veya seçin</p>
+                <p>Bölmek istediğiniz PDF dosyasını seçin</p>
                 <input type="file" id="split-input" accept="application/pdf" style="display:none" onchange="handleSplitFile(event)">
             </div>
 
@@ -397,7 +500,7 @@
                 </p>
             </div>
 
-            <button class="btn-submit" id="btn-split" disabled onclick="executeSplit()">Seçilen Sayfaları Ayıkla ve İndir</button>
+            <button class="btn-submit" id="btn-split" disabled onclick="executeSplit()">Seçilen Sayfaları Ayıkla</button>
         </div>
 
         <div id="tab-rotate" class="tab-content">
@@ -406,7 +509,7 @@
 
             <div class="drop-zone" onclick="triggerFileInput('rotate-input')">
                 <span style="font-size: 2.5rem;">📥</span>
-                <p>Döndürmek istediğiniz PDF dosyasını sürükleyin veya seçin</p>
+                <p>Döndürmek istediğiniz PDF dosyasını seçin</p>
                 <input type="file" id="rotate-input" accept="application/pdf" style="display:none" onchange="handleRotateFile(event)">
             </div>
 
@@ -420,7 +523,7 @@
                 <select id="rotate-angle">
                     <option value="90">90° Sağa Döndür (Saat Yönü)</option>
                     <option value="180">180° Döndür (Baş Aşağı)</option>
-                    <option value="270">90° Sola Döndür (Saat Yönünün Tersi)</option>
+                    <option value="270">90° Sola Döndür</option>
                 </select>
             </div>
 
@@ -428,12 +531,12 @@
         </div>
 
         <div id="tab-word" class="tab-content">
-            <h2 style="color: #10b981;">PDF'ten Word'e Dönüştür (OCR Destekli)</h2>
-            <p class="description">PDF belgenizi düzenlenebilir Word (.doc) belgesine çevirin. Taranmış, resim formatındaki PDF'ler için akıllı Türkçe OCR özelliğini açabilirsiniz.</p>
+            <h2 style="color: #10b981;">PDF'ten Word'e Dönüştür</h2>
+            <p class="description">PDF belgenizi düzenlenebilir Word belgesine çevirin. Taranmış, resimli PDF'ler için akıllı Türkçe OCR özelliğini açabilirsiniz.</p>
 
             <div class="drop-zone" style="border-color: #10b981;" onclick="triggerFileInput('word-input')">
                 <span style="font-size: 2.5rem;">📥</span>
-                <p>Word'e çevirmek istediğiniz PDF dosyasını sürükleyin veya seçin</p>
+                <p>Word'e çevirmek istediğiniz PDF dosyasını seçin</p>
                 <input type="file" id="word-input" accept="application/pdf" style="display:none" onchange="handleWordFile(event)">
             </div>
 
@@ -447,13 +550,13 @@
                     <input type="checkbox" id="use-ocr"> 
                     <span><strong>Gelişmiş OCR'ı Etkinleştir (Türkçe Karakter Desteği)</strong></span>
                 </label>
-                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -5px; margin-left: 28px;">
-                    Eğer PDF'iniz bir kitaptan veya belgeden çekilmiş <strong>fotoğraflardan (taranmış)</strong> oluşuyorsa bu seçeneği işaretleyin. Normal (seçilebilir yazılı) PDF'ler için işaretsiz bırakmanız çok daha hızlı sonuç verir.
+                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -5px; margin-left: 32px;">
+                    Eğer PDF'iniz taranmış <strong>fotoğraflardan</strong> oluşuyorsa işaretleyin. Normal (seçilebilir yazılı) PDF'ler için işaretsiz bırakmanız çok daha hızlı sonuç verir.
                 </p>
             </div>
 
             <button class="btn-submit" style="background-color: #10b981; color: #0f172a;" id="btn-word" disabled onclick="executeWordConversion()">
-                Word Dosyasına Dönüştür ve İndir
+                Word Dosyasına Dönüştür
             </button>
         </div>
 
@@ -722,7 +825,6 @@
 
             try {
                 wordFileDataBytes = await file.arrayBuffer();
-                // PDFJS kullanarak sayfa sayısını alalım
                 const pdf = await pdfjsLib.getDocument({ data: wordFileDataBytes }).promise;
                 wordPageCount = pdf.numPages;
 
@@ -750,12 +852,10 @@
                 let fullText = "";
 
                 if (useOcr) {
-                    // OCR Modu: Sayfaları resme çevirip Tesseract ile Türkçe okutuyoruz
                     for (let i = 1; i <= pdf.numPages; i++) {
                         showLoader(`Sayfa ${i}/${pdf.numPages} resme dönüştürülüyor...`);
                         const page = await pdf.getPage(i);
                         
-                        // Kaliteyi artırmak için 2.0 ölçekle render alıyoruz (OCR başarısı için önemli)
                         const viewport = page.getViewport({ scale: 2.0 });
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
@@ -766,7 +866,6 @@
 
                         showLoader(`Türkçe OCR İşleniyor: Sayfa ${i}/${pdf.numPages}...`);
                         
-                        // Tesseract.js Türkçe (tur) motoru çağrısı
                         const result = await Tesseract.recognize(
                             canvas,
                             'tur',
@@ -782,13 +881,11 @@
                         fullText += result.data.text + "\n\n";
                     }
                 } else {
-                    // Dijital Metin Ayıklama Modu (Çok hızlıdır)
                     for (let i = 1; i <= pdf.numPages; i++) {
                         showLoader(`Metin ayıklanıyor: Sayfa ${i}/${pdf.numPages}`);
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
                         
-                        // Satırları düzgün gruplayıp metne döküyoruz
                         const pageText = textContent.items.map(item => item.str).join(' ');
                         fullText += pageText + "\n\n";
                     }
@@ -799,7 +896,6 @@
                     return;
                 }
 
-                // Word Uyumlu HTML belgesi oluşturma (UTF-8 BOM ile Türkçe karakterleri koruyoruz)
                 const docTemplate = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
@@ -822,7 +918,6 @@
                 </body>
                 </html>`;
 
-                // UTF-8 BOM ekleyerek Word'ün Türkçe karakterleri (ş, ç, ğ, ı, ö, ü) düzgün okumasını kesinleştiriyoruz
                 const blob = new Blob(['\ufeff' + docTemplate], { type: 'application/msword;charset=utf-8' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
