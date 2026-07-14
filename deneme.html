@@ -277,7 +277,6 @@
             background-color: #475569;
         }
 
-        /* Boyut kilitleme simgesi */
         .dimensions-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -366,6 +365,10 @@
                         <option value="image/png">PNG (Kayıpsız)</option>
                         <option value="image/jpeg">JPEG (Sıkıştırılmış)</option>
                         <option value="image/webp">WebP (Modern & Hafif)</option>
+                        <option value="image/avif">AVIF (Yeni Nesil & Güçlü Sıkıştırma)</option>
+                        <option value="image/gif">GIF (Retro & 256 Renk)</option>
+                        <option value="image/bmp">BMP (Sıkıştırmasız / Ham)</option>
+                        <option value="image/x-icon">ICO (Favicon / Web İkonu)</option>
                     </select>
                 </div>
                 <div class="control-group" id="qualityContainer" style="display: none;">
@@ -509,11 +512,12 @@
             processImage();
         }
 
-        // Piksel Sıkıştırma ve Format Kontrolleri
+        // Sıkıştırma Kalitesi Sürgüsü Görünürlüğü
         function toggleQualitySlider() {
             const format = document.getElementById('outputFormat').value;
             const container = document.getElementById('qualityContainer');
-            if (format === 'image/jpeg' || format === 'image/webp') {
+            // JPEG, WebP ve AVIF formatları kalite kayıplı sıkıştırmayı destekler
+            if (format === 'image/jpeg' || format === 'image/webp' || format === 'image/avif') {
                 container.style.display = 'block';
             } else {
                 container.style.display = 'none';
@@ -522,7 +526,6 @@
 
         function updateQuality(val) {
             document.getElementById('qualityVal').textContent = val + '%';
-            // Sürekli render performansı için dinamik güncelliyoruz
         }
 
         function togglePixelate(checkbox) {
@@ -547,18 +550,15 @@
             processImage();
         }
 
-        // Görüntü İşleme Motoru (Sihirli Alan)
+        // Görüntü İşleme Motoru
         function processImage() {
             if (!originalImage) return;
 
-            // Önce tuvali yeni boyutlarla eşleştiriyoruz
             canvas.width = currentWidth;
             canvas.height = currentHeight;
 
-            // Görseli çiz
             ctx.drawImage(originalImage, 0, 0, currentWidth, currentHeight);
 
-            // Filtreleri Uygula
             const imgData = ctx.getImageData(0, 0, currentWidth, currentHeight);
             const data = imgData.data;
 
@@ -567,19 +567,17 @@
             const pixelate = document.getElementById('filterPixelate').checked;
             const ascii = document.getElementById('filterAscii').checked;
 
-            // 1. Pikselleştirme (Pixelate)
+            // 1. Pikselleştirme
             if (pixelate) {
                 const size = parseInt(document.getElementById('pixelSize').value);
                 for (let y = 0; y < currentHeight; y += size) {
                     for (let x = 0; x < currentWidth; x += size) {
-                        // Bloğun ilk pikselinin RGBA değerlerini alıyoruz
                         const rIdx = (y * currentWidth + x) * 4;
                         const r = data[rIdx];
                         const g = data[rIdx + 1];
                         const b = data[rIdx + 2];
                         const a = data[rIdx + 3];
 
-                        // Tüm bloğu bu tek renkle doldur
                         for (let py = 0; py < size && (y + py) < currentHeight; py++) {
                             for (let px = 0; px < size && (x + px) < currentWidth; px++) {
                                 const idx = ((y + py) * currentWidth + (x + px)) * 4;
@@ -593,7 +591,7 @@
                 }
             }
 
-            // 2. Gri Tonlama ve Ters Çevirme (Matematiksel Dönüşümler)
+            // 2. Gri Tonlama ve Ters Çevirme
             if (grayscale || invert) {
                 for (let i = 0; i < data.length; i += 4) {
                     let r = data[i];
@@ -601,7 +599,6 @@
                     let b = data[i + 2];
 
                     if (grayscale) {
-                        // İnsan gözünün renk algısına duyarlı parlaklık formülü (Y)
                         const gray = 0.299 * r + 0.587 * g + 0.114 * b;
                         r = g = b = gray;
                     }
@@ -619,21 +616,18 @@
 
             ctx.putImageData(imgData, 0, 0);
 
-            // 3. ASCII Sanatı Dönüşümü
             if (ascii) {
                 generateAsciiArt();
             }
 
-            // Dosya Özelliklerini Güncelle
             imgSpecs.textContent = `Mevcut Boyut: ${currentWidth} x ${currentHeight} px`;
         }
 
-        // ASCII Sanatı Oluşturucu (Karanlıktan Aydınlığa Karakter Eşleme)
+        // ASCII Sanatı Oluşturucu
         function generateAsciiArt() {
-            const asciiWidth = 100; // Standart karakter genişliği
-            const asciiHeight = Math.round(currentHeight * (asciiWidth / currentWidth) * 0.52); // Karakter yüksekliği ayarı
+            const asciiWidth = 100;
+            const asciiHeight = Math.round(currentHeight * (asciiWidth / currentWidth) * 0.52);
 
-            // Analiz için geçici küçük bir canvas yaratıyoruz (Performans için)
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = asciiWidth;
             tempCanvas.height = asciiHeight;
@@ -643,7 +637,6 @@
             const imgData = tempCtx.getImageData(0, 0, asciiWidth, asciiHeight);
             const data = imgData.data;
 
-            // Yoğunluk haritası (Karanlıktan aydınlığa doğru karakterler)
             const chars = '@#W$9876543210?!abc;:+=-,._ ';
             let asciiStr = '';
 
@@ -654,7 +647,6 @@
                     const g = data[idx+1];
                     const b = data[idx+2];
                     
-                    // Parlaklık değeri
                     const gray = 0.299 * r + 0.587 * g + 0.114 * b;
                     const charIdx = Math.floor((gray / 255) * (chars.length - 1));
                     asciiStr += chars[charIdx];
@@ -664,7 +656,7 @@
             asciiPreview.textContent = asciiStr;
         }
 
-        // Dosyayı İndirme Fonksiyonu
+        // Dosyayı İndirme Fonksiyonu (Uzantı Eşleştirmeli)
         function downloadImage() {
             if (!originalImage) return;
 
@@ -673,17 +665,27 @@
             const isAscii = document.getElementById('filterAscii').checked;
 
             if (isAscii) {
-                // ASCII Metin dosyası olarak indir
                 const blob = new Blob([asciiPreview.textContent], { type: 'text/plain' });
                 const link = document.createElement('a');
                 link.download = 'ascii_sanati.txt';
                 link.href = URL.createObjectURL(blob);
                 link.click();
             } else {
-                // Görsel olarak indir
                 const link = document.createElement('a');
-                const extension = format.split('/')[1];
-                link.download = `piksel_laboratuvarı.${extension}`;
+                
+                // Format MIME türlerini düzgün dosya uzantılarına eşliyoruz
+                const extensionMap = {
+                    'image/png': 'png',
+                    'image/jpeg': 'jpg',
+                    'image/webp': 'webp',
+                    'image/avif': 'avif',
+                    'image/gif': 'gif',
+                    'image/bmp': 'bmp',
+                    'image/x-icon': 'ico'
+                };
+                
+                const extension = extensionMap[format] || 'png';
+                link.download = `piksel_laboratuvari.${extension}`;
                 link.href = canvas.toDataURL(format, quality);
                 link.click();
             }
