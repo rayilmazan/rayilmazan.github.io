@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Metal Dedektörü</title>
+    <style>
+        :root {
+            --neon-green: #00ff66;
+            --neon-red: #ff3333;
+            --dark-bg: #0a0f0d;
+            --panel-bg: #111a16;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--neon-green);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            border-bottom: 1px solid rgba(0, 255, 102, 0.2);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+            gap: 20px;
+        }
+
+        /* Radar Dairesi */
+        .radar-screen {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            border: 2px solid var(--neon-green);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,102,0.05) 0%, rgba(0,0,0,0.8) 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-sweep {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            background: linear-gradient(45deg, rgba(0, 255, 102, 0.4) 0%, transparent 100%);
+            transform-origin: bottom right;
+            bottom: 50%;
+            right: 50%;
+            border-radius: 100% 0 0 0;
+            animation: sweep 3s linear infinite;
+        }
+
+        @keyframes sweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .radar-grid {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            border: 1px dashed rgba(0, 255, 102, 0.3);
+            border-radius: 50%;
+        }
+
+        .radar-grid-inner {
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            border: 1px dashed rgba(0, 255, 102, 0.3);
+            border-radius: 50%;
+        }
+
+        .radar-cross-h {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: rgba(0, 255, 102, 0.2);
+        }
+
+        .radar-cross-v {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background: rgba(0, 255, 102, 0.2);
+        }
+
+        /* Sayısal Değer Paneli */
+        .readout {
+            text-align: center;
+            z-index: 10;
+        }
+
+        .value-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 0 0 15px var(--neon-green);
+            transition: color 0.2s, text-shadow 0.2s;
+        }
+
+        .unit {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        /* Grafik Alanı */
+        .graph-container {
+            width: 100%;
+            height: 120px;
+            background-color: var(--panel-bg);
+            border: 1px solid rgba(0, 255, 102, 0.3);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Kontroller */
+        .control-panel {
+            width: 100%;
+            background-color: var(--panel-bg);
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 10px 15px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            border-radius: 4px;
+            transition: all 0.2s;
+            box-shadow: 0 0 5px rgba(0, 255, 102, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--neon-green);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .btn-danger {
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+        }
+
+        .btn-danger:hover {
+            background-color: var(--neon-red);
+            color: white;
+            box-shadow: 0 0 15px var(--neon-red);
+        }
+
+        .toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+        }
+
+        /* Simülatör Alanı (Gerektiğinde Görünür) */
+        .simulator-box {
+            width: 100%;
+            border: 1px dashed #ff9900;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            background: rgba(255, 153, 0, 0.05);
+            color: #ff9900;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            accent-color: #ff9900;
+        }
+
+        .status-message {
+            font-size: 0.8rem;
+            text-align: center;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>MAG-RADAR v1.0</h1>
+        <div class="status-message" id="status-text">Donanım kontrol ediliyor...</div>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="radar-screen">
+            <div class="radar-sweep" id="sweep-element"></div>
+            <div class="radar-grid"></div>
+            <div class="radar-grid-inner"></div>
+            <div class="radar-cross-h"></div>
+            <div class="radar-cross-v"></div>
+            
+            <div class="readout">
+                <div class="value-display" id="val-display">0.0</div>
+                <div class="unit">µT (M. Alan)</div>
+            </div>
+        </div>
+
+        <div class="graph-container">
+            <canvas id="graph-canvas"></canvas>
+        </div>
+
+        <div class="control-panel">
+            <button class="btn" id="start-btn">Sistemi Başlat</button>
+            
+            <div class="toggle-group">
+                <span class="toggle-label">Sesli Bildirim (Bip)</span>
+                <button class="btn" style="padding: 5px 10px;" id="audio-toggle">KAPALI</button>
+            </div>
+
+            <div class="toggle-group">
+                <span class="toggle-label">Cihaz Titreşimi</span>
+                <button class="btn" style="padding: 5px 10px;" id="vibrate-toggle">KAPALI</button>
+            </div>
+
+            <button class="btn btn-danger" id="reset-peak-btn">Zirve Değeri Sıfırla</button>
+        </div>
+
+        <div class="simulator-box" id="sim-box">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                <span>Yapay Metal Test Sürgüsü:</span>
+                <span id="sim-val">Normal Seviye</span>
+            </div>
+            <input type="range" min="30" max="350" value="45" class="slider" id="sim-slider">
+        </div>
+
+    </div>
+
+    <script>
+        // Durum Değişkenleri
+        let active = false;
+        let audioEnabled = false;
+        let vibrateEnabled = false;
+        let sensorSupported = false;
+        let currentMagneticField = 45; // Varsayılan Dünya değeri
+        let peakValue = 45;
+        let history = Array(100).fill(45);
+
+        // Web Audio API Değişkenleri
+        let audioCtx = null;
+        let oscNode = null;
+        let gainNode = null;
+
+        // Elementler
+        const startBtn = document.getElementById('start-btn');
+        const audioToggle = document.getElementById('audio-toggle');
+        const vibrateToggle = document.getElementById('vibrate-toggle');
+        const valDisplay = document.getElementById('val-display');
+        const statusText = document.getElementById('status-text');
+        const canvas = document.getElementById('graph-canvas');
+        const ctx = canvas.getContext('2d');
+        const simSlider = document.getElementById('sim-slider');
+        const simValText = document.getElementById('sim-val');
+        const resetPeakBtn = document.getElementById('reset-peak-btn');
+        const sweepElement = document.getElementById('sweep-element');
+
+        // Canvas Boyutlandırma
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Sensör Desteğini Kontrol Et
+        if ('Magnetometer' in window) {
+            sensorSupported = true;
+            statusText.textContent = "Sensör algılandı. Başlatmak için butona basın.";
+            statusText.style.color = "var(--neon-green)";
+        } else {
+            statusText.textContent = "Fiziksel sensör yok. Simülatör modu aktif!";
+            statusText.style.color = "#ff9900";
+        }
+
+        // Web Audio Kurulumu
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                oscNode = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+
+                oscNode.type = 'sawtooth'; // Retro sonar sesi için testere dişi dalga
+                oscNode.frequency.value = 100;
+                gainNode.gain.value = 0; // Başta sessiz
+
+                oscNode.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscNode.start();
+            }
+        }
+
+        // Sistemi Başlat / Durdur
+        startBtn.addEventListener('click', () => {
+            if (!active) {
+                initAudio();
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                active = true;
+                startBtn.textContent = "Sistemi Durdur";
+                startBtn.style.borderColor = "var(--neon-red)";
+                startBtn.style.color = "var(--neon-red)";
+                sweepElement.style.animationPlayState = 'running';
+
+                if (sensorSupported) {
+                    startSensor();
+                } else {
+                    runLoop();
+                }
+            } else {
+                active = false;
+                startBtn.textContent = "Sistemi Başlat";
+                startBtn.style.borderColor = "var(--neon-green)";
+                startBtn.style.color = "var(--neon-green)";
+                sweepElement.style.animationPlayState = 'paused';
+                if (gainNode) gainNode.gain.value = 0;
+            }
+        });
+
+        // Manyetometre Sensörünü Çalıştır
+        let sensorInstance = null;
+        function startSensor() {
+            navigator.permissions.query({ name: 'magnetometer' }).then(result => {
+                if (result.state === 'granted' || result.state === 'prompt') {
+                    try {
+                        if (!sensorInstance) {
+                            sensorInstance = new Magnetometer({ frequency: 30 });
+                            sensorInstance.addEventListener('reading', () => {
+                                // B = sqrt(x^2 + y^2 + z^2)
+                                const x = sensorInstance.x || 0;
+                                const y = sensorInstance.y || 0;
+                                const z = sensorInstance.z || 0;
+                                // Ham mikrostesla değerini elde ederiz
+                                const magnitude = Math.sqrt(x*x + y*y + z*z);
+                                currentMagneticField = Math.round(magnitude);
+                            });
+                            sensorInstance.addEventListener('error', event => {
+                                console.error("Sensör hatası: ", event.error);
+                                statusText.textContent = "Sensör okunamadı. Simülatöre dönülüyor.";
+                                sensorSupported = false;
+                            });
+                        }
+                        sensorInstance.start();
+                        runLoop();
+                    } catch (e) {
+                        console.error(e);
+                        sensorSupported = false;
+                        runLoop();
+                    }
+                } else {
+                    statusText.textContent = "İzin reddedildi. Simülatör aktif.";
+                    sensorSupported = false;
+                    runLoop();
+                }
+            });
+        }
+
+        // Ses Seçeneği
+        audioToggle.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            audioToggle.textContent = audioEnabled ? "AÇIK" : "KAPALI";
+            audioToggle.style.backgroundColor = audioEnabled ? "var(--neon-green)" : "transparent";
+            audioToggle.style.color = audioEnabled ? "var(--dark-bg)" : "var(--neon-green)";
+            if (!audioEnabled && gainNode) {
+                gainNode.gain.value = 0;
+            }
+        });
+
+        // Titreşim Seçeneği
+        vibrateToggle.addEventListener('click', () => {
+            vibrateEnabled = !vibrateEnabled;
+            vibrateToggle.textContent = vibrateEnabled ? "AÇIK" : "KAPALI";
+            vibrateToggle.style.backgroundColor = vibrateEnabled ? "var(--neon-green)" : "transparent";
+            vibrateToggle.style.color = vibrateEnabled ? "var(--dark-bg)" : "var(--neon-green)";
+        });
+
+        // Peak Sıfırlama
+        resetPeakBtn.addEventListener('click', () => {
+            peakValue = currentMagneticField;
+        });
+
+        // Simülatör Kontrolü
+        simSlider.addEventListener('input', (e) => {
+            if (!sensorSupported) {
+                currentMagneticField = parseInt(e.target.value);
+                if (currentMagneticField < 65) {
+                    simValText.textContent = "Normal Seviye";
+                    simValText.style.color = "#ff9900";
+                } else if (currentMagneticField < 150) {
+                    simValText.textContent = "Hafif Manyetik / Metal";
+                    simValText.style.color = "yellow";
+                } else {
+                    simValText.textContent = "DİKKAT: Yoğun Metal!";
+                    simValText.style.color = "red";
+                }
+            }
+        });
+
+        // Ana Çalışma Döngüsü (Render & Feedback)
+        function runLoop() {
+            if (!active) return;
+
+            // Değerleri Güncelle
+            valDisplay.textContent = currentMagneticField;
+            if (currentMagneticField > peakValue) {
+                peakValue = currentMagneticField;
+            }
+
+            // Tehlike Durumuna Göre Renk Değişimi (Örn: >100 µT ise tehlike)
+            if (currentMagneticField > 120) {
+                valDisplay.style.color = "var(--neon-red)";
+                valDisplay.style.textShadow = "0 0 15px var(--neon-red)";
+            } else {
+                valDisplay.style.color = "var(--neon-green)";
+                valDisplay.style.textShadow = "0 0 15px var(--neon-green)";
+            }
+
+            // Geri Bildirimler (Ses & Titreşim)
+            if (audioEnabled && audioCtx && oscNode && gainNode) {
+                if (currentMagneticField > 65) {
+                    // Normal seviyenin üzerindeyse bip frekansını ve sesini artır
+                    gainNode.gain.value = Math.min((currentMagneticField - 60) / 300, 0.4);
+                    // Ses frekansını manyetik kuvvete göre ölçekle (Örn: 200Hz - 1000Hz arası)
+                    oscNode.frequency.value = 150 + Math.min(currentMagneticField * 2, 800);
+                } else {
+                    gainNode.gain.value = 0;
+                }
+            }
+
+            if (vibrateEnabled && currentMagneticField > 150) {
+                // Şiddetli metal algılandığında nabız şeklinde titreş
+                if (Math.random() < 0.1) {
+                    navigator.vibrate(50);
+                }
+            }
+
+            // Grafik Geçmişini Güncelle
+            history.push(currentMagneticField);
+            history.shift();
+
+            // Grafiği Çiz
+            drawGraph();
+
+            requestAnimationFrame(runLoop);
+        }
+
+        // Canvas Grafik Çizimi
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Arka Plan Grid Çizimi
+            ctx.strokeStyle = 'rgba(0, 255, 102, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // Grafik Çizgisi
+            ctx.strokeStyle = currentMagneticField > 120 ? 'var(--neon-red)' : 'var(--neon-green)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const step = canvas.width / (history.length - 1);
+            for (let i = 0; i < history.length; i++) {
+                // Değeri dikey eksene sığdır (30-300 µT arasını ölçekle)
+                const val = history[i];
+                const y = canvas.height - ((val - 30) / 270) * canvas.height;
+                const x = i * step;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+
+            // Zirve (Peak) Seviyesi Referans Çizgisi
+            const peakY = canvas.height - ((peakValue - 30) / 270) * canvas.height;
+            ctx.strokeStyle = 'rgba(255, 51, 51, 0.4)';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(0, peakY);
+            ctx.lineTo(canvas.width, peakY);
+            ctx.stroke();
+            ctx.setLineDash([]); // Çizgiyi sıfırla
+
+            // Yazı Etiketi
+            ctx.fillStyle = 'rgba(255, 51, 51, 0.8)';
+            ctx.font = '9px monospace';
+            ctx.fillText(`ZIRVE: ${peakValue} µT`, 10, peakY - 5);
+        }
+
+        // Başlangıçta sessiz ve durağan başla
+        sweepElement.style.animationPlayState = 'paused';
+    </script>
+</body>
+</html>
