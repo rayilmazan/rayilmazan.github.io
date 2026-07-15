@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Selçuklu Tasarım Editörü</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f4f4f4; }
+        .toolbar { margin: 10px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        canvas { border: 2px solid #333; background: white; }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <button onclick="addMotif('https://svgshare.com/i/123.svg')">Selçuklu Motifi Ekle</button>
+        <button onclick="addText()">Metin Ekle</button>
+        <input type="file" id="logoInput" onchange="addLogo(this)">
+        <button onclick="downloadPDF()" style="background: green; color: white;">PDF Olarak İndir</button>
+    </div>
+
+    <canvas id="canvas" width="500" height="700"></canvas>
+
+    <script>
+        const canvas = new fabric.Canvas('canvas');
+
+        // Motif Ekleme
+        function addMotif(url) {
+            fabric.loadSVGFromURL(url, (objects, options) => {
+                const svg = fabric.util.groupSVGElements(objects, options);
+                svg.scale(0.5);
+                canvas.add(svg);
+            });
+        }
+
+        // Metin Ekleme
+        function addText() {
+            const text = new fabric.IText('Okul İsmi Buraya', { left: 100, top: 100, fontFamily: 'Arial' });
+            canvas.add(text);
+        }
+
+        // Logo Ekleme
+        function addLogo(e) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                fabric.Image.fromURL(event.target.result, (img) => {
+                    img.scale(0.2);
+                    canvas.add(img);
+                });
+            };
+            reader.readAsDataURL(e.files[0]);
+        }
+
+        // PDF İndirme
+        function downloadPDF() {
+            const dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            pdf.addImage(dataURL, 'PNG', 10, 10, 180, 250);
+            pdf.save("tasarimim.pdf");
+        }
+    </script>
+</body>
+</html>
 
