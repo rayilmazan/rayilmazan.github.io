@@ -1,1 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kıble Bulucu</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; width: 100%; }
+        #arrow { 
+            font-size: 50px; 
+            text-align: center; 
+            margin-top: 20px;
+            transition: transform 0.5s;
+        }
+    </style>
+</head>
+<body>
 
+    <div id="map"></div>
+    <div id="arrow">⬆️</div>
+    <p>Cihazı düz tutun.</p>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Haritayı başlat
+        const map = L.map('map').setView([0, 0], 18);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Kabe Koordinatları
+        const kabe = { lat: 21.4225, lng: 39.8262 };
+
+        // Konum al
+        navigator.geolocation.watchPosition((pos) => {
+            const userPos = [pos.coords.latitude, pos.coords.longitude];
+            map.setView(userPos, 18);
+            L.marker(userPos).addTo(map).bindPopup("Konumunuz").openPopup();
+            
+            // Kıble yönü hesaplama (Basitleştirilmiş açı)
+            const y = Math.sin(kabe.lng - pos.coords.longitude) * Math.cos(kabe.lat);
+            const x = Math.cos(pos.coords.latitude) * Math.sin(kabe.lat) - 
+                      Math.sin(pos.coords.latitude) * Math.cos(kabe.lat) * Math.cos(kabe.lng - pos.coords.longitude);
+            const brng = Math.atan2(y, x) * 180 / Math.PI;
+            
+            document.getElementById('arrow').style.transform = `rotate(${brng}deg)`;
+        });
+    </script>
+</body>
+</html>
