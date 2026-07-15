@@ -3,65 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kıble Bulucu (Pro)</title>
-    <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css' rel='stylesheet' />
+    <title>Kıble Pusulası</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { margin: 0; padding: 0; }
-        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-        #indicator { 
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        #map { height: 100vh; width: 100vw; transition: transform 0.2s ease-out; }
+        #overlay {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 10px; z-index: 1;
-            font-family: sans-serif; text-align: center;
+            background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 10px; z-index: 999;
+            font-family: sans-serif; pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div id="indicator">Kıbleye yönelmek için haritayı döndürün...</div>
+    <div id="overlay">Cihazı döndürerek haritayı kıbleye hizalayın</div>
     <div id="map"></div>
 
     <script>
-        // Tokenınızı buraya yapıştırın
-        mapboxgl.accessToken = 'BURAYA_MAPBOX_TOKENINIZI_YAZIN';
+        // Haritayı başlat
+        const map = L.map('map', { zoomControl: false }).setView([0, 0], 18);
 
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/satellite-v9', // Uydu görüntüsü
-            center: [35, 39],
-            zoom: 18,
-            pitch: 60 // 3D eğim
+        // Uydu görüntüsü katmanı (API anahtarı gerekmez)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Uydu Görüntüsü'
+        }).addTo(map);
+
+        let userMarker;
+
+        // Konumu al
+        navigator.geolocation.watchPosition((pos) => {
+            const userPos = [pos.coords.latitude, pos.coords.longitude];
+            if (!userMarker) {
+                userMarker = L.marker(userPos).addTo(map);
+            }
+            userMarker.setLatLng(userPos);
+            map.setView(userPos, 19);
         });
 
-        // Kullanıcı konumunu al ve haritayı güncelle
-        navigator.geolocation.watchPosition((pos) => {
-            const userPos = [pos.coords.longitude, pos.coords.latitude];
-            
-            // Haritayı kullanıcının konumuna odakla
-            map.flyTo({ center: userPos, zoom: 19 });
-
-            // Kabe'ye doğru çizgi ekle (Basit geometri)
-            if (map.getSource('route')) {
-                map.getSource('route').setData({
-                    "type": "Feature",
-                    "geometry": { "type": "LineString", "coordinates": [userPos, [39.8262, 21.4225]] }
-                });
-            } else {
-                map.addSource('route', { 'type': 'geojson', 'data': {
-                    "type": "Feature", "geometry": { "type": "LineString", "coordinates": [userPos, [39.8262, 21.4225]] }
-                }});
-                map.addLayer({
-                    'id': 'route', 'type': 'line', 'source': 'route',
-                    'layout': { 'line-join': 'round', 'line-cap': 'round' },
-                    'paint': { 'line-color': '#ff0000', 'line-width': 8 }
-                });
-            }
-        }, null, { enableHighAccuracy: true });
-
-        // Cihazın yönünü dinle ve haritayı döndür
+        // Cihaz dönüşünü (Pusula) dinle
         window.addEventListener('deviceorientation', (event) => {
             let rotate = event.webkitCompassHeading || (360 - event.alpha);
-            map.setBearing(rotate); // Haritayı pusula yönüne döndür
+            // Haritayı döndür
+            document.getElementById('map').style.transform = `rotate(${-rotate}deg)`;
         }, true);
     </script>
 </body>
