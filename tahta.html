@@ -1,1 +1,343 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ağ Dedektifi - Lokal Tahta İzleme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .scanning-pulse {
+            animation: pulse-fast 1s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
 
+    <header class="bg-gray-800 border-b border-gray-700 py-4 px-6 sticky top-0 z-50 shadow-md">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🔍</span>
+                <h1 class="text-xl font-bold tracking-wide text-teal-400">Ağ Dedektifi <span class="text-xs text-gray-400 font-mono">v1.0</span></h1>
+            </div>
+            <div id="global-status" class="text-sm font-semibold text-gray-400 bg-gray-900 px-3 py-1.5 rounded-full border border-gray-700">
+                Hazır
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
+
+        <section class="bg-gray-800 rounded-2xl p-4 sm:p-6 border border-gray-700 shadow-xl">
+            <h2 class="text-lg font-semibold text-gray-200 mb-4 flex items-center gap-2">
+                ⚙️ Tarama Ayarları
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Başlangıç IP</label>
+                    <input type="text" id="ip-start" value="192.168.1.1" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 focus:outline-none focus:border-teal-500 font-mono transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Bitiş IP</label>
+                    <input type="text" id="ip-end" value="192.168.1.50" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 focus:outline-none focus:border-teal-500 font-mono transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Hedef Port (Standart: 80)</label>
+                    <input type="number" id="target-port" value="80" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 focus:outline-none focus:border-teal-500 font-mono transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Zaman Aşımı (ms)</label>
+                    <input type="number" id="timeout-ms" value="1200" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-gray-200 focus:outline-none focus:border-teal-500 font-mono transition">
+                </div>
+            </div>
+
+            <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                <button id="btn-scan" onclick="startNetworkScan()" class="flex-1 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition duration-200 shadow-lg shadow-teal-900/30">
+                    Ağı Taramaya Başla
+                </button>
+                <button id="btn-stop" onclick="stopScan()" disabled class="sm:w-32 bg-red-600/20 hover:bg-red-600/40 text-red-400 font-semibold py-3 px-6 rounded-xl border border-red-500/30 transition disabled:opacity-50 disabled:pointer-events-none">
+                    Durdur
+                </button>
+            </div>
+        </section>
+
+        <section id="progress-container" class="hidden bg-gray-800 rounded-xl p-4 border border-gray-700">
+            <div class="flex justify-between text-xs text-gray-400 mb-2">
+                <span>Tarama İlerlemesi</span>
+                <span id="progress-percent">0%</span>
+            </div>
+            <div class="w-full bg-gray-900 rounded-full h-3 overflow-hidden">
+                <div id="progress-bar" class="bg-teal-500 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Toplam Hedef</p>
+                <p id="stat-total" class="text-2xl font-bold text-gray-200 font-mono">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 text-emerald-400">Açık Tahtalar</p>
+                <p id="stat-online" class="text-2xl font-bold text-emerald-400 font-mono">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 text-red-400">Ulaşılamayan</p>
+                <p id="stat-offline" class="text-2xl font-bold text-red-400 font-mono">0</p>
+            </div>
+            <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                <p class="text-xs text-gray-400 uppercase tracking-wider mb-1 text-yellow-400">Kalan</p>
+                <p id="stat-remaining" class="text-2xl font-bold text-yellow-400 font-mono">0</p>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <h3 class="text-lg font-semibold text-gray-200 flex items-center gap-2">
+                🖥️ Sınıf / Cihaz Haritası <span class="text-xs text-gray-500">(Otomatik IP Sıralı)</span>
+            </h3>
+            <div id="device-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+                <div class="col-span-full text-center py-12 text-gray-500 border border-dashed border-gray-700 rounded-2xl">
+                    Tarama henüz başlatılmadı. Başlatmak için yukarıdaki butona tıklayın.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let isScanning = false;
+        let abortController = null;
+
+        // Yardımcı: IP Serisini Üretir (192.168.1.1 - 192.168.1.50 arasını diziye döker)
+        function generateIPRange(startIp, endIp) {
+            const startParts = startIp.split('.').map(Number);
+            const endParts = endIp.split('.').map(Number);
+            const ips = [];
+
+            if (startParts.length !== 4 || endParts.length !== 4) return [];
+
+            const startNum = (startParts[0] << 24) + (startParts[1] << 16) + (startParts[2] << 8) + startParts[3];
+            const endNum = (endParts[0] << 24) + (endParts[1] << 16) + (endParts[2] << 8) + endParts[3];
+
+            for (let i = startNum; i <= endNum; i++) {
+                const ip = [
+                    (i >> 24) & 0xFF,
+                    (i >> 16) & 0xFF,
+                    (i >> 8) & 0xFF,
+                    i & 0xFF
+                ].join('.');
+                ips.push(ip);
+            }
+            return ips;
+        }
+
+        // Akıllı Tarayıcı Testi (Time-based Probing)
+        async function probeIP(ip, port, timeoutMs, signal) {
+            const startTime = performance.now();
+            const fetchController = new AbortController();
+            
+            // Eğer ana tarama durdurulursa fetch'i de iptal et
+            signal.addEventListener('abort', () => fetchController.abort());
+
+            const timeoutId = setTimeout(() => fetchController.abort(), timeoutMs);
+
+            try {
+                // 'no-cors' modu ile tarayıcının güvenlik bariyerini esnetip doğrudan ağ katmanına dokunuyoruz
+                await fetch(`http://${ip}:${port}`, {
+                    mode: 'no-cors',
+                    signal: fetchController.signal,
+                    credentials: 'omit',
+                    cache: 'no-store'
+                });
+                clearTimeout(timeoutId);
+                return { ip, active: true };
+            } catch (error) {
+                clearTimeout(timeoutId);
+                const duration = performance.now() - startTime;
+
+                // Kullanıcı veya kod tarafından iptal edildiyse
+                if (error.name === 'AbortError' && signal.aborted) {
+                    throw new Error('stopped');
+                }
+
+                // Eğer bağlantı zaman aşımı süresinden ÇOK DAHA KISA sürede reddedildiyse,
+                // hedef IP aktiftir ancak port kapalıdır ya da CORS engeli vermiştir.
+                // Bu durum cihazın online olduğunu kanıtlar!
+                if (duration < (timeoutMs - 100)) {
+                    return { ip, active: true };
+                }
+                
+                // Gerçekten paket kaybolduysa ve timeout olduysa cihaz kapalıdır.
+                return { ip, active: false };
+            }
+        }
+
+        // Tarama Başlatıcı
+        async function startNetworkScan() {
+            if (isScanning) return;
+
+            const startIp = document.getElementById('ip-start').value.trim();
+            const endIp = document.getElementById('ip-end').value.trim();
+            const port = parseInt(document.getElementById('target-port').value) || 80;
+            const timeout = parseInt(document.getElementById('timeout-ms').value) || 1200;
+
+            const ipList = generateIPRange(startIp, endIp);
+            if (ipList.length === 0) {
+                alert('Lütfen geçerli bir IP aralığı girin!');
+                return;
+            }
+
+            // Arayüz Hazırlıkları
+            isScanning = true;
+            abortController = new AbortController();
+            document.getElementById('btn-scan').disabled = true;
+            document.getElementById('btn-stop').disabled = false;
+            document.getElementById('progress-container').classList.remove('hidden');
+            document.getElementById('global-status').innerText = "Taranıyor...";
+            document.getElementById('global-status').className = "text-sm font-semibold text-teal-400 bg-teal-950/30 px-3 py-1.5 rounded-full border border-teal-800";
+
+            // Grid Sıfırlama ve Yapılandırma
+            const grid = document.getElementById('device-grid');
+            grid.innerHTML = '';
+            
+            // Kartları "Taranıyor" olarak grid'e ekle
+            ipList.forEach(ip => {
+                const card = document.createElement('div');
+                card.id = `card-${ip.replace(/\./g, '-')}`;
+                card.className = "bg-gray-800 p-3 sm:p-4 rounded-xl border border-gray-700 flex flex-col justify-between h-24 relative overflow-hidden transition-all duration-300";
+                card.innerHTML = `
+                    <div class="text-xs text-gray-500 font-mono">${ip}</div>
+                    <div class="text-sm font-bold text-gray-300 truncate">Sorgulanıyor...</div>
+                    <div class="flex items-center gap-1.5 mt-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 scanning-pulse"></span>
+                        <span class="text-[10px] text-yellow-500 uppercase tracking-wider font-semibold">Taranıyor</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // İstatistikler
+            let total = ipList.length;
+            let onlineCount = 0;
+            let offlineCount = 0;
+            
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-online').innerText = "0";
+            document.getElementById('stat-offline').innerText = "0";
+            document.getElementById('stat-remaining').innerText = total;
+
+            // Eşzamanlı Tarama Kapasitesi (Ağı kilitlememek için aynı anda 8-10 cihaz taranır)
+            const concurrencyLimit = 8;
+            let index = 0;
+
+            const runWorker = async () => {
+                while (index < ipList.length && isScanning) {
+                    const currentIndex = index++;
+                    const ip = ipList[currentIndex];
+                    const cardId = `card-${ip.replace(/\./g, '-')}`;
+                    const cardElement = document.getElementById(cardId);
+
+                    try {
+                        const result = await probeIP(ip, port, timeout, abortController.signal);
+                        
+                        if (!isScanning) return; // Durdurulduysa arayüzü güncelleme
+
+                        if (result.active) {
+                            onlineCount++;
+                            document.getElementById('stat-online').innerText = onlineCount;
+                            
+                            // Kartı Aktif Yap
+                            cardElement.className = "bg-emerald-950/20 p-3 sm:p-4 rounded-xl border-2 border-emerald-500/80 shadow-lg shadow-emerald-950/30 flex flex-col justify-between h-24 transition-all duration-300";
+                            cardElement.innerHTML = `
+                                <div class="text-xs text-emerald-400 font-mono font-semibold">${ip}</div>
+                                <div class="text-sm font-bold text-gray-100 truncate">ET-LOKAL</div>
+                                <div class="flex items-center gap-1.5 mt-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                                    <span class="text-[10px] text-emerald-400 uppercase tracking-wider font-bold">AÇIK (Çevrimiçi)</span>
+                                </div>
+                            `;
+                        } else {
+                            offlineCount++;
+                            document.getElementById('stat-offline').innerText = offlineCount;
+
+                            // Kartı Pasif Yap
+                            cardElement.className = "bg-gray-800/40 p-3 sm:p-4 rounded-xl border border-gray-800 flex flex-col justify-between h-24 opacity-60 transition-all duration-300";
+                            cardElement.innerHTML = `
+                                <div class="text-xs text-gray-600 font-mono">${ip}</div>
+                                <div class="text-sm font-semibold text-gray-500 truncate">Yanıt Yok</div>
+                                <div class="flex items-center gap-1.5 mt-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-gray-700"></span>
+                                    <span class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">KAPALI</span>
+                                </div>
+                            `;
+                        }
+
+                        // İlerleme Güncelleme
+                        const processed = onlineCount + offlineCount;
+                        const remaining = total - processed;
+                        document.getElementById('stat-remaining').innerText = remaining;
+                        
+                        const percent = Math.round((processed / total) * 100);
+                        document.getElementById('progress-bar').style.width = `${percent}%`;
+                        document.getElementById('progress-percent').innerText = `${percent}%`;
+
+                    } catch (err) {
+                        if (err.message === 'stopped') return;
+                    }
+                }
+            };
+
+            // Eşzamanlı havuzu başlat
+            const workers = Array(Math.min(concurrencyLimit, ipList.length))
+                .fill(null)
+                .map(() => runWorker());
+
+            await Promise.all(workers);
+            finishScan();
+        }
+
+        // Taramayı Durdurma
+        function stopScan() {
+            if (!isScanning) return;
+            isScanning = false;
+            if (abortController) {
+                abortController.abort();
+            }
+            
+            // Sorgulanıyor olarak kalanları temizle
+            const remainingCards = document.querySelectorAll('[id^="card-"]');
+            remainingCards.forEach(card => {
+                if (card.innerHTML.includes("Taranıyor")) {
+                    card.className = "bg-gray-800/40 p-3 sm:p-4 rounded-xl border border-gray-800 flex flex-col justify-between h-24 opacity-40";
+                    card.innerHTML = `
+                        <div class="text-xs text-gray-600 font-mono">${card.id.replace("card-", "").replace(/-/g, ".")}</div>
+                        <div class="text-sm font-semibold text-gray-500 truncate">İptal Edildi</div>
+                        <div class="flex items-center gap-1.5 mt-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-gray-700"></span>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Taranmadı</span>
+                        </div>
+                    `;
+                }
+            });
+
+            finishScan("Tarama Durduruldu");
+        }
+
+        // Tarama Bitiş İşlemleri
+        function finishScan(statusText = "Tarama Tamamlandı") {
+            isScanning = false;
+            document.getElementById('btn-scan').disabled = false;
+            document.getElementById('btn-stop').disabled = true;
+            
+            document.getElementById('global-status').innerText = statusText;
+            if (statusText.includes("Durduruldu")) {
+                document.getElementById('global-status').className = "text-sm font-semibold text-yellow-400 bg-yellow-950/30 px-3 py-1.5 rounded-full border border-yellow-800";
+            } else {
+                document.getElementById('global-status').className = "text-sm font-semibold text-emerald-400 bg-emerald-950/30 px-3 py-1.5 rounded-full border border-emerald-800";
+            }
+        }
+    </script>
+</body>
+</html>
