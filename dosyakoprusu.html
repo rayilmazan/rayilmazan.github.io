@@ -1,1 +1,596 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WebRTC LAN & WAN Dosya Köprüsü</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        body {
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .drag-over {
+            border-color: #2dd4bf !important;
+            background-color: rgba(45, 212, 191, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
+    <header class="bg-slate-900 border-b border-slate-800 p-4 shadow-lg">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">⚡</span>
+                <div>
+                    <h1 class="text-base font-bold text-teal-400">Dosya Köprüsü (İnternet Versiyonu)</h1>
+                    <p class="text-[10px] text-slate-400">STUN Destekli - Farklı Ağlar Arası Doğrudan Transfer</p>
+                </div>
+            </div>
+            <div id="connection-status" class="text-xs bg-rose-950/40 text-rose-400 border border-rose-900 px-3 py-1 rounded-full font-semibold">
+                🔴 Bağlı Değil
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col justify-center">
+        
+        <section id="step-role" class="space-y-6 text-center py-8">
+            <h2 class="text-xl font-bold text-slate-200">Bu cihazın rolü nedir?</h2>
+            <p class="text-sm text-slate-400 max-w-md mx-auto">Dosya almak istediğiniz cihazı "Alıcı", dosya göndermek istediğiniz cihazı "Gönderici" olarak ayarlayın.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto pt-4">
+                <button onclick="initRole('host')" class="bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/50 p-6 rounded-2xl transition group text-center">
+                    <span class="text-4xl block mb-3 group-hover:scale-110 transition-transform">🖥️</span>
+                    <span class="font-bold text-slate-200 block">Akıllı Tahta (Alıcı)</span>
+                    <span class="text-xs text-slate-500 mt-1 block">Dosya kabul eden ve indiren ana istasyon</span>
+                </button>
+                <button onclick="initRole('joiner')" class="bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-teal-500/50 p-6 rounded-2xl transition group text-center">
+                    <span class="text-4xl block mb-3 group-hover:scale-110 transition-transform">📱</span>
+                    <span class="font-bold text-slate-200 block">Telefon / Cihaz (Gönderici)</span>
+                    <span class="text-xs text-slate-500 mt-1 block">Kamerayı açıp tahtaya bağlanan cihaz</span>
+                </button>
+            </div>
+        </section>
+
+        <section id="step-host-setup" class="hidden space-y-6 bg-slate-900 p-6 rounded-2xl border border-slate-800">
+            <div class="text-center border-b border-slate-800 pb-4">
+                <h2 class="text-lg font-bold text-teal-400">Akıllı Tahta Alıcı Kurulumu</h2>
+                <p class="text-xs text-slate-400">Telefonunuzdan bu sayfayı açın ve "Telefon (Gönderici)" modunu seçin.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div class="flex flex-col items-center space-y-3">
+                    <span class="text-xs font-semibold text-amber-400">1. Telefonla Bu QR Kodu Taratın:</span>
+                    <div class="bg-white p-3 rounded-xl flex items-center justify-center min-w-[210px] min-h-[210px]">
+                        <div id="host-loading" class="text-xs text-slate-600 animate-pulse">STUN IP Adresleri Alınıyor...</div>
+                        <canvas id="host-qr" class="hidden w-48 h-48"></canvas>
+                    </div>
+                    <button onclick="copyToClipboard('host-sdp-text')" class="text-[10px] text-slate-500 hover:text-slate-300 underline">
+                        QR okumazsa kodu manuel kopyala
+                    </button>
+                    <textarea id="host-sdp-text" readonly class="hidden w-full text-[10px] bg-slate-950 border border-slate-800 p-2 rounded h-12 text-slate-500"></textarea>
+                </div>
+
+                <div class="space-y-4">
+                    <span class="text-xs font-semibold text-teal-400 block">2. Telefondaki Yanıt Kodunu Girin:</span>
+                    
+                    <div id="host-scanner-container" class="relative hidden bg-black rounded-xl overflow-hidden aspect-video border border-slate-800">
+                        <video id="host-video" class="w-full h-full object-cover"></video>
+                    </div>
+                    <button id="btn-host-scan" onclick="startQRScanner('host')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2 px-4 rounded-xl transition font-semibold">
+                        📷 Tahta Kamerasını Aç ve Yanıt QR Tara
+                    </button>
+
+                    <div class="text-center text-xs text-slate-500 font-bold">— VEYA MANUEL YAPIŞTIRIN —</div>
+
+                    <textarea id="host-answer-input" placeholder="Telefonda oluşan Yanıt Kodunu buraya yapıştırın..." class="w-full h-20 text-xs bg-slate-950 border border-slate-800 rounded-xl p-3 focus:outline-none focus:border-teal-500 text-mono text-slate-300"></textarea>
+                    
+                    <button onclick="connectAsHost()" class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-teal-900/20">
+                        ⚡ Bağlantıyı Tamamla
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="step-joiner-setup" class="hidden space-y-6 bg-slate-900 p-6 rounded-2xl border border-slate-800">
+            <div class="text-center border-b border-slate-800 pb-4">
+                <h2 class="text-lg font-bold text-teal-400">Telefon Gönderici Kurulumu</h2>
+                <p class="text-xs text-slate-400">Akıllı tahtadaki QR kodu taratarak bağlantıyı başlatın.</p>
+            </div>
+
+            <div class="space-y-4">
+                <span class="text-xs font-semibold text-amber-400 block">1. Tahtadaki QR Kodu Taratın:</span>
+                <div id="joiner-scanner-container" class="relative hidden bg-black rounded-xl overflow-hidden aspect-video border border-slate-800 max-w-sm mx-auto">
+                    <video id="joiner-video" class="w-full h-full object-cover"></video>
+                </div>
+                <button id="btn-joiner-scan" onclick="startQRScanner('joiner')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs py-2.5 px-4 rounded-xl transition font-semibold">
+                    📷 Telefon Kamerasını Aç ve Tara
+                </button>
+
+                <div class="text-center text-xs text-slate-500 font-bold">— VEYA MANUEL YAPIŞTIRIN —</div>
+
+                <textarea id="joiner-offer-input" placeholder="Tahtadaki kopyalanan kodu buraya yapıştırın..." class="w-full h-20 text-xs bg-slate-950 border border-slate-800 rounded-xl p-3 focus:outline-none focus:border-teal-500 text-mono text-slate-300"></textarea>
+                <button onclick="processOffer()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-amber-900/20">
+                    🔍 Kodu Çöz ve Yanıt Üret
+                </button>
+            </div>
+
+            <div id="joiner-response-area" class="hidden border-t border-slate-800 pt-6 flex flex-col items-center space-y-4">
+                <span class="text-xs font-semibold text-teal-400">2. Bu QR Kodu Tahtaya Gösterin:</span>
+                <div class="bg-white p-3 rounded-xl flex items-center justify-center min-w-[210px] min-h-[210px]">
+                    <div id="joiner-loading" class="text-xs text-slate-600 animate-pulse">STUN IP Adresleri Alınıyor...</div>
+                    <canvas id="joiner-qr" class="hidden w-48 h-48"></canvas>
+                </div>
+                <button onclick="copyToClipboard('joiner-sdp-text')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl transition">
+                    📋 Yanıt Kodunu Kopyala (Manuel)
+                </button>
+                <textarea id="joiner-sdp-text" readonly class="hidden w-full text-[10px] bg-slate-950 border border-slate-800 p-2 rounded h-12 text-slate-500"></textarea>
+            </div>
+        </section>
+
+        <section id="transfer-area" class="hidden space-y-6">
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                <h3 class="text-sm font-bold text-slate-200 flex items-center justify-between">
+                    <span>📤 Dosya Gönder</span>
+                    <span class="text-xs text-teal-400 font-mono" id="p2p-role-indicator">P2P Aktif</span>
+                </h3>
+
+                <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-teal-500 rounded-xl p-8 text-center cursor-pointer transition-colors duration-200">
+                    <span class="text-4xl block mb-2">📁</span>
+                    <p class="text-xs text-slate-300 font-semibold">Dosyayı buraya sürükleyin veya tıklayarak seçin</p>
+                    <input type="file" id="file-input" class="hidden">
+                </div>
+
+                <div id="progress-container" class="hidden space-y-2 bg-slate-950 p-4 rounded-xl border border-slate-850">
+                    <div class="flex items-center justify-between text-xs">
+                        <span id="progress-filename" class="truncate max-w-[200px] text-slate-300 font-medium">dosya.pdf</span>
+                        <span id="progress-percent" class="font-mono text-teal-400 font-bold">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="bg-teal-500 h-full w-0 transition-all duration-100"></div>
+                    </div>
+                    <div id="progress-speed" class="text-[10px] text-slate-500 text-right">Gönderiliyor...</div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+                <h3 class="text-sm font-bold text-slate-200">📥 Gelen Dosyalar</h3>
+                <div id="received-files-list" class="space-y-2 max-h-60 overflow-y-auto">
+                    <p id="no-files-msg" class="text-xs text-slate-500 text-center py-4">Henüz gelen bir dosya yok.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="mt-6 bg-slate-900/50 border border-slate-800/80 rounded-xl p-4 text-xs space-y-2">
+            <div class="font-bold text-slate-400 flex items-center justify-between border-b border-slate-850 pb-1.5 mb-2">
+                <span>📋 Bağlantı Durum Konsolu</span>
+                <button onclick="clearLogs()" class="text-[10px] text-rose-400 hover:text-rose-300">Sıfırla</button>
+            </div>
+            <div id="log-container" class="space-y-1 max-h-24 overflow-y-auto font-mono text-slate-400">
+                <div>> Sistem hazır. Lütfen bir rol seçin.</div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-900/30 border-t border-slate-900 p-3 text-center text-[10px] text-slate-600">
+        <p>🔒 Bu versiyonda dış IP tespiti için Google STUN sunucuları kullanılmaktadır.</p>
+    </footer>
+
+    <script>
+        let pc = null;
+        let dataChannel = null;
+        let role = ""; 
+        let videoStream = null;
+        let scanInterval = null;
+
+        let incomingFileInfo = null;
+        let receivedBuffer = [];
+        let receivedSize = 0;
+
+        // CRITICAL UPDATE: Google Genel STUN Sunucuları Entegre Edildi
+        const rtcConfig = {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ]
+        };
+
+        function addLog(text, type = "info") {
+            const container = document.getElementById('log-container');
+            const newLog = document.createElement('div');
+            let prefix = "> ";
+            let color = "text-slate-400";
+
+            if (type === "success") { prefix = "✅ "; color = "text-teal-400 font-semibold"; }
+            else if (type === "error") { prefix = "🚨 [HATA] "; color = "text-red-400 font-bold"; }
+            else if (type === "warning") { prefix = "⚠️ [BAĞLANTI] "; color = "text-amber-400 font-semibold"; }
+
+            newLog.className = color;
+            newLog.innerText = prefix + text;
+            container.appendChild(newLog);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = "<div>> Konsol sıfırlandı.</div>";
+        }
+
+        function initRole(selectedRole) {
+            role = selectedRole;
+            document.getElementById('step-role').classList.add('hidden');
+            
+            if (role === 'host') {
+                document.getElementById('step-host-setup').classList.remove('hidden');
+                setupHostConnection();
+            } else {
+                document.getElementById('step-joiner-setup').classList.remove('hidden');
+            }
+            addLog(`${selectedRole === 'host' ? 'Alıcı (Tahta)' : 'Gönderici (Telefon)'} modu seçildi.`);
+        }
+
+        function compressSDP(sdp) {
+            const sdpObj = JSON.parse(sdp);
+            const lines = sdpObj.sdp.split('\r\n');
+            const filteredLines = lines.filter(line => {
+                return line.indexOf('a=rtpmap') === -1 && 
+                       line.indexOf('a=fmtp') === -1 && 
+                       line.indexOf('a=rtcp') === -1 && 
+                       line.indexOf('a=ssrc') === -1;
+            });
+            sdpObj.sdp = filteredLines.join('\r\n');
+            return btoa(unescape(encodeURIComponent(JSON.stringify(sdpObj))));
+        }
+
+        function decompressSDP(base64) {
+            return JSON.parse(decodeURIComponent(escape(atob(base64))));
+        }
+
+        function generateQRCode(canvasId, text) {
+            try {
+                new QRious({
+                    element: document.getElementById(canvasId),
+                    value: text,
+                    size: 300,
+                    level: 'L'
+                });
+            } catch (e) {
+                addLog("QR oluşturulamadı.", "error");
+            }
+        }
+
+        function copyToClipboard(elementId) {
+            const copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            addLog("Kod panoya kopyalandı!");
+        }
+
+        // --- AKILLI TAHTA (HOST) ---
+        function setupHostConnection() {
+            pc = new RTCPeerConnection(rtcConfig);
+            
+            dataChannel = pc.createDataChannel("fileBridgeChannel", { ordered: true });
+            setupDataChannelEvents();
+
+            pc.onicecandidate = e => {
+                // Tüm aday ağ yolları (Lokal IP'ler + STUN'dan gelen Dış IP'ler) toplandığında QR üretilir
+                if (e.candidate === null) {
+                    const compressed = compressSDP(JSON.stringify(pc.localDescription));
+                    document.getElementById('host-sdp-text').value = compressed;
+                    
+                    document.getElementById('host-loading').classList.add('hidden');
+                    const qrCanvas = document.getElementById('host-qr');
+                    qrCanvas.classList.remove('hidden');
+                    
+                    generateQRCode('host-qr', compressed);
+                    addLog("STUN dış IP keşfi tamamlandı. QR Kod hazır.", "success");
+                }
+            };
+
+            pc.createOffer()
+                .then(offer => pc.setLocalDescription(offer))
+                .catch(err => addLog("Teklif hatası: " + err.message, "error"));
+        }
+
+        function connectAsHost() {
+            const answerInput = document.getElementById('host-answer-input').value.trim();
+            if (!answerInput) {
+                addLog("Lütfen yanıt kodunu girin!", "error");
+                return;
+            }
+            try {
+                const answerSDP = decompressSDP(answerInput);
+                pc.setRemoteDescription(new RTCSessionDescription(answerSDP))
+                    .then(() => addLog("Telefon el sıkışma kodu kabul edildi.", "warning"))
+                    .catch(err => addLog("Bağlantı hatası: " + err.message, "error"));
+            } catch (err) {
+                addLog("Geçersiz yanıt kodu.", "error");
+            }
+        }
+
+        // --- TELEFON (JOINER) ---
+        function processOffer() {
+            const offerInput = document.getElementById('joiner-offer-input').value.trim();
+            if (!offerInput) {
+                addLog("Lütfen tahtadaki kodu girin!", "error");
+                return;
+            }
+
+            try {
+                const offerSDP = decompressSDP(offerInput);
+                pc = new RTCPeerConnection(rtcConfig);
+
+                pc.ondatachannel = event => {
+                    dataChannel = event.channel;
+                    setupDataChannelEvents();
+                };
+
+                pc.onicecandidate = e => {
+                    if (e.candidate === null) {
+                        const compressed = compressSDP(JSON.stringify(pc.localDescription));
+                        document.getElementById('joiner-sdp-text').value = compressed;
+                        
+                        document.getElementById('joiner-loading').classList.add('hidden');
+                        const qrCanvas = document.getElementById('joiner-qr');
+                        qrCanvas.classList.remove('hidden');
+
+                        generateQRCode('joiner-qr', compressed);
+                        addLog("Telefon dış IP adresi eklendi ve Yanıt QR oluşturuldu.", "success");
+                    }
+                };
+
+                document.getElementById('joiner-response-area').classList.remove('hidden');
+
+                pc.setRemoteDescription(new RTCSessionDescription(offerSDP))
+                    .then(() => pc.createAnswer())
+                    .then(answer => pc.setLocalDescription(answer))
+                    .catch(err => addLog("Yanıt oluşturulamadı: " + err.message, "error"));
+
+            } catch (err) {
+                addLog("Geçersiz teklif kodu.", "error");
+            }
+        }
+
+        // --- VERİ AKIŞI ---
+        function setupDataChannelEvents() {
+            dataChannel.binaryType = "arraybuffer";
+
+            dataChannel.onopen = () => {
+                document.getElementById('connection-status').innerText = "🟢 BAĞLANDI (WAN/LAN)";
+                document.getElementById('connection-status').className = "text-xs bg-emerald-950/40 text-emerald-400 border border-emerald-900 px-3 py-1 rounded-full font-semibold";
+                
+                document.getElementById('step-host-setup').classList.add('hidden');
+                document.getElementById('step-joiner-setup').classList.add('hidden');
+                document.getElementById('transfer-area').classList.remove('hidden');
+                
+                document.getElementById('p2p-role-indicator').innerText = role === 'host' ? 'Alıcı İstasyonu' : 'Gönderici İstasyonu';
+                addLog("P2P Tüneli başarıyla açıldı. Dosya gönderebilirsiniz.", "success");
+                stopQRScanner();
+            };
+
+            dataChannel.onclose = () => {
+                document.getElementById('connection-status').innerText = "🔴 Bağlantı Koptu";
+                document.getElementById('connection-status').className = "text-xs bg-rose-950/40 text-rose-400 border border-rose-900 px-3 py-1 rounded-full font-semibold";
+                addLog("Bağlantı kesildi.", "warning");
+            };
+
+            dataChannel.onmessage = e => {
+                const data = e.data;
+                if (typeof data === "string") {
+                    if (data.startsWith("META:")) {
+                        const meta = JSON.parse(data.substring(5));
+                        incomingFileInfo = meta;
+                        receivedBuffer = [];
+                        receivedSize = 0;
+                        document.getElementById('no-files-msg').classList.add('hidden');
+                        showIncomingProgress(meta.name);
+                    } else if (data === "EOF") {
+                        const fileBlob = new Blob(receivedBuffer, { type: incomingFileInfo.type });
+                        saveReceivedFile(fileBlob, incomingFileInfo.name);
+                        hideProgress();
+                    }
+                } else {
+                    receivedBuffer.push(data);
+                    receivedSize += data.byteLength;
+                    const percent = Math.round((receivedSize / incomingFileInfo.size) * 100);
+                    updateProgressBar(percent, `${formatBytes(receivedSize)} / ${formatBytes(incomingFileInfo.size)}`);
+                }
+            };
+        }
+
+        // --- ENTEGRE QR OKUYUCU ---
+        function startQRScanner(targetRole) {
+            const containerId = targetRole === 'host' ? 'host-scanner-container' : 'joiner-scanner-container';
+            const videoId = targetRole === 'host' ? 'host-video' : 'joiner-video';
+            const btnId = targetRole === 'host' ? 'btn-host-scan' : 'btn-joiner-scan';
+
+            const container = document.getElementById(containerId);
+            const video = document.getElementById(videoId);
+            const btn = document.getElementById(btnId);
+
+            if (typeof jsQR === 'undefined') {
+                addLog("Kamera kütüphanesi yüklenemedi.", "error");
+                return;
+            }
+
+            container.classList.remove('hidden');
+            btn.classList.add('hidden');
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(stream => {
+                    videoStream = stream;
+                    video.srcObject = stream;
+                    video.setAttribute("playsinline", true);
+                    video.play();
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+
+                    scanInterval = setInterval(() => {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            canvas.height = video.videoHeight;
+                            canvas.width = video.videoWidth;
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                                inversionAttempts: "dontInvert",
+                            });
+
+                            if (code) {
+                                addLog("QR Kod algılandı.", "success");
+                                stopQRScanner();
+                                if (targetRole === 'host') {
+                                    document.getElementById('host-answer-input').value = code.data;
+                                    connectAsHost();
+                                } else {
+                                    document.getElementById('joiner-offer-input').value = code.data;
+                                    processOffer();
+                                }
+                            }
+                        }
+                    }, 250);
+                })
+                .catch(err => {
+                    addLog("Kamera izni reddedildi veya bulunamadı: " + err.message, "error");
+                    container.classList.add('hidden');
+                    btn.classList.remove('hidden');
+                });
+        }
+
+        function stopQRScanner() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            if (scanInterval) {
+                clearInterval(scanInterval);
+                scanInterval = null;
+            }
+            document.getElementById('host-scanner-container').classList.add('hidden');
+            document.getElementById('joiner-scanner-container').classList.add('hidden');
+            document.getElementById('btn-host-scan').classList.remove('hidden');
+            document.getElementById('btn-joiner-scan').classList.remove('hidden');
+        }
+
+        // --- SÜRÜKLE BIRAK VE GÖNDERİM ---
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFileSend(files[0]);
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) handleFileSend(fileInput.files[0]);
+        });
+
+        function handleFileSend(file) {
+            if (!dataChannel || dataChannel.readyState !== "open") {
+                addLog("Bağlantı açık değil!", "error");
+                return;
+            }
+
+            addLog(`"${file.name}" gönderiliyor...`, "warning");
+            showIncomingProgress(file.name);
+
+            const meta = { name: file.name, size: file.size, type: file.type };
+            dataChannel.send("META:" + JSON.stringify(meta));
+
+            const CHUNK_SIZE = 16384; 
+            let offset = 0;
+            const fileReader = new FileReader();
+
+            function sendChunk() {
+                if (offset >= file.size) {
+                    dataChannel.send("EOF");
+                    addLog("Dosya başarıyla gönderildi!", "success");
+                    hideProgress();
+                    return;
+                }
+
+                if (dataChannel.bufferedAmount > 1048576) { 
+                    setTimeout(sendChunk, 50); 
+                    return;
+                }
+
+                const slice = file.slice(offset, offset + CHUNK_SIZE);
+                fileReader.onload = e => {
+                    dataChannel.send(e.target.result);
+                    offset += slice.size;
+                    const percent = Math.round((offset / file.size) * 100);
+                    updateProgressBar(percent, `${formatBytes(offset)} / ${formatBytes(file.size)}`);
+                    sendChunk();
+                };
+                fileReader.readAsArrayBuffer(slice);
+            }
+            sendChunk();
+        }
+
+        function showIncomingProgress(filename) {
+            const container = document.getElementById('progress-container');
+            container.classList.remove('hidden');
+            document.getElementById('progress-filename').innerText = filename;
+            updateProgressBar(0, "Hazırlanıyor...");
+        }
+
+        function updateProgressBar(percent, speedText) {
+            document.getElementById('progress-bar').style.width = percent + "%";
+            document.getElementById('progress-percent').innerText = percent + "%";
+            document.getElementById('progress-speed').innerText = speedText || "";
+        }
+
+        function hideProgress() {
+            setTimeout(() => {
+                document.getElementById('progress-container').classList.add('hidden');
+            }, 1000);
+        }
+
+        function saveReceivedFile(blob, filename) {
+            const list = document.getElementById('received-files-list');
+            const fileURL = URL.createObjectURL(blob);
+            
+            const card = document.createElement('div');
+            card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between";
+            card.innerHTML = `
+                <div class="flex items-center space-x-2 truncate">
+                    <span class="text-xl">📄</span>
+                    <div class="truncate">
+                        <span class="text-xs font-semibold text-slate-200 block truncate">${filename}</span>
+                        <span class="text-[10px] text-slate-500">${formatBytes(blob.size)}</span>
+                    </div>
+                </div>
+                <a href="${fileURL}" download="${filename}" class="bg-teal-600 hover:bg-teal-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition shrink-0">
+                    💾 İndir
+                </a>
+            `;
+            list.appendChild(card);
+            addLog(`"${filename}" başarıyla alındı!`, "success");
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
