@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Kameradan Word'e Metin Dönüştürücü</title>
+    <title>Gelişmiş Kameradan Word'e Metin Dönüştürücü (v2)</title>
     
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #090d16;
-            --bg-card: #151f32;
-            --bg-input: #1e293b;
-            --primary: #0284c7;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --primary: #0ea5e9;
             --primary-hover: #38bdf8;
             --accent: #f59e0b;
+            --accent-hover: #fbbf24;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --border: #334155;
+            --border: #475569;
             --success: #10b981;
+            --danger: #ef4444;
         }
 
         * {
@@ -43,18 +45,61 @@
             border-bottom: 1px solid var(--border);
             padding: 1rem;
             text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .logo-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 800;
             color: var(--primary-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .logo-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
             margin-top: 0.2rem;
+        }
+
+        /* Adım Göstergesi (Steps) */
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .step {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .step.active {
+            color: var(--primary-hover);
+        }
+
+        .step-num {
+            background: var(--border);
+            color: var(--text-main);
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.65rem;
+        }
+
+        .step.active .step-num {
+            background: var(--primary);
         }
 
         main {
@@ -65,88 +110,187 @@
             width: 100%;
             margin: 0 auto;
             position: relative;
+            padding: 1rem;
+            gap: 1rem;
         }
 
-        /* Kamera Arayüzü */
-        .camera-wrapper {
-            position: relative;
-            flex: 1;
-            background: #000;
+        /* Kart Yapısı */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
             display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--primary-hover);
+            border-left: 3px solid var(--primary);
+            padding-left: 0.5rem;
+        }
+
+        /* Kamera ve Dosya Seçim Alanı */
+        .upload-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Gizli dosya girişi */
+        .hidden-file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Şık dosya yükleme butonu */
+        .upload-area-btn {
+            border: 2px dashed var(--border);
+            border-radius: 0.75rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            background: rgba(30, 41, 59, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 65vh; /* Mobil ekranlarda daha fazla dikey alan */
-            min-height: 450px;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .upload-area-btn:hover, .upload-area-btn:active {
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+        }
+
+        /* Canlı Kamera Alanı */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1.414; /* Dikey A4 Oranı */
+            background: #000;
+            border-radius: 0.75rem;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
 
         #camera-preview {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            position: absolute;
         }
 
-        /* Dikey Uzun A4 Odak Çerçevesi */
-        .scan-overlay {
+        /* Gelişmiş A4 Hizalama Çerçevesi */
+        .camera-overlay {
             position: absolute;
-            width: 75%;
-            max-width: 320px;
-            aspect-ratio: 1 / 1.414; /* Tam A4 Kağıdı Geometrik Oranı */
-            border: 3px dashed var(--primary-hover);
-            border-radius: 12px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
+            inset: 15px;
+            border: 2px dashed var(--primary-hover);
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
             pointer-events: none;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            padding: 10px;
         }
 
-        .scan-overlay::before {
-            content: "A4 BELGEYİ BURAYA HİZALAYIN";
+        .overlay-text {
+            align-self: center;
+            background: rgba(15, 23, 42, 0.85);
             color: var(--primary-hover);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: bold;
-            background: rgba(9, 13, 22, 0.85);
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
             letter-spacing: 1px;
             text-align: center;
         }
 
-        /* Kontrol Paneli */
-        .controls {
-            background-color: var(--bg-card);
-            padding: 1.25rem;
-            border-top: 1px solid var(--border);
+        /* Görsel Düzenleme / Önizleme Alanı */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #processing-canvas {
+            max-width: 100%;
+            max-height: 55vh;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* Kontrol Sürgüleri (Binarization & Contrast) */
+        .sliders-group {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
             gap: 0.75rem;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
         }
 
+        .slider-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Buton Tasarımları */
         .btn {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 0.85rem 1.5rem;
+            padding: 0.8rem 1.2rem;
             border-radius: 0.75rem;
             font-weight: 700;
             font-size: 0.9rem;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            flex: 1;
-            transition: background 0.2s, transform 0.1s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
         }
 
         .btn:active {
@@ -159,30 +303,47 @@
             color: var(--text-main);
         }
 
-        .btn-capture {
+        .btn-accent {
             background-color: var(--accent);
-            flex: 1.2;
-            font-size: 1rem;
-            padding: 1rem 1.5rem;
+        }
+        .btn-accent:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-danger {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-group-row {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .btn-group-row .btn {
+            flex: 1;
         }
 
         /* OCR Yükleme Ekranı */
         .loading-overlay {
-            position: absolute;
-            inset: 0;
-            background-color: rgba(9, 13, 22, 0.95);
+            text-align: center;
+            padding: 2rem 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
-            padding: 2rem;
-            z-index: 10;
+            gap: 1.25rem;
         }
 
         .spinner {
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             border: 5px solid var(--border);
             border-bottom-color: var(--primary-hover);
             border-radius: 50%;
@@ -191,34 +352,22 @@
 
         .progress-container {
             width: 100%;
-            max-width: 300px;
             background-color: var(--border);
-            height: 8px;
+            height: 10px;
             border-radius: 9999px;
             overflow: hidden;
-            margin-top: 0.5rem;
         }
 
         .progress-bar {
             background-color: var(--primary-hover);
             width: 0%;
             height: 100%;
-            transition: width 0.1s;
+            transition: width 0.15s;
         }
 
         /* Düzenleme Alanı */
-        .editor-wrapper {
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            flex: 1;
-            background-color: var(--bg-dark);
-        }
-
         .text-editor {
             width: 100%;
-            flex: 1;
             min-height: 250px;
             background-color: var(--bg-input);
             color: var(--text-main);
@@ -226,13 +375,31 @@
             border-radius: 0.75rem;
             padding: 1rem;
             font-size: 0.95rem;
-            line-height: 1.5;
-            resize: none;
+            line-height: 1.6;
+            resize: vertical;
             outline: none;
+            font-family: inherit;
         }
 
         .text-editor:focus {
             border-color: var(--primary-hover);
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+
+        /* İpuçları Paneli */
+        .tips-panel {
+            background: rgba(14, 165, 233, 0.05);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 0.75rem;
+            padding: 0.85rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--primary-hover);
+        }
+
+        .tips-panel ul {
+            margin-left: 1.2rem;
+            margin-top: 0.3rem;
         }
 
         @keyframes rotation {
@@ -248,56 +415,135 @@
 <body>
 
     <header>
-        <h1 class="logo-title">📝 Tarayıcıdan Word'e</h1>
-        <p class="logo-subtitle">A4 Boyutlu Türkçe Karakter Destekli OCR</p>
+        <h1 class="logo-title">📝 Akıllı Tarayıcıdan Word'e v2</h1>
+        <p class="logo-subtitle">Sıfır Dağılma • Yüksek Hassasiyetli Türkçe OCR</p>
     </header>
+
+    <div class="steps-container">
+        <div id="step-1-indicator" class="step active"><span class="step-num">1</span> Görsel Seç / Çek</div>
+        <div id="step-2-indicator" class="step"><span class="step-num">2</span> Filtrele & Döndür</div>
+        <div id="step-3-indicator" class="step"><span class="step-num">3</span> Word Yap</div>
+    </div>
 
     <main>
         
-        <div id="capture-section" class="flex-1 flex flex-col">
-            <div class="camera-wrapper">
-                <video id="camera-preview" autoplay playsinline></video>
-                <div class="scan-overlay"></div>
-                <canvas id="snapshot-canvas" class="hidden"></canvas>
+        <div id="section-1" class="card">
+            <div class="card-title">Görsel Kaynağını Seçin</div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+                Hatalı ve dağılmış yazıları engellemek için, telefonunuzun kendi kamera uygulamasını kullanarak 
+                <strong>belge tarama modunda</strong> çektiğiniz fotoğrafları yüklemeniz şiddetle tavsiye edilir.
+            </p>
+
+            <div class="upload-options">
+                <div class="file-input-wrapper">
+                    <div class="upload-area-btn">
+                        <span class="upload-icon">📸</span>
+                        <strong style="color: var(--primary-hover);">Fotoğraf Çek veya Belge Yükle</strong>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">Kamerayı açar veya galeriye erişir</span>
+                    </div>
+                    <input type="file" id="file-uploader" class="hidden-file-input" accept="image/*" capture="environment">
+                </div>
+
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; font-weight: bold;">— VEYA —</div>
+
+                <button class="btn btn-secondary" onclick="activateLiveCamera()">
+                    🎥 Canlı Web Kamerasını Başlat
+                </button>
             </div>
 
-            <div class="controls">
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="switchCamera()">
-                        🔄 Çevir
+            <div id="live-camera-module" class="hidden" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="camera-container">
+                    <video id="camera-preview" autoplay playsinline></video>
+                    <div class="camera-overlay">
+                        <div class="overlay-text">A4 BELGEYİ ÇERÇEVEYE SIĞDIRIN</div>
+                        <div class="overlay-text" style="font-size: 0.6rem;">Yatay eğimleri önleyin</div>
+                    </div>
+                </div>
+                <div class="btn-group-row">
+                    <button class="btn btn-secondary" onclick="switchCamera()">🔄 Çevir</button>
+                    <button class="btn btn-accent" onclick="captureLiveFrame()">📷 Fotoğrafı Yakala</button>
+                </div>
+            </div>
+
+            <div class="tips-panel">
+                <strong>💡 Kusursuz Okuma İpuçları:</strong>
+                <ul>
+                    <li>Gölge oluşmasını engelleyin, ışığın üstten dik gelmesini sağlayın.</li>
+                    <li>Telefonu eğri tutmayın, kağıda tam paralel (90 derece üstten) çekin.</li>
+                    <li>Mümkünse telefonun kendi tarayıcı kamerasıyla çekip buraya yükleyin.</li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div id="section-2" class="card hidden">
+            <div class="card-title">Netleştirme ve Görsel Ayarları</div>
+            
+            <p style="font-size: 0.8rem; color: var(--text-muted);">
+                Yazıların dağılmasını önlemek için aşağıdaki araçları kullanın. 
+                Yazılar <strong>net siyah</strong>, arka plan ise <strong>tamamen beyaz</strong> olana kadar sürgüyü kaydırın.
+            </p>
+
+            <div class="canvas-wrapper">
+                <canvas id="processing-canvas"></canvas>
+            </div>
+
+            <div class="sliders-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; font-weight: bold;">Yönü Hizala:</span>
+                    <button class="btn btn-secondary" onclick="rotateImage()" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                        ↪️ 90° Sağ döndür
                     </button>
-                    <button class="btn btn-capture" onclick="captureAndOCR()">
-                        📷 Metni Tara
-                    </button>
+                </div>
+                
+                <div class="slider-row">
+                    <div class="slider-labels">
+                        <span>Yazı Netliği (Eşik)</span>
+                        <span id="threshold-val">128</span>
+                    </div>
+                    <input type="range" id="threshold-slider" min="50" max="200" value="128" oninput="updateFilters()">
+                </div>
+            </div>
+
+            <div class="btn-group-row">
+                <button class="btn btn-secondary" onclick="goToStep1()">⬅️ Geri Dön</button>
+                <button class="btn btn-success" onclick="runOCR()">🔍 Metne Dönüştür (OCR)</button>
+            </div>
+        </div>
+
+
+        <div id="section-loading" class="card hidden">
+            <div class="loading-overlay">
+                <div class="spinner"></div>
+                <h3 id="status-text" style="color: var(--primary-hover);">Yapay Zeka Hazırlanıyor...</h3>
+                <p id="substatus-text" style="font-size: 0.85rem; color: var(--text-muted);">Lütfen bekleyin...</p>
+                <div class="progress-container">
+                    <div id="progress-bar" class="progress-bar"></div>
                 </div>
             </div>
         </div>
 
-        <div id="loading-section" class="loading-overlay hidden">
-            <div class="spinner"></div>
-            <h3 id="status-text" style="color: var(--primary-hover);">Görüntü İşleniyor...</h3>
-            <p id="substatus-text" style="font-size: 0.8rem; color: var(--text-muted);">Türkçe OCR modülü hazırlanıyor...</p>
-            <div class="progress-container">
-                <div id="progress-bar" class="progress-bar"></div>
-            </div>
-        </div>
 
-        <div id="editor-section" class="editor-wrapper hidden">
-            <h3 style="color: var(--primary-hover);">Taranan Metin</h3>
-            <p style="font-size: 0.75rem; color: var(--text-muted);">Word belgesine aktarmadan önce metni düzenleyebilirsiniz:</p>
+        <div id="section-3" class="card hidden">
+            <div class="card-title">Taranan Düzenlenebilir Metin</div>
             
+            <p style="font-size: 0.75rem; color: var(--text-muted);">
+                Aşağıdaki alanda kayma ve hataları elinizle düzeltebilir, ardından doğrudan Word formatında indirebilirsiniz:
+            </p>
+
             <textarea id="text-output" class="text-editor" placeholder="Kameradan okunan metin burada belirecek..."></textarea>
             
-            <div class="button-group" style="flex-direction: column;">
-                <button class="btn" onclick="exportToWord()" style="width: 100%; background-color: var(--success);">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <button class="btn btn-success" onclick="exportToWord()" style="padding: 1rem; font-size: 1rem; width: 100%;">
                     💾 Word Belgesi Olarak İndir (.doc)
                 </button>
-                <div style="display: flex; gap: 0.5rem; width: 100%;">
+                <div class="btn-group-row">
                     <button class="btn btn-secondary" onclick="copyToClipboard()">
-                        📋 Kopyala
+                        📋 Metni Kopyala
                     </button>
-                    <button class="btn btn-secondary" onclick="resetApp()" style="background-color: rgba(244, 63, 94, 0.1); color: #f43f5e; border-color: rgba(244, 63, 94, 0.2);">
-                        🗑️ Yeni Tarama
+                    <button class="btn btn-danger" onclick="resetApp()">
+                        🗑️ Yeni Tarama Başlat
                     </button>
                 </div>
             </div>
@@ -306,31 +552,72 @@
     </main>
 
     <script>
+        // Global Değişkenler
         let currentStream = null;
         let useFrontCamera = false;
-
-        const video = document.getElementById('camera-preview');
-        const canvas = document.getElementById('snapshot-canvas');
-        const outputTextarea = document.getElementById('text-output');
+        let loadedImage = null; // Orijinal yüklenen resim objesi
+        let rotationAngle = 0; // Resim döndürme açısı (0, 90, 180, 270)
         
-        const captureSection = document.getElementById('capture-section');
-        const loadingSection = document.getElementById('loading-section');
-        const editorSection = document.getElementById('editor-section');
+        // Elementler
+        const fileUploader = document.getElementById('file-uploader');
+        const cameraPreview = document.getElementById('camera-preview');
+        const liveCameraModule = document.getElementById('live-camera-module');
+        const processingCanvas = document.getElementById('processing-canvas');
+        const thresholdSlider = document.getElementById('threshold-slider');
+        const thresholdVal = document.getElementById('threshold-val');
+        const textOutput = document.getElementById('text-output');
         
-        const statusText = document.getElementById('status-text');
-        const substatusText = document.getElementById('substatus-text');
-        const progressBar = document.getElementById('progress-bar');
+        // Bölümler
+        const sec1 = document.getElementById('section-1');
+        const sec2 = document.getElementById('section-2');
+        const secLoading = document.getElementById('section-loading');
+        const sec3 = document.getElementById('section-3');
+        
+        // Adım Göstergeleri
+        const step1Ind = document.getElementById('step-1-indicator');
+        const step2Ind = document.getElementById('step-2-indicator');
+        const step3Ind = document.getElementById('step-3-indicator');
 
-        // --- 1. KAMERA YÖNETİMİ ---
-        async function startCamera() {
+        // --- ADIM GÖSTERGE YÖNETİMİ ---
+        function updateSteps(activeStep) {
+            step1Ind.classList.remove('active');
+            step2Ind.classList.remove('active');
+            step3Ind.classList.remove('active');
+            if (activeStep === 1) step1Ind.classList.add('active');
+            if (activeStep === 2) step2Ind.classList.add('active');
+            if (activeStep === 3) step3Ind.classList.add('active');
+        }
+
+        // --- DOSYA YÜKLEME VE SİSTEM KAMERASI ENTEGRASYONU ---
+        fileUploader.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            stopLiveCamera(); // Eğer aktifse canlı yayını durdur
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                loadedImage = new Image();
+                loadedImage.onload = function() {
+                    rotationAngle = 0; // Yeni görselde açıyı sıfırla
+                    initializeEditorCanvas();
+                };
+                loadedImage.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // --- CANLI KAMERA YÖNETİMİ ---
+        async function activateLiveCamera() {
+            liveCameraModule.classList.remove('hidden');
             if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
+                stopLiveCamera();
             }
 
             const constraints = {
                 video: {
                     facingMode: useFrontCamera ? "user" : "environment",
-                    width: { ideal: 1920 }, // Yüksek çözünürlük ile net okuma sağlar
+                    width: { ideal: 1920 },
                     height: { ideal: 1080 }
                 },
                 audio: false
@@ -338,128 +625,218 @@
 
             try {
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = currentStream;
+                cameraPreview.srcObject = currentStream;
             } catch (err) {
-                alert("Kameraya erişilemedi! Tarayıcı izinlerini kontrol edin.");
+                alert("Kameraya erişilemedi. Tarayıcı izinlerini kontrol edin ya da fotoğraf yükleme seçeneğini kullanın.");
                 console.error(err);
             }
         }
 
         function switchCamera() {
             useFrontCamera = !useFrontCamera;
-            startCamera();
+            activateLiveCamera();
         }
 
-        // --- 2. GÖRÜNTÜ ÖN İŞLEME (KONTRAST FİLTRESİ) ---
-        function enhanceContrast(ctx, width, height) {
+        function stopLiveCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            liveCameraModule.classList.add('hidden');
+        }
+
+        function captureLiveFrame() {
+            if (!cameraPreview.srcObject) return;
+            
+            // Canlı kareden resim objesi üretme
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = cameraPreview.videoWidth;
+            tempCanvas.height = cameraPreview.videoHeight;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.drawImage(cameraPreview, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            loadedImage = new Image();
+            loadedImage.onload = function() {
+                rotationAngle = 0;
+                stopLiveCamera();
+                initializeEditorCanvas();
+            };
+            loadedImage.src = tempCanvas.toDataURL('image/jpeg');
+        }
+
+
+        // --- ADIM 2: RESİM SÜZME VE DÖNDÜRME ---
+        function initializeEditorCanvas() {
+            sec1.classList.add('hidden');
+            sec2.classList.remove('hidden');
+            updateSteps(2);
+            
+            // Sürgüyü varsayılana getir
+            thresholdSlider.value = 125;
+            thresholdVal.innerText = 125;
+            
+            renderCanvas();
+        }
+
+        function rotateImage() {
+            rotationAngle = (rotationAngle + 90) % 360;
+            renderCanvas();
+        }
+
+        // Canvas üzerine resmin döndürülmüş ve süzülmüş halini basma
+        function renderCanvas() {
+            if (!loadedImage) return;
+
+            const ctx = processingCanvas.getContext('2d');
+            
+            // Döndürme açılarına göre canvas genişlik/yükseklik belirleme
+            if (rotationAngle === 90 || rotationAngle === 270) {
+                processingCanvas.width = loadedImage.height;
+                processingCanvas.height = loadedImage.width;
+            } else {
+                processingCanvas.width = loadedImage.width;
+                processingCanvas.height = loadedImage.height;
+            }
+
+            // Temizleme ve döndürme matrisi uygulama
+            ctx.clearRect(0, 0, processingCanvas.width, processingCanvas.height);
+            ctx.save();
+            ctx.translate(processingCanvas.width / 2, processingCanvas.height / 2);
+            ctx.rotate((rotationAngle * Math.PI) / 180);
+            ctx.drawImage(loadedImage, -loadedImage.width / 2, -loadedImage.height / 2);
+            ctx.restore();
+
+            // Siyah/Beyaz Netleştirme Filtresi Uygula
+            applyBinarization(parseInt(thresholdSlider.value));
+        }
+
+        // Akıllı Binarizasyon (Thresholding) Piksel Analizi
+        function applyBinarization(threshold) {
+            const ctx = processingCanvas.getContext('2d');
+            const width = processingCanvas.width;
+            const height = processingCanvas.height;
             const imgData = ctx.getImageData(0, 0, width, height);
             const data = imgData.data;
-            
-            // Metinlerin arka plandan ayrışması için kontrastı yükseltiyoruz
-            const contrast = 80; // Kontrast artış oranı
-            const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
 
             for (let i = 0; i < data.length; i += 4) {
-                // Gri tonlama
-                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
                 
-                // Kontrast formülü
-                let newValue = factor * (gray - 128) + 128;
-                newValue = Math.max(0, Math.min(255, newValue));
-
-                data[i] = newValue;     // R
-                data[i + 1] = newValue; // G
-                data[i + 2] = newValue; // B
+                // Gri Dönüşümü (İnsan gözü duyarlılığına göre)
+                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                
+                // Siyah mı Beyaz mı?
+                const binaryValue = gray >= threshold ? 255 : 0;
+                
+                data[i] = binaryValue;     // Kırmızı
+                data[i + 1] = binaryValue; // Yeşil
+                data[i + 2] = binaryValue; // Mavi
             }
+            
             ctx.putImageData(imgData, 0, 0);
         }
 
-        // --- 3. KAMERA YAKALAMA VE SIFIR HATA SİNYAL MOTORU ---
-        async function captureAndOCR() {
-            const ctx = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
-            // Resmi canvas üzerine çiz
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        function updateFilters() {
+            const val = thresholdSlider.value;
+            thresholdVal.innerText = val;
+            renderCanvas();
+        }
 
-            // Filtreyi uygula
-            enhanceContrast(ctx, canvas.width, canvas.height);
+        function goToStep1() {
+            sec2.classList.add('hidden');
+            sec1.classList.remove('hidden');
+            updateSteps(1);
+        }
 
-            const imageDataUrl = canvas.toDataURL('image/jpeg');
 
-            captureSection.classList.add('hidden');
-            loadingSection.classList.remove('hidden');
-            
-            statusText.innerText = "Sistem Başlatılıyor...";
-            substatusText.innerText = "Türkçe dil modülü yükleniyor (İlk seferde internet bağlantısı gerekir)...";
-            progressBar.style.width = "0%";
+        // --- ADIM 3: OCR ANALİZ MOTORU ---
+        async function runOCR() {
+            sec2.classList.add('hidden');
+            secLoading.classList.remove('hidden');
+
+            const statusText = document.getElementById('status-text');
+            const substatusText = document.getElementById('substatus-text');
+            const progressBar = document.getElementById('progress-bar');
+
+            statusText.innerText = "Yapay Zeka Çalışıyor...";
+            substatusText.innerText = "Türkçe dil modeli aktif ediliyor...";
+            progressBar.style.width = "5%";
+
+            // Hazırlanan işlenmiş siyah beyaz resmi OCR motoruna gönder
+            const processedImageData = processingCanvas.toDataURL('image/png');
 
             try {
-                // CORS ve dosya protokolü hatalarını ezmek için doğrudan Tesseract API çağrısı
                 const result = await Tesseract.recognize(
-                    imageDataUrl,
+                    processedImageData,
                     'tur',
                     {
                         logger: m => {
                             if (m.status === 'recognizing text') {
-                                statusText.innerText = "Metin Çözümleniyor...";
-                                const progressPercent = Math.round(m.progress * 100);
-                                substatusText.innerText = `%${progressPercent} tamamlandı`;
-                                progressBar.style.width = `${progressPercent}%`;
+                                statusText.innerText = "Metin Okunuyor...";
+                                const percent = Math.round(m.progress * 100);
+                                substatusText.innerText = `%${percent} tamamlandı. Kelimeler ayıklanıyor.`;
+                                progressBar.style.width = `${percent}%`;
                             } else if (m.status === 'loading tesseract core') {
-                                statusText.innerText = "Yapay Zeka Yükleniyor...";
-                                substatusText.innerText = "Dil işleme motoru çekirdeği aktif ediliyor...";
+                                statusText.innerText = "Motor Yükleniyor...";
+                                substatusText.innerText = "OCR motoru çekirdeği başlatılıyor...";
+                                progressBar.style.width = "20%";
                             }
                         }
                     }
                 );
 
                 if (!result || !result.data) {
-                    throw new Error("Görüntüden okunabilir bir metin çıkarılamadı.");
+                    throw new Error("Görselden hiçbir yazı okunamadı.");
                 }
 
-                // Taranan metni yerleştir
-                outputTextarea.value = cleanOCRText(result.data.text);
+                // Taranan ve temizlenen metni yazdır
+                textOutput.value = cleanOCRText(result.data.text);
 
-                stopCamera();
-                loadingSection.classList.add('hidden');
-                editorSection.classList.remove('hidden');
+                // Ekranları değiştir
+                secLoading.classList.add('hidden');
+                sec3.classList.remove('hidden');
+                updateSteps(3);
 
             } catch (err) {
-                console.error("OCR Hatası: ", err);
-                alert("Dönüştürme Hatası!\n\nDetay: " + err.message + "\n\nNot: Eğer bu aracı İLK KEZ açıyorsanız, Türkçe dil paketini kendi hafızasına kaydedebilmesi için aktif bir internet bağlantınız bulunmalıdır. Sonraki kullanımlarda internetsiz çalışacaktır.");
-                resetApp();
+                console.error(err);
+                alert("Dönüştürme Hatası!\n\nDetay: " + err.message + "\n\nNot: Eğer ilk kez açıyorsanız, dil paketi indirilebilmesi için aktif bir internet bağlantısı şarttır.");
+                secLoading.classList.add('hidden');
+                sec2.classList.remove('hidden');
+                updateSteps(2);
             }
         }
 
-        // Türkçe harfleri optimize etme filtresi
+        // Tesseract'ın sık yaptığı Türkçe kelime kaymalarını düzeltme
         function cleanOCRText(text) {
             return text
                 .replace(/I1/g, 'ı')
                 .replace(/S$/g, 'ş')
+                .replace(/\n\s*\n/g, '\n') // Gereksiz boş satırları temizle
                 .trim();
         }
 
-        // --- 4. TR KARAKTER UYUMLU WORD (.DOC) AKTARIMI ---
+
+        // --- ADIM 4: WORD (.DOC) DOSYASI ÜRETME ---
         function exportToWord() {
-            const text = outputTextarea.value;
+            const text = textOutput.value;
             if (!text) {
-                alert("İçerik boş, önce metin taramalısınız!");
+                alert("İndirilecek metin bulunamadı!");
                 return;
             }
 
-            // Word tarafından doğrudan UTF-8 olarak yorumlanacak şık şablon
+            // Word tarafından doğrudan UTF-8 kodlamayla açılacak HTML yapısı
             const htmlContent = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head>
-                    <title>Tarama Çıktısı</title>
+                    <title>Dönüştürülmüş Belge</title>
                     <meta charset="utf-8">
                     <style>
                         body {
                             font-family: Arial, sans-serif;
-                            font-size: 12pt;
-                            line-height: 1.5;
+                            font-size: 11pt;
+                            line-height: 1.6;
+                            color: #333333;
                         }
                     </style>
                 </head>
@@ -469,13 +846,14 @@
                 </html>
             `;
 
-            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+            // BOM (\ufeff) ekleyerek Excel ve Word'ün Türkçe karakterleri (ı, ş, ğ, vb.) bozmasını kesinlikle engelliyoruz
+            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             
             const a = document.createElement('a');
             const date = new Date().toISOString().slice(0, 10);
             a.href = url;
-            a.download = `Belge_Tarama_${date}.doc`;
+            a.download = `Metin_Belgesi_${date}.doc`;
             document.body.appendChild(a);
             a.click();
             
@@ -485,29 +863,25 @@
             }, 0);
         }
 
-        // --- GENEL FONKSİYONLAR ---
+
+        // --- GENEL AMACLI FONKSIYONLAR ---
         function copyToClipboard() {
-            outputTextarea.select();
+            textOutput.select();
             document.execCommand('copy');
-            alert("Metin panoya kopyalandı!");
+            alert("Metin kopyalandı!");
         }
 
         function resetApp() {
-            editorSection.classList.add('hidden');
-            loadingSection.classList.add('hidden');
-            captureSection.classList.remove('hidden');
-            outputTextarea.value = "";
-            startCamera();
+            stopLiveCamera();
+            loadedImage = null;
+            rotationAngle = 0;
+            textOutput.value = "";
+            sec3.classList.add('hidden');
+            sec2.classList.add('hidden');
+            secLoading.classList.add('hidden');
+            sec1.classList.remove('hidden');
+            updateSteps(1);
         }
-
-        function stopCamera() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-        }
-
-        // Başlangıçta kamerayı otomatik çalıştır
-        window.addEventListener('load', startCamera);
     </script>
 </body>
 </html>
