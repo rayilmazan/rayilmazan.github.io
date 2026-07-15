@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BTR USB Dedektifi & Virüs Temizleyici</title>
+    <title>Rayılmazan USB Dedektifi & Virüs Temizleyici</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -337,22 +337,25 @@
 <body>
 
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1>BTR USB Dedektifi <span class="badge">Sürüm 1.0</span></h1>
+            <h1>Rayılmazan USB Dedektifi <span class="badge">Sürüm 1.0</span></h1>
             <p>Okul tahta ve bilgisayarlarındaki kısayol virüslerini temizleyen güvenli, çevrimdışı web aracı</p>
         </div>
 
         <div class="content">
+            <!-- Tarayıcı Destek Uyarısı -->
             <div id="compat-alert" class="alert">
-                <strong>Dikkat:</strong> Tarayıcınız modern Dosya Sistemi Erişim (File System Access) özelliğini desteklemmiyor. 
+                <strong>Dikkat:</strong> Tarayıcınız modern Dosya Sistemi Erişim (File System Access) özelliğini desteklemiyor. 
                 Lütfen bu aracı Google Chrome, Microsoft Edge veya Opera tarayıcılarının güncel bir sürümüyle bilgisayarınızda açınız.
             </div>
 
             <div id="offline-ready-alert" class="alert warning" style="display: block;">
-                <strong>Bilgi (BTR):</strong> Bu araç tamamen tarayıcınızda çalışmaktadır. 
+                <strong>Bilgi (Rayılmazan):</strong> Bu araç tamamen tarayıcınızda çalışmaktadır. 
                 İnternet bağlantınızı kesseniz dahi çalışmaya devam eder. Hiçbir veriniz dışarıya veya bir sunucuya gönderilmez.
             </div>
 
+            <!-- ADIM 1: SÜRÜCÜ SEÇİMİ -->
             <div class="step-card active" id="step-1-card">
                 <div class="step-title">
                     <span class="step-number">1</span>
@@ -367,12 +370,14 @@
                 </button>
             </div>
 
+            <!-- ADIM 2: TARAMA VE TEMİZLİK -->
             <div class="step-card" id="step-2-card" style="opacity: 0.5; pointer-events: none;">
                 <div class="step-title">
                     <span class="step-number">2</span>
                     <span>Tarama ve Tehdit Analizi</span>
                 </div>
                 
+                <!-- İstatistikler -->
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-val" id="stat-scanned-count">0</div>
@@ -395,11 +400,13 @@
                     <button class="btn btn-secondary" id="btn-rescan" disabled>Tekrar Tara</button>
                 </div>
 
+                <!-- Canlı Terminal Logu -->
                 <div class="terminal" id="terminal-log">
                     <div class="terminal-line info">Sürücü seçimi bekleniyor...</div>
                 </div>
             </div>
 
+            <!-- ADIM 3: GERİ GETİRME BETİĞİ -->
             <div class="step-card" id="step-3-card" style="opacity: 0.5; pointer-events: none;">
                 <div class="step-title">
                     <span class="step-number">3</span>
@@ -619,9 +626,9 @@
             const batContent = `@echo off
 chcp 65001 > nul
 color 0a
-title BTR USB Dosya Kurtarici
+title Rayılmazan USB Dosya Kurtarici
 echo ==========================================================
-echo          BTR USB DOSYA VE KLASOR KURTARICI (OFFLINE)
+echo       RAYILMAZAN USB DOSYA VE KLASOR KURTARICI (OFFLINE)
 echo ==========================================================
 echo.
 echo Bu betik, kisayol virusu tarafindan gizlenen orijinal 
