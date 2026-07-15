@@ -1,1 +1,420 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IR Çerçeve Toz ve Engel Dedektifi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tam ekran dokunmatik deneyimi için kaydırmayı engelle */
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+            50% { opacity: 1; box-shadow: 0 0 25px rgba(239, 68, 68, 1); }
+        }
+        .ir-active-error {
+            animation: pulse-red 0.8s infinite;
+            background-color: rgb(239, 68, 68) !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
+    <div id="sensor-top" class="absolute top-0 left-0 right-0 h-2.5 bg-slate-800 transition-colors duration-300 z-50"></div>
+    <div id="sensor-bottom" class="absolute bottom-0 left-0 right-0 h-2.5 bg-slate-800 transition-colors duration-300 z-50"></div>
+    <div id="sensor-left" class="absolute top-0 bottom-0 left-0 w-2.5 bg-slate-800 transition-colors duration-300 z-50"></div>
+    <div id="sensor-right" class="absolute top-0 bottom-0 right-0 w-2.5 bg-slate-800 transition-colors duration-300 z-50"></div>
+
+    <header class="bg-slate-900/95 border-b border-slate-800 p-4 z-40 relative flex flex-wrap gap-4 items-center justify-between shadow-lg">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">🚨</span>
+            <div>
+                <h1 class="text-lg font-bold text-teal-400">IR Çerçeve Dedektifi</h1>
+                <p class="text-xs text-slate-400">Akıllı Tahta Toz & Hayalet Dokunuş Teşhis Aracı</p>
+            </div>
+        </div>
+
+        <div class="flex gap-3 text-xs sm:text-sm">
+            <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span>Aktif Dokunma: <strong id="stat-active" class="font-mono text-emerald-400">0</strong></span>
+            </div>
+            <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 flex items-center gap-2">
+                <span id="stat-obstruction-led" class="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
+                <span>Tespit Edilen Engel: <strong id="stat-obstruction" class="font-mono text-red-400">0</strong></span>
+            </div>
+        </div>
+
+        <div class="flex gap-2 w-full sm:w-auto">
+            <button onclick="toggleFullscreen()" class="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-2 rounded-xl text-xs transition border border-slate-700">
+                🖥️ Tam Ekran (F11)
+            </button>
+            <button onclick="startPassiveCalibration()" id="btn-calibrate" class="flex-1 sm:flex-initial bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg shadow-amber-900/20">
+                ⏳ Hayalet Dokunuş Testi
+            </button>
+            <button onclick="clearCanvas()" class="bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 font-semibold px-4 py-2 rounded-xl text-xs transition border border-rose-900/40">
+                🗑️ Temizle
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 relative w-full overflow-hidden" id="canvas-container">
+        <div class="absolute inset-0 grid grid-cols-12 grid-rows-6 pointer-events-none opacity-[0.03]">
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+            <div class="border-r border-slate-100 col-span-1 row-span-full h-full"></div>
+        </div>
+
+        <canvas id="paint-canvas" class="absolute inset-0 w-full h-full block z-10"></canvas>
+
+        <div id="calibration-overlay" class="hidden absolute inset-0 bg-slate-950/90 z-30 flex flex-col items-center justify-center text-center p-6 transition-all duration-300">
+            <div class="max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl space-y-6">
+                <div id="calib-icon" class="text-6xl animate-bounce">⏳</div>
+                <h3 id="calib-title" class="text-xl font-bold text-amber-400">Hayalet Dokunuş Testi Başlıyor</h3>
+                <p id="calib-desc" class="text-sm text-slate-400 leading-relaxed">
+                    Lütfen tahtaya kesinlikle **DOKUNMAYIN** ve hiçbir cismin ekrana temas etmediğinden emin olun. Sistem 3 saniye içinde kızılötesi çerçevedeki statik tıkanmaları ve tozları analiz edecektir.
+                </p>
+                <div id="calib-timer" class="text-5xl font-black text-white font-mono">3</div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-4 left-4 z-20 max-w-xs sm:max-w-sm bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl p-4 text-xs space-y-2 shadow-xl pointer-events-none">
+            <div class="font-bold text-slate-300 flex items-center justify-between border-b border-slate-800 pb-1.5 mb-2">
+                <span>📋 Teşhis Günlüğü</span>
+                <span class="text-[10px] text-teal-400 font-mono">Canlı Akış</span>
+            </div>
+            <div id="log-container" class="space-y-1.5 max-h-32 overflow-y-auto font-mono text-slate-400">
+                <div>> Sistem hazır. Dokunarak test edin veya kalibrasyonu başlatın.</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900/50 border-t border-slate-800/80 p-3 text-center text-[10px] sm:text-xs text-slate-500 z-40 relative">
+        <p>💡 <strong>Nasıl Teşhis Edilir?</strong> Tahtaya dokunmadığınız halde kırmızı uyarılar görüyorsanız, o bölgelerdeki çerçeveyi kuru bir bezle temizleyin. Aktif çizim sırasında kopan çizgiler ise o bölgedeki IR LED arızasını işaret eder.</p>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('paint-canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+        
+        let activePointers = new Map(); // Ekrana basılı tüm pointerları tutar
+        let staticObstructions = new Map(); // Statik kalan (toz/engel) noktaları tutar
+        let isCalibrating = false;
+
+        // Hassasiyet Ayarları
+        const JITTER_THRESHOLD = 4; // Statik algılama için piksel oynama toleransı
+        const TIME_TO_OBSTRUCTION = 1200; // Milisaniye cinsinden bir noktanın "Engel" sayılması için gereken süre
+
+        // Canvas Boyutlandırma
+        function resizeCanvas() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawGridLines();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('DOMContentLoaded', () => {
+            resizeCanvas();
+            setupPointerEvents();
+        });
+
+        // Arka plan kılavuz çizgileri (Canvas üzerinde çizim desteği için)
+        function drawGridLines() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.2)';
+            ctx.lineWidth = 1;
+            
+            const gridSize = 40;
+            // Dikey çizgiler
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            // Yatay çizgiler
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        function clearCanvas() {
+            drawGridLines();
+            staticObstructions.clear();
+            resetSensorBorders();
+            updateStats();
+            addLog("Ekran ve teşhis verileri temizlendi.");
+        }
+
+        // Teşhis Günlüğüne Yazma
+        function addLog(text, type = "info") {
+            const container = document.getElementById('log-container');
+            const newLog = document.createElement('div');
+            let prefix = "> ";
+            let colorClass = "text-slate-400";
+
+            if (type === "warning") {
+                prefix = "⚠️ [UYARI] ";
+                colorClass = "text-amber-400 font-semibold";
+            } else if (type === "error") {
+                prefix = "🚨 [ENGEL] ";
+                colorClass = "text-red-400 font-bold";
+            } else if (type === "success") {
+                prefix = "✅ [BAŞARILI] ";
+                colorClass = "text-teal-400 font-semibold";
+            }
+
+            newLog.className = colorClass;
+            newLog.innerText = prefix + text;
+            container.appendChild(newLog);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Fiziksel Kenar Sensör Uyarılarını Resetleme
+        function resetSensorBorders() {
+            document.getElementById('sensor-top').className = "absolute top-0 left-0 right-0 h-2.5 bg-slate-800 transition-colors duration-300 z-50";
+            document.getElementById('sensor-bottom').className = "absolute bottom-0 left-0 right-0 h-2.5 bg-slate-800 transition-colors duration-300 z-50";
+            document.getElementById('sensor-left').className = "absolute top-0 bottom-0 left-0 w-2.5 bg-slate-800 transition-colors duration-300 z-50";
+            document.getElementById('sensor-right').className = "absolute top-0 bottom-0 right-0 w-2.5 bg-slate-800 transition-colors duration-300 z-50";
+        }
+
+        // Yakalanan koordinatın hangi fiziksel kenara en yakın olduğunu tespit etme (Metrik bulucu)
+        function triggerEdgeWarning(x, y) {
+            const width = canvas.width;
+            const height = canvas.height;
+
+            const distLeft = x;
+            const distRight = width - x;
+            const distTop = y;
+            const distBottom = height - y;
+
+            const minDist = Math.min(distLeft, distRight, distTop, distBottom);
+
+            // Koordinatı yüzde olarak hesaplayalım (Öğretmenin hatayı eliyle bulması için)
+            if (minDist === distLeft) {
+                const percent = Math.round((y / height) * 100);
+                document.getElementById('sensor-left').className = "absolute top-0 bottom-0 left-0 w-2.5 ir-active-error z-50";
+                addLog(`Sol kenar, yukarıdan %${percent} konumunda tıkanma!`, "error");
+            } else if (minDist === distRight) {
+                const percent = Math.round((y / height) * 100);
+                document.getElementById('sensor-right').className = "absolute top-0 bottom-0 right-0 w-2.5 ir-active-error z-50";
+                addLog(`Sağ kenar, yukarıdan %${percent} konumunda tıkanma!`, "error");
+            } else if (minDist === distTop) {
+                const percent = Math.round((x / width) * 100);
+                document.getElementById('sensor-top').className = "absolute top-0 left-0 right-0 h-2.5 ir-active-error z-50";
+                addLog(`Üst kenar, soldan %${percent} konumunda tıkanma!`, "error");
+            } else {
+                const percent = Math.round((x / width) * 100);
+                document.getElementById('sensor-bottom').className = "absolute bottom-0 left-0 right-0 h-2.5 ir-active-error z-50";
+                addLog(`Alt kenar, soldan %${percent} konumunda tıkanma!`, "error");
+            }
+        }
+
+        // İstatistik Alanlarını Güncelleme
+        function updateStats() {
+            document.getElementById('stat-active').innerText = activePointers.size;
+            document.getElementById('stat-obstruction').innerText = staticObstructions.size;
+
+            const led = document.getElementById('stat-obstruction-led');
+            if (staticObstructions.size > 0) {
+                led.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse";
+            } else {
+                led.className = "w-2.5 h-2.5 rounded-full bg-slate-600";
+            }
+        }
+
+        // POINTER EVENTS (Çoklu Dokunma Yönetimi)
+        function setupPointerEvents() {
+            // Pointer Down (Dokunma Başladı)
+            canvas.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const pointerData = {
+                    id: e.pointerId,
+                    startX: x,
+                    startY: y,
+                    lastX: x,
+                    lastY: y,
+                    startTime: Date.now(),
+                    lastMoveTime: Date.now(),
+                    color: getRandomColor(e.pointerId)
+                };
+
+                activePointers.set(e.pointerId, pointerData);
+                updateStats();
+
+                if (isCalibrating) {
+                    // Kalibrasyon anında dokunma olursa bunu doğrudan hayalet sinyal kaydet
+                    triggerEdgeWarning(x, y);
+                }
+
+                // Ekrana ilk dokunuş noktasını çiz
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = pointerData.color;
+                ctx.fill();
+            });
+
+            // Pointer Move (Sürükleme / Çizim)
+            canvas.addEventListener('pointermove', (e) => {
+                e.preventDefault();
+                if (!activePointers.has(e.pointerId)) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const data = activePointers.get(e.pointerId);
+
+                // Dokunma noktasının ne kadar hareket ettiğini bul (Jitter/Titreme Filtresi)
+                const distMoved = Math.hypot(x - data.lastX, y - data.lastY);
+
+                if (distMoved > JITTER_THRESHOLD) {
+                    // Hareket var: Çizim yap
+                    ctx.beginPath();
+                    ctx.strokeStyle = data.color;
+                    ctx.lineWidth = 3;
+                    ctx.lineCap = 'round';
+                    ctx.moveTo(data.lastX, data.lastY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+
+                    // Bilgileri güncelle
+                    data.lastX = x;
+                    data.lastY = y;
+                    data.lastMoveTime = Date.now();
+                } else {
+                    // Hareket YOK (Sabit duruyor): Zaman analizine sok
+                    const stationaryDuration = Date.now() - data.lastMoveTime;
+                    if (stationaryDuration > TIME_TO_OBSTRUCTION && !staticObstructions.has(e.pointerId)) {
+                        // Statik engel/toz teşhisi koyuldu!
+                        staticObstructions.set(e.pointerId, { x, y });
+                        triggerEdgeWarning(x, y);
+                        
+                        // Ekranda engeli görsel olarak işaretle (Kırmızı radar halkası)
+                        ctx.beginPath();
+                        ctx.arc(x, y, 20, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+                        ctx.lineWidth = 3;
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 4, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ef4444';
+                        ctx.fill();
+
+                        updateStats();
+                    }
+                }
+            });
+
+            // Pointer Up / Cancel (Temas Kesildi)
+            const handlePointerUp = (e) => {
+                if (activePointers.has(e.pointerId)) {
+                    activePointers.delete(e.pointerId);
+                    updateStats();
+                }
+            };
+
+            canvas.addEventListener('pointerup', handlePointerUp);
+            canvas.addEventListener('pointercancel', handlePointerUp);
+            canvas.addEventListener('pointerleave', handlePointerUp);
+        }
+
+        // Gelişmiş Renk Üretici (Çoklu dokunmada her kalemi ayırmak için)
+        function getRandomColor(id) {
+            const colors = [
+                '#38bdf8', '#34d399', '#a78bfa', '#fbbf24', 
+                '#f472b6', '#22d3ee', '#818cf8', '#fb7185'
+            ];
+            return colors[id % colors.length];
+        }
+
+        // TAM EKRAN KONTROLÜ (F11 Simülasyonu)
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Tam ekran modu başlatılamadı: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // PASİF KALİBRASYON (Hayalet Dokunuş Toz Yakalayıcı)
+        function startPassiveCalibration() {
+            if (isCalibrating) return;
+
+            const overlay = document.getElementById('calibration-overlay');
+            const timerText = document.getElementById('calib-timer');
+            const btn = document.getElementById('btn-calibrate');
+            
+            overlay.classList.remove('hidden');
+            btn.disabled = true;
+            isCalibrating = true;
+            
+            clearCanvas();
+            resetSensorBorders();
+            addLog("Pasif Kalibrasyon Testi başlatıldı. Bekleniyor...", "warning");
+
+            let countdown = 3;
+            timerText.innerText = countdown;
+
+            const timerInterval = setInterval(() => {
+                countdown--;
+                timerText.innerText = countdown;
+
+                if (countdown === 0) {
+                    clearInterval(timerInterval);
+                    
+                    // Analiz Fazı (1.5 Saniye boyunca ekrandaki statik sinyaller taranıyor)
+                    document.getElementById('calib-title').innerText = "Çerçeve Analiz Ediliyor...";
+                    document.getElementById('calib-desc').innerText = "Duyarlı kızılötesi barlar taranıyor. Lütfen dokunmayın...";
+                    document.getElementById('calib-icon').innerText = "📡";
+
+                    setTimeout(() => {
+                        // Kalibrasyonu tamamla
+                        overlay.classList.add('hidden');
+                        btn.disabled = false;
+                        isCalibrating = false;
+
+                        // Reset overlay content for next run
+                        document.getElementById('calib-title').innerText = "Hayalet Dokunuş Testi Başlıyor";
+                        document.getElementById('calib-desc').innerText = "Lütfen tahtaya kesinlikle DOKUNMAYIN ve hiçbir cismin ekrana temas etmediğinden emin olun. Sistem 3 saniye içinde kızılötesi çerçevedeki statik tıkanmaları analiz edecektir.";
+                        document.getElementById('calib-icon').innerText = "⏳";
+
+                        // Sonuç Değerlendirmesi
+                        if (staticObstructions.size > 0 || activePointers.size > 0) {
+                            addLog(`Hata Analizi: Ekran üzerinde ${staticObstructions.size + activePointers.size} noktada engel/toz sinyali kalıcı olarak yakalandı!`, "error");
+                        } else {
+                            addLog("Analiz Sonucu: Çerçeveniz mükemmel temizlikte! Herhangi bir kızılötesi engel veya toz bulunamadı.", "success");
+                        }
+                    }, 1500);
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
