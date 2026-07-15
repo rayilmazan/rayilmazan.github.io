@@ -2,46 +2,44 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Kıble Bulucu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kıble Uydu Görünümü</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        #map { height: 400px; width: 100%; }
-        #arrow { 
-            font-size: 50px; 
-            text-align: center; 
-            margin-top: 20px;
-            transition: transform 0.5s;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; }
+        #map { height: 100vh; width: 100vw; }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
-    <div id="arrow">⬆️</div>
-    <p>Cihazı düz tutun.</p>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Haritayı başlat
-        const map = L.map('map').setView([0, 0], 18);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // 1. Haritayı başlat ve tam ekran yap
+        const map = L.map('map', { zoomControl: false }).setView([0, 0], 18);
+
+        // 2. Uydu katmanını ekle (ESRI Satellite)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri'
+        }).addTo(map);
 
         // Kabe Koordinatları
-        const kabe = { lat: 21.4225, lng: 39.8262 };
+        const kabe = [21.4225, 39.8262];
 
-        // Konum al
+        // 3. Konumu takip et
         navigator.geolocation.watchPosition((pos) => {
             const userPos = [pos.coords.latitude, pos.coords.longitude];
-            map.setView(userPos, 18);
-            L.marker(userPos).addTo(map).bindPopup("Konumunuz").openPopup();
             
-            // Kıble yönü hesaplama (Basitleştirilmiş açı)
-            const y = Math.sin(kabe.lng - pos.coords.longitude) * Math.cos(kabe.lat);
-            const x = Math.cos(pos.coords.latitude) * Math.sin(kabe.lat) - 
-                      Math.sin(pos.coords.latitude) * Math.cos(kabe.lat) * Math.cos(kabe.lng - pos.coords.longitude);
-            const brng = Math.atan2(y, x) * 180 / Math.PI;
+            map.setView(userPos, 19); // Uydu detayını artırmak için zoom 19
+
+            // Kullanıcı işaretçisi ve Kıble çizgisi
+            map.eachLayer((layer) => { if (layer instanceof L.Polyline || layer instanceof L.Marker) map.removeLayer(layer); });
             
-            document.getElementById('arrow').style.transform = `rotate(${brng}deg)`;
+            L.marker(userPos).addTo(map).bindPopup("Siz buradasınız").openPopup();
+            
+            // Kıble çizgisi (Kırmızı, 5px kalınlığında)
+            L.polyline([userPos, kabe], { color: 'red', weight: 5, opacity: 0.8 }).addTo(map);
         });
     </script>
 </body>
