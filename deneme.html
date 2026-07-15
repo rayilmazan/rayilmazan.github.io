@@ -3,943 +3,661 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Güvenli PDF & OCR Word Araç Kutusu</title>
-    
-    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    
-    <script>
-        // PDF.js arka plan işçisini ayarla
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
-
+    <title>BTR USB Dedektifi & Virüs Temizleyici</title>
     <style>
         :root {
             --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --text-color: #f8fafc;
-            --border-color: #334155;
+            --card-bg: #1e293b;
+            --accent-color: #10b981;
+            --accent-hover: #059669;
             --danger-color: #ef4444;
-            --danger-hover: #dc2626;
+            --warning-color: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --terminal-bg: #090d16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
-            margin: 0;
-            padding: 0;
             background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
             display: flex;
-            flex-direction: row;
-            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
 
-        /* Sol Navigasyon Menüsü (Masaüstü) */
-        #sidebar {
-            width: 300px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            flex-shrink: 0;
-        }
-
-        .sidebar-header {
-            padding: 25px 20px;
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 30px 24px;
             border-bottom: 1px solid var(--border-color);
+            position: relative;
         }
 
-        .sidebar-header h1 {
-            font-size: 1.25rem;
-            margin: 0;
-            color: var(--accent-color);
-        }
-
-        .sidebar-header p {
-            margin: 5px 0 0 0;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        .menu-items {
-            flex: 1;
-            padding: 20px 10px;
-        }
-
-        .menu-btn {
-            width: 100%;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            text-align: left;
-            padding: 12px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .menu-btn:hover, .menu-btn.active {
-            color: #fff;
-            background-color: rgba(56, 189, 248, 0.1);
-        }
-
-        .menu-btn.active {
-            border-left: 4px solid var(--accent-color);
-            border-radius: 0 8px 8px 0;
-        }
-
-        /* Sağ İçerik Alanı */
-        #main-content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            display: flex;
-            justify-content: center;
-        }
-
-        .tab-content {
-            width: 100%;
-            max-width: 700px;
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        h2 {
-            font-size: 1.75rem;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .description {
-            color: #94a3b8;
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        /* Sürükle Bırak / Yükleme Alanı */
-        .drop-zone {
-            border: 2px dashed #475569;
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            background-color: rgba(30, 41, 59, 0.3);
-            cursor: pointer;
-            transition: border-color 0.3s;
-            margin-bottom: 20px;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .drop-zone:hover {
-            border-color: var(--accent-color);
-        }
-
-        .drop-zone p {
-            margin: 10px 0 0 0;
-            font-size: 0.9rem;
-            color: #94a3b8;
-        }
-
-        /* Liste Elemanları (Birleştirme için) */
-        .pdf-list {
-            background-color: rgba(30, 41, 59, 0.5);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 25px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .pdf-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .pdf-item:last-child {
-            border-bottom: none;
-        }
-
-        .pdf-name {
-            font-size: 0.9rem;
-            font-weight: 500;
-            max-width: 60%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .pdf-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .action-btn {
-            background-color: #334155;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-        }
-
-        .action-btn:hover {
-            background-color: #475569;
-        }
-
-        .action-btn.delete {
-            background-color: rgba(239, 68, 68, 0.2);
-            color: var(--danger-color);
-        }
-
-        .action-btn.delete:hover {
-            background-color: var(--danger-hover);
-            color: #fff;
-        }
-
-        /* Form Elemanları */
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-        }
-
-        input[type="text"], select {
-            width: 100%;
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 12px 14px;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        input[type="text"]:focus, select:focus {
-            border-color: var(--accent-color);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .checkbox-group input {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .checkbox-group span {
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .file-info-badge {
-            background-color: rgba(56, 189, 248, 0.15);
-            color: var(--accent-color);
-            padding: 12px 15px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        /* Ana Buton */
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--accent-color);
-            color: #0f172a;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-submit:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .btn-submit:disabled {
-            background-color: #334155;
-            color: #64748b;
-            cursor: not-allowed;
-        }
-
-        /* Yükleme Bildirimi (Overlay) */
-        #loader {
-            display: none;
-            position: fixed;
+        .header::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background-color: rgba(15, 23, 42, 0.9);
-            z-index: 1000;
-            flex-direction: column;
+            height: 4px;
+            background: linear-gradient(90deg, var(--danger-color), var(--warning-color), var(--accent-color));
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
+            gap: 10px;
         }
 
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border-left-color: var(--accent-color);
-            animation: spin 1s linear infinite;
+        .header h1 span.badge {
+            font-size: 11px;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-color);
+            padding: 4px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* İçerik Alanı */
+        .content {
+            padding: 24px;
+        }
+
+        /* Uyarı Kutuları */
+        .alert {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 16px;
+            border-radius: 8px;
             margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .alert.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fde047;
         }
 
-        #loader p {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin: 0;
+        /* Kart Yapısı */
+        .step-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: var(--border-color);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .active .step-number {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .step-desc {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        /* Butonlar */
+        .btn {
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        /* Canlı Terminal Alanı */
+        .terminal {
+            background-color: var(--terminal-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 12.5px;
+            max-height: 200px;
+            overflow-y: auto;
+            color: #38bdf8;
+            margin-top: 15px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+            word-break: break-all;
+        }
+
+        .terminal-line.danger {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .terminal-line.success {
+            color: var(--accent-color);
+        }
+
+        .terminal-line.info {
+            color: var(--text-muted);
+        }
+
+        /* İstatistik Paneli */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
             text-align: center;
-            max-width: 100%;
-            line-height: 1.5;
         }
 
-        /* -------------------------------------------------- */
-        /* MOBİL UYUMLULUK CSS (RESPONSIVE MEDIA QUERIES)     */
-        /* -------------------------------------------------- */
-        @media (max-width: 768px) {
+        .stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .stat-val.danger {
+            color: var(--danger-color);
+        }
+
+        .stat-val.success {
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* Rehber Kutusu */
+        .instruction-box {
+            background: rgba(245, 158, 11, 0.05);
+            border-left: 3px solid var(--warning-color);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .instruction-box ol {
+            padding-left: 18px;
+            margin-top: 6px;
+        }
+
+        .instruction-box li {
+            margin-bottom: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Mobil Uyumluluk */
+        @media (max-width: 600px) {
             body {
-                flex-direction: column; /* Yan yana yerleşimi dikey yerleşime çevir */
+                padding: 10px;
             }
-
-            /* Sidebar'ı üst tarafa yatay menü barına dönüştür */
-            #sidebar {
+            .header {
+                padding: 20px 16px;
+            }
+            .content {
+                padding: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn {
                 width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
+                justify-content: center;
             }
-
-            .sidebar-header {
-                padding: 15px;
-                text-align: center;
-            }
-
-            .sidebar-header p {
-                display: none; /* Mobilde dikey alanı kurtarmak için alt başlığı gizle */
-            }
-
-            /* Sekmeleri yatayda kaydırılabilir yap */
-            .menu-items {
+            .button-group {
                 display: flex;
-                padding: 5px 10px;
-                overflow-x: auto;
-                gap: 8px;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch; /* iOS pürüzsüz kaydırma */
-                scrollbar-width: none; /* Firefox için scrollbar gizleme */
-            }
-
-            .menu-items::-webkit-scrollbar {
-                display: none; /* Chrome/Safari için scrollbar gizleme */
-            }
-
-            .menu-btn {
-                width: auto;
-                margin-bottom: 0;
-                padding: 10px 16px;
-                flex-shrink: 0; /* Butonların sıkışıp küçülmesini engelle */
-                font-size: 0.9rem;
-            }
-
-            .menu-btn.active {
-                border-left: none;
-                border-bottom: 3px solid var(--accent-color);
-                border-radius: 8px 8px 0 0;
-            }
-
-            /* Ana İçerik Alanı Mobilde Tam Otursun */
-            #main-content {
-                padding: 20px;
-                flex: 1; /* Kalan ekran boşluğunu doldur */
-            }
-
-            h2 {
-                font-size: 1.4rem;
-            }
-
-            .description {
-                font-size: 0.85rem;
-                margin-bottom: 20px;
-            }
-
-            .drop-zone {
-                padding: 30px 15px;
-            }
-
-            .file-info-badge {
                 flex-direction: column;
-                gap: 5px;
-                font-size: 0.85rem;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <p id="loader-text">İşleminiz yapılıyor, lütfen bekleyin...</p>
-    </div>
-
-    <div id="sidebar">
-        <div class="sidebar-header">
-            <h1>PDF & OCR Kutusu</h1>
-            <p>Çevrimdışı ve Güvenli İşlemler</p>
-        </div>
-        <div class="menu-items">
-            <button class="menu-btn active" onclick="switchTab('tab-merge')">
-                <span>📂</span> PDF Birleştir
-            </button>
-            <button class="menu-btn" onclick="switchTab('tab-split')">
-                <span>✂️</span> PDF Böl
-            </button>
-            <button class="menu-btn" onclick="switchTab('tab-rotate')">
-                <span>🔄</span> PDF Döndür
-            </button>
-            <button class="menu-btn" onclick="switchTab('tab-word')" style="color: #10b981;">
-                <span>📝</span> Word'e Çevir (OCR)
-            </button>
-        </div>
-    </div>
-
-    <div id="main-content">
-        
-        <div id="tab-merge" class="tab-content active">
-            <h2>PDF Dosyalarını Birleştir</h2>
-            <p class="description">Birden fazla PDF yükle, sıralarını dilediğin gibi ayarla ve tek bir PDF dosyası olarak birleştir.</p>
-            
-            <div class="drop-zone" onclick="triggerFileInput('merge-input')">
-                <span style="font-size: 2.5rem;">📥</span>
-                <p>PDF seçin veya buraya sürükleyin</p>
-                <input type="file" id="merge-input" accept="application/pdf" multiple style="display:none" onchange="handleMergeFiles(event)">
-            </div>
-
-            <div class="pdf-list" id="mergeList">
-                <p style="text-align:center; color:#64748b; padding:20px; margin:0;">Henüz dosya yüklenmedi.</p>
-            </div>
-
-            <button class="btn-submit" id="btn-merge" disabled onclick="executeMerge()">Dosyaları Birleştir ve İndir</button>
+    <div class="container">
+        <div class="header">
+            <h1>BTR USB Dedektifi <span class="badge">Sürüm 1.0</span></h1>
+            <p>Okul tahta ve bilgisayarlarındaki kısayol virüslerini temizleyen güvenli, çevrimdışı web aracı</p>
         </div>
 
-        <div id="tab-split" class="tab-content">
-            <h2>PDF Böl ve Sayfa Ayıkla</h2>
-            <p class="description">Büyük bir PDF dosyasından sadece istediğin sayfaları veya sayfa aralıklarını ayıklayarak yeni bir PDF oluştur.</p>
-
-            <div class="drop-zone" onclick="triggerFileInput('split-input')">
-                <span style="font-size: 2.5rem;">📥</span>
-                <p>Bölmek istediğiniz PDF dosyasını seçin</p>
-                <input type="file" id="split-input" accept="application/pdf" style="display:none" onchange="handleSplitFile(event)">
+        <div class="content">
+            <div id="compat-alert" class="alert">
+                <strong>Dikkat:</strong> Tarayıcınız modern Dosya Sistemi Erişim (File System Access) özelliğini desteklemmiyor. 
+                Lütfen bu aracı Google Chrome, Microsoft Edge veya Opera tarayıcılarının güncel bir sürümüyle bilgisayarınızda açınız.
             </div>
 
-            <div id="split-file-info" style="display: none;" class="file-info-badge">
-                <span id="split-name">Dosya: yok</span>
-                <span id="split-pages">0 Sayfa</span>
+            <div id="offline-ready-alert" class="alert warning" style="display: block;">
+                <strong>Bilgi (BTR):</strong> Bu araç tamamen tarayıcınızda çalışmaktadır. 
+                İnternet bağlantınızı kesseniz dahi çalışmaya devam eder. Hiçbir veriniz dışarıya veya bir sunucuya gönderilmez.
             </div>
 
-            <div class="form-group">
-                <label for="page-range">Çıkartılacak Sayfalar</label>
-                <input type="text" id="page-range" placeholder="Örn: 1-3, 5, 7-10">
-                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">
-                    Sayfaları virgülle ayırın. Aralık belirtmek için tire (-) kullanın.
-                </p>
+            <div class="step-card active" id="step-1-card">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    <span>USB Sürücüsünü Bağlayın ve Seçin</span>
+                </div>
+                <div class="step-desc">
+                    Aşağıdaki butona tıklayarak bilgisayarınıza takılı olan virüslü USB belleğin ana dizinini seçin. 
+                    Tarayıcı sizden okuma ve yazma izni isteyecektir, işlemi onaylayın.
+                </div>
+                <button class="btn" id="btn-select-dir">
+                    USB Sürücüsünü Seç
+                </button>
             </div>
 
-            <button class="btn-submit" id="btn-split" disabled onclick="executeSplit()">Seçilen Sayfaları Ayıkla</button>
+            <div class="step-card" id="step-2-card" style="opacity: 0.5; pointer-events: none;">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    <span>Tarama ve Tehdit Analizi</span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-val" id="stat-scanned-count">0</div>
+                        <div class="stat-label">Taranan Öğe</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val danger" id="stat-threat-count">0</div>
+                        <div class="stat-label">Tehdit/Kısayol</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-val success" id="stat-status">Bekliyor</div>
+                        <div class="stat-label">Durum</div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-danger" id="btn-clean" disabled>
+                        Tehditleri Temizle
+                    </button>
+                    <button class="btn btn-secondary" id="btn-rescan" disabled>Tekrar Tara</button>
+                </div>
+
+                <div class="terminal" id="terminal-log">
+                    <div class="terminal-line info">Sürücü seçimi bekleniyor...</div>
+                </div>
+            </div>
+
+            <div class="step-card" id="step-3-card" style="opacity: 0.5; pointer-events: none;">
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    <span>Gizli Klasörleri Kurtarma</span>
+                </div>
+                <div class="step-desc">
+                    Kısayol virüsleri orijinal klasörlerinizi sistem dosyası gibi gizler. Tarayıcıların güvenlik kısıtlaması nedeniyle gizlilik öznitelikleri doğrudan web üzerinden kaldırılamaz. 
+                    Bu sorunu çözmek için USB sürücünüzün içerisine otomatik bir kurtarma betiği (.bat) yazacağız.
+                </div>
+
+                <div class="button-group">
+                    <button class="btn" id="btn-write-bat" disabled style="background-color: var(--warning-color); color: #000;">
+                        USB İçine "kurtar.bat" Oluştur
+                    </button>
+                </div>
+
+                <div class="instruction-box" id="bat-instructions" style="display: none;">
+                    <strong>Nasıl Çalıştırılır?</strong>
+                    <ol>
+                        <li>Bilgisayarınızdan USB sürücüsünün (Flash Bellek) içine girin.</li>
+                        <li>Yeni oluşturulmuş olan <strong>kurtar.bat</strong> dosyasına çift tıklayın.</li>
+                        <li>Siyah konsol ekranı açılacak ve gizli orijinal klasörleriniz saniyeler içinde geri gelecektir.</li>
+                        <li>İşlem bittiğinde bu yardımcı betik dosyası kendini otomatik olarak silecektir.</li>
+                    </ol>
+                </div>
+            </div>
+
         </div>
-
-        <div id="tab-rotate" class="tab-content">
-            <h2>PDF Sayfalarını Döndür</h2>
-            <p class="description">Ters veya yan duran PDF belgelerinin tüm sayfalarını dilediğin açıda döndür.</p>
-
-            <div class="drop-zone" onclick="triggerFileInput('rotate-input')">
-                <span style="font-size: 2.5rem;">📥</span>
-                <p>Döndürmek istediğiniz PDF dosyasını seçin</p>
-                <input type="file" id="rotate-input" accept="application/pdf" style="display:none" onchange="handleRotateFile(event)">
-            </div>
-
-            <div id="rotate-file-info" style="display: none;" class="file-info-badge">
-                <span id="rotate-name">Dosya: yok</span>
-                <span id="rotate-pages">0 Sayfa</span>
-            </div>
-
-            <div class="form-group">
-                <label for="rotate-angle">Döndürme Açısı</label>
-                <select id="rotate-angle">
-                    <option value="90">90° Sağa Döndür (Saat Yönü)</option>
-                    <option value="180">180° Döndür (Baş Aşağı)</option>
-                    <option value="270">90° Sola Döndür</option>
-                </select>
-            </div>
-
-            <button class="btn-submit" id="btn-rotate" disabled onclick="executeRotate()">Döndür ve İndir</button>
-        </div>
-
-        <div id="tab-word" class="tab-content">
-            <h2 style="color: #10b981;">PDF'ten Word'e Dönüştür</h2>
-            <p class="description">PDF belgenizi düzenlenebilir Word belgesine çevirin. Taranmış, resimli PDF'ler için akıllı Türkçe OCR özelliğini açabilirsiniz.</p>
-
-            <div class="drop-zone" style="border-color: #10b981;" onclick="triggerFileInput('word-input')">
-                <span style="font-size: 2.5rem;">📥</span>
-                <p>Word'e çevirmek istediğiniz PDF dosyasını seçin</p>
-                <input type="file" id="word-input" accept="application/pdf" style="display:none" onchange="handleWordFile(event)">
-            </div>
-
-            <div id="word-file-info" style="display: none;" class="file-info-badge">
-                <span id="word-name">Dosya: yok</span>
-                <span id="word-pages">0 Sayfa</span>
-            </div>
-
-            <div class="form-group">
-                <label class="checkbox-group">
-                    <input type="checkbox" id="use-ocr"> 
-                    <span><strong>Gelişmiş OCR'ı Etkinleştir (Türkçe Karakter Desteği)</strong></span>
-                </label>
-                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: -5px; margin-left: 32px;">
-                    Eğer PDF'iniz taranmış <strong>fotoğraflardan</strong> oluşuyorsa işaretleyin. Normal (seçilebilir yazılı) PDF'ler için işaretsiz bırakmanız çok daha hızlı sonuç verir.
-                </p>
-            </div>
-
-            <button class="btn-submit" style="background-color: #10b981; color: #0f172a;" id="btn-word" disabled onclick="executeWordConversion()">
-                Word Dosyasına Dönüştür
-            </button>
-        </div>
-
     </div>
 
     <script>
-        let mergeFilesList = [];
-        let splitFile = null;
-        let rotateFile = null;
-        let wordFile = null;
+        // Tarayıcı uyumluluk kontrolü (Chrome, Edge, Opera destekler)
+        const isSupported = 'showDirectoryPicker' in window;
+        const compatAlert = document.getElementById('compat-alert');
+        const btnSelectDir = document.getElementById('btn-select-dir');
 
-        let splitPageCount = 0;
-        let rotatePageCount = 0;
-        let wordPageCount = 0;
-        let wordFileDataBytes = null;
-
-        // Sekme Değiştirme
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+        if (!isSupported) {
+            compatAlert.style.display = 'block';
+            btnSelectDir.disabled = true;
         }
 
-        // Gizli dosya girişlerini tetikleme
-        function triggerFileInput(id) {
-            document.getElementById(id).click();
+        let rootDirHandle = null;
+        let foundThreats = []; 
+        let scannedCount = 0;
+
+        const terminalLog = document.getElementById('terminal-log');
+        const statScannedCount = document.getElementById('stat-scanned-count');
+        const statThreatCount = document.getElementById('stat-threat-count');
+        const statStatus = document.getElementById('stat-status');
+        const step2Card = document.getElementById('step-2-card');
+        const step3Card = document.getElementById('step-3-card');
+        const btnClean = document.getElementById('btn-clean');
+        const btnRescan = document.getElementById('btn-rescan');
+        const btnWriteBat = document.getElementById('btn-write-bat');
+        const batInstructions = document.getElementById('bat-instructions');
+
+        function addLog(text, type = 'info') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            line.textContent = `> ${text}`;
+            terminalLog.appendChild(line);
+            terminalLog.scrollTop = terminalLog.scrollHeight;
         }
 
-        // Yükleme ekranı yönetimi
-        function showLoader(text) {
-            document.getElementById('loader-text').innerText = text;
-            document.getElementById('loader').style.display = 'flex';
+        function clearLog() {
+            terminalLog.innerHTML = '';
         }
 
-        function hideLoader() {
-            document.getElementById('loader').style.display = 'none';
-        }
-
-        // --- BİRLEŞTİRME İŞLEMLERİ ---
-        function handleMergeFiles(event) {
-            const files = Array.from(event.target.files);
-            files.forEach(file => {
-                if (file.type === "application/pdf") {
-                    mergeFilesList.push(file);
-                }
-            });
-            renderMergeList();
-            checkMergeButton();
-            event.target.value = '';
-        }
-
-        function renderMergeList() {
-            const list = document.getElementById('mergeList');
-            if (mergeFilesList.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:#64748b; padding:20px; margin:0;">Henüz dosya yüklenmedi.</p>';
-                return;
-            }
-
-            list.innerHTML = '';
-            mergeFilesList.forEach((file, index) => {
-                const item = document.createElement('div');
-                item.className = 'pdf-item';
-                item.innerHTML = `
-                    <span class="pdf-name">${file.name}</span>
-                    <div class="pdf-actions">
-                        <button class="action-btn" onclick="moveMergeItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
-                        <button class="action-btn" onclick="moveMergeItem(${index}, 1)" ${index === mergeFilesList.length - 1 ? 'disabled' : ''}>▼</button>
-                        <button class="action-btn delete" onclick="deleteMergeItem(${index})">✕</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        function moveMergeItem(index, direction) {
-            const targetIndex = index + direction;
-            if (targetIndex < 0 || targetIndex >= mergeFilesList.length) return;
-            const temp = mergeFilesList[index];
-            mergeFilesList[index] = mergeFilesList[targetIndex];
-            mergeFilesList[targetIndex] = temp;
-            renderMergeList();
-        }
-
-        function deleteMergeItem(index) {
-            mergeFilesList.splice(index, 1);
-            renderMergeList();
-            checkMergeButton();
-        }
-
-        function checkMergeButton() {
-            const btn = document.getElementById('btn-merge');
-            btn.disabled = mergeFilesList.length < 2;
-        }
-
-        async function executeMerge() {
-            showLoader("PDF dosyaları birleştiriliyor...");
+        // Sürücü Seçim İşlemi
+        btnSelectDir.addEventListener('click', async () => {
             try {
-                const { PDFDocument } = PDFLib;
-                const mergedPdf = await PDFDocument.create();
-
-                for (const file of mergeFilesList) {
-                    const bytes = await file.arrayBuffer();
-                    const pdf = await PDFDocument.load(bytes);
-                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                    copiedPages.forEach(page => mergedPdf.addPage(page));
-                }
-
-                const mergedPdfBytes = await mergedPdf.save();
-                downloadFile(mergedPdfBytes, "birlesmis_belge.pdf");
-            } catch (error) {
-                alert("PDF Birleştirme sırasında bir hata oluştu: " + error.message);
-            } finally {
-                hideLoader();
-            }
-        }
-
-
-        // --- BÖLME İŞLEMLERİ ---
-        async function handleSplitFile(event) {
-            const file = event.target.files[0];
-            if (!file || file.type !== "application/pdf") return;
-
-            splitFile = file;
-            showLoader("Dosya analiz ediliyor...");
-
-            try {
-                const { PDFDocument } = PDFLib;
-                const bytes = await file.arrayBuffer();
-                const pdf = await PDFDocument.load(bytes);
-                splitPageCount = pdf.getPageCount();
-
-                document.getElementById('split-name').innerText = `Dosya: ${file.name}`;
-                document.getElementById('split-pages').innerText = `${splitPageCount} Sayfa`;
-                document.getElementById('split-file-info').style.display = 'flex';
-                document.getElementById('btn-split').disabled = false;
-            } catch (error) {
-                alert("Dosya okunurken bir hata oluştu.");
-                splitFile = null;
-                document.getElementById('btn-split').disabled = true;
-            } finally {
-                hideLoader();
-            }
-        }
-
-        function parsePageRange(rangeStr, maxPages) {
-            const pages = [];
-            const parts = rangeStr.split(',');
-            for (let part of parts) {
-                part = part.trim();
-                if (part.includes('-')) {
-                    const [startStr, endStr] = part.split('-');
-                    const start = parseInt(startStr, 10);
-                    const end = parseInt(endStr, 10);
-                    if (!isNaN(start) && !isNaN(end)) {
-                        const s = Math.max(1, Math.min(start, maxPages));
-                        const e = Math.max(1, Math.min(end, maxPages));
-                        const step = s <= e ? 1 : -1;
-                        for (let i = s; s <= e ? i <= e : i >= e; i += step) {
-                            pages.push(i - 1);
-                        }
-                    }
-                } else {
-                    const pageNum = parseInt(part, 10);
-                    if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxPages) {
-                        pages.push(pageNum - 1);
-                    }
-                }
-            }
-            return pages;
-        }
-
-        async function executeSplit() {
-            const rangeStr = document.getElementById('page-range').value.trim();
-            if (!rangeStr) {
-                alert("Lütfen ayıklamak istediğiniz sayfaları belirtin.");
-                return;
-            }
-
-            const targetPages = parsePageRange(rangeStr, splitPageCount);
-            if (targetPages.length === 0) {
-                alert("Geçersiz sayfa aralığı belirtildi.");
-                return;
-            }
-
-            showLoader("Sayfalar ayıklanıyor...");
-            try {
-                const { PDFDocument } = PDFLib;
-                const bytes = await splitFile.arrayBuffer();
-                const pdf = await PDFDocument.load(bytes);
-                const splitPdf = await PDFDocument.create();
-
-                const copiedPages = await splitPdf.copyPages(pdf, targetPages);
-                copiedPages.forEach(page => splitPdf.addPage(page));
-
-                const splitPdfBytes = await splitPdf.save();
-                downloadFile(splitPdfBytes, "ayiklanmis_sayfalar.pdf");
-            } catch (error) {
-                alert("Bölme işlemi sırasında hata: " + error.message);
-            } finally {
-                hideLoader();
-            }
-        }
-
-
-        // --- DÖNDÜRME İŞLEMLERİ ---
-        async function handleRotateFile(event) {
-            const file = event.target.files[0];
-            if (!file || file.type !== "application/pdf") return;
-
-            rotateFile = file;
-            showLoader("Dosya analiz ediliyor...");
-
-            try {
-                const { PDFDocument } = PDFLib;
-                const bytes = await file.arrayBuffer();
-                const pdf = await PDFDocument.load(bytes);
-                rotatePageCount = pdf.getPageCount();
-
-                document.getElementById('rotate-name').innerText = `Dosya: ${file.name}`;
-                document.getElementById('rotate-pages').innerText = `${rotatePageCount} Sayfa`;
-                document.getElementById('rotate-file-info').style.display = 'flex';
-                document.getElementById('btn-rotate').disabled = false;
-            } catch (error) {
-                alert("Dosya okunurken bir hata oluştu.");
-                rotateFile = null;
-                document.getElementById('btn-rotate').disabled = true;
-            } finally {
-                hideLoader();
-            }
-        }
-
-        async function executeRotate() {
-            showLoader("PDF sayfaları döndürülüyor...");
-            try {
-                const { PDFDocument, degrees } = PDFLib;
-                const bytes = await rotateFile.arrayBuffer();
-                const pdf = await PDFDocument.load(bytes);
-                const pages = pdf.getPages();
-                
-                const angleInput = parseInt(document.getElementById('rotate-angle').value, 10);
-
-                pages.forEach(page => {
-                    const currentRotation = page.getRotation().angle;
-                    page.setRotation(degrees(currentRotation + angleInput));
+                // Okuma ve yazma yetkisi ile dizin seçtirilir
+                rootDirHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite'
                 });
 
-                const rotatedPdfBytes = await pdf.save();
-                downloadFile(rotatedPdfBytes, "dondurulmus_belge.pdf");
-            } catch (error) {
-                alert("Döndürme işlemi sırasında hata: " + error.message);
-            } finally {
-                hideLoader();
+                // Adım 2'yi aktif et
+                step2Card.style.opacity = '1';
+                step2Card.style.pointerEvents = 'all';
+                document.getElementById('step-1-card').classList.remove('active');
+                step2Card.classList.add('active');
+
+                await startScan();
+            } catch (err) {
+                console.error(err);
+                addLog('Sürücü seçimi iptal edildi veya erişim izni verilmedi: ' + err.message, 'danger');
             }
-        }
+        });
 
+        // Tarama İşlemi
+        async function startScan() {
+            if (!rootDirHandle) return;
+            clearLog();
+            addLog('Tarama başlatılıyor...', 'info');
+            
+            foundThreats = [];
+            scannedCount = 0;
+            
+            statScannedCount.textContent = '0';
+            statThreatCount.textContent = '0';
+            statStatus.textContent = 'Taranıyor...';
+            statStatus.style.color = 'var(--warning-color)';
 
-        // --- WORD DÖNÜŞTÜRME & OCR İŞLEMLERİ ---
-        async function handleWordFile(event) {
-            const file = event.target.files[0];
-            if (!file || file.type !== "application/pdf") return;
-
-            wordFile = file;
-            showLoader("PDF belgesi yükleniyor...");
+            btnClean.disabled = true;
+            btnRescan.disabled = true;
 
             try {
-                wordFileDataBytes = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: wordFileDataBytes }).promise;
-                wordPageCount = pdf.numPages;
+                await scanDirectory(rootDirHandle, "");
+                
+                statStatus.textContent = 'Tamamlandı';
+                statStatus.style.color = foundThreats.length > 0 ? 'var(--danger-color)' : 'var(--accent-color)';
+                btnRescan.disabled = false;
 
-                document.getElementById('word-name').innerText = `Dosya: ${file.name}`;
-                document.getElementById('word-pages').innerText = `${wordPageCount} Sayfa`;
-                document.getElementById('word-file-info').style.display = 'flex';
-                document.getElementById('btn-word').disabled = false;
-            } catch (error) {
-                alert("Dosya yüklenirken bir hata oluştu: " + error.message);
-                wordFile = null;
-                document.getElementById('btn-word').disabled = true;
-            } finally {
-                hideLoader();
-            }
-        }
-
-        async function executeWordConversion() {
-            if (!wordFileDataBytes) return;
-
-            const useOcr = document.getElementById('use-ocr').checked;
-            showLoader("PDF okunuyor...");
-
-            try {
-                const pdf = await pdfjsLib.getDocument({ data: wordFileDataBytes }).promise;
-                let fullText = "";
-
-                if (useOcr) {
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        showLoader(`Sayfa ${i}/${pdf.numPages} resme dönüştürülüyor...`);
-                        const page = await pdf.getPage(i);
-                        
-                        const viewport = page.getViewport({ scale: 2.0 });
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-
-                        await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-                        showLoader(`Türkçe OCR İşleniyor: Sayfa ${i}/${pdf.numPages}...`);
-                        
-                        const result = await Tesseract.recognize(
-                            canvas,
-                            'tur',
-                            {
-                                logger: m => {
-                                    if (m.status === 'recognizing text') {
-                                        showLoader(`Sayfa ${i}/${pdf.numPages} OCR yapılıyor: %${Math.round(m.progress * 100)}`);
-                                    }
-                                }
-                            }
-                        );
-                        
-                        fullText += result.data.text + "\n\n";
-                    }
+                if (foundThreats.length > 0) {
+                    addLog(`Toplam ${foundThreats.length} adet zararlı kısayol/dosya tespit edildi!`, 'danger');
+                    btnClean.disabled = false;
                 } else {
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        showLoader(`Metin ayıklanıyor: Sayfa ${i}/${pdf.numPages}`);
-                        const page = await pdf.getPage(i);
-                        const textContent = await page.getTextContent();
-                        
-                        const pageText = textContent.items.map(item => item.str).join(' ');
-                        fullText += pageText + "\n\n";
-                    }
+                    addLog('Harika! Herhangi bir tehlikeli kısayol virüsü izine rastlanmadı.', 'success');
                 }
 
-                if (!fullText.trim()) {
-                    alert("Uyarı: Belgeden hiç metin ayıklanamadı. PDF taranmış bir resim olabilir, lütfen 'OCR' seçeneğini işaretleyerek tekrar deneyin.");
-                    return;
-                }
+                // Klasörler gizli kalmış olabileceği için her durumda Adım 3'ü aktif et
+                step3Card.style.opacity = '1';
+                step3Card.style.pointerEvents = 'all';
+                btnWriteBat.disabled = false;
 
-                const docTemplate = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta charset="utf-8">
-                    <title>Dönüştürülen PDF Belgesi</title>
-                    <style>
-                        body {
-                            font-family: 'Calibri', 'Arial', sans-serif;
-                            font-size: 11pt;
-                            line-height: 1.5;
-                        }
-                        p {
-                            margin: 0 0 12pt 0;
-                            text-align: justify;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${fullText.replace(/\n/g, '<br>')}
-                </body>
-                </html>`;
-
-                const blob = new Blob(['\ufeff' + docTemplate], { type: 'application/msword;charset=utf-8' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = wordFile.name.replace('.pdf', '') + "_donusturulen.doc";
-                link.click();
-
-            } catch (error) {
-                alert("Dönüştürme başarısız oldu: " + error.message);
-            } finally {
-                hideLoader();
+            } catch (err) {
+                addLog('Tarama sırasında hata oluştu: ' + err.message, 'danger');
+                statStatus.textContent = 'Hata Oluştu';
+                statStatus.style.color = 'var(--danger-color)';
             }
         }
 
+        // Klasörleri ve Alt Klasörleri Tarayan Özyinelemeli (Recursive) Fonksiyon
+        async function scanDirectory(dirHandle, relativePath) {
+            for await (const entry of dirHandle.values()) {
+                scannedCount++;
+                statScannedCount.textContent = scannedCount;
 
-        // Genel İndirme Yardımcısı
-        function downloadFile(bytes, filename) {
-            const blob = new Blob([bytes], { type: "application/pdf" });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
+                const currentPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+
+                if (entry.kind === 'file') {
+                    const lowerName = entry.name.toLowerCase();
+                    
+                    // Kısayol virüsü belirtileri:
+                    // 1. .lnk dosyaları
+                    // 2. Kök dizindeki autorun.inf dosyası
+                    // 3. Kök dizindeki şüpheli vbs, vbe, js, scr dosyaları
+                    const isRoot = relativePath === "";
+                    let isThreat = false;
+
+                    if (lowerName.endsWith('.lnk')) {
+                        isThreat = true;
+                    } else if (isRoot && lowerName === 'autorun.inf') {
+                        isThreat = true;
+                    } else if (isRoot && (lowerName.endsWith('.vbs') || lowerName.endsWith('.vbe') || lowerName.endsWith('.js') || lowerName.endsWith('.scr'))) {
+                        isThreat = true;
+                    }
+
+                    if (isThreat) {
+                        foundThreats.push({ parentHandle: dirHandle, name: entry.name, path: currentPath });
+                        addLog(`[TEHDİT] Kısayol/Zararlı bulundu: ${currentPath}`, 'danger');
+                        statThreatCount.textContent = foundThreats.length;
+                    } else {
+                        addLog(`Güvenli Öğe: ${entry.name}`, 'info');
+                    }
+
+                } else if (entry.kind === 'directory') {
+                    // Windows sistem ve geri dönüşüm kutusu klasörlerini kilitleme yapmaması için atlıyoruz
+                    const lowerName = entry.name.toLowerCase();
+                    if (lowerName === 'system volume information' || lowerName === '$recycle.bin' || lowerName === 'recycler') {
+                        addLog(`Sistem Klasörü Atlandı: ${entry.name}`, 'info');
+                        continue;
+                    }
+                    
+                    addLog(`Klasör Taranıyor: ${currentPath}`, 'info');
+                    await scanDirectory(entry, currentPath);
+                }
+            }
         }
+
+        // Temizleme İşlemi (Silme)
+        btnClean.addEventListener('click', async () => {
+            if (foundThreats.length === 0) return;
+            
+            addLog('Temizlik işlemi başlatılıyor...', 'info');
+            let successCount = 0;
+
+            for (const threat of foundThreats) {
+                try {
+                    await threat.parentHandle.removeEntry(threat.name);
+                    addLog(`Başarıyla Silindi: ${threat.path}`, 'success');
+                    successCount++;
+                } catch (err) {
+                    addLog(`Silinemedi (${threat.path}): ${err.message}`, 'danger');
+                }
+            }
+
+            addLog(`${successCount}/${foundThreats.length} tehdit başarıyla imha edildi!`, 'success');
+            
+            foundThreats = [];
+            statThreatCount.textContent = '0';
+            btnClean.disabled = true;
+            statStatus.textContent = 'Temizlendi';
+            statStatus.style.color = 'var(--accent-color)';
+        });
+
+        // Tekrar Tara Butonu
+        btnRescan.addEventListener('click', startScan);
+
+        // BAT Dosyası Oluşturma İşlemi
+        btnWriteBat.addEventListener('click', async () => {
+            if (!rootDirHandle) return;
+
+            addLog('Kurtarma betiği USB içerisine yazılıyor...', 'info');
+
+            // Türkçe Windows karakter uyumlu kurtarıcı BAT içeriği
+            const batContent = `@echo off
+chcp 65001 > nul
+color 0a
+title BTR USB Dosya Kurtarici
+echo ==========================================================
+echo          BTR USB DOSYA VE KLASOR KURTARICI (OFFLINE)
+echo ==========================================================
+echo.
+echo Bu betik, kisayol virusu tarafindan gizlenen orijinal 
+echo klasorlerinizin oziteliklerini duzelterek gorunur yapar.
+echo.
+echo Islem suruyor, lutfen bekleyiniz...
+echo.
+
+:: Klasörlerin ve dosyaların gizlilik özniteliklerini temizler
+attrib -h -r -s /s /d *.*
+
+echo.
+echo [BASARILI] Tum klasorler ve dosyalar basariyla kurtarildi!
+echo.
+echo Bu yardimci betik simdi kendini imha edecektir.
+echo Cikis yapmak icin bir tusa basiniz...
+pause > nul
+(goto) 2>nul & del "%~f0"
+`;
+
+            try {
+                // USB kök dizininde 'kurtar.bat' oluşturur veya üzerine yazar
+                const fileHandle = await rootDirHandle.getFileHandle('kurtar.bat', { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(batContent);
+                await writable.close();
+
+                addLog('kurtar.bat dosyası USB kök dizinine başarıyla yazıldı!', 'success');
+                batInstructions.style.display = 'block';
+                
+                step3Card.classList.add('active');
+                btnWriteBat.disabled = true;
+            } catch (err) {
+                addLog('HATA: kurtar.bat dosyası oluşturulamadı: ' + err.message, 'danger');
+            }
+        });
     </script>
 </body>
 </html>
