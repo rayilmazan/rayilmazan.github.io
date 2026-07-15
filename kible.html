@@ -3,52 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kıble Yön Bulucu</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Kıble Bulucu (Pro)</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css' rel='stylesheet' />
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
-        #map { height: 100vh; width: 100vw; }
-        #overlay {
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        #indicator { 
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 8px; z-index: 1000;
+            background: rgba(0,0,0,0.7); color: white; padding: 15px; border-radius: 10px; z-index: 1;
+            font-family: sans-serif; text-align: center;
         }
     </style>
 </head>
 <body>
 
+    <div id="indicator">Kıbleye yönelmek için haritayı döndürün...</div>
     <div id="map"></div>
-    <div id="overlay">Telefonu Kabe çizgisine hizalayın</div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const map = L.map('map', { zoomControl: false }).setView([0, 0], 19);
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+        // Tokenınızı buraya yapıştırın
+        mapboxgl.accessToken = 'BURAYA_MAPBOX_TOKENINIZI_YAZIN';
 
-        const kabe = [21.4225, 39.8262];
-        let userMarker, polyline;
-
-        // 1. Konumu takip et
-        navigator.geolocation.watchPosition((pos) => {
-            const userPos = [pos.coords.latitude, pos.coords.longitude];
-            if (!userMarker) {
-                userMarker = L.marker(userPos).addTo(map);
-            } else {
-                userMarker.setLatLng(userPos);
-            }
-            map.setView(userPos, 19);
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-v9', // Uydu görüntüsü
+            center: [35, 39],
+            zoom: 18,
+            pitch: 60 // 3D eğim
         });
 
-        // 2. Cihaz yönünü (Orientation) dinle
+        // Kullanıcı konumunu al ve haritayı güncelle
+        navigator.geolocation.watchPosition((pos) => {
+            const userPos = [pos.coords.longitude, pos.coords.latitude];
+            
+            // Haritayı kullanıcının konumuna odakla
+            map.flyTo({ center: userPos, zoom: 19 });
+
+            // Kabe'ye doğru çizgi ekle (Basit geometri)
+            if (map.getSource('route')) {
+                map.getSource('route').setData({
+                    "type": "Feature",
+                    "geometry": { "type": "LineString", "coordinates": [userPos, [39.8262, 21.4225]] }
+                });
+            } else {
+                map.addSource('route', { 'type': 'geojson', 'data': {
+                    "type": "Feature", "geometry": { "type": "LineString", "coordinates": [userPos, [39.8262, 21.4225]] }
+                }});
+                map.addLayer({
+                    'id': 'route', 'type': 'line', 'source': 'route',
+                    'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                    'paint': { 'line-color': '#ff0000', 'line-width': 8 }
+                });
+            }
+        }, null, { enableHighAccuracy: true });
+
+        // Cihazın yönünü dinle ve haritayı döndür
         window.addEventListener('deviceorientation', (event) => {
-            // iOS için webkitCompassHeading, Android için alpha
-            let compass = event.webkitCompassHeading || (360 - event.alpha);
-            
-            // Haritayı cihazın baktığı yöne döndür
-            // Not: Leaflet standart olarak haritayı döndürmez, CSS transform kullanılır
-            document.getElementById('map').style.transform = `rotate(${-compass}deg)`;
-            
-            // Burada kıble çizgisi ile telefonun yönü arasındaki farkı hesaplayıp
-            // telefon doğru yönü gösterdiğinde renk değişimi tetiklenebilir.
+            let rotate = event.webkitCompassHeading || (360 - event.alpha);
+            map.setBearing(rotate); // Haritayı pusula yönüne döndür
         }, true);
     </script>
 </body>
