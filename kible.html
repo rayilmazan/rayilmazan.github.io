@@ -3,44 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kıble Uydu Görünümü</title>
+    <title>Kıble Yön Bulucu</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
         #map { height: 100vh; width: 100vw; }
+        #overlay {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 8px; z-index: 1000;
+        }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
+    <div id="overlay">Telefonu Kabe çizgisine hizalayın</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. Haritayı başlat ve tam ekran yap
-        const map = L.map('map', { zoomControl: false }).setView([0, 0], 18);
+        const map = L.map('map', { zoomControl: false }).setView([0, 0], 19);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-        // 2. Uydu katmanını ekle (ESRI Satellite)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri'
-        }).addTo(map);
-
-        // Kabe Koordinatları
         const kabe = [21.4225, 39.8262];
+        let userMarker, polyline;
 
-        // 3. Konumu takip et
+        // 1. Konumu takip et
         navigator.geolocation.watchPosition((pos) => {
             const userPos = [pos.coords.latitude, pos.coords.longitude];
-            
-            map.setView(userPos, 19); // Uydu detayını artırmak için zoom 19
-
-            // Kullanıcı işaretçisi ve Kıble çizgisi
-            map.eachLayer((layer) => { if (layer instanceof L.Polyline || layer instanceof L.Marker) map.removeLayer(layer); });
-            
-            L.marker(userPos).addTo(map).bindPopup("Siz buradasınız").openPopup();
-            
-            // Kıble çizgisi (Kırmızı, 5px kalınlığında)
-            L.polyline([userPos, kabe], { color: 'red', weight: 5, opacity: 0.8 }).addTo(map);
+            if (!userMarker) {
+                userMarker = L.marker(userPos).addTo(map);
+            } else {
+                userMarker.setLatLng(userPos);
+            }
+            map.setView(userPos, 19);
         });
+
+        // 2. Cihaz yönünü (Orientation) dinle
+        window.addEventListener('deviceorientation', (event) => {
+            // iOS için webkitCompassHeading, Android için alpha
+            let compass = event.webkitCompassHeading || (360 - event.alpha);
+            
+            // Haritayı cihazın baktığı yöne döndür
+            // Not: Leaflet standart olarak haritayı döndürmez, CSS transform kullanılır
+            document.getElementById('map').style.transform = `rotate(${-compass}deg)`;
+            
+            // Burada kıble çizgisi ile telefonun yönü arasındaki farkı hesaplayıp
+            // telefon doğru yönü gösterdiğinde renk değişimi tetiklenebilir.
+        }, true);
     </script>
 </body>
 </html>
