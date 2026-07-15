@@ -2,63 +2,54 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Selçuklu Motif Üreticisi</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <title>Pixel to Vector Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/potrace@2.1.8/potrace.min.js"></script>
     <style>
-        body { display: flex; flex-direction: column; align-items: center; background: #2c3e50; color: white; font-family: sans-serif; }
-        .editor-container { background: white; padding: 20px; border-radius: 15px; margin-top: 20px; }
-        .controls { margin-bottom: 15px; display: flex; gap: 10px; }
-        button { padding: 10px; cursor: pointer; border: none; border-radius: 5px; background: #e67e22; color: white; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #222; color: #eee; }
+        .container { background: #333; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        #preview { border: 1px solid #555; max-width: 500px; display: block; margin: 10px 0; }
     </style>
 </head>
 <body>
 
-    <h1>Selçuklu Motif Üreticisi</h1>
-    <div class="editor-container">
-        <div class="controls">
-            <button onclick="addStar(8)">8'li Yıldız Ekle</button>
-            <button onclick="addStar(12)">12'li Yıldız Ekle</button>
-            <button onclick="canvas.clear()">Tuvali Temizle</button>
-            <button onclick="downloadAsImage()" style="background: #27ae60;">Görseli İndir</button>
-        </div>
-        <canvas id="c" width="600" height="600" style="border:1px solid #ccc"></canvas>
+    <div class="container">
+        <h2>Görüntüden Vektöre (SVG)</h2>
+        <input type="file" id="upload" accept="image/*">
+        <br>
+        <img id="preview" src="" alt="Önizleme">
+        <button id="convertBtn">Vektöre Dönüştür ve İndir</button>
     </div>
 
     <script>
-        const canvas = new fabric.Canvas('c');
+        const upload = document.getElementById('upload');
+        const preview = document.getElementById('preview');
+        const convertBtn = document.getElementById('convertBtn');
 
-        // Geometrik motif çizim mantığı (Selçuklu yıldızı)
-        function addStar(points) {
-            const star = new fabric.Polygon(generateStarPoints(points), {
-                fill: 'transparent',
-                stroke: '#8e44ad',
-                strokeWidth: 3,
-                left: 150,
-                top: 150
-            });
-            canvas.add(star);
-        }
+        upload.addEventListener('change', (e) => {
+            const reader = new FileReader();
+            reader.onload = (event) => { preview.src = event.target.result; };
+            reader.readAsDataURL(e.target.files[0]);
+        });
 
-        function generateStarPoints(n) {
-            let points = [];
-            for (let i = 0; i < n * 2; i++) {
-                let radius = (i % 2 === 0) ? 100 : 50;
-                let angle = (i * Math.PI) / n;
-                points.push({
-                    x: radius * Math.cos(angle) + 150,
-                    y: radius * Math.sin(angle) + 150
+        convertBtn.addEventListener('click', () => {
+            if (!preview.src) return alert("Önce resim yükleyin!");
+
+            // Potrace motorunu başlat
+            const trace = new Potrace.Potrace();
+            trace.loadImage(preview.src, () => {
+                trace.process(() => {
+                    const svg = trace.getSVG(1); // 1 = hassasiyet (1-10 arası)
+                    
+                    // İndirme işlemini tetikle
+                    const blob = new Blob([svg], { type: 'image/svg+xml' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'vektor_cikti.svg';
+                    link.click();
                 });
-            }
-            return points;
-        }
-
-        function downloadAsImage() {
-            const dataURL = canvas.toDataURL({format: 'png'});
-            const link = document.createElement('a');
-            link.download = 'selcuklu-motifim.png';
-            link.href = dataURL;
-            link.click();
-        }
+            });
+        });
     </script>
 </body>
 </html>
