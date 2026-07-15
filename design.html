@@ -2,42 +2,59 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Selçuklu Tasarım Editörü</title>
+    <title>Selçuklu & Osmanlı Tasarım Editörü</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f4f4f4; }
-        .toolbar { margin: 10px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        canvas { border: 2px solid #333; background: white; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #eef; display: flex; flex-direction: column; align-items: center; }
+        .controls { background: #fff; padding: 15px; border-radius: 10px; margin: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        canvas { border: 2px solid #333; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        button { cursor: pointer; padding: 8px 15px; border: none; border-radius: 5px; background: #4a6741; color: white; }
+        button:hover { background: #354a2e; }
     </style>
 </head>
 <body>
 
-    <div class="toolbar">
-        <button onclick="addMotif('https://svgshare.com/i/123.svg')">Selçuklu Motifi Ekle</button>
+    <div class="controls">
+        <select id="sizeSelector" onchange="changeSize()">
+            <option value="afis">Afiş (A4)</option>
+            <option value="brosur">Broşür (Yatay)</option>
+            <option value="yaka">Yaka Kartı</option>
+        </select>
+        <button onclick="addMotif('https://raw.githubusercontent.com/fabricjs/fabric.js/master/lib/fabric.js')">Motif Ekle</button>
         <button onclick="addText()">Metin Ekle</button>
-        <input type="file" id="logoInput" onchange="addLogo(this)">
-        <button onclick="downloadPDF()" style="background: green; color: white;">PDF Olarak İndir</button>
+        <input type="file" id="logoInput" onchange="addLogo(this)" style="display:none">
+        <button onclick="document.getElementById('logoInput').click()">Logo Yükle</button>
+        <button onclick="downloadPDF()" style="background: #a0522d;">PDF İndir</button>
+        <button onclick="canvas.getActiveObject() ? canvas.remove(canvas.getActiveObject()) : null" style="background: #b22222;">Sil</button>
     </div>
 
-    <canvas id="canvas" width="500" height="700"></canvas>
+    <canvas id="canvas"></canvas>
 
     <script>
-        const canvas = new fabric.Canvas('canvas');
+        const canvas = new fabric.Canvas('canvas', { width: 595, height: 842 });
 
-        // Motif Ekleme
-        function addMotif(url) {
-            fabric.loadSVGFromURL(url, (objects, options) => {
-                const svg = fabric.util.groupSVGElements(objects, options);
-                svg.scale(0.5);
-                canvas.add(svg);
-            });
+        // Boyut Değiştirme
+        function changeSize() {
+            const size = document.getElementById('sizeSelector').value;
+            if(size === 'afis') canvas.setDimensions({width: 595, height: 842});
+            if(size === 'brosur') canvas.setDimensions({width: 842, height: 595});
+            if(size === 'yaka') canvas.setDimensions({width: 300, height: 400});
         }
 
         // Metin Ekleme
         function addText() {
-            const text = new fabric.IText('Okul İsmi Buraya', { left: 100, top: 100, fontFamily: 'Arial' });
+            const text = new fabric.IText('Düzenlemek için tıklayın...', { left: 50, top: 50, fontSize: 20 });
             canvas.add(text);
+        }
+
+        // Motif Ekleme (Örnek SVG - Kendi SVG linklerinizle değiştirebilirsiniz)
+        function addMotif(url) {
+            fabric.loadSVGFromURL('https://upload.wikimedia.org/wikipedia/commons/4/4e/Islamic_geometric_pattern.svg', (objects, options) => {
+                const svg = fabric.util.groupSVGElements(objects, options);
+                svg.scale(0.3).set({left: 100, top: 100});
+                canvas.add(svg);
+            });
         }
 
         // Logo Ekleme
@@ -45,7 +62,7 @@
             const reader = new FileReader();
             reader.onload = (event) => {
                 fabric.Image.fromURL(event.target.result, (img) => {
-                    img.scale(0.2);
+                    img.scale(0.2).set({left: 50, top: 50});
                     canvas.add(img);
                 });
             };
@@ -54,13 +71,12 @@
 
         // PDF İndirme
         function downloadPDF() {
-            const dataURL = canvas.toDataURL({ format: 'png', quality: 1.0 });
+            const dataURL = canvas.toDataURL({ format: 'jpeg', quality: 1.0 });
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            pdf.addImage(dataURL, 'PNG', 10, 10, 180, 250);
-            pdf.save("tasarimim.pdf");
+            const pdf = new jsPDF('p', 'px', [canvas.width, canvas.height]);
+            pdf.addImage(dataURL, 'JPEG', 0, 0, canvas.width, canvas.height);
+            pdf.save("Selcuklu_Tasarimim.pdf");
         }
     </script>
 </body>
 </html>
-
