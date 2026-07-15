@@ -75,7 +75,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 350px;
+            height: 65vh; /* Mobil ekranlarda daha fazla dikey alan */
+            min-height: 450px;
             overflow: hidden;
         }
 
@@ -86,32 +87,35 @@
             position: absolute;
         }
 
-        /* Tarama Alanı Odak Çerçevesi */
+        /* Dikey Uzun A4 Odak Çerçevesi */
         .scan-overlay {
             position: absolute;
-            width: 85%;
-            height: 60%;
-            border: 2px dashed var(--primary-hover);
+            width: 75%;
+            max-width: 320px;
+            aspect-ratio: 1 / 1.414; /* Tam A4 Kağıdı Geometrik Oranı */
+            border: 3px dashed var(--primary-hover);
             border-radius: 12px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
             pointer-events: none;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
         .scan-overlay::before {
-            content: "METNİ BU ALANA HİZALAYIN";
+            content: "A4 BELGEYİ BURAYA HİZALAYIN";
             color: var(--primary-hover);
             font-size: 0.75rem;
             font-weight: bold;
-            background: rgba(9, 13, 22, 0.8);
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
+            background: rgba(9, 13, 22, 0.85);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
             letter-spacing: 1px;
+            text-align: center;
         }
 
-        /* Kontrol Paneli (Mobil alt menü tasarımı) */
+        /* Kontrol Paneli */
         .controls {
             background-color: var(--bg-card);
             padding: 1.25rem;
@@ -166,7 +170,7 @@
         .loading-overlay {
             position: absolute;
             inset: 0;
-            background-color: rgba(9, 13, 22, 0.9);
+            background-color: rgba(9, 13, 22, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -245,7 +249,7 @@
 
     <header>
         <h1 class="logo-title">📝 Tarayıcıdan Word'e</h1>
-        <p class="logo-subtitle">Türkçe Karakter Uyumlu Yerel OCR Çözümü</p>
+        <p class="logo-subtitle">A4 Boyutlu Türkçe Karakter Destekli OCR</p>
     </header>
 
     <main>
@@ -272,7 +276,7 @@
         <div id="loading-section" class="loading-overlay hidden">
             <div class="spinner"></div>
             <h3 id="status-text" style="color: var(--primary-hover);">Görüntü İşleniyor...</h3>
-            <p id="substatus-text" style="font-size: 0.8rem; color: var(--text-muted);">Türkçe OCR modülü hazırlanıyor</p>
+            <p id="substatus-text" style="font-size: 0.8rem; color: var(--text-muted);">Türkçe OCR modülü hazırlanıyor...</p>
             <div class="progress-container">
                 <div id="progress-bar" class="progress-bar"></div>
             </div>
@@ -326,8 +330,8 @@
             const constraints = {
                 video: {
                     facingMode: useFrontCamera ? "user" : "environment",
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    width: { ideal: 1920 }, // Yüksek çözünürlük ile net okuma sağlar
+                    height: { ideal: 1080 }
                 },
                 audio: false
             };
@@ -336,7 +340,7 @@
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
             } catch (err) {
-                alert("Kameraya erişilemedi! İzin verdiğinizden emin olun.");
+                alert("Kameraya erişilemedi! Tarayıcı izinlerini kontrol edin.");
                 console.error(err);
             }
         }
@@ -346,59 +350,90 @@
             startCamera();
         }
 
-        // --- 2. GÖRÜNTÜ YAKALAMA VE OCR (TESSERACT) ---
+        // --- 2. GÖRÜNTÜ ÖN İŞLEME (KONTRAST FİLTRESİ) ---
+        function enhanceContrast(ctx, width, height) {
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const data = imgData.data;
+            
+            // Metinlerin arka plandan ayrışması için kontrastı yükseltiyoruz
+            const contrast = 80; // Kontrast artış oranı
+            const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+
+            for (let i = 0; i < data.length; i += 4) {
+                // Gri tonlama
+                const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+                
+                // Kontrast formülü
+                let newValue = factor * (gray - 128) + 128;
+                newValue = Math.max(0, Math.min(255, newValue));
+
+                data[i] = newValue;     // R
+                data[i + 1] = newValue; // G
+                data[i + 2] = newValue; // B
+            }
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        // --- 3. KAMERA YAKALAMA VE SIFIR HATA SİNYAL MOTORU ---
         async function captureAndOCR() {
-            // Saniyeyi dondurup canvas'a çiziyoruz
             const ctx = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            
+            // Resmi canvas üzerine çiz
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Görüntüyü base64 formatına çevirip işleme alıyoruz
+            // Filtreyi uygula
+            enhanceContrast(ctx, canvas.width, canvas.height);
+
             const imageDataUrl = canvas.toDataURL('image/jpeg');
 
-            // Ekran geçişlerini yönet
             captureSection.classList.add('hidden');
             loadingSection.classList.remove('hidden');
             
-            statusText.innerText = "Sistem Hazırlanıyor...";
-            substatusText.innerText = "Türkçe dil kütüphanesi yükleniyor (İlk seferde internet gerekebilir)...";
+            statusText.innerText = "Sistem Başlatılıyor...";
+            substatusText.innerText = "Türkçe dil modülü yükleniyor (İlk seferde internet bağlantısı gerekir)...";
             progressBar.style.width = "0%";
 
             try {
-                // Tesseract işleyicisini oluştur ve Türkçe dil setini tanımla
-                const worker = await Tesseract.createWorker('tur');
-                
-                // OCR ilerlemesini takip et
-                worker.logger = (m) => {
-                    if (m.status === 'recognizing text') {
-                        statusText.innerText = "Metin Tanınıyor...";
-                        const progressPercent = Math.round(m.progress * 100);
-                        substatusText.innerText = `%${progressPercent} tamamlandı`;
-                        progressBar.style.width = `${progressPercent}%`;
+                // CORS ve dosya protokolü hatalarını ezmek için doğrudan Tesseract API çağrısı
+                const result = await Tesseract.recognize(
+                    imageDataUrl,
+                    'tur',
+                    {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                statusText.innerText = "Metin Çözümleniyor...";
+                                const progressPercent = Math.round(m.progress * 100);
+                                substatusText.innerText = `%${progressPercent} tamamlandı`;
+                                progressBar.style.width = `${progressPercent}%`;
+                            } else if (m.status === 'loading tesseract core') {
+                                statusText.innerText = "Yapay Zeka Yükleniyor...";
+                                substatusText.innerText = "Dil işleme motoru çekirdeği aktif ediliyor...";
+                            }
+                        }
                     }
-                };
+                );
 
-                // Resmi analiz et
-                const ret = await worker.recognize(imageDataUrl);
-                await worker.terminate();
+                if (!result || !result.data) {
+                    throw new Error("Görüntüden okunabilir bir metin çıkarılamadı.");
+                }
 
-                // Çıkan metni temizle ve düzenleme alanına yansıt
-                const cleanedText = cleanOCRText(ret.data.text);
-                outputTextarea.value = cleanedText;
+                // Taranan metni yerleştir
+                outputTextarea.value = cleanOCRText(result.data.text);
 
-                // Kamera akışını kapatıp editörü göster
                 stopCamera();
                 loadingSection.classList.add('hidden');
                 editorSection.classList.remove('hidden');
 
             } catch (err) {
-                alert("Dönüştürme sırasında hata oluştu: " + err.message);
+                console.error("OCR Hatası: ", err);
+                alert("Dönüştürme Hatası!\n\nDetay: " + err.message + "\n\nNot: Eğer bu aracı İLK KEZ açıyorsanız, Türkçe dil paketini kendi hafızasına kaydedebilmesi için aktif bir internet bağlantınız bulunmalıdır. Sonraki kullanımlarda internetsiz çalışacaktır.");
                 resetApp();
             }
         }
 
-        // Türkçe karakterlerde oluşabilecek ufak OCR hatalarını optimize eden basit filtre
+        // Türkçe harfleri optimize etme filtresi
         function cleanOCRText(text) {
             return text
                 .replace(/I1/g, 'ı')
@@ -406,15 +441,15 @@
                 .trim();
         }
 
-        // --- 3. WORD (.DOC) AKTARMA MANTIĞI ---
+        // --- 4. TR KARAKTER UYUMLU WORD (.DOC) AKTARIMI ---
         function exportToWord() {
             const text = outputTextarea.value;
             if (!text) {
-                alert("İndirilecek metin bulunamadı!");
+                alert("İçerik boş, önce metin taramalısınız!");
                 return;
             }
 
-            // Word tarafından sorunsuzca okunabilen HTML şablonu (UTF-8 ve Türkçe karakterleri doğrudan korur)
+            // Word tarafından doğrudan UTF-8 olarak yorumlanacak şık şablon
             const htmlContent = `
                 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                 <head>
@@ -437,22 +472,20 @@
             const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             
-            // İndirme işlemini tetikle
             const a = document.createElement('a');
             const date = new Date().toISOString().slice(0, 10);
             a.href = url;
-            a.download = `Tarama_Belgesi_${date}.doc`;
+            a.download = `Belge_Tarama_${date}.doc`;
             document.body.appendChild(a);
             a.click();
             
-            // Temizlik
             setTimeout(() => {
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             }, 0);
         }
 
-        // --- YARDIMCI FONKSİYONLAR ---
+        // --- GENEL FONKSİYONLAR ---
         function copyToClipboard() {
             outputTextarea.select();
             document.execCommand('copy');
@@ -473,9 +506,8 @@
             }
         }
 
-        // Uygulama açılışında kamerayı doğrudan aktifleştir
+        // Başlangıçta kamerayı otomatik çalıştır
         window.addEventListener('load', startCamera);
     </script>
 </body>
 </html>
-
