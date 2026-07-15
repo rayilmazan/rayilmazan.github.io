@@ -1,1 +1,481 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kameradan Word'e Metin Dönüştürücü</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #151f32;
+            --bg-input: #1e293b;
+            --primary: #0284c7;
+            --primary-hover: #38bdf8;
+            --accent: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .logo-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--primary-hover);
+        }
+
+        .logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Kamera Arayüzü */
+        .camera-wrapper {
+            position: relative;
+            flex: 1;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 350px;
+            overflow: hidden;
+        }
+
+        #camera-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+        }
+
+        /* Tarama Alanı Odak Çerçevesi */
+        .scan-overlay {
+            position: absolute;
+            width: 85%;
+            height: 60%;
+            border: 2px dashed var(--primary-hover);
+            border-radius: 12px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-overlay::before {
+            content: "METNİ BU ALANA HİZALAYIN";
+            color: var(--primary-hover);
+            font-size: 0.75rem;
+            font-weight: bold;
+            background: rgba(9, 13, 22, 0.8);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Kontrol Paneli (Mobil alt menü tasarımı) */
+        .controls {
+            background-color: var(--bg-card);
+            padding: 1.25rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-capture {
+            background-color: var(--accent);
+            flex: 1.2;
+            font-size: 1rem;
+            padding: 1rem 1.5rem;
+        }
+
+        /* OCR Yükleme Ekranı */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(9, 13, 22, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            z-index: 10;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--border);
+            border-bottom-color: var(--primary-hover);
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 300px;
+            background-color: var(--border);
+            height: 8px;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar {
+            background-color: var(--primary-hover);
+            width: 0%;
+            height: 100%;
+            transition: width 0.1s;
+        }
+
+        /* Düzenleme Alanı */
+        .editor-wrapper {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+            background-color: var(--bg-dark);
+        }
+
+        .text-editor {
+            width: 100%;
+            flex: 1;
+            min-height: 250px;
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+
+        .text-editor:focus {
+            border-color: var(--primary-hover);
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="logo-title">📝 Tarayıcıdan Word'e</h1>
+        <p class="logo-subtitle">Türkçe Karakter Uyumlu Yerel OCR Çözümü</p>
+    </header>
+
+    <main>
+        
+        <div id="capture-section" class="flex-1 flex flex-col">
+            <div class="camera-wrapper">
+                <video id="camera-preview" autoplay playsinline></video>
+                <div class="scan-overlay"></div>
+                <canvas id="snapshot-canvas" class="hidden"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="switchCamera()">
+                        🔄 Çevir
+                    </button>
+                    <button class="btn btn-capture" onclick="captureAndOCR()">
+                        📷 Metni Tara
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-section" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <h3 id="status-text" style="color: var(--primary-hover);">Görüntü İşleniyor...</h3>
+            <p id="substatus-text" style="font-size: 0.8rem; color: var(--text-muted);">Türkçe OCR modülü hazırlanıyor</p>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <div id="editor-section" class="editor-wrapper hidden">
+            <h3 style="color: var(--primary-hover);">Taranan Metin</h3>
+            <p style="font-size: 0.75rem; color: var(--text-muted);">Word belgesine aktarmadan önce metni düzenleyebilirsiniz:</p>
+            
+            <textarea id="text-output" class="text-editor" placeholder="Kameradan okunan metin burada belirecek..."></textarea>
+            
+            <div class="button-group" style="flex-direction: column;">
+                <button class="btn" onclick="exportToWord()" style="width: 100%; background-color: var(--success);">
+                    💾 Word Belgesi Olarak İndir (.doc)
+                </button>
+                <div style="display: flex; gap: 0.5rem; width: 100%;">
+                    <button class="btn btn-secondary" onclick="copyToClipboard()">
+                        📋 Kopyala
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetApp()" style="background-color: rgba(244, 63, 94, 0.1); color: #f43f5e; border-color: rgba(244, 63, 94, 0.2);">
+                        🗑️ Yeni Tarama
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentStream = null;
+        let useFrontCamera = false;
+
+        const video = document.getElementById('camera-preview');
+        const canvas = document.getElementById('snapshot-canvas');
+        const outputTextarea = document.getElementById('text-output');
+        
+        const captureSection = document.getElementById('capture-section');
+        const loadingSection = document.getElementById('loading-section');
+        const editorSection = document.getElementById('editor-section');
+        
+        const statusText = document.getElementById('status-text');
+        const substatusText = document.getElementById('substatus-text');
+        const progressBar = document.getElementById('progress-bar');
+
+        // --- 1. KAMERA YÖNETİMİ ---
+        async function startCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+
+            const constraints = {
+                video: {
+                    facingMode: useFrontCamera ? "user" : "environment",
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            };
+
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+            } catch (err) {
+                alert("Kameraya erişilemedi! İzin verdiğinizden emin olun.");
+                console.error(err);
+            }
+        }
+
+        function switchCamera() {
+            useFrontCamera = !useFrontCamera;
+            startCamera();
+        }
+
+        // --- 2. GÖRÜNTÜ YAKALAMA VE OCR (TESSERACT) ---
+        async function captureAndOCR() {
+            // Saniyeyi dondurup canvas'a çiziyoruz
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Görüntüyü base64 formatına çevirip işleme alıyoruz
+            const imageDataUrl = canvas.toDataURL('image/jpeg');
+
+            // Ekran geçişlerini yönet
+            captureSection.classList.add('hidden');
+            loadingSection.classList.remove('hidden');
+            
+            statusText.innerText = "Sistem Hazırlanıyor...";
+            substatusText.innerText = "Türkçe dil kütüphanesi yükleniyor (İlk seferde internet gerekebilir)...";
+            progressBar.style.width = "0%";
+
+            try {
+                // Tesseract işleyicisini oluştur ve Türkçe dil setini tanımla
+                const worker = await Tesseract.createWorker('tur');
+                
+                // OCR ilerlemesini takip et
+                worker.logger = (m) => {
+                    if (m.status === 'recognizing text') {
+                        statusText.innerText = "Metin Tanınıyor...";
+                        const progressPercent = Math.round(m.progress * 100);
+                        substatusText.innerText = `%${progressPercent} tamamlandı`;
+                        progressBar.style.width = `${progressPercent}%`;
+                    }
+                };
+
+                // Resmi analiz et
+                const ret = await worker.recognize(imageDataUrl);
+                await worker.terminate();
+
+                // Çıkan metni temizle ve düzenleme alanına yansıt
+                const cleanedText = cleanOCRText(ret.data.text);
+                outputTextarea.value = cleanedText;
+
+                // Kamera akışını kapatıp editörü göster
+                stopCamera();
+                loadingSection.classList.add('hidden');
+                editorSection.classList.remove('hidden');
+
+            } catch (err) {
+                alert("Dönüştürme sırasında hata oluştu: " + err.message);
+                resetApp();
+            }
+        }
+
+        // Türkçe karakterlerde oluşabilecek ufak OCR hatalarını optimize eden basit filtre
+        function cleanOCRText(text) {
+            return text
+                .replace(/I1/g, 'ı')
+                .replace(/S$/g, 'ş')
+                .trim();
+        }
+
+        // --- 3. WORD (.DOC) AKTARMA MANTIĞI ---
+        function exportToWord() {
+            const text = outputTextarea.value;
+            if (!text) {
+                alert("İndirilecek metin bulunamadı!");
+                return;
+            }
+
+            // Word tarafından sorunsuzca okunabilen HTML şablonu (UTF-8 ve Türkçe karakterleri doğrudan korur)
+            const htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head>
+                    <title>Tarama Çıktısı</title>
+                    <meta charset="utf-8">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            font-size: 12pt;
+                            line-height: 1.5;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${text.replace(/\n/g, '<br>')}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            
+            // İndirme işlemini tetikle
+            const a = document.createElement('a');
+            const date = new Date().toISOString().slice(0, 10);
+            a.href = url;
+            a.download = `Tarama_Belgesi_${date}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Temizlik
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+        }
+
+        // --- YARDIMCI FONKSİYONLAR ---
+        function copyToClipboard() {
+            outputTextarea.select();
+            document.execCommand('copy');
+            alert("Metin panoya kopyalandı!");
+        }
+
+        function resetApp() {
+            editorSection.classList.add('hidden');
+            loadingSection.classList.add('hidden');
+            captureSection.classList.remove('hidden');
+            outputTextarea.value = "";
+            startCamera();
+        }
+
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        // Uygulama açılışında kamerayı doğrudan aktifleştir
+        window.addEventListener('load', startCamera);
+    </script>
+</body>
+</html>
 
