@@ -2,32 +2,63 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>rayılmazan | Dashboard</title>
+    <title>rayılmazan | Sistem İzleyici</title>
     <style>
-        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card { border: 1px solid #004400; padding: 15px; background: #0a0a0a; cursor: pointer; transition: 0.3s; }
-        .card:hover { border-color: #00ff00; }
-        .online { border-left: 5px solid #00ff00; }
-        .offline { border-left: 5px solid #ff0000; }
-        .modal { display: none; background: #111; padding: 20px; border: 1px solid #00ff00; position: fixed; top: 30%; left: 30%; width: 40%; z-index: 1000; }
-        h2 { border-bottom: 2px solid #00ff00; display: inline-block; }
+        :root { --bg: #050505; --card: #111; --green: #00ff00; --red: #ff3e3e; }
+        body { background: var(--bg); color: var(--green); font-family: 'Segoe UI', monospace; margin: 0; padding: 20px; }
+        
+        /* Başlık Alanı */
+        header { border-bottom: 2px solid var(--green); padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Cihaz Grid Yapısı */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+        }
+        
+        .card { 
+            background: var(--card); 
+            padding: 20px; 
+            border: 1px solid #222; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            position: relative;
+            border-radius: 4px;
+        }
+        .card:hover { border-color: var(--green); box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); }
+        
+        /* Durum Göstergeleri */
+        .online { border-left: 6px solid var(--green); }
+        .offline { border-left: 6px solid var(--red); }
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: var(--card); width: 300px; margin: 15% auto; padding: 25px; border: 1px solid var(--green); }
     </style>
 </head>
 <body>
-    <h2>Sistem İzleme Paneli</h2>
+
+    <header>
+        <h2>SİSTEM TAKİP PANELİ</h2>
+        <div id="saat">Güncelleniyor...</div>
+    </header>
+
     <div id="dashboard" class="dashboard-grid"></div>
 
     <div id="modal" class="modal">
-        <h3 id="m-ad"></h3>
-        <p id="m-log"></p>
-        <button onclick="document.getElementById('modal').style.display='none'">Kapat</button>
+        <div class="modal-content">
+            <h3 id="m-ad"></h3>
+            <p id="m-log"></p>
+            <button onclick="document.getElementById('modal').style.display='none'" style="background:var(--green); border:none; padding:10px; width:100%; cursor:pointer;">TAMAM</button>
+        </div>
     </div>
 
     <script>
         const cihazlar = [
-            { ad: "Tahta-1", ip: "192.168.1.10", durum: "kontrol ediliyor", log: "Bekliyor..." },
-            { ad: "Yazıcı-Lab", ip: "192.168.1.50", durum: "kontrol ediliyor", log: "Bekliyor..." }
+            { ad: "Tahta-1", ip: "192.168.1.10", durum: "...", log: "Veri bekleniyor..." },
+            { ad: "Yazıcı-Lab", ip: "192.168.1.50", durum: "...", log: "Veri bekleniyor..." }
         ];
 
         async function taramaYap() {
@@ -35,10 +66,10 @@
                 try {
                     await fetch(`http://${c.ip}`, { mode: 'no-cors' });
                     c.durum = "online";
-                    c.log = "Cihaz erişilebilir durumda.";
+                    c.log = "Cihaz ağ üzerinde aktif ve yanıt veriyor.";
                 } catch (e) {
                     c.durum = "offline";
-                    c.log = "HATA: Cihaz yanıt vermiyor. Bağlantıyı kontrol edin.";
+                    c.log = "HATA: Cihaz ile iletişim kurulamadı. Hotspot bağlantısını veya cihaz gücünü kontrol edin.";
                 }
             }
             render();
@@ -50,7 +81,11 @@
             cihazlar.forEach(c => {
                 const card = document.createElement('div');
                 card.className = `card ${c.durum === 'online' ? 'online' : 'offline'}`;
-                card.innerHTML = `<strong>${c.ad}</strong><br><small>${c.ip}</small><br>Durum: ${c.durum}`;
+                card.innerHTML = `
+                    <div style="font-size: 0.8em; opacity: 0.7;">${c.ip}</div>
+                    <div style="font-size: 1.2em; font-weight: bold; margin: 10px 0;">${c.ad}</div>
+                    <div><span class="status-dot" style="background:${c.durum === 'online' ? '#00ff00' : '#ff3e3e'}"></span>${c.durum.toUpperCase()}</div>
+                `;
                 card.onclick = () => {
                     document.getElementById('m-ad').innerText = c.ad;
                     document.getElementById('m-log').innerText = c.log;
@@ -58,6 +93,7 @@
                 };
                 dash.appendChild(card);
             });
+            document.getElementById('saat').innerText = "Son Tarama: " + new Date().toLocaleTimeString();
         }
 
         taramaYap();
