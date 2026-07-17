@@ -2,18 +2,21 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>rayılmazan | Ağ İzleyici</title>
+    <title>rayılmazan | Dashboard</title>
     <style>
-        body { background: #0a0a0a; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
-        .card { border: 1px solid #333; padding: 15px; width: 220px; display: inline-block; margin: 10px; cursor: pointer; border-left: 5px solid #555; transition: 0.3s; }
-        .online { border-left-color: #00ff00; background: #030; }
-        .offline { border-left-color: #ff0000; background: #300; }
-        .modal { display: none; background: #1a1a1a; padding: 20px; border: 1px solid #00ff00; position: fixed; top: 30%; left: 35%; width: 30%; }
+        body { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { border: 1px solid #004400; padding: 15px; background: #0a0a0a; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: #00ff00; }
+        .online { border-left: 5px solid #00ff00; }
+        .offline { border-left: 5px solid #ff0000; }
+        .modal { display: none; background: #111; padding: 20px; border: 1px solid #00ff00; position: fixed; top: 30%; left: 30%; width: 40%; z-index: 1000; }
+        h2 { border-bottom: 2px solid #00ff00; display: inline-block; }
     </style>
 </head>
 <body>
-    <h2>Sistem İzleme Paneli (30s Tarama)</h2>
-    <div id="dashboard"></div>
+    <h2>Sistem İzleme Paneli</h2>
+    <div id="dashboard" class="dashboard-grid"></div>
 
     <div id="modal" class="modal">
         <h3 id="m-ad"></h3>
@@ -30,13 +33,12 @@
         async function taramaYap() {
             for (let c of cihazlar) {
                 try {
-                    // Cihaza port 80 üzerinden ulaşmayı dene (CORS hatası alsa bile cihazın yaşadığı anlaşılır)
                     await fetch(`http://${c.ip}`, { mode: 'no-cors' });
                     c.durum = "online";
-                    c.log = "Cihaz ağda yanıt veriyor.";
+                    c.log = "Cihaz erişilebilir durumda.";
                 } catch (e) {
                     c.durum = "offline";
-                    c.log = "HATA: Cihaz yanıt vermiyor veya ağ kopuk.";
+                    c.log = "HATA: Cihaz yanıt vermiyor. Bağlantıyı kontrol edin.";
                 }
             }
             render();
@@ -48,7 +50,7 @@
             cihazlar.forEach(c => {
                 const card = document.createElement('div');
                 card.className = `card ${c.durum === 'online' ? 'online' : 'offline'}`;
-                card.innerHTML = `<strong>${c.ad}</strong><br>${c.ip}<br><small>${c.durum}</small>`;
+                card.innerHTML = `<strong>${c.ad}</strong><br><small>${c.ip}</small><br>Durum: ${c.durum}`;
                 card.onclick = () => {
                     document.getElementById('m-ad').innerText = c.ad;
                     document.getElementById('m-log').innerText = c.log;
@@ -58,7 +60,6 @@
             });
         }
 
-        // 30 saniyede bir tetikle
         taramaYap();
         setInterval(taramaYap, 30000);
     </script>
