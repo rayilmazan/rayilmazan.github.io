@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rayılmazan - Dijital Müfredat ve Takvim Asistanı</title>
+    <style>
+        :root { --primary-color: #2c3e50; --secondary-color: #16a085; }
+        body { font-family: sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        header { background: var(--primary-color); color: white; padding: 20px; text-align: center; border-radius: 10px; }
+        .container { max-width: 1000px; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: #eee; border-radius: 5px; }
+        .tab-btn.active { background: var(--secondary-color); color: white; }
+        .card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .notebook-box { background: #fffde7; padding: 15px; border: 1px dashed #f39c12; font-family: monospace; white-space: pre-line; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>RAYILMAZAN - MÜFREDAT ASİSTANI</h1>
+    <p>YEĞİTEK Sorumlusu Günlük Plan Paneli</p>
+</header>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="setTab('5sınıf')">5. Sınıflar</button>
+        <button class="tab-btn" onclick="setTab('6sınıf')">6. Sınıflar</button>
+    </div>
+    
+    <div id="dashboard">
+        <h2 id="title">Yükleniyor...</h2>
+        <div class="card">
+            <h3>📌 Günlük Ders İçeriği</h3>
+            <p id="kazanim-text"></p>
+            <div class="notebook-box" id="defter-text"></div>
+        </div>
+        <div class="card">
+            <h3>📁 Drive Materyalleri</h3>
+            <a id="drive-link" href="https://drive.google.com/drive/folders/1EwXFoHf1GRmBwMlm-HfQGVggpuKYcRpQ" target="_blank">Drive Klasörünü Aç</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Linki kodun içine gömdüm
+    const driveBaseFolder = "https://drive.google.com/drive/folders/1EwXFoHf1GRmBwMlm-HfQGVggpuKYcRpQ";
+    
+    function setTab(sinif) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('title').innerText = sinif + " Planı";
+        // Buraya plan verilerini (mufredatData) ekleyerek dinamik hale getirebilirsin
+        document.getElementById('defter-text').innerText = "Deftere yazılacak notlar buraya gelecek...";
+    }
+</script>
+
+</body>
+</html>
 
