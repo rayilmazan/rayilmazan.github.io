@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>rayılmazan | Ağ İzleyici</title>
+    <style>
+        body { background: #0a0a0a; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
+        .tabs { border-bottom: 1px solid #333; margin-bottom: 20px; }
+        .tab-btn { background: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 10px; cursor: pointer; }
+        .card { border: 1px solid #333; padding: 15px; width: 220px; display: inline-block; margin: 10px; cursor: pointer; border-left: 5px solid #555; }
+        .status-online { border-left-color: #00ff00; }
+        .status-offline { border-left-color: #ff0000; }
+        .modal { display: none; background: #1a1a1a; padding: 20px; border: 1px solid #00ff00; position: fixed; top: 20%; left: 30%; width: 40%; }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+        <button class="tab-btn" onclick="filter('tahta')">Tahtalar</button>
+        <button class="tab-btn" onclick="filter('windows')">Windows</button>
+    </div>
+
+    <div id="dashboard"></div>
+
+    <div id="modal" class="modal">
+        <h3 id="modal-title"></h3>
+        <p id="modal-log"></p>
+        <button onclick="document.getElementById('modal').style.display='none'">Kapat</button>
+    </div>
+
+    <script>
+        // Tanımlı cihazlar (IP ve tür bilgisi)
+        const cihazlar = [
+            { id: 1, ad: "Tahta-1", ip: "192.168.1.10", tur: "tahta", log: "Son kontrol normal." },
+            { id: 2, ad: "Lab-PC-1", ip: "192.168.1.20", tur: "windows", log: "Disk alanı uyarısı." }
+        ];
+
+        function render() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = '';
+            cihazlar.forEach(c => {
+                const card = document.createElement('div');
+                card.className = `card ${c.log.includes('uyarı') ? 'status-offline' : 'status-online'}`;
+                card.innerHTML = `<strong>${c.ad}</strong><br>${c.ip}`;
+                card.onclick = () => showModal(c);
+                dashboard.appendChild(card);
+            });
+        }
+
+        function showModal(c) {
+            document.getElementById('modal-title').innerText = c.ad;
+            document.getElementById('modal-log').innerText = c.log;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        render();
+    </script>
+</body>
+</html>
 
