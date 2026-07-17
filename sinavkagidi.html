@@ -2,65 +2,59 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>rayılmazan | Flashcard Sistemi</title>
+    <title>rayılmazan | Sınav Editörü</title>
     <style>
-        body { background: #121212; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .kart { width: 400px; height: 250px; background: #1e1e1e; border: 2px solid #ff9800; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; text-align: center; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .kontroller { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; width: 400px; }
-        input { padding: 10px; border-radius: 4px; border: none; }
-        button { padding: 10px; cursor: pointer; background: #ff9800; border: none; border-radius: 4px; font-weight: bold; }
-        .info { margin-top: 20px; color: #888; font-size: 12px; }
+        body { font-family: sans-serif; background: #222; color: #fff; padding: 20px; display: flex; gap: 20px; }
+        
+        /* Düzenleme Paneli */
+        #panel { width: 300px; background: #333; padding: 15px; border-radius: 8px; }
+        #panel input, #panel textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+        
+        /* A4 Kağıdı */
+        .a4-kagit { width: 210mm; min-height: 297mm; background: white; color: #000; padding: 15mm; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .header { border-bottom: 2px solid #000; margin-bottom: 20px; text-align: center; }
+        .content { display: flex; gap: 20px; height: 600px; }
+        .sutun { flex: 1; border: 1px dashed #ccc; padding: 10px; white-space: pre-wrap; }
+        .footer { border-top: 2px solid #000; margin-top: 20px; padding-top: 10px; text-align: center; font-weight: bold; }
+
+        @media print { #panel, button { display: none; } body { background: none; } .a4-kagit { box-shadow: none; } }
     </style>
 </head>
 <body>
 
-    <h2>Flashcard Sistemi</h2>
-    <div class="kart" id="kart" onclick="cevir()">Başlamak için tıkla</div>
-    
-    <div class="kontroller">
-        <input type="text" id="on" placeholder="Soru">
-        <input type="text" id="arka" placeholder="Cevap">
-        <button onclick="ekle()">Kartı Ekle</button>
-        <button onclick="sonraki()" style="background:#444; color:#fff;">Sıradaki Kart</button>
+    <div id="panel">
+        <h3>Sınav Ayarları</h3>
+        <input type="text" id="okulAdi" placeholder="Okul Adı" oninput="guncelle()">
+        <input type="text" id="ogretmen" placeholder="Öğretmen Adı" oninput="guncelle()">
+        <input type="text" id="sure" placeholder="Sınav Süresi" oninput="guncelle()">
+        <textarea id="sorularA" placeholder="A Grubu Soruları" oninput="guncelle()" rows="5"></textarea>
+        <textarea id="sorularB" placeholder="B Grubu Soruları" oninput="guncelle()" rows="5"></textarea>
+        <button onclick="window.print()" style="width:100%; background:#28a745; color:white; border:none; padding:10px; cursor:pointer;">PDF/Yazdır</button>
     </div>
 
-    <div class="info">Veriler tarayıcıda kalıcı olarak saklanır.</div>
+    <div class="a4-kagit">
+        <div class="header">
+            <h2 id="viewOkul">OKUL ADI</h2>
+            <p>Ad Soyad: _______________ | Sınıf/No: ____/____ | Not: ____</p>
+        </div>
+        <div class="content">
+            <div class="sutun" id="viewA"><h4>A Grubu</h4></div>
+            <div class="sutun" id="viewB"><h4>B Grubu</h4></div>
+        </div>
+        <div class="footer">
+            <p>Sınav Süresi: <span id="viewSure">__</span> | Başarılar Dilerim.</p>
+            <p>Öğretmen: <span id="viewOgretmen">_______</span></p>
+        </div>
+    </div>
 
     <script>
-        // Veri yapısı: Tarayıcı hafızasından çek, yoksa varsayılanı yükle
-        let kartlar = JSON.parse(localStorage.getItem('rayilmazan_flashcards')) || [{on: "Hoş geldin!", arka: "rayılmazan sistemine hazırsın."}];
-        let index = 0;
-        let onYuz = true;
-
         function guncelle() {
-            document.getElementById('kart').innerText = onYuz ? kartlar[index].on : kartlar[index].arka;
+            document.getElementById('viewOkul').innerText = document.getElementById('okulAdi').value || 'OKUL ADI';
+            document.getElementById('viewOgretmen').innerText = document.getElementById('ogretmen').value || '_______';
+            document.getElementById('viewSure').innerText = document.getElementById('sure').value || '__';
+            document.getElementById('viewA').innerHTML = '<h4>A Grubu</h4>' + document.getElementById('sorularA').value;
+            document.getElementById('viewB').innerHTML = '<h4>B Grubu</h4>' + document.getElementById('sorularB').value;
         }
-
-        function cevir() {
-            onYuz = !onYuz;
-            guncelle();
-        }
-
-        function ekle() {
-            let on = document.getElementById('on').value;
-            let arka = document.getElementById('arka').value;
-            if(on && arka) {
-                kartlar.push({on, arka});
-                localStorage.setItem('rayilmazan_flashcards', JSON.stringify(kartlar));
-                document.getElementById('on').value = '';
-                document.getElementById('arka').value = '';
-                alert("Kart kaydedildi!");
-            }
-        }
-
-        function sonraki() {
-            index = (index + 1) % kartlar.length;
-            onYuz = true;
-            guncelle();
-        }
-
-        guncelle();
     </script>
 </body>
 </html>
-
