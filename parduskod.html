@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>rayılmazan | Pardus Hızlı Müdahale</title>
+    <style>
+        body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        .kategori { margin-bottom: 20px; }
+        .komut-kart { background: #1e1e1e; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #007bff; display: flex; justify-content: space-between; align-items: center; }
+        code { background: #000; padding: 5px 10px; color: #00ff00; border-radius: 4px; font-family: monospace; }
+        button { background: #007bff; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .toast { position: fixed; bottom: 20px; background: #333; padding: 10px 20px; border-radius: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+    <h2>Pardus Hızlı Müdahale Kütüphanesi</h2>
+
+    <div id="kutuphane">
+        <!-- Ağ Sorunları -->
+        <div class="kategori">
+            <h3>Ağ ve Bağlantı Sorunları</h3>
+            <div class="komut-kart">
+                <span>DNS'leri Sıfırla (İnternet Yoksa)</span>
+                <code>sudo systemctl restart networking</code>
+                <button onclick="kopyala('sudo systemctl restart networking')">Kopyala</button>
+            </div>
+            <div class="komut-kart">
+                <span>Ağ Kartını Yeniden Başlat</span>
+                <code>nmcli networking off && nmcli networking on</code>
+                <button onclick="kopyala('nmcli networking off && nmcli networking on')">Kopyala</button>
+            </div>
+        </div>
+
+        <!-- Sistem Sorunları -->
+        <div class="kategori">
+            <h3>Sistem ve Arayüz</h3>
+            <div class="komut-kart">
+                <span>Ekran/Arayüz Donduysa (Restart)</span>
+                <code>systemctl restart display-manager</code>
+                <button onclick="kopyala('systemctl restart display-manager')">Kopyala</button>
+            </div>
+            <div class="komut-kart">
+                <span>Askıda Kalan Uygulamayı Kapat</span>
+                <code>xkill</code>
+                <button onclick="kopyala('xkill')">Kopyala</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Komut panoya kopyalandı!</div>
+
+    <script>
+        function kopyala(text) {
+            navigator.clipboard.writeText(text);
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+    </script>
+</body>
+</html>
 
