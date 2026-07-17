@@ -1,39 +1,65 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayılmazan - Bilişim Sektör Bülteni</title>
+    <title>Rayılmazan - Mobil Müfredat Asistanı</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        h2 { color: #34495e; margin-top: 25px; }
-        .news-item { margin-bottom: 15px; padding: 10px; border-left: 4px solid #3498db; background: #f9f9f9; }
-        .date { font-size: 0.9em; color: #7f8c8d; margin-bottom: 20px; }
-        footer { margin-top: 40px; font-size: 0.8em; text-align: center; color: #95a5a6; }
+        body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 10px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 15px; cursor: pointer; border: none; background: #ddd; border-radius: 5px; font-weight: bold; }
+        .tab-btn.active { background: #16a085; color: white; }
+        .card { border-left: 5px solid #2c3e50; padding: 15px; background: #fff; margin-top: 10px; border-radius: 5px; }
+        .notebook { background: #fffde7; padding: 15px; border: 1px dashed #f39c12; margin-top: 10px; font-size: 14px; }
+        a { display: block; margin-top: 15px; padding: 15px; background: #2980b9; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Rayılmazan - Bilişim Sektör Bülteni</h1>
-        <div class="date">Güncelleme: 17 Temmuz 2026</div>
 
-        <h2>🚀 Uzay ve Yerli Teknoloji</h2>
-        <div class="news-item"><strong>Yerli Atomik Saat Uzayda:</strong> Kritik önem taşıyan Rubidyum Atomik Saati (RAFS) başarıyla fırlatıldı ve sinyal alınmaya başlandı.</div>
-        <div class="news-item"><strong>NATO ve Türkiye:</strong> İMECE uyduları ve ASELSAN LEO ağları NATO mimarisine dahil edildi.</div>
-
-        <h2>🤖 Yapay Zeka (YZ) ve Yazılım</h2>
-        <div class="news-item"><strong>Meta'dan Geri Adım:</strong> Gizlilik tepkileri üzerine tartışmalı YZ entegrasyonu kaldırıldı.</div>
-        <div class="news-item"><strong>Hukuki Süreçler:</strong> Apple, ticari sırların çalındığı gerekçesiyle OpenAI'a dava açtı.</div>
-
-        <h2>💻 Sektörel ve Akademik Gelişmeler</h2>
-        <div class="news-item"><strong>Eğitimde Yerli Çözüm:</strong> Makinist eğitimleri için "SİMURAY-KBÜ" simülasyon sistemi geliştiriliyor.</div>
-        <div class="news-item"><strong>Bilimsel Keşif:</strong> Samanyolu merkezinde yaşamın kökenine dair şeker molekülleri tespit edildi.</div>
-
-        <footer>Rayılmazan - Okul Teknik Altyapı Aracı</footer>
+<div class="container">
+    <h2 style="text-align:center">Rayılmazan Asistan</h2>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="loadData('5sınıf')">5. Sınıf</button>
+        <button class="tab-btn" onclick="loadData('6sınıf')">6. Sınıf</button>
     </div>
+
+    <div id="display">
+        <h3 id="sinif-adi">5. Sınıf Planı</h3>
+        <div class="card">
+            <strong>Kazanım:</strong>
+            <p id="kazanim">-</p>
+            <strong>Defter Notu:</strong>
+            <div class="notebook" id="defter">-</div>
+            <a href="https://drive.google.com/drive/folders/1EwXFoHf1GRmBwMlm-HfQGVggpuKYcRpQ" target="_blank">📂 Drive Materyallerini Aç</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const planVerisi = {
+        "5sınıf": { 
+            kazanim: "5.1.1.2. Bilişim teknolojilerinin günlük yaşamdaki önemi[span_2](start_span)[span_2](end_span).", 
+            defter: "Konu: Bilişim Teknolojileri\n- Bilişim: Bilginin işlenmesi sürecidir.\n- Donanım: Kasa, ekran, klavye, fare." 
+        },
+        "6sınıf": { 
+            kazanim: "6.5.1.1. Problem çözme süreci ve yaklaşımları[span_3](start_span)[span_3](end_span).", 
+            defter: "Konu: Problem Çözme\n- Problem: Çözülmesi gereken durumdur.\n- Algoritma: Adım adım çözüm yöntemidir." 
+        }
+    };
+
+    function loadData(sinif) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        document.getElementById('sinif-adi').innerText = sinif === '5sınıf' ? "5. Sınıf Planı" : "6. Sınıf Planı";
+        document.getElementById('kazanim').innerText = planVerisi[sinif].kazanim;
+        document.getElementById('defter').innerText = planVerisi[sinif].defter;
+    }
+    
+    // Sayfa açıldığında varsayılanı yükle
+    loadData('5sınıf');
+</script>
+
 </body>
 </html>
-
