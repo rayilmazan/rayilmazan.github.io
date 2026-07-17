@@ -5,55 +5,62 @@
     <title>rayılmazan | Ağ İzleyici</title>
     <style>
         body { background: #0a0a0a; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
-        .tabs { border-bottom: 1px solid #333; margin-bottom: 20px; }
-        .tab-btn { background: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 10px; cursor: pointer; }
-        .card { border: 1px solid #333; padding: 15px; width: 220px; display: inline-block; margin: 10px; cursor: pointer; border-left: 5px solid #555; }
-        .status-online { border-left-color: #00ff00; }
-        .status-offline { border-left-color: #ff0000; }
-        .modal { display: none; background: #1a1a1a; padding: 20px; border: 1px solid #00ff00; position: fixed; top: 20%; left: 30%; width: 40%; }
+        .card { border: 1px solid #333; padding: 15px; width: 220px; display: inline-block; margin: 10px; cursor: pointer; border-left: 5px solid #555; transition: 0.3s; }
+        .online { border-left-color: #00ff00; background: #030; }
+        .offline { border-left-color: #ff0000; background: #300; }
+        .modal { display: none; background: #1a1a1a; padding: 20px; border: 1px solid #00ff00; position: fixed; top: 30%; left: 35%; width: 30%; }
     </style>
 </head>
 <body>
-    <div class="tabs">
-        <button class="tab-btn" onclick="filter('tahta')">Tahtalar</button>
-        <button class="tab-btn" onclick="filter('windows')">Windows</button>
-    </div>
-
+    <h2>Sistem İzleme Paneli (30s Tarama)</h2>
     <div id="dashboard"></div>
 
     <div id="modal" class="modal">
-        <h3 id="modal-title"></h3>
-        <p id="modal-log"></p>
+        <h3 id="m-ad"></h3>
+        <p id="m-log"></p>
         <button onclick="document.getElementById('modal').style.display='none'">Kapat</button>
     </div>
 
     <script>
-        // Tanımlı cihazlar (IP ve tür bilgisi)
         const cihazlar = [
-            { id: 1, ad: "Tahta-1", ip: "192.168.1.10", tur: "tahta", log: "Son kontrol normal." },
-            { id: 2, ad: "Lab-PC-1", ip: "192.168.1.20", tur: "windows", log: "Disk alanı uyarısı." }
+            { ad: "Tahta-1", ip: "192.168.1.10", durum: "kontrol ediliyor", log: "Bekliyor..." },
+            { ad: "Yazıcı-Lab", ip: "192.168.1.50", durum: "kontrol ediliyor", log: "Bekliyor..." }
         ];
 
+        async function taramaYap() {
+            for (let c of cihazlar) {
+                try {
+                    // Cihaza port 80 üzerinden ulaşmayı dene (CORS hatası alsa bile cihazın yaşadığı anlaşılır)
+                    await fetch(`http://${c.ip}`, { mode: 'no-cors' });
+                    c.durum = "online";
+                    c.log = "Cihaz ağda yanıt veriyor.";
+                } catch (e) {
+                    c.durum = "offline";
+                    c.log = "HATA: Cihaz yanıt vermiyor veya ağ kopuk.";
+                }
+            }
+            render();
+        }
+
         function render() {
-            const dashboard = document.getElementById('dashboard');
-            dashboard.innerHTML = '';
+            const dash = document.getElementById('dashboard');
+            dash.innerHTML = '';
             cihazlar.forEach(c => {
                 const card = document.createElement('div');
-                card.className = `card ${c.log.includes('uyarı') ? 'status-offline' : 'status-online'}`;
-                card.innerHTML = `<strong>${c.ad}</strong><br>${c.ip}`;
-                card.onclick = () => showModal(c);
-                dashboard.appendChild(card);
+                card.className = `card ${c.durum === 'online' ? 'online' : 'offline'}`;
+                card.innerHTML = `<strong>${c.ad}</strong><br>${c.ip}<br><small>${c.durum}</small>`;
+                card.onclick = () => {
+                    document.getElementById('m-ad').innerText = c.ad;
+                    document.getElementById('m-log').innerText = c.log;
+                    document.getElementById('modal').style.display = 'block';
+                };
+                dash.appendChild(card);
             });
         }
 
-        function showModal(c) {
-            document.getElementById('modal-title').innerText = c.ad;
-            document.getElementById('modal-log').innerText = c.log;
-            document.getElementById('modal').style.display = 'block';
-        }
-
-        render();
+        // 30 saniyede bir tetikle
+        taramaYap();
+        setInterval(taramaYap, 30000);
     </script>
 </body>
 </html>
-
