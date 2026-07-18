@@ -1,56 +1,36 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>rayılmazan - Tek Dosya</title>
+    <title>rayılmazan - Tarayıcı Kontrol</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; font-family: sans-serif; }
-        #ekran { flex: 1; position: relative; background: #eee; border-bottom: 2px solid #999; }
-        #touchpad { height: 35vh; background: #222; color: #fff; display: flex; align-items: center; justify-content: center; touch-action: none; }
-        #imlec { position: absolute; width: 20px; height: 20px; background: red; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); z-index: 10; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #remote { width: 100%; height: 200px; border: 2px dashed #ccc; margin-top: 20px; }
     </style>
 </head>
 <body>
-
-    <div id="ekran">
-        <div id="imlec"></div>
-        <h3 style="padding:10px;">rayılmazan Sanal İmleç Alanı</h3>
-    </div>
-
-    <div id="touchpad">
-        <h2>Touchpad (Burada kaydır)</h2>
-    </div>
+    <h3>rayılmazan - WebRTC Kontrol</h3>
+    <div id="qrcode"></div>
+    <div id="status">Bağlantı bekleniyor...</div>
+    <div id="remote" onscroll="sendScroll(this.scrollTop)">İçerik Buraya</div>
 
     <script>
-        const imlec = document.getElementById('imlec');
-        const touchpad = document.getElementById('touchpad');
-        let x = window.innerWidth / 2;
-        let y = window.innerHeight / 4;
-        let lastX, lastY;
+        const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+        let dc;
 
-        function guncelle() {
-            imlec.style.left = x + 'px';
-            imlec.style.top = y + 'px';
+        function start() {
+            dc = pc.createDataChannel("control");
+            dc.onmessage = (e) => { window.scrollTo(0, e.data); };
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+            pc.onicecandidate = e => {
+                if (!e.candidate) new QRCode("qrcode", btoa(JSON.stringify(pc.localDescription)));
+            };
         }
 
-        touchpad.addEventListener('touchstart', (e) => {
-            lastX = e.touches[0].clientX;
-            lastY = e.touches[0].clientY;
-        });
-
-        touchpad.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            let dx = e.touches[0].clientX - lastX;
-            let dy = e.touches[0].clientY - lastY;
-            x += dx * 1.5;
-            y += dy * 1.5;
-            guncelle();
-            lastX = e.touches[0].clientX;
-            lastY = e.touches[0].clientY;
-        });
-
-        guncelle();
+        function sendScroll(val) { if(dc && dc.readyState === "open") dc.send(val); }
+        
+        // Eşleşme için QR okuma arayüzü eklenebilir
+        start();
     </script>
 </body>
 </html>
