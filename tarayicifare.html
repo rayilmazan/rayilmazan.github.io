@@ -1,1 +1,72 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rayılmazan Touchpad</title>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background: #222; color: white; font-family: sans-serif; }
+        #cursor { width: 20px; height: 20px; background: red; position: absolute; border-radius: 50%; pointer-events: none; }
+        #setup { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        #controller { display: none; width: 100vw; height: 100vh; touch-action: none; background: #333; }
+    </style>
+</head>
+<body>
+
+<div id="setup">
+    <h2>Telefonla Bağlan</h2>
+    <div id="qrcode"></div>
+    <p id="status">Bağlantı bekleniyor...</p>
+</div>
+
+<div id="cursor"></div>
+<div id="controller"></div>
+
+<script>
+    const isMobile = /Android|iPhone/i.test(navigator.userAgent);
+    const cursor = document.getElementById('cursor');
+    let peer, conn, posX = 500, posY = 500;
+
+    if (!isMobile) {
+        // BİLGİSAYAR TARAFI
+        peer = new Peer();
+        peer.on('open', id => {
+            new QRCode(document.getElementById("qrcode"), window.location.href + "?id=" + id);
+        });
+
+        peer.on('connection', c => {
+            conn = c;
+            document.getElementById('setup').style.display = 'none';
+            conn.on('data', data => {
+                posX += data.x * 2; posY += data.y * 2;
+                cursor.style.left = posX + 'px'; cursor.style.top = posY + 'px';
+            });
+        });
+    } else {
+        // TELEFON TARAFI
+        document.getElementById('setup').style.display = 'none';
+        const controller = document.getElementById('controller');
+        controller.style.display = 'block';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        peer = new Peer();
+        peer.on('open', () => {
+            conn = peer.connect(urlParams.get('id'));
+        });
+
+        let lastX, lastY;
+        controller.addEventListener('touchmove', e => {
+            if (conn && conn.open) {
+                let dx = (e.touches[0].clientX - (lastX || e.touches[0].clientX));
+                let dy = (e.touches[0].clientY - (lastY || e.touches[0].clientY));
+                conn.send({x: dx, y: dy});
+                lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+            }
+        });
+        controller.addEventListener('touchend', () => { lastX = null; lastY = null; });
+    }
+</script>
+</body>
+</html>
