@@ -1,36 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>rayılmazan - Tam Bağımsız QR</title>
+    <title>rayılmazan - Ağ Tarayıcı</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .active { color: green; font-weight: bold; }
+        #results { margin-top: 20px; }
+    </style>
 </head>
 <body>
-    <h3>rayılmazan - Yerel Eşleşme</h3>
-    <div id="qrcode"></div>
+    <h3>rayılmazan - Hızlı IP Tarayıcı</h3>
+    <input type="text" id="subnet" value="192.168.1" placeholder="Örn: 192.168.1">
+    <button onclick="scan()">Taramayı Başlat</button>
+    <div id="results"></div>
 
     <script>
-        // QR kod kütüphanesini buraya gömdüm (Gerekli temel yapı)
-        !function(){var t=function(t){this.qr=t};t.prototype.draw=function(t){var e=document.createElement("div");return e.innerHTML=t,document.getElementById("qrcode").appendChild(e),e};var e=new t();
-        
-        const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
-        let dc = pc.createDataChannel("rayılmazan");
+        async function scan() {
+            const subnet = document.getElementById('subnet').value;
+            const results = document.getElementById('results');
+            results.innerHTML = "Taranıyor...";
 
-        pc.onicecandidate = e => {
-            if (!e.candidate) {
-                const signal = btoa(JSON.stringify(pc.localDescription));
-                // Basit bir QR görseli oluşturucu
-                const c = document.createElement('canvas');
-                c.width=150; c.height=150;
-                const ctx = c.getContext('2d');
-                ctx.fillStyle="black";
-                for(let i=0; i<signal.length; i+=5) {
-                    ctx.fillRect((i*15)%150, (Math.floor(i/10)*15)%150, 10, 10);
-                }
-                document.getElementById('qrcode').appendChild(c);
+            for (let i = 1; i < 255; i++) {
+                const ip = `${subnet}.${i}`;
+                // fetch ile kısa sürede yanıt almayı deneriz
+                fetch(`http://${ip}`, { mode: 'no-cors', cache: 'no-cache' })
+                    .then(() => {
+                        const div = document.createElement('div');
+                        div.className = "active";
+                        div.innerText = "Aktif Cihaz: " + ip;
+                        results.appendChild(div);
+                    })
+                    .catch(() => {}); // Pasifler yoksayılır
             }
-        };
-        pc.createOffer().then(offer => pc.setLocalDescription(offer));
-        window.onscroll = () => { if(dc && dc.readyState === "open") dc.send(window.scrollY); };
-        }()
+        }
     </script>
 </body>
 </html>
