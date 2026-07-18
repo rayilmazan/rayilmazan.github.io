@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cihaz Dedektifi | Akıllı Sistem Analizörü</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-955 text-gray-100 font-sans min-h-screen py-6 px-4 md:py-8">
+
+    <div class="container mx-auto max-w-4xl">
+        <header class="text-center mb-6 md:mb-8">
+            <h1 class="text-3xl md:text-4xl font-black text-indigo-400 tracking-tight flex items-center justify-center gap-2">
+                🔍 Cihaz Dedektifi
+            </h1>
+        </header>
+
+        <div class="bg-gray-900 p-4 md:p-6 rounded-2xl shadow-xl border border-gray-800 text-center mb-6">
+            <button id="startBtn" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-10 rounded-xl transition duration-200 shadow-lg cursor-pointer text-base md:text-lg active:scale-98">
+                Sistemi Tara ve Analiz Et
+            </button>
+        </div>
+
+        <div id="hardwareBox" class="bg-gray-900 p-5 md:p-6 rounded-2xl shadow-xl border border-gray-800 mb-6 hidden">
+            <h2 class="text-base md:text-lg font-bold text-indigo-300 mb-4 flex items-center gap-2">📋 Toplanan Donanım & Çevre Bilgileri</h2>
+            <div id="hardwareGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 text-xs">
+                </div>
+        </div>
+
+        <div id="testBox" class="bg-gray-900 p-5 md:p-6 rounded-2xl shadow-xl border border-gray-800 mb-6 hidden">
+            <h2 class="text-base md:text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">⚡ Canlı Performans Testleri</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 text-sm">
+                <div class="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                    <span class="text-gray-400 block text-xs mb-0.5">CPU Matematik İşleme</span>
+                    <span id="testCPU" class="font-bold text-amber-500 animate-pulse">Test ediliyor...</span>
+                </div>
+                <div class="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                    <span class="text-gray-400 block text-xs mb-0.5">Depolama Payı</span>
+                    <span id="testStorage" class="font-bold text-amber-500 animate-pulse">Hesaplanıyor...</span>
+                </div>
+                <div class="bg-gray-800/50 p-3 rounded-xl border border-gray-700">
+                    <span class="text-gray-400 block text-xs mb-0.5">Ağ Hattı Kararlılığı</span>
+                    <span id="testNet" class="font-bold text-amber-500 animate-pulse">Ölçülüyor...</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="scoreBox" class="bg-gray-900 p-5 md:p-6 rounded-2xl shadow-xl border border-gray-800 mb-6 hidden text-center">
+            <h2 class="text-lg md:text-xl font-bold mb-1 text-gray-200">Sistem Sağlık ve Performans Skoru</h2>
+            <div class="text-4xl md:text-5xl font-black my-3 transition-all duration-500" id="scoreText">0%</div>
+            <div class="w-full bg-gray-800 h-4 md:h-5 rounded-full overflow-hidden shadow-inner p-0.5 border border-gray-700">
+                <div id="scoreBar" class="h-full rounded-full transition-all duration-1000 ease-out bg-red-500" style="width: 0%"></div>
+            </div>
+            <p id="scoreSummary" class="text-xs md:text-sm text-gray-400 mt-3 italic"></p>
+        </div>
+
+        <div id="reportBox" class="bg-gray-900 p-5 md:p-6 rounded-2xl shadow-xl border border-gray-800 hidden">
+            <h2 class="text-base md:text-lg font-bold text-emerald-400 mb-4">📢 Olası Sorunlar ve Dedektif Tahminleri</h2>
+            <div id="reportContainer" class="space-y-3 md:space-y-4 text-xs md:text-sm"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('startBtn').addEventListener('click', runFullAnalysis);
+
+        async function runFullAnalysis() {
+            const btn = document.getElementById('startBtn');
+            
+            btn.disabled = true;
+            btn.innerText = "Derin Analiz Yapılıyor...";
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            document.getElementById('hardwareBox').classList.remove('hidden');
+            document.getElementById('testBox').classList.remove('hidden');
+            document.getElementById('scoreBox').classList.add('hidden');
+            document.getElementById('reportBox').classList.add('hidden');
+
+            const sysData = await gatherAllSystemData();
+            renderHardwareGrid(sysData);
+
+            const testData = await runLiveTests();
+            const finalReport = analyzeAndCalculateScore(sysData, testData);
+
+            displayResults(finalReport);
+
+            btn.disabled = false;
+            btn.innerText = "Sistemi Yeniden Tara";
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        async function gatherAllSystemData() {
+            const ua = navigator.userAgent;
+            let os = "Bilinmeyen OS";
+            if (ua.indexOf("Win") !== -1) os = "Windows";
+            if (ua.indexOf("Mac") !== -1) os = "macOS";
+            if (ua.indexOf("Linux") !== -1) os = "Linux";
+            if (ua.indexOf("Android") !== -1) os = "Android";
+            if (ua.indexOf("like Mac") !== -1) os = "iOS";
+
+            let gpu = "Erişilemedi / Entegre";
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl');
+                if (gl) {
+                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || gpu;
+                }
+            } catch(e){}
+
+            let batteryInfo = "Bilinmiyor";
+            try {
+                if (navigator.getBattery) {
+                    const bat = await navigator.getBattery();
+                    batteryInfo = `%${Math.round(bat.level * 100)} (${bat.charging ? 'Şarjda' : 'Pilde'})`;
+                }
+            } catch(e){}
+
+            const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            let netType = conn ? `${conn.effectiveType || 'Bilinmiyor'} (~${conn.downlink || 0} Mbps)` : "Bilinmiyor";
+
+            return {
+                os: os,
+                cores: navigator.hardwareConcurrency || 2,
+                ram: navigator.deviceMemory || 4,
+                gpu: gpu,
+                screen: `${screen.width}x${screen.height}`,
+                network: netType,
+                battery: batteryInfo,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+        }
+
+        function renderHardwareGrid(data) {
+            const grid = document.getElementById('hardwareGrid');
+            const items = [
+                { label: "İşletim Sistemi", val: data.os },
+                { label: "İşlemci (CPU)", val: `${data.cores} Çekirdek` },
+                { label: "Algılanan RAM", val: `~${data.ram} GB` },
+                { label: "Grafik Birimi (GPU)", val: data.gpu },
+                { label: "Ekran Çözünürlüğü", val: data.screen },
+                { label: "Bağlantı & Hız", val: data.network },
+                { label: "Güç / Batarya", val: data.battery },
+                { label: "Zaman Dilimi", val: data.timezone },
+                { label: "Sistem Dili", val: data.language }
+            ];
+
+            grid.innerHTML = items.map(i => `
+                <div class="bg-gray-800 p-3 rounded-xl border border-gray-700/60 shadow-sm">
+                    <span class="text-gray-400 block font-medium mb-0.5 text-[10px] uppercase tracking-wider">${i.label}</span>
+                    <span class="text-gray-100 font-semibold break-words">${i.val}</span>
+                </div>
+            `).join('');
+        }
+
+        async function runLiveTests() {
+            const cpuStart = performance.now();
+            let iterations = 0;
+            while(performance.now() - cpuStart < 400) {
+                Math.sin(Math.random()) * Math.cos(Math.random());
+                iterations++;
+            }
+            document.getElementById('testCPU').innerText = "Tamamlandı";
+            document.getElementById('testCPU').className = "font-bold text-green-400";
+
+            let storagePressure = false;
+            let storageText = "Normal";
+            if (navigator.storage && navigator.storage.estimate) {
+                const est = await navigator.storage.estimate();
+                const ratio = est.usage / est.quota;
+                if(ratio > 0.85 || est.quota < 4000000000) {
+                    storagePressure = true;
+                    storageText = "Kısıtlı";
+                }
+            }
+            document.getElementById('testStorage').innerText = storageText;
+            document.getElementById('testStorage').className = storagePressure ? "font-bold text-red-400" : "font-bold text-green-400";
+
+            let pings = [];
+            for (let i = 0; i < 3; i++) {
+                const pStart = performance.now();
+                try {
+                    await fetch('https://cdnjs.cloudflare.com/ajax/libs/keymaster/1.6.1/keymaster.min.js', { cache: 'no-store', mode: 'no-cors' });
+                    pings.push(performance.now() - pStart);
+                } catch (e) { pings.push(500); }
+            }
+            const avgPing = pings.reduce((a,b)=>a+b, 0) / pings.length;
+            const jitter = Math.max(...pings) - Math.min(...pings);
+
+            document.getElementById('testNet').innerText = `${Math.round(avgPing)}ms`;
+            document.getElementById('testNet').className = avgPing > 200 ? "font-bold text-red-400" : "font-bold text-green-400";
+
+            return {
+                cpuScore: iterations,
+                storagePressure: storagePressure,
+                latency: avgPing,
+                jitter: jitter
+            };
+        }
+
+        function analyzeAndCalculateScore(sys, test) {
+            let score = 100;
+            let logs = [];
+
+            if (sys.ram < 4) {
+                score -= 15;
+                logs.push({
+                    title: "⚠️ Düşük RAM Kapasitesi",
+                    desc: `Sisteminizde yaklaşık ${sys.ram}GB RAM tespit edildi. Mobil tarayıcılar ve ağır siteler için bu sınır düşüktür.`,
+                    guess: "DEDEKTİF TAHMİNİ: Birden fazla sekmeyi aynı anda yönetirken arka plan sekmeleriniz otomatik olarak çökebilir veya yeniden yüklenebilir."
+                });
+            }
+
+            if (sys.cores < 4) {
+                score -= 10;
+                logs.push({
+                    title: "⚠️ Çekirdek Sayısı Sınırı",
+                    desc: `İşlemciniz sadece ${sys.cores} çekirdeğe sahip.`,
+                    guess: "DEDEKTİF TAHMİNİ: Cihazınız yoğun görevler altında anlık olarak takılma (stuttering) eğilimindedir."
+                });
+            }
+
+            if (test.cpuScore < 1200000) {
+                score -= 20;
+                logs.push({
+                    title: "🚨 İşlemci Üzerinde Gizli Yük / Yavaşlık",
+                    desc: `İşlemciniz canlı stres testinde zayıf bir skor (${test.cpuScore}) üretti.`,
+                    guess: "DEDEKTİF TAHMİNİ: Arka planda çalışan ağır uygulamalar var ya da cihazınız şu an ısınıp hızı sabitledi (Termal Kısılma). Cihazınız mobil ise pilde tasarruf modunun açık olması muhtemeldir."
+                });
+            }
+
+            if (test.latency > 180 || test.jitter > 120) {
+                score -= 15;
+                logs.push({
+                    title: "🌐 Kararsız Ağ Tepki Süresi",
+                    desc: `Ağ testinde gecikme süreniz ${Math.round(test.latency)}ms çıktı.`,
+                    guess: "DEDEKTİF TAHMİNİ: Hücresel veride (3G/4G/5G) çekim gücü zayıf olabilir ya da Wi-Fi kullanıyorsanız modemden uzaksınız. Canlı yayın ve oyunlarda donmalar yaşanabilir."
+                });
+            }
+
+            if (test.storagePressure) {
+                score -= 10;
+                logs.push({
+                    title: "💾 Kritik Depolama Sınırı",
+                    desc: "Tarayıcıya ayrılan güvenli alan kısıtlı.",
+                    guess: "DEDEKTİF TAHMİNİ: Telefonunuzun veya bilgisayarınızın ana disk alanı dolmak üzere. Bu durum genel sistem akıcılığını doğrudan baltalar."
+                });
+            }
+
+            score = Math.max(10, Math.min(100, score));
+            return { score, logs };
+        }
+
+        function displayResults(report) {
+            const scoreBox = document.getElementById('scoreBox');
+            const scoreText = document.getElementById('scoreText');
+            const scoreBar = document.getElementById('scoreBar');
+            const scoreSummary = document.getElementById('scoreSummary');
+            const reportBox = document.getElementById('reportBox');
+            const container = document.getElementById('reportContainer');
+
+            scoreBox.classList.remove('hidden');
+            scoreText.innerText = `${report.score}%`;
+            
+            scoreBar.style.width = `${report.score}%`;
+            scoreBar.className = "h-full rounded-full transition-all duration-1000 ease-out ";
+            
+            if (report.score >= 80) {
+                scoreBar.classList.add('bg-green-500');
+                scoreText.className = "text-4xl md:text-5xl font-black my-3 text-green-400";
+                scoreSummary.innerText = "Cihazınızda ciddi bir donanım veya performans anomalisi tespit edilmedi.";
+            } else if (report.score >= 50) {
+                scoreBar.classList.add('bg-yellow-500');
+                scoreText.className = "text-4xl md:text-5xl font-black my-3 text-yellow-400";
+                scoreSummary.innerText = "Dedektif bazı performans tıkanıklıkları yakaladı. Aşağıyı inceleyin.";
+            } else {
+                scoreBar.classList.add('bg-red-500');
+                scoreText.className = "text-4xl md:text-5xl font-black my-3 text-red-500";
+                scoreSummary.innerText = "Sistem üzerinde ağır baskı veya donanım darboğazları sezildi.";
+            }
+
+            container.innerHTML = '';
+            if (report.logs.length > 0) {
+                reportBox.classList.remove('hidden');
+                report.logs.forEach(log => {
+                    const card = document.createElement('div');
+                    card.className = "p-4 bg-gray-900 border border-gray-800 rounded-xl space-y-1.5 shadow-md";
+                    card.innerHTML = `
+                        <h3 class="font-bold text-gray-100 text-sm md:text-base">${log.title}</h3>
+                        <p class="text-gray-400 text-xs">${log.desc}</p>
+                        <p class="text-amber-400 bg-amber-950/20 p-3 rounded-lg border-l-2 border-amber-500 text-xs italic font-medium leading-relaxed">${log.guess}</p>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                reportBox.classList.remove('hidden');
+                container.innerHTML = `<div class="text-green-400 font-medium p-4 bg-green-950/20 rounded-xl border border-green-900/40 text-center text-xs md:text-sm">Dedektif vakayı kapattı! Cihazınızda şüpheli hiçbir yavaşlık veya kararsızlık izine rastlanmadı.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
+
