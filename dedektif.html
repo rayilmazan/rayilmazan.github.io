@@ -2,66 +2,69 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rayılmazan | Merkezi Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body { background-color: #0b0f19; color: #f8fafc; }</style>
+    <style>
+        body { background-color: #0b0f19; color: #f8fafc; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+    </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto space-y-6">
-        <h1 class="text-3xl font-black text-emerald-500">Rayılmazan <span class="text-white font-light">Merkezi Panel</span></h1>
+<body class="p-2 md:p-8">
+    <div class="max-w-4xl mx-auto space-y-4">
+        <h1 class="text-2xl font-black text-emerald-500">Rayılmazan <span class="text-white font-light">Panel</span></h1>
         
         <!-- Sekmeler -->
         <div class="flex gap-2 p-1 bg-gray-900 rounded-xl border border-gray-800">
-            <button onclick="show('scanner')" class="flex-1 py-3 rounded-lg bg-emerald-600 font-bold">Cihaz/Tahta Tarayıcı</button>
-            <button onclick="show('printer')" class="flex-1 py-3 rounded-lg hover:bg-gray-800 font-bold">Yazıcı Paneli</button>
+            <button onclick="showPanel('scanner')" class="flex-1 py-2 rounded-lg bg-emerald-600 text-sm font-bold">Tarayıcı</button>
+            <button onclick="showPanel('printer')" class="flex-1 py-2 rounded-lg hover:bg-gray-800 text-sm font-bold">Yazıcı</button>
         </div>
 
-        <!-- Tarayıcı -->
-        <div id="scanner" class="panel bg-gray-800 p-6 rounded-2xl border border-gray-700">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <input type="text" id="subnet" value="192.168.1" class="bg-gray-900 p-3 rounded-xl border border-gray-700 col-span-2">
-                <button onclick="startScan()" class="bg-emerald-500 hover:bg-emerald-600 font-bold p-3 rounded-xl col-span-2">Taramayı Başlat</button>
+        <!-- Tarayıcı Paneli -->
+        <div id="scanner" class="panel active bg-gray-800 p-4 rounded-xl border border-gray-700">
+            <div class="flex flex-col gap-3 mb-4">
+                <input type="text" id="subnet" value="192.168.1" class="bg-gray-900 p-3 rounded-lg border border-gray-700 w-full">
+                <button onclick="startScan()" class="bg-emerald-500 hover:bg-emerald-600 font-bold p-3 rounded-lg w-full">Taramayı Başlat</button>
             </div>
-            <div id="device-grid" class="grid grid-cols-2 md:grid-cols-6 gap-3"></div>
+            <div id="device-grid" class="grid grid-cols-3 gap-2 text-[10px]"></div>
         </div>
 
-        <!-- Yazıcı -->
-        <div id="printer" class="panel hidden bg-gray-800 p-6 rounded-2xl border border-gray-700">
-            <button onclick="downloadAgent()" class="bg-yellow-600 p-3 rounded-xl w-full font-bold">Yazıcı Tarama Ajanını (.bat) İndir</button>
-            <input type="file" id="file-input" class="mt-4 w-full" onchange="loadJson(event)">
-            <div id="printer-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6"></div>
+        <!-- Yazıcı Paneli -->
+        <div id="printer" class="panel bg-gray-800 p-4 rounded-xl border border-gray-700">
+            <button onclick="downloadAgent()" class="bg-yellow-600 p-3 rounded-lg w-full font-bold text-sm">Yazıcı Ajanını (.bat) İndir</button>
+            <input type="file" id="file-input" class="mt-4 w-full text-sm" onchange="loadJson(event)">
+            <div id="printer-grid" class="grid grid-cols-1 gap-3 mt-4"></div>
         </div>
     </div>
 
     <script>
-        function show(id) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
+        function showPanel(id) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        // Hızlı Tarama Yöntemi
         async function startScan() {
             const subnet = document.getElementById('subnet').value;
             const grid = document.getElementById('device-grid');
             grid.innerHTML = '';
-            for (let i = 1; i <= 50; i++) {
+            for (let i = 1; i <= 30; i++) { // Mobil hız için 30 ip
                 const ip = `${subnet}.${i}`;
                 const div = document.createElement('div');
-                div.className = "p-2 border border-gray-700 rounded text-xs bg-gray-900";
+                div.className = "p-2 border border-gray-700 rounded bg-gray-900 truncate";
                 div.id = `ip-${i}`;
-                div.innerText = `${ip} : Taranıyor...`;
+                div.innerText = i;
                 grid.appendChild(div);
 
                 const img = new Image();
-                img.onload = () => { div.innerText = `${ip} : AKTİF`; div.style.borderColor = "#10b981"; };
-                img.onerror = () => { div.innerText = `${ip} : Yok`; div.style.opacity = "0.3"; };
+                img.onload = () => { div.className += " border-emerald-500 text-emerald-400"; div.innerText = i + " OK"; };
+                img.onerror = () => { div.style.opacity = "0.2"; };
                 img.src = `http://${ip}/favicon.ico?${new Date().getTime()}`;
             }
         }
 
-        // Ajan İndirme
         function downloadAgent() {
-            const content = `@echo off\necho Rayılmazan Ajanı Çalışıyor...`; // Basitleştirilmiş ajan içeriği
+            const content = `@echo off\necho Rayılmazan Ajanı Çalışıyor...`;
             const blob = new Blob([content], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -69,15 +72,13 @@
             link.click();
         }
 
-        // JSON Yükleme
         function loadJson(event) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const data = JSON.parse(e.target.result);
                 document.getElementById('printer-grid').innerHTML = data.map(p => `
-                    <div class="bg-gray-900 p-4 rounded-xl border border-gray-700">
-                        <h3 class="font-bold">${p.name}</h3>
-                        <p class="text-sm">IP: ${p.ip}</p>
+                    <div class="bg-gray-900 p-3 rounded-lg border border-gray-700 text-sm">
+                        <div class="font-bold truncate">${p.name}</div>
                         <div class="w-full bg-gray-700 h-2 mt-2 rounded"><div class="bg-emerald-500 h-full rounded" style="width:${p.toner_level}%"></div></div>
                     </div>
                 `).join('');
