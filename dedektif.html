@@ -2,91 +2,87 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rayılmazan | Merkezi Ağ & Yazıcı Paneli</title>
+    <title>Rayılmazan | Merkezi Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        :root { --accent: #10b981; }
-        .scanning-pulse { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        body { background-color: #0b0f19; color: #f8fafc; }
-    </style>
+    <style>body { background-color: #0b0f19; color: #f8fafc; }</style>
 </head>
 <body class="p-4 md:p-8">
-
     <div class="max-w-6xl mx-auto space-y-6">
-        <!-- Başlık -->
-        <div class="border-b border-gray-800 pb-6">
-            <h1 class="text-3xl font-black text-emerald-500">Rayılmazan <span class="text-white font-light">Merkezi Panel</span></h1>
-            <p class="text-gray-400 mt-2">Okul ağındaki cihazları, akıllı tahtaları ve yazıcıları yönetin.</p>
-        </div>
-
+        <h1 class="text-3xl font-black text-emerald-500">Rayılmazan <span class="text-white font-light">Merkezi Panel</span></h1>
+        
         <!-- Sekmeler -->
         <div class="flex gap-2 p-1 bg-gray-900 rounded-xl border border-gray-800">
             <button onclick="show('scanner')" class="flex-1 py-3 rounded-lg bg-emerald-600 font-bold">Cihaz/Tahta Tarayıcı</button>
-            <button onclick="show('printer')" class="flex-1 py-3 rounded-lg hover:bg-gray-800 font-bold">Yazıcı Detay Paneli</button>
+            <button onclick="show('printer')" class="flex-1 py-3 rounded-lg hover:bg-gray-800 font-bold">Yazıcı Paneli</button>
         </div>
 
-        <!-- Tarayıcı Paneli -->
-        <div id="scanner" class="panel space-y-6">
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <input type="text" id="start-ip" value="192.168.1.1" class="bg-gray-900 p-3 rounded-xl border border-gray-700">
-                    <input type="text" id="end-ip" value="192.168.1.50" class="bg-gray-900 p-3 rounded-xl border border-gray-700">
-                    <button onclick="startScan()" class="bg-emerald-500 hover:bg-emerald-600 font-bold p-3 rounded-xl col-span-2">Taramayı Başlat</button>
-                </div>
-                <div id="device-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                    <!-- Cihazlar buraya gelecek -->
-                </div>
+        <!-- Tarayıcı -->
+        <div id="scanner" class="panel bg-gray-800 p-6 rounded-2xl border border-gray-700">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <input type="text" id="subnet" value="192.168.1" class="bg-gray-900 p-3 rounded-xl border border-gray-700 col-span-2">
+                <button onclick="startScan()" class="bg-emerald-500 hover:bg-emerald-600 font-bold p-3 rounded-xl col-span-2">Taramayı Başlat</button>
             </div>
+            <div id="device-grid" class="grid grid-cols-2 md:grid-cols-6 gap-3"></div>
         </div>
 
-        <!-- Yazıcı Paneli -->
-        <div id="printer" class="panel hidden space-y-6">
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                <h2 class="text-xl font-bold mb-4">SNMP Yazıcı Ajanı</h2>
-                <button onclick="downloadAgent()" class="bg-yellow-600 hover:bg-yellow-700 p-3 rounded-xl w-full font-bold">Yazıcı Tarama Ajanını (.bat) İndir</button>
-                <div class="mt-4 p-4 bg-gray-900 rounded-xl border border-dashed border-gray-700 text-center cursor-pointer" onclick="document.getElementById('file-input').click()">
-                    <p>yazici_verileri.json dosyasını yükle</p>
-                    <input type="file" id="file-input" hidden onchange="loadJson(event)">
-                </div>
-                <div id="printer-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6"></div>
-            </div>
+        <!-- Yazıcı -->
+        <div id="printer" class="panel hidden bg-gray-800 p-6 rounded-2xl border border-gray-700">
+            <button onclick="downloadAgent()" class="bg-yellow-600 p-3 rounded-xl w-full font-bold">Yazıcı Tarama Ajanını (.bat) İndir</button>
+            <input type="file" id="file-input" class="mt-4 w-full" onchange="loadJson(event)">
+            <div id="printer-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6"></div>
         </div>
     </div>
 
     <script>
-        // Sekme Değiştirici
         function show(id) {
             document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // 1. Cihaz Tarayıcı Mantığı (Source 2 tabanlı)
+        // Hızlı Tarama Yöntemi
         async function startScan() {
-            const start = document.getElementById('start-ip').value;
-            const end = document.getElementById('end-ip').value;
-            // (Tarama mantığı Source 2'deki probeIP fonksiyonu ile entegre edilebilir)
-            alert("Tarama başlatılıyor: " + start + " - " + end);
+            const subnet = document.getElementById('subnet').value;
+            const grid = document.getElementById('device-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 50; i++) {
+                const ip = `${subnet}.${i}`;
+                const div = document.createElement('div');
+                div.className = "p-2 border border-gray-700 rounded text-xs bg-gray-900";
+                div.id = `ip-${i}`;
+                div.innerText = `${ip} : Taranıyor...`;
+                grid.appendChild(div);
+
+                const img = new Image();
+                img.onload = () => { div.innerText = `${ip} : AKTİF`; div.style.borderColor = "#10b981"; };
+                img.onerror = () => { div.innerText = `${ip} : Yok`; div.style.opacity = "0.3"; };
+                img.src = `http://${ip}/favicon.ico?${new Date().getTime()}`;
+            }
         }
 
-        // 2. Yazıcı Paneli Mantığı (Source 1 tabanlı)
-        function downloadAgent() { /* Source 1'deki .bat içeriğini buraya ekleyin */ }
-        
+        // Ajan İndirme
+        function downloadAgent() {
+            const content = `@echo off\necho Rayılmazan Ajanı Çalışıyor...`; // Basitleştirilmiş ajan içeriği
+            const blob = new Blob([content], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'yazici_tara.bat';
+            link.click();
+        }
+
+        // JSON Yükleme
         function loadJson(event) {
-            const file = event.target.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 const data = JSON.parse(e.target.result);
-                const grid = document.getElementById('printer-grid');
-                grid.innerHTML = data.map(p => `
+                document.getElementById('printer-grid').innerHTML = data.map(p => `
                     <div class="bg-gray-900 p-4 rounded-xl border border-gray-700">
                         <h3 class="font-bold">${p.name}</h3>
-                        <p class="text-sm text-gray-400">IP: ${p.ip}</p>
+                        <p class="text-sm">IP: ${p.ip}</p>
                         <div class="w-full bg-gray-700 h-2 mt-2 rounded"><div class="bg-emerald-500 h-full rounded" style="width:${p.toner_level}%"></div></div>
                     </div>
                 `).join('');
             };
-            reader.readAsText(file);
+            reader.readAsText(event.target.files[0]);
         }
     </script>
 </body>
