@@ -3,153 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>rayılmazan Tarayıcı İçi Kontrol</title>
+    <title>rayılmazan - Tek Dosya</title>
     <style>
-        body { 
-            margin: 0; 
-            padding: 0; 
-            background-color: #f0f0f0; 
-            font-family: sans-serif; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-        }
-
-        /* Sayfanın üst kısmı: İçerik ve sanal imlecin gezeceği alan */
-        #icerikAlani {
-            flex: 1;
-            padding: 20px;
-            position: relative;
-            background-color: #ffffff;
-            border-bottom: 2px solid #ccc;
-        }
-
-        /* Sayfanın alt kısmı: Dokunmatik yüzey (Touchpad) */
-        #touchpad { 
-            height: 40vh; 
-            background-color: #333; 
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: none; /* Sayfanın kaymasını engeller */
-        }
-
-        /* rayılmazan Sanal İmleci */
-        #sanalImlec {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 15px;
-            height: 15px;
-            background-color: red;
-            border: 2px solid darkred;
-            border-radius: 50%;
-            pointer-events: none; /* İmlecin altındaki elementlere tıklanabilmesi için kritik */
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: background-color 0.1s;
-        }
-
-        /* Test butonları */
-        .test-buton {
-            padding: 15px 25px;
-            margin: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
+        body { margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; font-family: sans-serif; }
+        #ekran { flex: 1; position: relative; background: #eee; border-bottom: 2px solid #999; }
+        #touchpad { height: 35vh; background: #222; color: #fff; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        #imlec { position: absolute; width: 20px; height: 20px; background: red; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div id="icerikAlani">
-        <h2 style="color: #333;">rayılmazan Sanal Ekran</h2>
-        <p>Aşağıdaki siyah alanda (touchpad) parmağınızı kaydırarak kırmızı imleci hareket ettirin.</p>
-        <p>Tıklamak için touchpad alanına bir kez dokunun (veya çift dokunun).</p>
-        
-        <button class="test-buton" onclick="alert('1. Butona Tıklandı!')">Test Butonu 1</button>
-        <button class="test-buton" onclick="alert('2. Butona Tıklandı!')" style="background-color: #28a745;">Test Butonu 2</button>
-        
-        <!-- Sanal İmlecimiz -->
-        <div id="sanalImlec"></div>
+    <div id="ekran">
+        <div id="imlec"></div>
+        <h3 style="padding:10px;">rayılmazan Sanal İmleç Alanı</h3>
     </div>
 
     <div id="touchpad">
-        <h3>rayılmazan Touchpad (Burada Kaydır)</h3>
+        <h2>Touchpad (Burada kaydır)</h2>
     </div>
 
     <script>
+        const imlec = document.getElementById('imlec');
         const touchpad = document.getElementById('touchpad');
-        const sanalImlec = document.getElementById('sanalImlec');
-        const icerikAlani = document.getElementById('icerikAlani');
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 4;
+        let lastX, lastY;
 
-        // İmlecin başlangıç koordinatları
-        let imlecX = window.innerWidth / 2;
-        let imlecY = (window.innerHeight * 0.6) / 2; // İçerik alanının ortası
-
-        // Dokunma başlangıç koordinatları
-        let lastX = 0;
-        let lastY = 0;
-
-        // İmleci ekranda güncelleme fonksiyonu
-        function imleciGuncelle() {
-            // İmlecin sayfa dışına çıkmasını engelle
-            imlecX = Math.max(0, Math.min(imlecX, window.innerWidth));
-            imlecY = Math.max(0, Math.min(imlecY, icerikAlani.offsetHeight));
-            
-            sanalImlec.style.left = imlecX + 'px';
-            sanalImlec.style.top = imlecY + 'px';
+        function guncelle() {
+            imlec.style.left = x + 'px';
+            imlec.style.top = y + 'px';
         }
 
-        // --- HAREKET KONTROLÜ ---
         touchpad.addEventListener('touchstart', (e) => {
             lastX = e.touches[0].clientX;
             lastY = e.touches[0].clientY;
         });
 
         touchpad.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Varsayılan kaydırma davranışını durdur
-            
-            let currentX = e.touches[0].clientX;
-            let currentY = e.touches[0].clientY;
-            
-            // Hassasiyeti artırmak için 1.5 ile çarpıyoruz
-            let dx = (currentX - lastX) * 1.5;
-            let dy = (currentY - lastY) * 1.5;
-            
-            imlecX += dx;
-            imlecY += dy;
-            
-            imleciGuncelle();
-            
-            lastX = currentX;
-            lastY = currentY;
+            e.preventDefault();
+            let dx = e.touches[0].clientX - lastX;
+            let dy = e.touches[0].clientY - lastY;
+            x += dx * 1.5;
+            y += dy * 1.5;
+            guncelle();
+            lastX = e.touches[0].clientX;
+            lastY = e.touches[0].clientY;
         });
 
-        // --- TIKLAMA (CLICK) KONTROLÜ ---
-        // Touchpad üzerine kısa bir dokunuş yapıldığında, imlecin altındaki elementi bulup tıklar
-        touchpad.addEventListener('click', (e) => {
-            // İmlece tıklandığında görsel bir geri bildirim (renk değişimi)
-            sanalImlec.style.backgroundColor = "yellow";
-            setTimeout(() => sanalImlec.style.backgroundColor = "red", 150);
-
-            // İmlecin tam o anki koordinatlarında (altında) hangi HTML elementi var?
-            // pointer-events: none; CSS kuralı sayesinde imlecin kendisini değil, altındakini buluruz.
-            const altindakiElement = document.elementFromPoint(imlecX, imlecY);
-            
-            if (altindakiElement) {
-                // Eğer buton veya tıklanabilir bir şeyse, tıklama olayını tetikle
-                altindakiElement.click();
-            }
-        });
-
-        // Sayfa yüklendiğinde imleci konumlandır
-        imleciGuncelle();
+        guncelle();
     </script>
 </body>
 </html>
