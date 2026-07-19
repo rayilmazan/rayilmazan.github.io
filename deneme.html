@@ -1,57 +1,66 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>rayılmazan | IP Kamera İzleyici</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rayılmazan Yönetim</title>
     <style>
-        body { background: #050505; color: #00ff00; font-family: monospace; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-        .kamera-kart { border: 1px solid #333; padding: 10px; background: #0a0a0a; }
-        .durum-bar { height: 5px; margin-top: 10px; }
-        .aktif { background: #00ff00; }
-        .pasif { background: #ff0000; }
+        body { font-family: sans-serif; margin: 0; padding: 10px; background: #f4f4f4; }
+        .tab-menu { display: flex; gap: 5px; margin-bottom: 10px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: #ddd; cursor: pointer; border-radius: 5px; font-size: 12px; }
+        .tab-btn.active { background: #007bff; color: white; }
+        .content { display: none; background: white; padding: 15px; border-radius: 5px; }
+        .content.active { display: block; }
+        .card { border-bottom: 1px solid #eee; padding: 10px 0; }
+        button.copy-btn { background: #28a745; color: white; border: none; padding: 5px; cursor: pointer; border-radius: 3px; }
     </style>
 </head>
 <body>
-    <h2>KAMERA VE TEŞHİS PORTALI</h2>
-    <div id="kamera-grid" class="grid"></div>
 
-    <script>
-        const kameralar = [
-            { ad: "Kamera-Giris", ip: "192.168.1.100" },
-            { ad: "Kamera-Lab", ip: "192.168.1.101" }
-        ];
+<div class="tab-menu">
+    <button class="tab-btn active" onclick="showTab('tab1')">Arıza</button>
+    <button class="tab-btn" onclick="showTab('tab2')">Ağ/IP</button>
+    <button class="tab-btn" onclick="showTab('tab3')">Komut</button>
+</div>
 
-        function olustur() {
-            const grid = document.getElementById('kamera-grid');
-            kameralar.forEach(k => {
-                const div = document.createElement('div');
-                div.className = 'kamera-kart';
-                div.innerHTML = `
-                    <h3>${k.ad}</h3>
-                    <img src="http://${k.ip}/video" width="100%" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='">
-                    <div class="durum-bar" id="durum-${k.ip.replace(/\./g, '-')}"></div>
-                    <small>${k.ip}</small>
-                `;
-                grid.appendChild(div);
-            });
-        }
+<!-- Tab 1: Arıza -->
+<div id="tab1" class="content active">
+    <h3>Arıza Çözümleri</h3>
+    <div class="card"><strong>PXE Boot Hatası:</strong> BIOS'tan Boot sırasını kontrol et, 'Network Boot'u devre dışı bırak.</div>
+    <div class="card"><strong>AMD Kapanma:</strong> İşlemci fanını temizle, termal macunu yenile.</div>
+</div>
 
-        async function kontrol() {
-            for (let k of kameralar) {
-                try {
-                    await fetch(`http://${k.ip}`, { mode: 'no-cors' });
-                    document.getElementById(`durum-${k.ip.replace(/\./g, '-')}`).className = 'durum-bar aktif';
-                } catch {
-                    document.getElementById(`durum-${k.ip.replace(/\./g, '-')}`).className = 'durum-bar pasif';
-                }
-            }
-        }
+<!-- Tab 2: Ağ/IP -->
+<div id="tab2" class="content">
+    <h3>Ağ/IP Tarama (Test)</h3>
+    <select id="ipBlock">
+        <option value="192.168.1">192.168.1.X</option>
+        <option value="192.168.2">192.168.2.X</option>
+        <option value="10.15.1">10.15.1.X (Fatih)</option>
+    </select>
+    <button onclick="scanNetwork()">Taramayı Başlat</button>
+    <div id="scanResult" style="margin-top:10px;"></div>
+</div>
 
-        olustur();
-        setInterval(kontrol, 30000);
-        kontrol();
-    </script>
+<!-- Tab 3: Komutlar -->
+<div id="tab3" class="content">
+    <h3>Pardus Komutları</h3>
+    <div class="card">Ağ Servisi Başlat: <button class="copy-btn" onclick="copyText('sudo systemctl restart NetworkManager')">Kopyala</button></div>
+    <div class="card">Güncelleme: <button class="copy-btn" onclick="copyText('sudo apt update && sudo apt upgrade -y')">Kopyala</button></div>
+</div>
+
+<script>
+    function showTab(id) {
+        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+    function copyText(text) { navigator.clipboard.writeText(text); alert("Kopyalandı: " + text); }
+    function scanNetwork() {
+        const block = document.getElementById('ipBlock').value;
+        document.getElementById('scanResult').innerHTML = "Tarama simülasyonu başlatıldı... " + block + ".x bloğu kontrol ediliyor.";
+    }
+</script>
 </body>
 </html>
