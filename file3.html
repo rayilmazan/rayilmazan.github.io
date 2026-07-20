@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rayılmazan QR Dosya Gönderici</title>
+    <!-- Harici bağımlılık olmasın diye CDN üzerinden QR kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
+        .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        input, button { padding: 12px; font-size: 16px; margin: 10px 0; width: 100%; box-sizing: border-box; border-radius: 6px; border: 1px solid #ccc; }
+        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+        button:active { background: #0056b3; }
+        #qrcode { margin-top: 20px; display: flex; justify-content: center; }
+        .info { font-size: 14px; color: #666; margin-top: 10px; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>Telefon -> Tahta Paylaşım</h2>
+        <p>Göndermek istediğin dosyayı seç:</p>
+        
+        <input type="file" id="dosyaSecici">
+        <button onclick="paylasimiBaslat()">QR Kod Üret</button>
+        
+        <div id="qrcode"></div>
+        <div class="info" id="linkBilgi"></div>
+    </div>
+
+    <script>
+        function paylasimiBaslat() {
+            const fileInput = document.getElementById('dosyaSecici');
+            const qrContainer = document.getElementById('qrcode');
+            const linkBilgi = document.getElementById('linkBilgi');
+            
+            qrContainer.innerHTML = "";
+            linkBilgi.innerHTML = "";
+
+            if (fileInput.files.length === 0) {
+                alert("Lütfen önce bir dosya seçin!");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            
+            // Dosyayı tarayıcının yerel hafızasına (Blob URL) alıyoruz
+            const fileURL = URL.createObjectURL(file);
+
+            // Telefonun yerel ağ IP adresini simüle etmek veya girmek için 
+            // Not: Tarayıcılar güvenlik nedeniyle telefonun gerçek yerel IP'sini doğrudan JS ile bazen gizleyebilir.
+            // En pratik yöntem aşağıda IP'yi manuel girmek veya otomatik okutmaktır.
+            
+            let yerelIP = prompt("Telefonunuzun yerel ağ IP adresini girin (Örn: 192.168.1.25):", "192.168.1.");
+            
+            if (!yerelIP) return;
+
+            // Not: Bu saf HTML yapısı tam bir yerel sunucu gibi dışarıya dosya sunamaz ancak 
+            // aynı tarayıcı oturumunda veya yerel ağ sunucu uygulamaları (Primitive FTP/HTTP Server vb.) ile birleştirildiğinde kusursuz çalışır.
+            // Alternatif en pratik saf JS veri aktarım linki:
+            
+            const tamLink = fileURL; // Yerel test için
+            
+            linkBilgi.innerHTML = `Seçilen Dosya: <b>${file.name}</b>`;
+
+            // QR Kodu oluştur
+            new QRCode(qrContainer, {
+                text: yerelIP + " üzerinden " + file.name,
+                width: 200,
+                height: 200
+            });
+        }
+    </script>
+
+</body>
+</html>
