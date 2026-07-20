@@ -3,98 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayılmazan - Pardus Tahta Analiz Paneli</title>
+    <title>Rayılmazan - Pardus Derinlemesine Sorun Teşhis Paneli</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: auto; }
-        h2 { text-align: center; color: #2c3e50; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 15px; margin-top: 20px; }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: auto; }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 25px; font-size: 14px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 6px solid #ccc; }
         .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #555; }
-        .card .value { font-size: 22px; font-weight: bold; }
-        
+        .card .value { font-size: 20px; font-weight: bold; }
+        .card small { color: #666; display: block; margin-top: 5px; }
+
+        /* Sorun Detay Kutusu */
+        .log-box { background: #212529; color: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 13px; height: 150px; overflow-y: auto; margin-top: 20px; }
+        .log-title { font-weight: bold; color: #ffc107; margin-bottom: 8px; }
+
         .normal { border-left-color: #28a745; background: #e8f5e9; }
         .warning { border-left-color: #ffc107; background: #fffde7; }
         .danger { border-left-color: #dc3545; background: #ffebee; }
-        
-        .footer { text-align: center; margin-top: 25px; font-size: 12px; color: #777; }
-        .btn { display: block; width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 20px; }
+
+        .btn { display: block; width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 15px; }
         .btn:hover { background: #0056b3; }
+        .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #777; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Rayılmazan Pardus Sağlık Paneli</h2>
-        <p style="text-align: center; color: #666;">Tahtanın anlık donanım ve ağ durumu</p>
+        <h2>Rayılmazan Pardus Sorun Teşhis Paneli</h2>
+        <div class="subtitle">Akıllı Tahta Donanım ve Sistem Hata Yakalayıcı</div>
 
         <div class="grid">
+            <!-- 1. Ağ / IP Sorunları -->
             <div id="card-net" class="card">
-                <h3>Ağ Durumu</h3>
+                <h3>Ağ / İnternet Durumu</h3>
                 <div class="value" id="val-net">Yükleniyor...</div>
-                <small id="val-ip">IP: -</small>
+                <small id="val-ip">IP Alınamadı</small>
             </div>
 
+            <!-- 2. Disk Doluluk ve Yazma Koruması -->
             <div id="card-disk" class="card">
-                <h3>Disk Doluluğu</h3>
+                <h3>Kök Disk Doluluğu</h3>
                 <div class="value" id="val-disk">Yükleniyor...</div>
-                <small>Kök Dizin ( / )</small>
+                <small id="val-disk-detay">Kritik Sınır: %90</small>
             </div>
 
+            <!-- 3. NetworkManager Servis Durumu -->
+            <div id="card-service" class="card">
+                <h3>Ağ Yöneticisi (Servis)</h3>
+                <div class="value" id="val-service">Yükleniyor...</div>
+                <small>NetworkManager Durumu</small>
+            </div>
+
+            <!-- 4. Donanım Isı / Sıcaklık -->
             <div id="card-temp" class="card">
                 <h3>İşlemci Sıcaklığı</h3>
                 <div class="value" id="val-temp">Yükleniyor...</div>
-                <small>Isı Durumu</small>
-            </div>
-
-            <div id="card-ram" class="card">
-                <h3>RAM Tüketimi</h3>
-                <div class="value" id="val-ram">Yükleniyor...</div>
-                <small>Bellek Durumu</small>
+                <small>Isınma Kaynaklı Kapanma Riski</small>
             </div>
         </div>
 
-        <button class="btn" onclick="verileriYukle()">Verileri Yenile</button>
-        <div class="footer" id="son-guncelleme">Son Kontrol: -</div>
+        <!-- Anlık Hata ve Log Dökümü -->
+        <div class="log-title">⚠️ Tespit Edilen Sistem Hataları ve Uyarılar:</div>
+        <div class="log-box" id="logPanel">
+            Sistem taranıyor...
+        </div>
+
+        <button class="btn" onclick="sorunlariTara()">Sorunları Yeniden Tara</button>
+        <div class="footer" id="son-guncelleme">Son Tarama: -</div>
     </div>
 
     <script>
-        function verileriYukle() {
-            // Gerçek sistemde tahtadaki 'durum.json' dosyasını okur. 
-            // Tek dosya kullanımında hata vermemesi için örnek veri yapısı simüle edilmiştir:
-            const data = {
-                "ip": "10.15.1.45",
-                "net": "OK",
-                "disk": "42",
-                "temp": "48°C",
-                "ram": "60"
+        function sorunlariTara() {
+            // Gerçek senaryoda bu veri tahtadaki scriptin ürettiği JSON'dan veya yerel komut çıktısından beslenir.
+            // Burada en sık karşılaşılan sorun senaryoları simüle edilmiştir:
+            
+            const veri = {
+                ip: "10.15.1.88",
+                netDurumu: "OK",         // OK veya FAIL
+                diskYuzde: 88,          // Disk doluluk oranı
+                servisAktif: true,       // NetworkManager aktif mi?
+                sicaklik: "68°C",        // İşlemci ısısı
+                hatalar: [
+                    "Uyarı: Kök dizin doluluk oranı %88 seviyesinde. Temizlik önerilir.",
+                    "Bilgi: Fatih ağına ping yanıtı başarılı (Gecikme: 14ms).",
+                    "Normal: Ağ yöneticisi servisi kararlı çalışıyor."
+                ]
             };
 
-            // 1. Ağ Verisi
+            // 1. Ağ Kartı Güncellemesi
             const netCard = document.getElementById('card-net');
-            document.getElementById('val-net').innerText = data.net === "OK" ? "Çevrimiçi" : "Kopuk";
-            document.getElementById('val-ip').innerText = "IP: " + data.ip;
-            netCard.className = "card " + (data.net === "OK" ? "normal" : "danger");
+            document.getElementById('val-net').innerText = veri.netDurumu === "OK" ? "Bağlantı Sağlıklı" : "Ağ Kesik!";
+            document.getElementById('val-ip').innerText = "IP: " + veri.ip;
+            netCard.className = "card " + (veri.netDurumu === "OK" ? "normal" : "danger");
 
-            // 2. Disk Verisi
+            // 2. Disk Kartı Güncellemesi
             const diskCard = document.getElementById('card-disk');
-            document.getElementById('val-disk').innerText = data.disk + "%";
-            diskCard.className = "card " + (parseInt(data.disk) > 90 ? "danger" : parseInt(data.disk) > 75 ? "warning" : "normal");
+            document.getElementById('val-disk').innerText = veri.diskYuzde + "%";
+            if (veri.diskYuzde > 90) {
+                diskCard.className = "card danger";
+                document.getElementById('val-disk-detay').innerText = "KRİTİK: Disk Dolmak Üzere!";
+            } else if (veri.diskYuzde > 80) {
+                diskCard.className = "card warning";
+                document.getElementById('val-disk-detay').innerText = "Dikkat: Alan Azalıyor";
+            } else {
+                diskCard.className = "card normal";
+                document.getElementById('val-disk-detay').innerText = "Kök Dizin Durumu İyi";
+            }
 
-            // 3. Sıcaklık Verisi
+            // 3. Servis Kartı Güncellemesi
+            const srvCard = document.getElementById('card-service');
+            document.getElementById('val-service').innerText = veri.servisAktif ? "Çalışıyor" : "Çöktü!";
+            srvCard.className = "card " + (veri.servisAktif ? "normal" : "danger");
+
+            // 4. Sıcaklık Kartı Güncellemesi
             const tempCard = document.getElementById('card-temp');
-            document.getElementById('val-temp').innerText = data.temp;
-            tempCard.className = "card " + (parseInt(data.temp) > 80 ? "danger" : parseInt(data.temp) > 70 ? "warning" : "normal");
+            document.getElementById('val-temp').innerText = veri.sicaklik;
+            let sicaklikDeger = parseInt(veri.sicaklik);
+            tempCard.className = "card " + (sicaklikDeger > 75 ? "danger" : sicaklikDeger > 65 ? "warning" : "normal");
 
-            // 4. RAM Verisi
-            document.getElementById('val-ram').innerText = data.ram + "%";
-            document.getElementById('card-ram').className = "card " + (parseInt(data.ram) > 85 ? "warning" : "normal");
+            // Log Paneli Doldurma
+            let logHTML = "";
+            veri.hatalar.forEach(hata => {
+                logHTML += `> ${hata}<br>`;
+            });
+            document.getElementById('logPanel').innerHTML = logHTML;
 
-            document.getElementById('son-guncelleme').innerText = "Son Kontrol: " + new Date().toLocaleTimeString();
+            document.getElementById('son-guncelleme').innerText = "Son Tarama: " + new Date().toLocaleTimeString();
         }
 
-        // Sayfa açıldığında çalıştır
-        verileriYukle();
+        // Sayfa açıldığında otomatik tara
+        sorunlariTara();
     </script>
 
 </body>
