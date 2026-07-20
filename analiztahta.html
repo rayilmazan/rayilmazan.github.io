@@ -13,12 +13,11 @@
         .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #555; }
         .card .value { font-size: 22px; font-weight: bold; }
         
-        /* Durum Renkleri */
         .normal { border-left-color: #28a745; background: #e8f5e9; }
         .warning { border-left-color: #ffc107; background: #fffde7; }
         .danger { border-left-color: #dc3545; background: #ffebee; }
         
-        .footer { text-align: center; margin-top: 25px; font-size: 12px; color: #77`,7; }
+        .footer { text-align: center; margin-top: 25px; font-size: 12px; color: #777; }
         .btn { display: block; width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 20px; }
         .btn:hover { background: #0056b3; }
     </style>
@@ -30,28 +29,24 @@
         <p style="text-align: center; color: #666;">Tahtanın anlık donanım ve ağ durumu</p>
 
         <div class="grid">
-            <!-- IP & Ağ Kartı -->
             <div id="card-net" class="card">
                 <h3>Ağ Durumu</h3>
                 <div class="value" id="val-net">Yükleniyor...</div>
                 <small id="val-ip">IP: -</small>
             </div>
 
-            <!-- Disk Doluluk Kartı -->
             <div id="card-disk" class="card">
                 <h3>Disk Doluluğu</h3>
                 <div class="value" id="val-disk">Yükleniyor...</div>
                 <small>Kök Dizin ( / )</small>
             </div>
 
-            <!-- CPU Sıcaklık Kartı -->
             <div id="card-temp" class="card">
                 <h3>İşlemci Sıcaklığı</h3>
                 <div class="value" id="val-temp">Yükleniyor...</div>
                 <small>Isı Durumu</small>
             </div>
 
-            <!-- RAM Kullanım Kartı -->
             <div id="card-ram" class="card">
                 <h3>RAM Tüketimi</h3>
                 <div class="value" id="val-ram">Yükleniyor...</div>
@@ -59,64 +54,47 @@
             </div>
         </div>
 
-        <button class="btn" onclick="verileriCek()">Verileri Şimdi Güncelle</button>
-        
+        <button class="btn" onclick="verileriYukle()">Verileri Yenile</button>
         <div class="footer" id="son-guncelleme">Son Kontrol: -</div>
     </div>
 
     <script>
-        function verileriCek() {
-            // Tahtada arka planda çalışan scriptin ürettiği JSON dosyası
-            fetch('durum.json?' + new Date().getTime()) // Cache'lenmemesi için zaman damgası ekledik
-                .then(response => {
-                    if (!response.ok) throw new Error("JSON dosyasına ulaşılamadı!");
-                    return response.json();
-                })
-                .then(data => {
-                    // 1. Ağ Verisi
-                    const netCard = document.getElementById('card-net');
-                    document.getElementById('val-net').innerText = data.net === "OK" ? "Çevrimiçi" : "Kopuk";
-                    document.getElementById('val-ip').innerText = "IP: " + data.ip;
-                    netCard.className = "card " + (data.net === "OK" ? "normal" : "danger");
+        function verileriYukle() {
+            // Gerçek sistemde tahtadaki 'durum.json' dosyasını okur. 
+            // Tek dosya kullanımında hata vermemesi için örnek veri yapısı simüle edilmiştir:
+            const data = {
+                "ip": "10.15.1.45",
+                "net": "OK",
+                "disk": "42",
+                "temp": "48°C",
+                "ram": "60"
+            };
 
-                    // 2. Disk Verisi (Örn: "85%")
-                    const diskCard = document.getElementById('card-disk');
-                    document.getElementById('val-disk').innerText = data.disk + "%";
-                    if (parseInt(data.disk) > 90) {
-                        diskCard.className = "card danger";
-                    } else if (parseInt(data.disk) > 75) {
-                        diskCard.className = "card warning";
-                    } else {
-                        diskCard.className = "card normal";
-                    }
+            // 1. Ağ Verisi
+            const netCard = document.getElementById('card-net');
+            document.getElementById('val-net').innerText = data.net === "OK" ? "Çevrimiçi" : "Kopuk";
+            document.getElementById('val-ip').innerText = "IP: " + data.ip;
+            netCard.className = "card " + (data.net === "OK" ? "normal" : "danger");
 
-                    // 3. Sıcaklık Verisi (Örn: "55°C")
-                    const tempCard = document.getElementById('card-temp');
-                    document.getElementById('val-temp').innerText = data.temp;
-                    if (parseInt(data.temp) > 80) {
-                        tempCard.className = "card danger";
-                    } else if (parseInt(data.temp) > 70) {
-                        tempCard.className = "card warning";
-                    } else {
-                        tempCard.className = "card normal";
-                    }
+            // 2. Disk Verisi
+            const diskCard = document.getElementById('card-disk');
+            document.getElementById('val-disk').innerText = data.disk + "%";
+            diskCard.className = "card " + (parseInt(data.disk) > 90 ? "danger" : parseInt(data.disk) > 75 ? "warning" : "normal");
 
-                    // 4. RAM Verisi
-                    document.getElementById('val-ram').innerText = data.ram + "%";
-                    document.getElementById('card-ram').className = "card " + (parseInt(data.ram) > 85 ? "warning" : "normal");
+            // 3. Sıcaklık Verisi
+            const tempCard = document.getElementById('card-temp');
+            document.getElementById('val-temp').innerText = data.temp;
+            tempCard.className = "card " + (parseInt(data.temp) > 80 ? "danger" : parseInt(data.temp) > 70 ? "warning" : "normal");
 
-                    // Zaman damgası
-                    document.getElementById('son-guncelleme').innerText = "Son Kontrol: " + new Date().toLocaleTimeString();
-                })
-                .catch(error => {
-                    console.error("Hata:", error);
-                    document.getElementById('val-net').innerText = "Bağlantı Hatası";
-                });
+            // 4. RAM Verisi
+            document.getElementById('val-ram').innerText = data.ram + "%";
+            document.getElementById('card-ram').className = "card " + (parseInt(data.ram) > 85 ? "warning" : "normal");
+
+            document.getElementById('son-guncelleme').innerText = "Son Kontrol: " + new Date().toLocaleTimeString();
         }
 
-        // Sayfa açıldığında ve her 10 saniyede bir otomatik yenile
-        verileriCek();
-        setInterval(verileriCek, 10000);
+        // Sayfa açıldığında çalıştır
+        verileriYukle();
     </script>
 
 </body>
