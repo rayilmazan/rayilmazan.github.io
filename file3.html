@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rayılmazan QR Dosya Gönderici</title>
-    <!-- Harici bağımlılık olmasın diye CDN üzerinden QR kütüphanesi -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f9; color: #333; }
@@ -14,23 +13,30 @@
         button:active { background: #0056b3; }
         #qrcode { margin-top: 20px; display: flex; justify-content: center; }
         .info { font-size: 14px; color: #666; margin-top: 10px; word-break: break-all; }
+        .settings { font-size: 12px; color: #007bff; cursor: pointer; margin-top: 5px; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="box">
-        <h2>Telefon -> Tahta Paylaşım</h2>
-        <p>Göndermek istediğin dosyayı seç:</p>
+        <h2>Rayılmazan Paylaşım</h2>
+        <p>Dosyayı seç ve direkt QR üret:</p>
         
         <input type="file" id="dosyaSecici">
-        <button onclick="paylasimiBaslat()">QR Kod Üret</button>
+        <button onclick="qrUret()">QR Kod Üret</button>
         
         <div id="qrcode"></div>
         <div class="info" id="linkBilgi"></div>
+        <div class="settings" onclick="ipSifirla()">IP Adresini Değiştir</div>
     </div>
 
     <script>
-        function paylasimiBaslat() {
+        function ipSifirla() {
+            localStorage.removeItem('telefon_ip');
+            alert("Kayıtlı IP silindi. Sonraki üretimde tekrar sorulacak.");
+        }
+
+        function qrUret() {
             const fileInput = document.getElementById('dosyaSecici');
             const qrContainer = document.getElementById('qrcode');
             const linkBilgi = document.getElementById('linkBilgi');
@@ -44,29 +50,26 @@
             }
 
             const file = fileInput.files[0];
-            
-            // Dosyayı tarayıcının yerel hafızasına (Blob URL) alıyoruz
-            const fileURL = URL.createObjectURL(file);
 
-            // Telefonun yerel ağ IP adresini simüle etmek veya girmek için 
-            // Not: Tarayıcılar güvenlik nedeniyle telefonun gerçek yerel IP'sini doğrudan JS ile bazen gizleyebilir.
-            // En pratik yöntem aşağıda IP'yi manuel girmek veya otomatik okutmaktır.
-            
-            let yerelIP = prompt("Telefonunuzun yerel ağ IP adresini girin (Örn: 192.168.1.25):", "192.168.1.");
-            
-            if (!yerelIP) return;
+            // IP adresini hafızadan (localStorage) kontrol et
+            let yerelIP = localStorage.getItem('telefon_ip');
 
-            // Not: Bu saf HTML yapısı tam bir yerel sunucu gibi dışarıya dosya sunamaz ancak 
-            // aynı tarayıcı oturumunda veya yerel ağ sunucu uygulamaları (Primitive FTP/HTTP Server vb.) ile birleştirildiğinde kusursuz çalışır.
-            // Alternatif en pratik saf JS veri aktarım linki:
+            if (!yerelIP) {
+                yerelIP = prompt("Telefonun yerel ağ IP adresini gir (Örn: 192.168.1.25):", "192.168.1.");
+                if (!yerelIP) return;
+                localStorage.setItem('telefon_ip', yerelIP); // Bir daha sormamak için kaydet
+            }
+
+            // Dosya için geçici yerel link oluştur
+            const dosyaLink = URL.createObjectURL(file);
             
-            const tamLink = fileURL; // Yerel test için
-            
-            linkBilgi.innerHTML = `Seçilen Dosya: <b>${file.name}</b>`;
+            // Eğer telefonda arka planda bir HTTP sunucu çalışıyorsa link doğrudan indirilebilir olur.
+            // Örnek: http://[IP]:8080/[dosya_adi] formatına dönüştürülebilir.
+            linkBilgi.innerHTML = `Seçilen: <b>${file.name}</b><br><small>Hedef IP: ${yerelIP}</small>`;
 
             // QR Kodu oluştur
             new QRCode(qrContainer, {
-                text: yerelIP + " üzerinden " + file.name,
+                text: "http://" + yerelIP + "/" + file.name,
                 width: 200,
                 height: 200
             });
