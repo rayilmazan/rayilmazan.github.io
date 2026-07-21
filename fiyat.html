@@ -2,50 +2,59 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Rayılmazan - Ürün Takip Asistanı</title>
+    <title>rayılmazan - Ürün Takip Asistanı</title>
     <style>
-        body { font-family: sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { margin-top: 0; color: #2c3e50; }
-        .form-group { margin-bottom: 15px; }
-        input[type="text"] { width: 70%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #2980b9; }
+        :root { --primary: #2c3e50; --accent: #27ae60; --bg: #f4f6f9; --card: #ffffff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: var(--card); padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .input-row { display: flex; gap: 10px; }
+        input[type="text"] { flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
+        input[type="text"]:focus { border-color: var(--accent); }
+        button { padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #219653; }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .tag { display: inline-flex; align-items: center; background: #e2e8f0; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+        .tag .remove { margin-left: 8px; cursor: pointer; color: #e74c3c; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f2f2f2; }
-        .tag { display: inline-block; background: #e0e0e0; padding: 3px 8px; border-radius: 12px; margin: 2px; font-size: 12px; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; font-size: 14px; }
+        th { background: #f8fafc; font-weight: 600; }
+        .status-loading { color: #d97706; font-weight: 500; }
+        .status-ready { color: #059669; font-weight: 500; }
+        .actions { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Ürün Takip Asistanı</h2>
-    <p>Takip etmek istediğiniz anahtar kelimeleri ekleyin ve yerel olarak listeyi yönetin.</p>
+    <h2>rayılmazan &mdash; Yerel Ürün & Fiyat Takip Asistanı</h2>
+    <p>Takip etmek istediğiniz ürün kelimelerini ekleyin. Veriler tarayıcınızda yerel olarak saklanır.</p>
     
     <div class="form-group">
-        <input type="text" id="keywordInput" placeholder="Örn: Süt 1 Litre, Çay 1kg...">
-        <button onclick="addKeyword()">Kelime Ekle</button>
+        <div class="input-row">
+            <input type="text" id="keywordInput" placeholder="Örn: Süt 1L, Toz Şeker, Çay 1kg..." onkeypress="checkEnter(event)">
+            <button onclick="addKeyword()">Kelime Ekle</button>
+        </div>
+        <div class="tag-container" id="keywordTags"></div>
     </div>
 
-    <div class="form-group">
-        <strong>Aktif Takip Listesi:</strong>
-        <div id="keywordTags" style="margin-top: 5px;"></div>
+    <div class="actions">
+        <button onclick="startScanning()" style="background: #2563eb; width: 100%;">Listeyi Sorgula / Tara</button>
     </div>
 
-    <button onclick="searchProducts()" style="background: #27ae60; width: 100%;">Taramayı Başlat</button>
-
-    <h3>Sonuçlar</h3>
+    <h3>Arama Sonuçları</h3>
     <table>
         <thead>
             <tr>
-                <th>Ürün / Kelime</th>
-                <th>Tahmini / Bulunan Fiyat</th>
-                <th>Durum</th>
+                <th>Aranan Ürün / Kelime</th>
+                <th>Kaynak / Platform</th>
+                <th>Tahmini / Güncel Durum</th>
+                <th>İşlem</th>
             </tr>
         </thead>
         <tbody id="resultTableBody">
-            <tr><td colspan="3" style="text-align: center; color: #777;">Henüz arama yapılmadı.</td></tr>
+            <tr><td colspan="4" style="text-align: center; color: #64748b;">Henüz arama başlatılmadı. Kelime ekleyip tara butonuna basın.</td></tr>
         </tbody>
     </table>
 </div>
@@ -56,10 +65,13 @@
     function renderKeywords() {
         const container = document.getElementById('keywordTags');
         container.innerHTML = '';
+        if (keywords.length === 0) {
+            container.innerHTML = '<span style="color: #94a3b8; font-size: 13px;">Henüz kelime eklenmedi.</span>';
+        }
         keywords.forEach((kw, index) => {
-            const tag = document.createElement('span');
+            const tag = document.createElement('div');
             tag.className = 'tag';
-            tag.innerHTML = `${kw} <span style="cursor:pointer;color:red;margin-left:5px;" onclick="removeKeyword(${index})">&times;</span>`;
+            tag.innerHTML = `${kw} <span class="remove" onclick="removeKeyword(${index})">&times;</span>`;
             container.appendChild(tag);
         });
         localStorage.setItem('rayilmazan_keywords', JSON.stringify(keywords));
@@ -75,32 +87,46 @@
         }
     }
 
+    function checkEnter(e) {
+        if (e.key === 'Enter') addKeyword();
+    }
+
     function removeKeyword(index) {
         keywords.splice(index, 1);
         renderKeywords();
     }
 
-    function searchProducts() {
+    function startScanning() {
         const tbody = document.getElementById('resultTableBody');
         tbody.innerHTML = '';
 
         if (keywords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Lütfen önce takip edilecek kelime ekleyin.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ef4444;">Lütfen önce takip edilecek en az bir kelime ekleyin.</td></tr>';
             return;
         }
 
         keywords.forEach(kw => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${kw}</td>
-                <td>Simüle Ediliyor...</td>
-                <td><span style="color:orange;">Bekleniyor</span></td>
+                <td><strong>${kw}</strong></td>
+                <td>marketfiyati.org.tr (Simüle)</td>
+                <td class="status-loading">Sorgulanıyor...</td>
+                <td><button style="padding: 5px 10px; font-size: 12px; background: #475569;" onclick="alert('${kw} için manuel arama bağlantısı hazırlanıyor.')">Git</button></td>
             `;
             tbody.appendChild(row);
         });
-        
-        // Not: Çoğu market sitesi CORS güvenlik kısıtlamaları (Cross-Origin Resource Sharing) nedeniyle doğrudan tarayıcı içinden fetch/AJAX istekleriyle kazınmaya izin vermez. 
-        // Gerçek API entegrasyonu veya hedef site yapısı için isteklerin nasıl şekillendirilmesini istersiniz?
+
+        // Simüle edilmiş ağ gecikmesiyle sonuçları doldur
+        setTimeout(() => {
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, idx) => {
+                if(keywords[idx]) {
+                    const statusCell = row.cells[2];
+                    statusCell.className = 'status-ready';
+                    statusCell.innerHTML = `Veri tabanı eşleşmesi bekleniyor (CORS Sınırı)`;
+                }
+            });
+        }, 1000);
     }
 
     renderKeywords();
