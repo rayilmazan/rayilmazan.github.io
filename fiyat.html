@@ -2,175 +2,199 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>rayılmazan - Python & Web Kazıma Paneli</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yerel Ağ IP Çakışma ve ARP Analizörü - rayılmazan</title>
     <style>
-        :root { --primary: #1e293b; --accent: #27ae60; --bg: #f8fafc; --card: #ffffff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: var(--card); padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        h2 { margin-top: 0; color: var(--primary); font-size: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; }
-        p { font-size: 14px; color: #475569; }
-        .form-group { margin-bottom: 15px; }
-        .input-row { display: flex; gap: 8px; }
-        input[type="text"] { flex: 1; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
-        input[type="text"]:focus { border-color: #2563eb; }
-        button { padding: 10px 18px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px; }
-        button:hover { background: #219653; }
-        .tag-container { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-        .tag { display: inline-flex; align-items: center; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 4px; font-size: 13px; }
-        .tag .remove { margin-left: 6px; cursor: pointer; color: #dc2626; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; font-size: 14px; }
-        th { background: #f8fafc; font-weight: 600; color: #334155; }
-        .instructions { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #1e3a8a; line-height: 1.5; }
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #334155;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        hh1, h2 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+        p {
+            font-size: 0.95rem;
+            color: #64748b;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        .results {
+            margin-top: 24px;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+        .alert-danger {
+            background-color: #fee2e2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+        .alert-success {
+            background-color: #dcfce7;
+            color: var(--success);
+            border: 1px solid #bbf7d0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: var(--primary);
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>rayılmazan &mdash; Entegre Ürün Takip Sistemi</h2>
+    <h2>IP Çakışma ve ARP Analizörü</h2>
+    <p>Komut satırından aldığınız <strong>arp -a</strong> (Windows) veya <strong>arp -n</strong> (Linux/Pardus) çıktısını aşağıdaki alana yapıştırıp analiz edin.</p>
     
-    <div class="instructions">
-        <strong>Nasıl Kullanılır?</strong> Tarayıcılar güvenlik (CORS) nedeniyle dış sitelerden doğrudan arka planda veri kazımasına izin vermez. Gerçek zamanlı ve hatasız bir web kazıma altyapısı için tek yapmanız gereken aşağıdaki adımları izlemektir:
-        <ol style="margin: 5px 0 0 20px; padding: 0;">
-            <li>Bilgisayarınızda terminale girip şu komutu çalıştırın: <code style="background:#dbeafe; padding:2px 4px; border-radius:4px;">pip install flask requests beautifulsoup4</code></li>
-            <li>Aşağıdaki Python kodunu kopyalayıp bir <code style="background:#dbeafe; padding:2px 4px; border-radius:4px;">app.py</code> dosyası olarak kaydedin ve <code style="background:#dbeafe; padding:2px 4px; border-radius:4px;">python app.py</code> ile çalıştırın.</li>
-            <li>Tarayıcınızdan <code style="background:#dbeafe; padding:2px 4px; border-radius:4px;">http://localhost:5000</code> adresine girerek bu arayüzü tam fonksiyonel olarak kullanın.</li>
-        </ol>
-    </div>
+    <textarea id="arpInput" placeholder="Örnek Çıktı:
+Internet Address      Physical Address      Type
+192.168.1.1       aa-bb-cc-dd-ee-ff     dynamic
+192.168.1.50      11-22-33-44-55-66     dynamic"></textarea>
+    
+    <button onclick="analyzeArp()">Analiz Et</button>
 
-    <div class="form-group">
-        <div class="input-row">
-            <input type="text" id="keywordInput" placeholder="Örn: Süt, Şeker, Çay..." onkeypress="checkEnter(event)">
-            <button onclick="addKeyword()">Kelime Ekle</button>
-        </div>
-        <div class="tag-container" id="keywordTags"></div>
-    </div>
-
-    <button onclick="startScraping()" style="width: 100%; background: #2563eb; margin-top: 10px;">Verileri Kazı ve Listele</button>
-
-    <h3>Kazıma Sonuçları</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Ürün / Kelime</th>
-                <th>Kazınan Sonuç / Durum</th>
-            </tr>
-        </thead>
-        <tbody id="resultTableBody">
-            <tr><td colspan="2" style="text-align: center; color: #64748b;">Henüz tarama başlatılmadı.</td></tr>
-        </tbody>
-    </table>
+    <div class="results" id="resultsArea"></div>
 </div>
 
-<hr style="margin: 30px 0; border: none; border-top: 1px solid #e2e8f0;">
-
-<h3>Python Sunucu Kodu (app.py)</h3>
-<p>Aşağıdaki kodu kopyalayıp bilgisayarınızda <code style="background:#e2e8f0; padding:2px 4px; border-radius:4px;">app.py</code> adıyla kaydedin:</p>
-<pre style="background: #1e293b; color: #f8fafc; padding: 15px; border-radius: 6px; font-size: 12px; overflow-x: auto;"><code>from flask import Flask, jsonify, render_template_string, request
-import requests
-from bs4 import BeautifulSoup
-
-app = Flask(__name__)
-
-# Tek dosya içinde hem sunucu hem arayüz sunumu
-HTML_TEMPLATE = """
-&lt;!-- Bu arayüz yukarıdaki HTML/JS kodunun birebir aynısıdır --&gt;
-"""
-
-def fetch_market_data(keyword):
-    try:
-        # marketfiyati.org.tr veya arama motoru üzerinden web scraping
-        url = f"https://www.google.com/search?q=site:marketfiyati.org.tr+{keyword}"
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        response = requests.get(url, headers=headers, timeout=5)
-        
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            result_div = soup.find('div', class_='BNeawe')
-            if result_div:
-                return result_div.text
-        return "Eşleşen veri bulunamadı."
-    except Exception as e:
-        return f"Bağlantı hatası: {str(e)}"
-
-@app.route('/api/search')
-def api_search():
-    keyword = request.args.get('q', '')
-    data = fetch_market_data(keyword)
-    return jsonify({'result': data})
-
-if __name__ == '__main__':
-    app.run(port=5000, debug=True)
-</code></pre>
+<div class="footer">
+    rayılmazan - Yerel Ağ Yönetim Aracı
+</div>
 
 <script>
-    let keywords = JSON.parse(localStorage.getItem('rayilmazan_keywords')) || [];
+function analyzeArp() {
+    const input = document.getElementById('arpInput').value;
+    const resultsArea = document.getElementById('resultsArea');
+    resultsArea.innerHTML = '';
 
-    function render() {
-        const container = document.getElementById('keywordTags');
-        container.innerHTML = '';
-
-        if (keywords.length === 0) {
-            container.innerHTML = '<span style="color: #94a3b8; font-size: 13px;">Henüz kelime eklenmedi.</span>';
-        }
-
-        keywords.forEach((kw, index) => {
-            const tag = document.createElement('div');
-            tag.className = 'tag';
-            tag.innerHTML = `${kw} <span class="remove" onclick="removeKeyword(${index})">&times;</span>`;
-            container.appendChild(tag);
-        });
-
-        localStorage.setItem('rayilmazan_keywords', JSON.stringify(keywords));
+    if (!input.trim()) {
+        resultsArea.innerHTML = '<div class="alert alert-danger">Lütfen geçerli bir ARP tablosu yapıştırın.</div>';
+        return;
     }
 
-    function addKeyword() {
-        const input = document.getElementById('keywordInput');
-        const val = input.value.trim();
-        if (val && !keywords.includes(val)) {
-            keywords.push(val);
-            input.value = '';
-            render();
-        }
-    }
+    const lines = input.split('\n');
+    const ipMap = new Map();
+    let parsedCount = 0;
 
-    function checkEnter(e) {
-        if (e.key === 'Enter') addKeyword();
-    }
+    // Regex to match IPv4 and MAC addresses
+    const ipRegex = /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/;
+    const macRegex = /\b(?:[0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}\b|\b(?:[0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b/;
 
-    function removeKeyword(index) {
-        keywords.splice(index, 1);
-        render();
-    }
+    lines.forEach(line => {
+        const ipMatch = line.match(ipRegex);
+        const macMatch = line.match(macRegex);
 
-    async function startScraping() {
-        const tbody = document.getElementById('resultTableBody');
-        tbody.innerHTML = '';
+        if (ipMatch && macMatch) {
+            const ip = ipMatch[0];
+            const mac = macMatch[0].toLowerCase().replace(/\./g, '-');
 
-        if (keywords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #ef4444;">Lütfen önce takip edilecek kelime ekleyin.</td></tr>';
-            return;
-        }
-
-        for (let kw of keywords) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td><strong>${kw}</strong></td><td style="color: #d97706;">Kazınıyor...</td>`;
-            tbody.appendChild(row);
-
-            try {
-                // Flask sunucunuza istek atar (Yerel test için app.py çalışıyor olmalıdır)
-                const res = await fetch(`http://localhost:5000/api/search?q=${encodeURIComponent(kw)}`);
-                const data = await res.json();
-                row.cells[1].style.color = '#059669';
-                row.cells[1].innerHTML = data.result;
-            } catch (err) {
-                row.cells[1].style.color = '#dc2626';
-                row.cells[1].innerHTML = 'Python sunucusuna (localhost:5000) bağlanılamadı. app.py çalışıyor mu?';
+            if (!ipMap.has(ip)) {
+                ipMap.set(ip, new Set());
             }
+            ipMap.get(ip).add(mac);
+            parsedCount++;
         }
+    });
+
+    if (parsedCount === 0) {
+        resultsArea.innerHTML = '<div class="alert alert-danger">Girilen metinde geçerli IP veya MAC adresi bulunamadı.</div>';
+        return;
     }
 
-    render();
+    let conflictsFound = [];
+    ipMap.forEach((macs, ip) => {
+        if (macs.size > 1) {
+            conflictsFound.push({ ip: ip, macs: Array.from(macs) });
+        }
+    });
+
+    let html = '';
+    if (conflictsFound.length > 0) {
+        html += `<div class="alert alert-danger">⚠️ Dikkat! ${conflictsFound.length} adet IP çakışması tespit edildi! Aynı IP adresini kullanan farklı cihazlar mevcut.</div>`;
+        html += '<table><tr><th>Çakışan IP Adresi</th><th>Tespit Edilen MAC Adresleri</th></tr>';
+        conflictsFound.forEach(item => {
+            html += `<tr><td><strong>${item.ip}</strong></td><td>${item.macs.join(', ')}</td></tr>`;
+        });
+        html += '</table>';
+    } else {
+        html += `<div class="alert alert-success">✓ Tarama tamamlandı. Analiz edilen ${parsedCount} kayıt arasında IP çakışmasına rastlanmadı.</div>`;
+    }
+
+    // Tüm listeyi tablo olarak göster
+    html += '<h3 style="margin-top:24px; font-size:1.1rem; color:#1e293b;">Tespit Edilen Tüm Cihazlar</h3>';
+    html += '<table><tr><th>IP Adresi</th><th>MAC Adresi</th></tr>';
+    ipMap.forEach((macs, ip) => {
+        macs.forEach(mac => {
+            html += `<tr><td>${ip}</td><td>${mac}</td></tr>`;
+        });
+    });
+    html += '</table>';
+
+    resultsArea.innerHTML = html;
+}
 </script>
 
 </body>
