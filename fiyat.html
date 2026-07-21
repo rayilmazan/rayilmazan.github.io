@@ -4,57 +4,51 @@
     <meta charset="UTF-8">
     <title>rayılmazan - Ürün Takip Asistanı</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #27ae60; --bg: #f4f6f9; --card: #ffffff; }
+        :root { --primary: #1e293b; --accent: #0f172a; --bg: #f8fafc; --card: #ffffff; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: var(--card); padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
-        .form-group { margin-bottom: 20px; }
-        .input-row { display: flex; gap: 10px; }
-        input[type="text"] { flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
-        input[type="text"]:focus { border-color: var(--accent); }
-        button { padding: 10px 20px; background: var(--accent); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-        button:hover { background: #219653; }
-        .tag-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-        .tag { display: inline-flex; align-items: center; background: #e2e8f0; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 500; }
-        .tag .remove { margin-left: 8px; cursor: pointer; color: #e74c3c; font-weight: bold; }
+        .container { max-width: 800px; margin: auto; background: var(--card); padding: 25px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+        h2 { margin-top: 0; color: var(--primary); font-size: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; }
+        p { font-size: 14px; color: #475569; }
+        .form-group { margin-bottom: 15px; }
+        .input-row { display: flex; gap: 8px; }
+        input[type="text"] { flex: 1; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
+        input[type="text"]:focus { border-color: #2563eb; }
+        button { padding: 10px 18px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 14px; }
+        button:hover { background: #1d4ed8; }
+        .tag-container { display: flex; flex-wrap: gap; gap: 6px; margin-top: 10px; }
+        .tag { display: inline-flex; align-items: center; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 4px; font-size: 13px; }
+        .tag .remove { margin-left: 6px; cursor: pointer; color: #dc2626; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; font-size: 14px; }
-        th { background: #f8fafc; font-weight: 600; }
-        .status-loading { color: #d97706; font-weight: 500; }
-        .status-ready { color: #059669; font-weight: 500; }
-        .actions { margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; font-size: 14px; }
+        th { background: #f8fafc; font-weight: 600; color: #334155; }
+        .btn-go { background: #16a34a; padding: 6px 12px; font-size: 13px; text-decoration: none; color: white; border-radius: 4px; display: inline-block; }
+        .btn-go:hover { background: #15803d; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>rayılmazan &mdash; Yerel Ürün & Fiyat Takip Asistanı</h2>
-    <p>Takip etmek istediğiniz ürün kelimelerini ekleyin. Veriler tarayıcınızda yerel olarak saklanır.</p>
+    <h2>rayılmazan &mdash; Hızlı Ürün Arama Paneli</h2>
+    <p>Takip etmek istediğiniz ürünleri ekleyin. Listeden tek tıkla doğrudan resmi fiyat sorgulama sayfasına gidin.</p>
     
     <div class="form-group">
         <div class="input-row">
-            <input type="text" id="keywordInput" placeholder="Örn: Süt 1L, Toz Şeker, Çay 1kg..." onkeypress="checkEnter(event)">
-            <button onclick="addKeyword()">Kelime Ekle</button>
+            <input type="text" id="keywordInput" placeholder="Örn: Süt, Şeker, Çay..." onkeypress="checkEnter(event)">
+            <button onclick="addKeyword()">Ekle</button>
         </div>
         <div class="tag-container" id="keywordTags"></div>
     </div>
 
-    <div class="actions">
-        <button onclick="startScanning()" style="background: #2563eb; width: 100%;">Listeyi Sorgula / Tara</button>
-    </div>
-
-    <h3>Arama Sonuçları</h3>
+    <h3>Takip Edilen Ürünler</h3>
     <table>
         <thead>
             <tr>
-                <th>Aranan Ürün / Kelime</th>
-                <th>Kaynak / Platform</th>
-                <th>Tahmini / Güncel Durum</th>
-                <th>İşlem</th>
+                <th>Ürün / Kelime</th>
+                <th>Hızlı Eylem</th>
             </tr>
         </thead>
         <tbody id="resultTableBody">
-            <tr><td colspan="4" style="text-align: center; color: #64748b;">Henüz arama başlatılmadı. Kelime ekleyip tara butonuna basın.</td></tr>
+            <tr><td colspan="2" style="text-align: center; color: #64748b;">Henüz kelime eklenmedi.</td></tr>
         </tbody>
     </table>
 </div>
@@ -62,18 +56,37 @@
 <script>
     let keywords = JSON.parse(localStorage.getItem('rayilmazan_keywords')) || [];
 
-    function renderKeywords() {
+    function render() {
         const container = document.getElementById('keywordTags');
+        const tbody = document.getElementById('resultTableBody');
+        
         container.innerHTML = '';
+        tbody.innerHTML = '';
+
         if (keywords.length === 0) {
-            container.innerHTML = '<span style="color: #94a3b8; font-size: 13px;">Henüz kelime eklenmedi.</span>';
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #64748b;">Henüz kelime eklenmedi.</td></tr>';
+            localStorage.setItem('rayilmazan_keywords', JSON.stringify(keywords));
+            return;
         }
+
         keywords.forEach((kw, index) => {
+            // Etiket oluştur
             const tag = document.createElement('div');
             tag.className = 'tag';
             tag.innerHTML = `${kw} <span class="remove" onclick="removeKeyword(${index})">&times;</span>`;
             container.appendChild(tag);
+
+            // Tablo satırı oluştur
+            const row = document.createElement('tr');
+            const targetUrl = `https://www.google.com/search?q=site:marketfiyati.org.tr+${encodeURIComponent(kw)}`;
+            
+            row.innerHTML = `
+                <td><strong>${kw}</strong></td>
+                <td><a href="${targetUrl}" target="_blank" class="btn-go">Fiyata Bak (MarketFiyatı)</a></td>
+            `;
+            tbody.appendChild(row);
         });
+
         localStorage.setItem('rayilmazan_keywords', JSON.stringify(keywords));
     }
 
@@ -83,7 +96,7 @@
         if (val && !keywords.includes(val)) {
             keywords.push(val);
             input.value = '';
-            renderKeywords();
+            render();
         }
     }
 
@@ -93,43 +106,10 @@
 
     function removeKeyword(index) {
         keywords.splice(index, 1);
-        renderKeywords();
+        render();
     }
 
-    function startScanning() {
-        const tbody = document.getElementById('resultTableBody');
-        tbody.innerHTML = '';
-
-        if (keywords.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #ef4444;">Lütfen önce takip edilecek en az bir kelime ekleyin.</td></tr>';
-            return;
-        }
-
-        keywords.forEach(kw => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><strong>${kw}</strong></td>
-                <td>marketfiyati.org.tr (Simüle)</td>
-                <td class="status-loading">Sorgulanıyor...</td>
-                <td><button style="padding: 5px 10px; font-size: 12px; background: #475569;" onclick="alert('${kw} için manuel arama bağlantısı hazırlanıyor.')">Git</button></td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        // Simüle edilmiş ağ gecikmesiyle sonuçları doldur
-        setTimeout(() => {
-            const rows = tbody.querySelectorAll('tr');
-            rows.forEach((row, idx) => {
-                if(keywords[idx]) {
-                    const statusCell = row.cells[2];
-                    statusCell.className = 'status-ready';
-                    statusCell.innerHTML = `Veri tabanı eşleşmesi bekleniyor (CORS Sınırı)`;
-                }
-            });
-        }, 1000);
-    }
-
-    renderKeywords();
+    render();
 </script>
 
 </body>
