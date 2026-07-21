@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rayılmazan - Ürün Takip Asistanı</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #2c3e50; }
+        .form-group { margin-bottom: 15px; }
+        input[type="text"] { width: 70%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f2f2f2; }
+        .tag { display: inline-block; background: #e0e0e0; padding: 3px 8px; border-radius: 12px; margin: 2px; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Ürün Takip Asistanı</h2>
+    <p>Takip etmek istediğiniz anahtar kelimeleri ekleyin ve yerel olarak listeyi yönetin.</p>
+    
+    <div class="form-group">
+        <input type="text" id="keywordInput" placeholder="Örn: Süt 1 Litre, Çay 1kg...">
+        <button onclick="addKeyword()">Kelime Ekle</button>
+    </div>
+
+    <div class="form-group">
+        <strong>Aktif Takip Listesi:</strong>
+        <div id="keywordTags" style="margin-top: 5px;"></div>
+    </div>
+
+    <button onclick="searchProducts()" style="background: #27ae60; width: 100%;">Taramayı Başlat</button>
+
+    <h3>Sonuçlar</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Ürün / Kelime</th>
+                <th>Tahmini / Bulunan Fiyat</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody id="resultTableBody">
+            <tr><td colspan="3" style="text-align: center; color: #777;">Henüz arama yapılmadı.</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    let keywords = JSON.parse(localStorage.getItem('rayilmazan_keywords')) || [];
+
+    function renderKeywords() {
+        const container = document.getElementById('keywordTags');
+        container.innerHTML = '';
+        keywords.forEach((kw, index) => {
+            const tag = document.createElement('span');
+            tag.className = 'tag';
+            tag.innerHTML = `${kw} <span style="cursor:pointer;color:red;margin-left:5px;" onclick="removeKeyword(${index})">&times;</span>`;
+            container.appendChild(tag);
+        });
+        localStorage.setItem('rayilmazan_keywords', JSON.stringify(keywords));
+    }
+
+    function addKeyword() {
+        const input = document.getElementById('keywordInput');
+        const val = input.value.trim();
+        if (val && !keywords.includes(val)) {
+            keywords.push(val);
+            input.value = '';
+            renderKeywords();
+        }
+    }
+
+    function removeKeyword(index) {
+        keywords.splice(index, 1);
+        renderKeywords();
+    }
+
+    function searchProducts() {
+        const tbody = document.getElementById('resultTableBody');
+        tbody.innerHTML = '';
+
+        if (keywords.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: red;">Lütfen önce takip edilecek kelime ekleyin.</td></tr>';
+            return;
+        }
+
+        keywords.forEach(kw => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${kw}</td>
+                <td>Simüle Ediliyor...</td>
+                <td><span style="color:orange;">Bekleniyor</span></td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+        // Not: Çoğu market sitesi CORS güvenlik kısıtlamaları (Cross-Origin Resource Sharing) nedeniyle doğrudan tarayıcı içinden fetch/AJAX istekleriyle kazınmaya izin vermez. 
+        // Gerçek API entegrasyonu veya hedef site yapısı için isteklerin nasıl şekillendirilmesini istersiniz?
+    }
+
+    renderKeywords();
+</script>
+
+</body>
+</html>
