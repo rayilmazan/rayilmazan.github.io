@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Güvenli Sıfır-IP P2P Dosya Transferi</title>
+    <title>P2P Yerel Ağ Dosya Köprüsü</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,6 +74,7 @@
         }
         progress { width: 100%; height: 20px; margin-top: 15px; }
         .warning { color: #e74c3c; font-size: 13px; margin: 5px 0; }
+        .success-box { background: #e8f8f5; border: 1px solid #27ae60; padding: 10px; border-radius: 4px; margin-top: 10px; }
     </style>
     <!-- QR Kod ve Tarayıcı Kütüphaneleri -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -94,10 +95,10 @@
     <div id="senderUI" class="hidden">
         <h3>Gönderici Cihaz</h3>
         <input type="file" id="fileInput">
-        <button id="createOfferBtn">1. Bağlantı Kodunu (QR) Üret</button>
+        <button id="createOfferBtn">1. Bağlantı Kodunu (QR/Metin) Üret</button>
         <div id="qrcode"></div>
         
-        <p class="warning">Kamera çalışmazsa aşağıdaki metni kopyalayıp alıcıya iletebilirsiniz:</p>
+        <p class="warning">QR kod yoğun veriden ötürü okunmazsa, aşağıdaki metni kopyalayıp alıcıya iletebilirsiniz:</p>
         <textarea id="senderManualText" placeholder="Bağlantı kodu burada görünecek..."></textarea>
         
         <p>Alıcının yanıt kodunu kamerayla okutun veya metni yapıştırın:</p>
@@ -110,7 +111,7 @@
     <!-- ALICI PANELİ -->
     <div id="receiverUI" class="hidden">
         <h3>Alıcı Cihaz</h3>
-        <p>Göndericinin bağlantı QR kodunu taratın veya metni yapıştırın:</p>
+        <p>Göndericinin bağlantı QR kodunu taratın veya metni aşağıya yapıştırın:</p>
         <video id="receiverVideo" autoplay playsinline></video>
         <canvas id="receiverCanvas" class="hidden"></canvas>
         <textarea id="senderOfferInput" placeholder="Gönderici kodunu buraya yapıştırın..."></textarea>
@@ -182,8 +183,8 @@
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById('qrcode'), {
                     text: fullOffer,
-                    width: 200,
-                    height: 200,
+                    width: 220,
+                    height: 220,
                     correctLevel: QRCode.CorrectLevel.L
                 });
                 log("Gönderici QR kodu ve metni oluşturuldu.");
@@ -255,7 +256,7 @@
             scanning = true;
             requestAnimationFrame(tickSender);
         }).catch(err => {
-            log("Kamera erişimi yok (Güvenlik politikası veya izin reddi). Manuel metin alanını kullanabilirsiniz.");
+            log("Kamera erişimi yok. Manuel metin alanını kullanabilirsiniz.");
         });
     }
 
@@ -366,8 +367,8 @@
                 document.getElementById('qrcodeReceiver').innerHTML = "";
                 new QRCode(document.getElementById('qrcodeReceiver'), {
                     text: fullAnswer,
-                    width: 200,
-                    height: 200,
+                    width: 220,
+                    height: 220,
                     correctLevel: QRCode.CorrectLevel.L
                 });
                 log("Alıcı yanıt QR kodu üretildi.");
