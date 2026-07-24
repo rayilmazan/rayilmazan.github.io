@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yerel Wi-Fi Dosya Transfer Paneli</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 { color: #2c3e50; }
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #qrcode {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+        }
+        .info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+            background: #eef2f7;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+    <!-- QR Kod kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Yerel Ağ Dosya Paylaşımı</h2>
+    <p>Hotspot ağına bağlı cihazların erişebilmesi için aşağıdaki alandan dosya seçin.</p>
+    
+    <input type="file" id="fileInput">
+    
+    <div class="info" id="statusText">Lütfen paylaşılacak bir dosya seçin.</div>
+    
+    <div id="qrcode"></div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const statusText = document.getElementById('statusText');
+    const qrcodeContainer = document.getElementById('qrcode');
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            statusText.innerHTML = `Seçilen Dosya: <strong>${file.name}</strong> (${(file.size/1024/1024).toFixed(2)} MB)`;
+            
+            // Gerçek yerel ağ senaryosunda bu kısma sunucunun yerel IP'si (örn: http://192.168.43.1:8080) yazılır.
+            const localURL = window.location.href; 
+            
+            qrcodeContainer.innerHTML = "";
+            new QRCode(qrcodeContainer, {
+                text: localURL,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
