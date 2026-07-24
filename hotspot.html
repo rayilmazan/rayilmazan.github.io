@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sıfır-IP WebRTC P2P Dosya Transferi</title>
+    <title>Güvenli Sıfır-IP P2P Dosya Transferi</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,14 +37,16 @@
             font-weight: bold;
         }
         button:hover { background-color: #2980b9; }
-        input[type="file"] {
+        input[type="file"], textarea {
             margin: 15px 0;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             width: 100%;
             box-sizing: border-box;
+            font-family: monospace;
         }
+        textarea { height: 80px; resize: vertical; }
         #qrcode, #qrcodeReceiver {
             margin: 20px auto;
             display: flex;
@@ -52,7 +54,7 @@
         }
         video {
             width: 100%;
-            max-height: 250px;
+            max-height: 220px;
             background: #000;
             border-radius: 4px;
             margin-top: 10px;
@@ -71,15 +73,16 @@
             color: #444;
         }
         progress { width: 100%; height: 20px; margin-top: 15px; }
+        .warning { color: #e74c3c; font-size: 13px; margin: 5px 0; }
     </style>
-    <!-- QR Kod Üretici ve Tarayıcı Kütüphaneleri -->
+    <!-- QR Kod ve Tarayıcı Kütüphaneleri -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h2>Sıfır-IP P2P QR Dosya Köprüsü</h2>
+    <h2>P2P Yerel Ağ Dosya Köprüsü</h2>
     
     <div id="modeSelect">
         <p>Lütfen bu cihazın rolünü seçin:</p>
@@ -93,18 +96,29 @@
         <input type="file" id="fileInput">
         <button id="createOfferBtn">1. Bağlantı Kodunu (QR) Üret</button>
         <div id="qrcode"></div>
-        <p>Alıcının ekranda oluşturacağı yanıt QR kodunu kamerayla okutun:</p>
+        
+        <p class="warning">Kamera çalışmazsa aşağıdaki metni kopyalayıp alıcıya iletebilirsiniz:</p>
+        <textarea id="senderManualText" placeholder="Bağlantı kodu burada görünecek..."></textarea>
+        
+        <p>Alıcının yanıt kodunu kamerayla okutun veya metni yapıştırın:</p>
         <video id="senderVideo" autoplay playsinline></video>
         <canvas id="senderCanvas" class="hidden"></canvas>
+        <textarea id="receiverAnswerInput" placeholder="Alıcı yanıt metnini buraya yapıştırın..."></textarea>
+        <button id="applyAnswerBtn">Yanıtı Uygula ve Bağlan</button>
     </div>
 
     <!-- ALICI PANELİ -->
     <div id="receiverUI" class="hidden">
         <h3>Alıcı Cihaz</h3>
-        <p>Göndericinin ekrandaki bağlantı QR kodunu kamerayla taratın:</p>
+        <p>Göndericinin bağlantı QR kodunu taratın veya metni yapıştırın:</p>
         <video id="receiverVideo" autoplay playsinline></video>
         <canvas id="receiverCanvas" class="hidden"></canvas>
+        <textarea id="senderOfferInput" placeholder="Gönderici kodunu buraya yapıştırın..."></textarea>
+        <button id="applyOfferBtn">Kodu İşle ve Yanıt Üret</button>
+        
         <div id="qrcodeReceiver"></div>
+        <p class="warning">Üretilen yanıt QR kodunu göndericiye okutun veya metni iletin:</p>
+        <textarea id="receiverManualText" placeholder="Yanıt kodu burada görünecek..."></textarea>
         <p id="receiverStatus" style="font-weight:bold; color:#e67e22;"></p>
     </div>
 
@@ -115,7 +129,7 @@
         <p id="transferStatus">Hazırlanıyor...</p>
     </div>
 
-    <div class="log" id="logBox">Sistem logları burada görünecek...</div>
+    <div class="log" id="logBox">Sistem logları hazır...</div>
 </div>
 
 <script>
@@ -132,10 +146,7 @@
     }
 
     function createPeerConnection() {
-        pc = new RTCPeerConnection({
-            iceServers: [] // Tamamen yerel ağ, harici STUN sunucuya gerek yok
-        });
-        
+        pc = new RTCPeerConnection({ iceServers: [] });
         pc.oniceconnectionstatechange = () => {
             log(`ICE Durumu: ${pc.iceConnectionState}`);
         };
@@ -145,7 +156,7 @@
     function startSenderMode() {
         document.getElementById('modeSelect').classList.add('hidden');
         document.getElementById('senderUI').classList.remove('hidden');
-        log("Gönderici modu seçildi.");
+        log("Gönderici modu aktif.");
 
         createPeerConnection();
 
@@ -164,19 +175,36 @@
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
 
-            // ICE adaylarının toplanmasını bekle
             setTimeout(async () => {
                 const fullOffer = JSON.stringify(pc.localDescription);
+                document.getElementById('senderManualText').value = fullOffer;
+                
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById('qrcode'), {
                     text: fullOffer,
-                    width: 220,
-                    height: 220,
+                    width: 200,
+                    height: 200,
                     correctLevel: QRCode.CorrectLevel.L
                 });
-                log("Gönderici QR kodu oluşturuldu. Alıcıya okutun.");
+                log("Gönderici QR kodu ve metni oluşturuldu.");
                 startSenderScanner();
             }, 1000);
+        };
+
+        document.getElementById('applyAnswerBtn').onclick = async () => {
+            const answerStr = document.getElementById('receiverAnswerInput').value.trim();
+            if (!answerStr) {
+                alert("Lütfen yanıt metnini girin!");
+                return;
+            }
+            try {
+                const answer = JSON.parse(answerStr);
+                await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                log("Bağlantı yanıtı uygulandı, tünel kuruluyor...");
+            } catch (e) {
+                log("Yanıt işleme hatası: " + e);
+                alert("Geçersiz yanıt formatı!");
+            }
         };
     }
 
@@ -199,7 +227,7 @@
             dataChannel.send(e.target.result);
             offset += e.target.result.byteLength;
             const progress = (offset / selectedFile.size) * 100;
-            document.getElementById('progressBar'].value = progress;
+            document.getElementById('progressBar').value = progress;
             document.getElementById('transferStatus').innerText = `%${progress.toFixed(1)} tamamlandı`;
 
             if (offset < selectedFile.size) {
@@ -215,7 +243,6 @@
             reader.readAsArrayBuffer(slice);
         }
 
-        // Meta veri gönder
         dataChannel.send(JSON.stringify({ name: selectedFile.name, size: selectedFile.size, type: selectedFile.type }));
         readNextChunk();
     }
@@ -227,13 +254,15 @@
             video.srcObject = stream;
             scanning = true;
             requestAnimationFrame(tickSender);
-        }).catch(err => log("Kamera erişim hatası: " + err));
+        }).catch(err => {
+            log("Kamera erişimi yok (Güvenlik politikası veya izin reddi). Manuel metin alanını kullanabilirsiniz.");
+        });
     }
 
     function tickSender() {
         if (!scanning) return;
         const video = document.getElementById('senderVideo');
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
             const canvas = document.getElementById('senderCanvas');
             canvas.height = video.videoHeight;
             canvas.width = video.videoWidth;
@@ -244,7 +273,7 @@
 
             if (code) {
                 scanning = false;
-                localStream.getTracks().forEach(t => t.stop());
+                if(localStream) localStream.getTracks().forEach(t => t.stop());
                 log("Alıcı yanıt QR kodu tarandı!");
                 try {
                     const answer = JSON.parse(code.data);
@@ -263,13 +292,22 @@
     function startReceiverMode() {
         document.getElementById('modeSelect').classList.add('hidden');
         document.getElementById('receiverUI').classList.remove('hidden');
-        log("Alıcı modu seçildi.");
+        log("Alıcı modu aktif.");
 
         createPeerConnection();
 
         pc.ondatachannel = event => {
             dataChannel = event.channel;
             setupDataChannelReceiver();
+        };
+
+        document.getElementById('applyOfferBtn').onclick = async () => {
+            const offerStr = document.getElementById('senderOfferInput').value.trim();
+            if (!offerStr) {
+                alert("Lütfen gönderici kodunu girin!");
+                return;
+            }
+            await handleOfferAndGenerateAnswer(offerStr);
         };
 
         startReceiverScanner();
@@ -283,13 +321,15 @@
             video.srcObject = stream;
             scanning = true;
             requestAnimationFrame(tickReceiver);
-        }).catch(err => log("Kamera erişim hatası: " + err));
+        }).catch(err => {
+            log("Kamera erişimi yok. Lütfen yukarıdaki metin alanına kodu yapıştırın.");
+        });
     }
 
     function tickReceiver() {
         if (!scanning) return;
         const video = document.getElementById('receiverVideo');
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        if (video && video.readyState === video.HAVE_ENOUGH_DATA) {
             const canvas = document.getElementById('receiverCanvas');
             canvas.height = video.videoHeight;
             canvas.width = video.videoWidth;
@@ -300,10 +340,10 @@
 
             if (code) {
                 scanning = false;
-                localStream.getTracks().forEach(t => t.stop());
+                if(localStream) localStream.getTracks().forEach(t => t.stop());
                 log("Gönderici teklif QR kodu tarandı!");
                 document.getElementById('receiverVideo').classList.add('hidden');
-                document.getElementById('receiverStatus').innerText = "Yanıt QR kodu üretiliyor...";
+                document.getElementById('receiverStatus').innerText = "Yanıt üretildi...";
 
                 handleOfferAndGenerateAnswer(code.data);
                 return;
@@ -321,18 +361,21 @@
 
             setTimeout(() => {
                 const fullAnswer = JSON.stringify(pc.localDescription);
+                document.getElementById('receiverManualText').value = fullAnswer;
+
                 document.getElementById('qrcodeReceiver').innerHTML = "";
                 new QRCode(document.getElementById('qrcodeReceiver'), {
                     text: fullAnswer,
-                    width: 220,
-                    height: 220,
+                    width: 200,
+                    height: 200,
                     correctLevel: QRCode.CorrectLevel.L
                 });
-                log("Alıcı yanıt QR kodu üretildi. Göndericiye okutun.");
-                document.getElementById('receiverStatus').innerText = "Lütfen bu QR kodu göndericiye taratın.";
+                log("Alıcı yanıt QR kodu üretildi.");
+                document.getElementById('receiverStatus').innerText = "Yanıt hazır. Göndericiye iletin.";
             }, 1000);
         } catch(e) {
             log("Offer işleme hatası: " + e);
+            alert("Geçersiz gönderici kodu!");
         }
     }
 
