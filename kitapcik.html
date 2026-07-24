@@ -2,11 +2,14 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>ÖSYM Tarzı İki Sütunlu Sınav Oluşturucu</title>
+    <title>ÖSYM Tarzı Sınav Oluşturucu</title>
     <style>
         @page {
             size: A4;
             margin: 15mm;
+        }
+        * {
+            box-sizing: border-box;
         }
         body {
             font-family: 'Times New Roman', Times, serif;
@@ -27,13 +30,12 @@
         }
         textarea {
             width: 100%;
-            height: 140px;
+            height: 220px;
             padding: 10px;
             font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box;
             resize: vertical;
             margin-bottom: 15px;
         }
@@ -44,26 +46,27 @@
             color: #2c3e50;
         }
         button {
-            background-color: #2c3e50;
+            background-color: #27ae60;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 11pt;
+            padding: 12px 24px;
+            font-size: 12pt;
+            font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            margin-right: 10px;
-            margin-top: 5px;
+            display: block;
+            width: 100%;
         }
         button:hover {
-            background-color: #34495e;
+            background-color: #219653;
         }
+        
+        /* Yazdırma Konteyneri - Ekran ve Baskı için ortak akış */
         .print-container {
             background: white;
-            width: 210mm;
+            max-width: 210mm;
             margin: 0 auto;
             padding: 0;
-            box-sizing: border-box;
-            box-shadow: 0 0 15px rgba(0,0,0,0.15);
         }
         .sinav-header {
             text-align: center;
@@ -86,7 +89,6 @@
             break-inside: avoid;
             page-break-inside: avoid;
         }
-        /* Cevap Anahtarı Alanı: Tek sütun (sütunsuz) ve tam genişlik */
         .cevap-anahtari-bolumu {
             column-span: all;
             -webkit-column-span: all;
@@ -116,6 +118,8 @@
             column-span: all;
             -webkit-column-span: all;
         }
+
+        /* Yazdırma Ayarları - İlk sayfa boşluğunu önleyen net kurallar */
         @media print {
             body {
                 background: none;
@@ -123,13 +127,16 @@
                 margin: 0;
             }
             .no-print {
-                display: none;
+                display: none !important;
             }
             .print-container {
-                box-shadow: none;
                 margin: 0;
+                box-shadow: none;
                 width: 100%;
-                padding: 0;
+            }
+            @page {
+                margin: 15mm;
+                size: A4;
             }
         }
     </style>
@@ -137,17 +144,13 @@
 <body>
 
     <div class="no-print">
-        <h2>ÖSYM Tarzı İki Sütunlu Sınav Oluşturucu</h2>
-        <p>Sorularınızı ve cevap anahtarınızı aşağıdaki kutulara girip <strong>"ÖSYM Düzenine Aktar"</strong> butonuna basın.</p>
+        <h2>ÖSYM Tarzı Sınav Oluşturucu</h2>
+        <p>Sorularınızı ve (varsa) en altta cevap anahtarınızı tek parça halinde aşağıdaki kutuya yapıştırın. Sistem otomatik olarak soruları iki sütuna, cevap anahtarını ise sütunsuz formata ayıracaktır.</p>
         
-        <label for="soruInput">Sorular (Her soruyu boşluk bırakarak yazın):</label>
-        <textarea id="soruInput" placeholder="1. Soru kökü ve seçenekleri...&#10;&#10;2. İkinci soru..."></textarea>
+        <label for="tumMetinInput">Sınav Metni:</label>
+        <textarea id="tumMetinInput" placeholder="1. Soru kökü...&#10;A) ... B) ... C) ... D) ... E) ...&#10;&#10;2. Soru kökü...&#10;&#10;CEVAP ANAHTARI&#10;1-A 2-C 3-B..."></textarea>
         
-        <label for="cevapInput">Cevap Anahtarı (İsteğe bağlı - Sütunsuz ve altta yer alır):</label>
-        <textarea id="cevapInput" style="height: 80px;" placeholder="Örn: 1-A  2-C  3-B  4-D  5-E"></textarea>
-        <br>
-        <button onclick="donustur()">ÖSYM Düzenine Aktar</button>
-        <button onclick="window.print()" style="background-color: #27ae60;">Yazdır / PDF Olarak Kaydet</button>
+        <button onclick="pdfAl()">PDF Olarak Kaydet / Yazdır</button>
     </div>
 
     <div class="print-container">
@@ -158,7 +161,7 @@
         
         <div id="osymOutput" class="osym-columns">
             <div class="soru">
-                <p><i>Sorularınızı yukarıdaki kutulara yazıp "ÖSYM Düzenine Aktar" butonuna tıkladığınızda burada ÖSYM formatında görünecektir.</i></p>
+                <p><i>Metninizi yukarıdaki kutuya yapıştırıp butona tıkladığınızda burada ÖSYM formatında görünecektir.</i></p>
             </div>
         </div>
         
@@ -168,19 +171,30 @@
     </div>
 
     <script>
-        function donustur() {
-            const soruText = document.getElementById('soruInput').value;
-            const cevapText = document.getElementById('cevapInput').value;
+        function pdfAl() {
+            const metin = document.getElementById('tumMetinInput').value;
             const output = document.getElementById('osymOutput');
             const cevapOutput = document.getElementById('cevapOutput');
             
-            if (!soruText.trim()) {
-                alert('Lütfen en az bir soru metni girin.');
+            if (!metin.trim()) {
+                alert('Lütfen sınav metnini girin.');
                 return;
             }
             
-            // Soruları paragraflara ayır
-            const paragraphs = soruText.split(/\n\s*\n/);
+            // Metni "CEVAP ANAHTARI" ibaresine göre ikiye ayırmaya çalış (büyük/küçük harf duyarsız)
+            let soruKismi = metin;
+            let cevapKismi = '';
+            
+            const regexCevap = /(cevap\s*anahtar[iı]?|cevaplar)/i;
+            const match = metin.search(regexCevap);
+            
+            if (match !== -1) {
+                soruKismi = metin.substring(0, match);
+                cevapKismi = metin.substring(match);
+            }
+            
+            // Soruları paragraflara ayır (çift satır boşluğu ile ayrılmış bloklar)
+            const paragraphs = soruKismi.split(/\n\s*\n/);
             let htmlContent = '';
             
             paragraphs.forEach((p) => {
@@ -192,18 +206,22 @@
             
             output.innerHTML = htmlContent;
             
-            // Cevap anahtarı varsa ekle (sütunsuz / tam genişlik)
-            if (cevapText.trim() !== '') {
-                const formattedCevap = cevapText.replace(/\n/g, '<br>');
+            // Cevap anahtarı kısmını işle
+            if (cevapKismi.trim() !== '') {
+                const formattedCevap = cevapKismi.replace(/\n/g, '<br>');
                 cevapOutput.innerHTML = `
                     <div class="cevap-anahtari-bolumu">
-                        <div class="cevap-baslik">CEVAP ANAHTARI</div>
                         <div class="cevap-icerik">${formattedCevap}</div>
                     </div>
                 `;
             } else {
                 cevapOutput.innerHTML = '';
             }
+            
+            // Kısa bir gecikme ile yazdırma penceresini aç (DOM güncellenmesi için)
+            setTimeout(() => {
+                window.print();
+            }, 300);
         }
     </script>
 </body>
