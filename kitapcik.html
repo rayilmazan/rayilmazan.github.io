@@ -30,7 +30,7 @@
         }
         textarea {
             width: 100%;
-            height: 220px;
+            height: 180px;
             padding: 10px;
             font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
@@ -120,6 +120,12 @@
             -webkit-column-span: all;
         }
 
+        /* Düzenlenebilir alan vurgusu için hafif odak efekti (Ekran görüntüsünde) */
+        .editable-area:focus {
+            outline: 1px dashed #3498db;
+            background-color: rgba(52, 152, 219, 0.02);
+        }
+
         /* Yazdırma / PDF Kuralları */
         @media print {
             body {
@@ -136,6 +142,10 @@
                 width: 100%;
                 padding: 0;
             }
+            .editable-area:focus {
+                outline: none;
+                background-color: transparent;
+            }
             @page {
                 margin: 15mm;
                 size: A4;
@@ -147,7 +157,7 @@
 
     <div class="no-print">
         <h2>ÖSYM Tarzı Sınav Oluşturucu</h2>
-        <p>Sorularınızı ve en altta (varsa) cevap anahtarınızı tek parça halinde aşağıdaki kutuya yapıştırıp butona basın.</p>
+        <p>Sınav metninizi kutuya yapıştırıp butona basın. İstediğiniz son düzenlemeleri doğrudan aşağıdaki <strong>ön izleme kağıdı üzerine tıklayarak</strong> yapabilirsiniz.</p>
         
         <label for="tumMetinInput">Sınav Metni:</label>
         <textarea id="tumMetinInput" placeholder="1. Soru kökü...&#10;A) ... B) ... C) ... D) ... E) ...&#10;&#10;2. Soru kökü...&#10;&#10;CEVAP ANAHTARI&#10;1-A 2-C 3-B..."></textarea>
@@ -156,18 +166,20 @@
     </div>
 
     <div class="print-container">
-        <div class="sinav-header">
+        <div class="sinav-header" contenteditable="true" class="editable-area" title="Tıklayıp başlığı düzenleyebilirsiniz">
             T.C. ÖLÇME, SEÇME VE YERLEŞTİRME MERKEZİ<br>
             ÖRNEK SINAV KİTAPÇIĞI
         </div>
         
-        <div id="osymOutput" class="osym-columns">
+        <!-- İki sütunlu soru alanı (Doğrudan düzenlenebilir) -->
+        <div id="osymOutput" class="osym-columns editable-area" contenteditable="true" title="Bu alana tıklayarak soruları doğrudan düzenleyebilirsiniz">
             <div class="soru">
-                <p><i>Metninizi yukarıdaki kutuya yapıştırıp butona tıkladığınızda burada iki sütunlu ÖSYM formatında görünecektir.</i></p>
+                <p><i>Metninizi yukarıdaki kutuya yapıştırıp butona tıkladığınızda burada iki sütunlu ÖSYM formatında görünecektir. Buraya tıklayarak metin üzerinde doğrudan değişiklik yapabilirsiniz.</i></p>
             </div>
         </div>
         
-        <div id="cevapOutput"></div>
+        <!-- Cevap anahtarı alanı (Doğrudan düzenlenebilir) -->
+        <div id="cevapOutput" class="editable-area" contenteditable="true"></div>
         
         <div class="footer-info">rayılmazan</div>
     </div>
@@ -217,6 +229,7 @@
                 cevapOutput.innerHTML = '';
             }
             
+            // Kısa bir gecikme ile yazdırma penceresini aç (yapılan manuel düzenlemelerin korunması için)
             setTimeout(() => {
                 window.print();
             }, 300);
