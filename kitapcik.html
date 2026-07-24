@@ -2,58 +2,63 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>ÖSYM Tarzı İki Sütunlu Sınav Şablonu</title>
+    <title>ÖSYM Tarzı İki Sütunlu Sınav Oluşturucu</title>
     <style>
-        /* Genel Sayfa Ayarları (A4) */
         @page {
             size: A4;
             margin: 15mm;
         }
-
         body {
-            font-family: 'Times New Roman', Times, serif, Arial, sans-serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
             line-height: 1.15;
             color: #000;
-            background-color: #fff;
+            background-color: #f4f6f8;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
-
-        /* İki Sütunlu Düzen ve Orta Çizgi */
-        .osym-container {
-            column-count: 2;
-            column-gap: 12mm;
-            column-rule: 1px solid #000; /* Sütunlar arası ÖSYM tarzı dikey çizgi */
-            text-align: justify;
-            orphans: 3;
-            widows: 3;
+        .no-print {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        /* Soru Blokları */
-        .soru {
-            margin-bottom: 15px;
-            break-inside: avoid; /* Sorunun ortadan bölünmesini engeller */
-            page-break-inside: avoid;
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 10px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11pt;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
         }
-
-        .soru-kok {
-            font-weight: bold;
-            margin-bottom: 5px;
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 11pt;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-right: 10px;
         }
-
-        /* Seçenekler Listesi */
-        .secenekler {
-            margin-top: 4px;
-            padding-left: 0;
-            list-style-type: none;
+        button:hover {
+            background-color: #34495e;
         }
-
-        .secenekler li {
-            margin-bottom: 3px;
+        .print-container {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 15mm;
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
         }
-
-        /* Üst Bilgi / Başlık Alanı (Opsiyonel) */
         .sinav-header {
             text-align: center;
             font-weight: bold;
@@ -62,53 +67,87 @@
             border-bottom: 1.5px solid #000;
             padding-bottom: 8px;
         }
-
-        /* Yazdırma Optimizasyonu */
+        .osym-columns {
+            column-count: 2;
+            column-gap: 12mm;
+            column-rule: 1px solid #000;
+            text-align: justify;
+            orphans: 3;
+            widows: 3;
+        }
+        .soru {
+            margin-bottom: 15px;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        .footer-info {
+            text-align: right;
+            font-size: 8pt;
+            color: #666;
+            margin-top: 30px;
+        }
         @media print {
             body {
-                width: 210mm;
-                height: 297mm;
+                background: none;
+                padding: 0;
+            }
+            .no-print {
+                display: none;
+            }
+            .print-container {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                padding: 0;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="sinav-header">
-        T.C. ÖLÇME, SEÇME VE YERLEŞTİRME MERKEZİ<br>
-        ÖRNEK SINAV KİTAPÇIĞI
+    <div class="no-print">
+        <h2>ÖSYM Tarzı İki Sütunlu Sınav Oluşturucu</h2>
+        <p>Sorularınızı veya metninizi aşağıdaki kutuya yapıştırın (Sorular arasında boşluk bırakın). Ardından <strong>"ÖSYM Düzenine Aktar"</strong> butonuna basın ve <strong>"Yazdır / PDF Olarak Kaydet"</strong> ile çıktısını alın.</p>
+        <textarea id="soruInput" placeholder="1. Soru kökü ve seçenekleri buraya yapıştırın...&#10;&#10;2. İkinci soru buraya..."></textarea>
+        <br>
+        <button onclick="donustur()">ÖSYM Düzenine Aktar</button>
+        <button onclick="window.print()" style="background-color: #27ae60;">Yazdır / PDF Olarak Kaydet</button>
     </div>
 
-    <div class="osym-container">
-
-        <!-- 1. Soru Örneği -->
-        <div class="soru">
-            <div class="soru-kok">1. Aşağıdakilerden hangisi istemci taraflı çalışan web teknolojilerinin temel özelliklerinden biri değildir?</div>
-            <ul class="secenekler">
-                A) Tarayıcı tarafından doğrudan yorumlanması<br>
-                B) Sunucu yükünü azaltması<br>
-                C) Veritabanı işlemlerini doğrudan güvenli biçimde yürütmesi<br>
-                D) Hızlı geri bildirim sağlaması<br>
-                E) Ek bir eklenti gerektirmemesi
-            </ul>
+    <div class="print-container">
+        <div class="sinav-header">
+            T.C. ÖLÇME, SEÇME VE YERLEŞTİRME MERKEZİ<br>
+            ÖRNEK SINAV KİTAPÇIĞI
         </div>
-
-        <!-- 2. Soru Örneği -->
-        <div class="soru">
-            <div class="soru-kok">2. Yerel ağ üzerinde donanım bileşenlerini izlemek amacıyla geliştirilen çevrim dışı araçlar, sunucu bağımlılığını ortadan kaldırır.</div>
-            <p>Bu yaklaşımın temel amacı aşağıdakilerden hangisidir?</p>
-            <ul class="secenekler">
-                A) Bulut tabanlı maliyetleri artırmak<br>
-                B) İnternet bağlantısına gerek duymadan kararlı çalışmak<br>
-                C) Verileri merkezi bir sunucuda depolamak<br>
-                D) Yalnızca işletim sistemi güncellemelerini denetlemek<br>
-                E) Ağ trafiğini dış sunuculara yönlendirmek
-            </ul>
+        <div id="osymOutput" class="osym-columns">
+            <div class="soru">
+                <p><i>Sorularınızı yukarıdaki kutuya yapıştırıp "ÖSYM Düzenine Aktar" butonuna tıkladığınızda burada iki sütunlu ÖSYM formatında görünecektir.</i></p>
+            </div>
         </div>
-
-        <!-- Buraya kendi sorularınızı veya doküman içeriğinizi ekleyebilirsiniz -->
-
+        <div class="footer-info">rayılmazan</div>
     </div>
 
+    <script>
+        function donustur() {
+            const text = document.getElementById('soruInput').value;
+            const output = document.getElementById('osymOutput');
+            if (!text.trim()) {
+                alert('Lütfen soru metni girin.');
+                return;
+            }
+            
+            const paragraphs = text.split(/\n\s*\n/);
+            let htmlContent = '';
+            
+            paragraphs.forEach((p) => {
+                if (p.trim() !== '') {
+                    const formattedText = p.replace(/\n/g, '<br>');
+                    htmlContent += `<div class="soru">${formattedText}</div>`;
+                }
+            });
+            
+            output.innerHTML = htmlContent;
+        }
+    </script>
 </body>
 </html>
