@@ -61,12 +61,15 @@
             background-color: #219653;
         }
         
-        /* Yazdırma Konteyneri - Ekran ve Baskı için ortak akış */
+        /* A4 Sayfa Ön İzleme Konteyneri */
         .print-container {
             background: white;
-            max-width: 210mm;
+            width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
-            padding: 0;
+            padding: 15mm;
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
         }
         .sinav-header {
             text-align: center;
@@ -76,6 +79,8 @@
             border-bottom: 1.5px solid #000;
             padding-bottom: 8px;
         }
+        
+        /* İki Sütunlu Soru Alanı ve Orta Çizgi */
         .osym-columns {
             column-count: 2;
             column-gap: 12mm;
@@ -89,6 +94,8 @@
             break-inside: avoid;
             page-break-inside: avoid;
         }
+
+        /* Cevap Anahtarı: Sütunsuz, Tam Genişlik (Tek Sütun) */
         .cevap-anahtari-bolumu {
             column-span: all;
             -webkit-column-span: all;
@@ -97,12 +104,6 @@
             padding-top: 15px;
             page-break-inside: avoid;
             break-inside: avoid;
-        }
-        .cevap-baslik {
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 8px;
-            font-size: 11pt;
         }
         .cevap-icerik {
             text-align: center;
@@ -119,7 +120,7 @@
             -webkit-column-span: all;
         }
 
-        /* Yazdırma Ayarları - İlk sayfa boşluğunu önleyen net kurallar */
+        /* Yazdırma / PDF Kuralları */
         @media print {
             body {
                 background: none;
@@ -130,9 +131,10 @@
                 display: none !important;
             }
             .print-container {
-                margin: 0;
                 box-shadow: none;
+                margin: 0;
                 width: 100%;
+                padding: 0;
             }
             @page {
                 margin: 15mm;
@@ -145,7 +147,7 @@
 
     <div class="no-print">
         <h2>ÖSYM Tarzı Sınav Oluşturucu</h2>
-        <p>Sorularınızı ve (varsa) en altta cevap anahtarınızı tek parça halinde aşağıdaki kutuya yapıştırın. Sistem otomatik olarak soruları iki sütuna, cevap anahtarını ise sütunsuz formata ayıracaktır.</p>
+        <p>Sorularınızı ve en altta (varsa) cevap anahtarınızı tek parça halinde aşağıdaki kutuya yapıştırıp butona basın.</p>
         
         <label for="tumMetinInput">Sınav Metni:</label>
         <textarea id="tumMetinInput" placeholder="1. Soru kökü...&#10;A) ... B) ... C) ... D) ... E) ...&#10;&#10;2. Soru kökü...&#10;&#10;CEVAP ANAHTARI&#10;1-A 2-C 3-B..."></textarea>
@@ -161,7 +163,7 @@
         
         <div id="osymOutput" class="osym-columns">
             <div class="soru">
-                <p><i>Metninizi yukarıdaki kutuya yapıştırıp butona tıkladığınızda burada ÖSYM formatında görünecektir.</i></p>
+                <p><i>Metninizi yukarıdaki kutuya yapıştırıp butona tıkladığınızda burada iki sütunlu ÖSYM formatında görünecektir.</i></p>
             </div>
         </div>
         
@@ -181,7 +183,6 @@
                 return;
             }
             
-            // Metni "CEVAP ANAHTARI" ibaresine göre ikiye ayırmaya çalış (büyük/küçük harf duyarsız)
             let soruKismi = metin;
             let cevapKismi = '';
             
@@ -193,7 +194,6 @@
                 cevapKismi = metin.substring(match);
             }
             
-            // Soruları paragraflara ayır (çift satır boşluğu ile ayrılmış bloklar)
             const paragraphs = soruKismi.split(/\n\s*\n/);
             let htmlContent = '';
             
@@ -206,7 +206,6 @@
             
             output.innerHTML = htmlContent;
             
-            // Cevap anahtarı kısmını işle
             if (cevapKismi.trim() !== '') {
                 const formattedCevap = cevapKismi.replace(/\n/g, '<br>');
                 cevapOutput.innerHTML = `
@@ -218,7 +217,6 @@
                 cevapOutput.innerHTML = '';
             }
             
-            // Kısa bir gecikme ile yazdırma penceresini aç (DOM güncellenmesi için)
             setTimeout(() => {
                 window.print();
             }, 300);
