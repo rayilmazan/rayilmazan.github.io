@@ -27,7 +27,7 @@
         }
         textarea {
             width: 100%;
-            height: 180px;
+            height: 140px;
             padding: 10px;
             font-family: 'Times New Roman', Times, serif;
             font-size: 11pt;
@@ -35,6 +35,13 @@
             border-radius: 4px;
             box-sizing: border-box;
             resize: vertical;
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
         }
         button {
             background-color: #2c3e50;
@@ -44,8 +51,8 @@
             font-size: 11pt;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
             margin-right: 10px;
+            margin-top: 5px;
         }
         button:hover {
             background-color: #34495e;
@@ -53,9 +60,8 @@
         .print-container {
             background: white;
             width: 210mm;
-            min-height: 297mm;
             margin: 0 auto;
-            padding: 15mm;
+            padding: 0;
             box-sizing: border-box;
             box-shadow: 0 0 15px rgba(0,0,0,0.15);
         }
@@ -80,16 +86,41 @@
             break-inside: avoid;
             page-break-inside: avoid;
         }
+        /* Cevap Anahtarı Alanı: Tek sütun (sütunsuz) ve tam genişlik */
+        .cevap-anahtari-bolumu {
+            column-span: all;
+            -webkit-column-span: all;
+            margin-top: 30px;
+            border-top: 1.5px dashed #000;
+            padding-top: 15px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .cevap-baslik {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 11pt;
+        }
+        .cevap-icerik {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            letter-spacing: 1px;
+        }
         .footer-info {
             text-align: right;
             font-size: 8pt;
             color: #666;
             margin-top: 30px;
+            column-span: all;
+            -webkit-column-span: all;
         }
         @media print {
             body {
                 background: none;
                 padding: 0;
+                margin: 0;
             }
             .no-print {
                 display: none;
@@ -107,8 +138,13 @@
 
     <div class="no-print">
         <h2>ÖSYM Tarzı İki Sütunlu Sınav Oluşturucu</h2>
-        <p>Sorularınızı veya metninizi aşağıdaki kutuya yapıştırın (Sorular arasında boşluk bırakın). Ardından <strong>"ÖSYM Düzenine Aktar"</strong> butonuna basın ve <strong>"Yazdır / PDF Olarak Kaydet"</strong> ile çıktısını alın.</p>
-        <textarea id="soruInput" placeholder="1. Soru kökü ve seçenekleri buraya yapıştırın...&#10;&#10;2. İkinci soru buraya..."></textarea>
+        <p>Sorularınızı ve cevap anahtarınızı aşağıdaki kutulara girip <strong>"ÖSYM Düzenine Aktar"</strong> butonuna basın.</p>
+        
+        <label for="soruInput">Sorular (Her soruyu boşluk bırakarak yazın):</label>
+        <textarea id="soruInput" placeholder="1. Soru kökü ve seçenekleri...&#10;&#10;2. İkinci soru..."></textarea>
+        
+        <label for="cevapInput">Cevap Anahtarı (İsteğe bağlı - Sütunsuz ve altta yer alır):</label>
+        <textarea id="cevapInput" style="height: 80px;" placeholder="Örn: 1-A  2-C  3-B  4-D  5-E"></textarea>
         <br>
         <button onclick="donustur()">ÖSYM Düzenine Aktar</button>
         <button onclick="window.print()" style="background-color: #27ae60;">Yazdır / PDF Olarak Kaydet</button>
@@ -119,24 +155,32 @@
             T.C. ÖLÇME, SEÇME VE YERLEŞTİRME MERKEZİ<br>
             ÖRNEK SINAV KİTAPÇIĞI
         </div>
+        
         <div id="osymOutput" class="osym-columns">
             <div class="soru">
-                <p><i>Sorularınızı yukarıdaki kutuya yapıştırıp "ÖSYM Düzenine Aktar" butonuna tıkladığınızda burada iki sütunlu ÖSYM formatında görünecektir.</i></p>
+                <p><i>Sorularınızı yukarıdaki kutulara yazıp "ÖSYM Düzenine Aktar" butonuna tıkladığınızda burada ÖSYM formatında görünecektir.</i></p>
             </div>
         </div>
+        
+        <div id="cevapOutput"></div>
+        
         <div class="footer-info">rayılmazan</div>
     </div>
 
     <script>
         function donustur() {
-            const text = document.getElementById('soruInput').value;
+            const soruText = document.getElementById('soruInput').value;
+            const cevapText = document.getElementById('cevapInput').value;
             const output = document.getElementById('osymOutput');
-            if (!text.trim()) {
-                alert('Lütfen soru metni girin.');
+            const cevapOutput = document.getElementById('cevapOutput');
+            
+            if (!soruText.trim()) {
+                alert('Lütfen en az bir soru metni girin.');
                 return;
             }
             
-            const paragraphs = text.split(/\n\s*\n/);
+            // Soruları paragraflara ayır
+            const paragraphs = soruText.split(/\n\s*\n/);
             let htmlContent = '';
             
             paragraphs.forEach((p) => {
@@ -147,6 +191,19 @@
             });
             
             output.innerHTML = htmlContent;
+            
+            // Cevap anahtarı varsa ekle (sütunsuz / tam genişlik)
+            if (cevapText.trim() !== '') {
+                const formattedCevap = cevapText.replace(/\n/g, '<br>');
+                cevapOutput.innerHTML = `
+                    <div class="cevap-anahtari-bolumu">
+                        <div class="cevap-baslik">CEVAP ANAHTARI</div>
+                        <div class="cevap-icerik">${formattedCevap}</div>
+                    </div>
+                `;
+            } else {
+                cevapOutput.innerHTML = '';
+            }
         }
     </script>
 </body>
