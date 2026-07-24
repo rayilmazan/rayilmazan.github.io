@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>ÖSYM Tarzı İki Sütunlu Sınav Şablonu</title>
+    <style>
+        /* Genel Sayfa Ayarları (A4) */
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.15;
+            color: #000;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* İki Sütunlu Düzen ve Orta Çizgi */
+        .osym-container {
+            column-count: 2;
+            column-gap: 12mm;
+            column-rule: 1px solid #000; /* Sütunlar arası ÖSYM tarzı dikey çizgi */
+            text-align: justify;
+            orphans: 3;
+            widows: 3;
+        }
+
+        /* Soru Blokları */
+        .soru {
+            margin-bottom: 15px;
+            break-inside: avoid; /* Sorunun ortadan bölünmesini engeller */
+            page-break-inside: avoid;
+        }
+
+        .soru-kok {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Seçenekler Listesi */
+        .secenekler {
+            margin-top: 4px;
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .secenekler li {
+            margin-bottom: 3px;
+        }
+
+        /* Üst Bilgi / Başlık Alanı (Opsiyonel) */
+        .sinav-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 20px;
+            border-bottom: 1.5px solid #000;
+            padding-bottom: 8px;
+        }
+
+        /* Yazdırma Optimizasyonu */
+        @media print {
+            body {
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sinav-header">
+        T.C. ÖLÇME, SEÇME VE YERLEŞTİRME MERKEZİ<br>
+        ÖRNEK SINAV KİTAPÇIĞI
+    </div>
+
+    <div class="osym-container">
+
+        <!-- 1. Soru Örneği -->
+        <div class="soru">
+            <div class="soru-kok">1. Aşağıdakilerden hangisi istemci taraflı çalışan web teknolojilerinin temel özelliklerinden biri değildir?</div>
+            <ul class="secenekler">
+                A) Tarayıcı tarafından doğrudan yorumlanması<br>
+                B) Sunucu yükünü azaltması<br>
+                C) Veritabanı işlemlerini doğrudan güvenli biçimde yürütmesi<br>
+                D) Hızlı geri bildirim sağlaması<br>
+                E) Ek bir eklenti gerektirmemesi
+            </ul>
+        </div>
+
+        <!-- 2. Soru Örneği -->
+        <div class="soru">
+            <div class="soru-kok">2. Yerel ağ üzerinde donanım bileşenlerini izlemek amacıyla geliştirilen çevrim dışı araçlar, sunucu bağımlılığını ortadan kaldırır.</div>
+            <p>Bu yaklaşımın temel amacı aşağıdakilerden hangisidir?</p>
+            <ul class="secenekler">
+                A) Bulut tabanlı maliyetleri artırmak<br>
+                B) İnternet bağlantısına gerek duymadan kararlı çalışmak<br>
+                C) Verileri merkezi bir sunucuda depolamak<br>
+                D) Yalnızca işletim sistemi güncellemelerini denetlemek<br>
+                E) Ağ trafiğini dış sunuculara yönlendirmek
+            </ul>
+        </div>
+
+        <!-- Buraya kendi sorularınızı veya doküman içeriğinizi ekleyebilirsiniz -->
+
+    </div>
+
+</body>
+</html>
