@@ -2,53 +2,192 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Yüz Gizleme ve Animasyon Aracı - rayılmazan</title>
+    <title>Gizlilik Odaklı Yüz Animasyon Aracı - rayılmazan</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input[type="file"] { margin: 20px 0; }
-        canvas { max-width: 100%; height: auto; border-radius: 4px; margin-top: 10px; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 { margin-top: 0; color: #1a73e8; }
+        .info { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            background: #fafafa;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .upload-box:hover { border-color: #1a73e8; background: #f1f7ff; }
+        input[type="file"] { display: none; }
+        .btn {
+            background: #1a73e8;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #1557b0; }
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            margin-top: 15px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        #loading {
+            font-weight: bold;
+            color: #d93025;
+            margin: 10px 0;
+            display: none;
+        }
     </style>
-    <!-- Yüz tespiti için hafif bir kütüphane entegrasyonu -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+
+    <!-- MediaPipe Face Detection ve Kamera/Çizim Araçları -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
 <div class="container">
-    <h2>Gizlilik Odaklı Yüz Animasyon ve Maskeleme Aracı</h2>
-    <p>Fotoğrafınız tarayıcınızda işlenir, sunucuya kesinlikle gönderilmez.</p>
-    
-    <input type="file" id="imageUpload" accept="image/*">
-    <br>
-    <canvas id="outputCanvas"></canvas>
+    <h2>KVKK Uyumlu Yüz Gizleme ve Animasyon Aracı</h2>
+    <div class="info">
+        🔒 Tüm işlemler tamamen tarayıcınızda (client-side) gerçekleşir. Fotoğraflarınız hiçbir sunucuya gönderilmez.
+    </div>
+
+    <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
+        <p>Fotoğraf seçmek için tıklayın veya sürükleyin</p>
+        <button class="btn">Dosya Seç</button>
+        <input type="file" id="imageUpload" accept="image/*">
+    </div>
+
+    <div id="loading">Yüzler tespit ediliyor ve animasyon uygulanıyor...</div>
+
+    <div class="canvas-container">
+        <canvas id="outputCanvas"></canvas>
+    </div>
 </div>
 
 <script>
     const imageUpload = document.getElementById('imageUpload');
     const canvas = document.getElementById('outputCanvas');
     const ctx = canvas.getContext('2d');
+    const loadingDiv = document.getElementById('loading');
 
-    imageUpload.addEventListener('change', async (e) => {
+    let faceDetection = null;
+    let animationId = null;
+    let currentDetections = [];
+    let currentImg = null;
+
+    // MediaPipe Face Detection Modelini Başlatma
+    async function initFaceDetection() {
+        faceDetection = new FaceDetection({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
+        });
+
+        faceDetection.setOptions({
+            model: 'short',
+            minDetectionConfidence: 0.5
+        });
+
+        faceDetection.onResults(onResults);
+        await faceDetection.initialize();
+    }
+
+    initFaceDetection();
+
+    imageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            
-            // Yüz tespiti ve animasyon/maske uygulama adımları buraya entegre edilir.
-            // Tespit edilen yüz koordinatlarına Canvas üzerindteyken efekt verilir.
-            applyPrivacyEffect();
-        };
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = async function() {
+                currentImg = img;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                loadingDiv.style.display = 'block';
+                if (animationId) cancelAnimationFrame(animationId);
+
+                // Yüz tespiti çalıştır
+                await faceDetection.send({ image: img });
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
     });
 
-    function applyPrivacyEffect() {
-        // Örnek mantık: Tespit edilen alanlara animasyonlu maske veya pikselleştirme uygulanır.
+    // Model sonuç döndürdüğünde çalışır
+    function onResults(results) {
+        loadingDiv.style.display = 'none';
+        currentDetections = results.detections || [];
+        startAnimationLoop();
+    }
+
+    // Animasyon döngüsü (Yüzlerin üzerinde hareketli/titreşimli gizlilik efekti oluşturur)
+    let angle = 0;
+    function startAnimationLoop() {
+        if (!currentImg) return;
+
+        // Orijinal resmi çiz
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
+
+        // Tespit edilen her yüz için gizleme/animasyon efekti uygula
+        currentDetections.forEach((detection, index) => {
+            const bbox = detection.boundingBox;
+            const x = bbox.xCenter * canvas.width - (bbox.width * canvas.width) / 2;
+            const y = bbox.yCenter * canvas.height - (bbox.height * canvas.height) / 2;
+            const w = bbox.width * canvas.width;
+            const h = bbox.height * canvas.height;
+
+            // Efekt: Hareketli/Dönen KVKK Maskesi (GİZLİ)
+            ctx.save();
+            ctx.translate(x + w / 2, y + h / 2);
+            
+            // Hafif bir animasyon efekti (nabız/boyut değişimi)
+            let scale = 1 + Math.sin(angle + index) * 0.05;
+            ctx.scale(scale, scale);
+
+            // Maske Arka Planı
+            ctx.fillStyle = 'rgba(26, 115, 232, 0.85)';
+            ctx.beginPath();
+            ctx.roundRect(-w/2, -h/2, w, h, 10);
+            ctx.fill();
+
+            // Maske Yazısı
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `${Math.max(12, w / 6)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('KVKK GİZLİ', 0, 0);
+
+            ctx.restore();
+        });
+
+        angle += 0.1;
+        animationId = requestAnimationFrame(startAnimationLoop);
     }
 </script>
 
