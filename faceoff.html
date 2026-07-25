@@ -98,18 +98,15 @@
     let currentImg = null;
     let isModelReady = false;
 
-    // MediaPipe Modelini Başlat
     async function initFaceDetection() {
         try {
             faceDetection = new FaceDetection({
-                locateFile: (file) => {
-                    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`;
-                }
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
             });
 
             faceDetection.setOptions({
-                model: 'short',
-                minDetectionConfidence: 0.5
+                model: 'full', // 'short' yerine 'full' modeli birden fazla ve uzak yüzleri daha iyi yakalar
+                minDetectionConfidence: 0.35 // Eşik değerini düşürerek daha fazla yüz yakalanmasını sağladık
             });
 
             faceDetection.onResults(onResults);
@@ -146,11 +143,14 @@
                 canvas.width = img.width;
                 canvas.height = img.height;
                 
+                // Resmi canvas'a çiz
+                ctx.drawImage(img, 0, 0);
+
                 if (animationId) cancelAnimationFrame(animationId);
 
-                // Yüz tespiti isteği gönder
                 try {
-                    await faceDetection.send({ image: img });
+                    // Doğrudan canvas elemanını modele gönderiyoruz (en kararlı yöntem)
+                    await faceDetection.send({ image: canvas });
                 } catch (err) {
                     statusDiv.textContent = 'Yüz tespiti sırasında hata: ' + err.message;
                     console.error(err);
@@ -166,7 +166,7 @@
         
         if (currentDetections.length === 0) {
             statusDiv.style.color = '#b06000';
-            statusDiv.textContent = 'Fotoğrafta yüz tespit edilemedi ama orijinal görüntü yüklendi.';
+            statusDiv.textContent = 'Fotoğrafta yüz tespit edilemedi. Farklı bir açı veya net bir fotoğraf deneyebilirsiniz.';
         } else {
             statusDiv.style.color = '#137333';
             statusDiv.textContent = `${currentDetections.length} adet yüz tespit edildi ve animasyon uygulanıyor.`;
@@ -179,9 +179,11 @@
     function startAnimationLoop() {
         if (!currentImg) return;
 
+        // Her karede orijinal resmi temizleyip tekrar çiziyoruz
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
 
+        // Tespit edilen her yüzün üzerine maske çiz
         currentDetections.forEach((detection, index) => {
             const bbox = detection.boundingBox;
             const x = bbox.xCenter * canvas.width - (bbox.width * canvas.width) / 2;
