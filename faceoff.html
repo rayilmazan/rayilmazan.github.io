@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Gizlilik Odaklı Yüz Animasyon Aracı - rayılmazan</title>
+    <title>KVKK Uyumlu Yüz Gizleme ve Animasyon Aracı - rayılmazan</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -54,15 +54,14 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        #loading {
+        #status {
             font-weight: bold;
             color: #d93025;
             margin: 10px 0;
-            display: none;
         }
     </style>
 
-    <!-- MediaPipe Face Detection ve Kamera/Çizim Araçları -->
+    <!-- MediaPipe Scriptleri -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
 </head>
@@ -71,16 +70,16 @@
 <div class="container">
     <h2>KVKK Uyumlu Yüz Gizleme ve Animasyon Aracı</h2>
     <div class="info">
-        🔒 Tüm işlemler tamamen tarayıcınızda (client-side) gerçekleşir. Fotoğraflarınız hiçbir sunucuya gönderilmez.
+        🔒 Tamamen tarayıcınızda çalışır. Sunucuya veri gitmez.
     </div>
 
     <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
-        <p>Fotoğraf seçmek için tıklayın veya sürükleyin</p>
+        <p>Fotoğraf seçmek için tıklayın</p>
         <button class="btn">Dosya Seç</button>
         <input type="file" id="imageUpload" accept="image/*">
     </div>
 
-    <div id="loading">Yüzler tespit ediliyor ve animasyon uygulanıyor...</div>
+    <div id="status">Sistem yükleniyor, lütfen bekleyin...</div>
 
     <div class="canvas-container">
         <canvas id="outputCanvas"></canvas>
@@ -91,26 +90,38 @@
     const imageUpload = document.getElementById('imageUpload');
     const canvas = document.getElementById('outputCanvas');
     const ctx = canvas.getContext('2d');
-    const loadingDiv = document.getElementById('loading');
+    const statusDiv = document.getElementById('status');
 
     let faceDetection = null;
     let animationId = null;
     let currentDetections = [];
     let currentImg = null;
+    let isModelReady = false;
 
-    // MediaPipe Face Detection Modelini Başlatma
+    // MediaPipe Modelini Başlat
     async function initFaceDetection() {
-        faceDetection = new FaceDetection({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
-        });
+        try {
+            faceDetection = new FaceDetection({
+                locateFile: (file) => {
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`;
+                }
+            });
 
-        faceDetection.setOptions({
-            model: 'short',
-            minDetectionConfidence: 0.5
-        });
+            faceDetection.setOptions({
+                model: 'short',
+                minDetectionConfidence: 0.5
+            });
 
-        faceDetection.onResults(onResults);
-        await faceDetection.initialize();
+            faceDetection.onResults(onResults);
+            await faceDetection.initialize();
+            
+            isModelReady = true;
+            statusDiv.style.color = '#137333';
+            statusDiv.textContent = 'Sistem hazır! Lütfen bir fotoğraf seçin.';
+        } catch (error) {
+            statusDiv.textContent = 'Model yüklenirken hata oluştu: ' + error.message;
+            console.error(error);
+        }
     }
 
     initFaceDetection();
@@ -118,6 +129,14 @@
     imageUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        if (!isModelReady) {
+            alert("Yapay zeka modeli henüz yüklenmedi, lütfen birkaç saniye bekleyin.");
+            return;
+        }
+
+        statusDiv.style.color = '#d93025';
+        statusDiv.textContent = 'Fotoğraf işleniyor ve yüzler tespit ediliyor...';
 
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -127,34 +146,42 @@
                 canvas.width = img.width;
                 canvas.height = img.height;
                 
-                loadingDiv.style.display = 'block';
                 if (animationId) cancelAnimationFrame(animationId);
 
-                // Yüz tespiti çalıştır
-                await faceDetection.send({ image: img });
+                // Yüz tespiti isteği gönder
+                try {
+                    await faceDetection.send({ image: img });
+                } catch (err) {
+                    statusDiv.textContent = 'Yüz tespiti sırasında hata: ' + err.message;
+                    console.error(err);
+                }
             }
             img.src = event.target.result;
         }
         reader.readAsDataURL(file);
     });
 
-    // Model sonuç döndürdüğünde çalışır
     function onResults(results) {
-        loadingDiv.style.display = 'none';
         currentDetections = results.detections || [];
+        
+        if (currentDetections.length === 0) {
+            statusDiv.style.color = '#b06000';
+            statusDiv.textContent = 'Fotoğrafta yüz tespit edilemedi ama orijinal görüntü yüklendi.';
+        } else {
+            statusDiv.style.color = '#137333';
+            statusDiv.textContent = `${currentDetections.length} adet yüz tespit edildi ve animasyon uygulanıyor.`;
+        }
+
         startAnimationLoop();
     }
 
-    // Animasyon döngüsü (Yüzlerin üzerinde hareketli/titreşimli gizlilik efekti oluşturur)
     let angle = 0;
     function startAnimationLoop() {
         if (!currentImg) return;
 
-        // Orijinal resmi çiz
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
 
-        // Tespit edilen her yüz için gizleme/animasyon efekti uygula
         currentDetections.forEach((detection, index) => {
             const bbox = detection.boundingBox;
             const x = bbox.xCenter * canvas.width - (bbox.width * canvas.width) / 2;
@@ -162,11 +189,9 @@
             const w = bbox.width * canvas.width;
             const h = bbox.height * canvas.height;
 
-            // Efekt: Hareketli/Dönen KVKK Maskesi (GİZLİ)
             ctx.save();
             ctx.translate(x + w / 2, y + h / 2);
             
-            // Hafif bir animasyon efekti (nabız/boyut değişimi)
             let scale = 1 + Math.sin(angle + index) * 0.05;
             ctx.scale(scale, scale);
 
