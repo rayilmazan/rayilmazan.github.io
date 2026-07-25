@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Güncel Ödev ve Duyuru Bülteni</title>
+    <style>
+        /* Temel Ayarlar ve Renk Paleti */
+        :root {
+            --primary: #2563eb;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --warning: #d97706;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); line-height: 1.5; padding-bottom: 2rem; }
+        
+        /* Mobil Uyumlu Kapsayıcı */
+        .container { max-width: 600px; margin: 0 auto; padding: 1rem; }
+        
+        /* Başlık ve Acil Duyuru Alanı */
+        header { text-align: center; margin-bottom: 1.5rem; padding-top: 1rem; }
+        h1 { font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+        
+        #duyuru-bandi { 
+            display: none; /* JS ile duyuru varsa aktif edilecek */
+            background-color: #fee2e2; 
+            color: var(--danger); 
+            padding: 1rem; 
+            border-left: 4px solid var(--danger);
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Sınıf Filtreleme Alanı */
+        .filtre-alani { margin-bottom: 1.5rem; background: var(--card-bg); padding: 1rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .filtre-alani label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-main); }
+        select { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+            font-size: 1rem; 
+            background-color: white;
+            appearance: auto;
+            outline: none;
+        }
+        select:focus { border-color: var(--primary); }
+        
+        /* Ödev Kartları Tasarımı */
+        .odev-listesi { display: flex; flex-direction: column; gap: 1rem; }
+        .odev-kart { 
+            background: var(--card-bg); 
+            padding: 1rem; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            border-left: 4px solid var(--primary);
+        }
+        
+        .kart-baslik { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .ders-adi { font-weight: bold; font-size: 1.1rem; color: var(--primary); }
+        
+        /* Durum Etiketleri (Badge) */
+        .durum-etiket { 
+            font-size: 0.75rem; 
+            padding: 0.25rem 0.5rem; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            color: white;
+            white-space: nowrap;
+        }
+        .durum-yeni { background-color: var(--success); }
+        .durum-devam { background-color: var(--warning); }
+        
+        .odev-konu { margin-bottom: 1rem; font-size: 0.95rem; }
+        
+        .kart-alt { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 0.85rem; 
+            color: var(--text-muted); 
+            border-top: 1px solid #e5e7eb; 
+            padding-top: 0.75rem; 
+        }
+        
+        .bos-durum { text-align: center; color: var(--text-muted); padding: 2rem 0; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Bülten Panosu</h1>
+    </header>
+
+    <!-- Acil Duyuru Varsa Burada Görünecek -->
+    <div id="duyuru-bandi"></div>
+
+    <!-- Sınıf Seçimi -->
+    <div class="filtre-alani">
+        <label for="sinif-secici">Sınıf Seçiniz:</label>
+        <select id="sinif-secici">
+            <option value="hepsi">Tüm Sınıflar</option>
+            <!-- Seçenekler JS ile otomatik eklenecek -->
+        </select>
+    </div>
+
+    <!-- Ödevlerin Listeleneceği Alan -->
+    <div id="odev-listesi" class="odev-listesi">
+        <!-- Kartlar JS ile oluşturulacak -->
+    </div>
+</div>
+
+<script>
+    // 1. VERİ ALANI: Sadece bu kısmı güncelleyerek sistemi yönetebilirsiniz.
+    const okulVerisi = {
+        // Duyuru yoksa tırnak içini boş bırakın: acilDuyuru: "",
+        acilDuyuru: "Önemli: Bilişim Teknolojileri sınıfındaki ağ altyapı çalışması nedeniyle perşembe günkü dersler teorik işlenecektir.",
+        odevler: [
+            { sinif: "5/A", ders: "Bilişim Teknolojileri", konu: "Donanım ve Yazılım kavramları araştırılıp deftere yazılacak.", tarih: "28.07.2026", durum: "Yeni" },
+            { sinif: "5/A", ders: "Matematik", konu: "Doğal sayılarla işlemler çalışma kağıdı tamamlanacak.", tarih: "29.07.2026", durum: "Devam Ediyor" },
+            { sinif: "6/B", ders: "Bilişim Teknolojileri", konu: "Dijital Yurttaşlık kuralları ile ilgili afiş tasarımı.", tarih: "30.07.2026", durum: "Yeni" },
+            { sinif: "6/C", ders: "Fen Bilimleri", konu: "Güneş sistemi maket teslimi.", tarih: "27.07.2026", durum: "Devam Ediyor" }
+        ]
+    };
+
+    // 2. SİSTEM KODLARI (Bu kısma dokunmanıza gerek yok)
+    const duyuruBandi = document.getElementById('duyuru-bandi');
+    const sinifSecici = document.getElementById('sinif-secici');
+    const odevListesi = document.getElementById('odev-listesi');
+
+    function baslat() {
+        // Duyuruyu yazdır
+        if (okulVerisi.acilDuyuru && okulVerisi.acilDuyuru.trim() !== "") {
+            duyuruBandi.textContent = "🚨 " + okulVerisi.acilDuyuru;
+            duyuruBandi.style.display = "block";
+        }
+
+        // Verideki sınıfları bul ve açılır menüye ekle (Tekrarları engeller)
+        const benzersizSiniflar = [...new Set(okulVerisi.odevler.map(o => o.sinif))].sort();
+        benzersizSiniflar.forEach(sinif => {
+            const option = document.createElement('option');
+            option.value = sinif;
+            option.textContent = sinif;
+            sinifSecici.appendChild(option);
+        });
+
+        // Sayfa açıldığında tüm ödevleri göster
+        odevleriCiz("hepsi");
+    }
+
+    function odevleriCiz(secilenSinif) {
+        odevListesi.innerHTML = ""; // Listeyi sıfırla
+
+        // Sınıfa göre filtrele
+        const filtrelenmisOdevler = secilenSinif === "hepsi" 
+            ? okulVerisi.odevler 
+            : okulVerisi.odevler.filter(o => o.sinif === secilenSinif);
+
+        // Ödev yoksa uyarı ver
+        if (filtrelenmisOdevler.length === 0) {
+            odevListesi.innerHTML = "<div class='bos-durum'>Bu sınıfa ait güncel ödev bulunmamaktadır.</div>";
+            return;
+        }
+
+        // Ödevleri kart olarak ekrana bas
+        filtrelenmisOdevler.forEach(odev => {
+            let durumClass = "durum-devam";
+            if (odev.durum.toLowerCase() === "yeni") durumClass = "durum-yeni";
+
+            const kart = document.createElement('div');
+            kart.className = 'odev-kart';
+            kart.innerHTML = `
+                <div class="kart-baslik">
+                    <span class="ders-adi">${odev.ders}</span>
+                    <span class="durum-etiket ${durumClass}">${odev.durum}</span>
+                </div>
+                <div class="odev-konu">${odev.konu}</div>
+                <div class="kart-alt">
+                    <span><strong>Sınıf:</strong> ${odev.sinif}</span>
+                    <span><strong>Son Tarih:</strong> ${odev.tarih}</span>
+                </div>
+            `;
+            odevListesi.appendChild(kart);
+        });
+    }
+
+    // Açılır menüden sınıf değiştirildiğinde listeyi güncelle
+    sinifSecici.addEventListener('change', (e) => {
+        odevleriCiz(e.target.value);
+    });
+
+    // Sayfa yüklendiğinde sistemi çalıştır
+    baslat();
+</script>
+</body>
+</html>
