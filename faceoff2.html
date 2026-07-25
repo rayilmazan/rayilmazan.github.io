@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gelişmiş Grup Yüz Gizleme (Emoji Maske) - rayılmazan</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; text-align: center; color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #1a73e8; }
+        .info { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .upload-box { border: 2px dashed #ccc; padding: 20px; border-radius: 8px; background: #fafafa; cursor: pointer; margin-bottom: 20px; }
+        .upload-box:hover { border-color: #1a73e8; background: #f1f7ff; }
+        input[type="file"] { display: none; }
+        .btn { background: #1a73e8; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        .canvas-container { position: relative; display: inline-block; margin-top: 15px; max-width: 100%; }
+        canvas { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        #status { font-weight: bold; color: #d93025; margin: 10px 0; }
+        #hiddenImage { display: none; }
+        #maskImage { display: none; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Yüzlere Emoji Yerleştirme (Grid Tarama)</h2>
+    <div class="info">
+        🎭 Tüm yüzlerin üzerine siyah kutu yerine belirlediğiniz maske/emoji yerleştirilir.
+    </div>
+
+    <!-- Varsayılan Maske Resmi (Bunu kendi logonuz veya başka bir maske ile değiştirebilirsiniz) -->
+    <!-- Bu örnek için basit bir SVG gülen yüz kullanıyoruz, Localde çalışırken yanına 'maske.png' koyup src='maske.png' yapabilirsiniz. -->
+    <img id="maskImage" crossorigin="anonymous" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23FFD700'/><circle cx='35' cy='40' r='7' fill='%23000'/><circle cx='65' cy='40' r='7' fill='%23000'/><path d='M30 65 Q 50 85 70 65' stroke='%23000' stroke-width='6' fill='transparent' stroke-linecap='round'/></svg>" />
+
+    <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
+        <p>Fotoğraf seçmek için tıklayın (Grid tarama yapılacaktır)</p>
+        <button class="btn">Dosya Seç</button>
+        <input type="file" id="imageUpload" accept="image/*">
+    </div>
+
+    <div id="status">Sistem hazırlanıyor...</div>
+
+    <img id="hiddenImage" crossorigin="anonymous" />
+    <div class="canvas-container" id="canvasContainer"></div>
+</div>
+
+<script>
+    const imageUpload = document.getElementById('imageUpload');
+    const hiddenImage = document.getElementById('hiddenImage');
+    const maskImage = document.getElementById('maskImage');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const statusDiv = document.getElementById('status');
+
+    let modelsLoaded = false;
+
+    async function loadModels() {
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+        try {
+            await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+            modelsLoaded = true;
+            statusDiv.style.color = '#137333';
+            statusDiv.textContent = 'Sistem hazır! Lütfen fotoğraf seçin.';
+        } catch (err) {
+            statusDiv.textContent = 'Hata oluştu!';
+        }
+    }
+
+    loadModels();
+
+    async function detectFacesOnCanvas(canvasToScan, offsetX, offsetY, scaleX, scaleY) {
+        const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.25 });
+        const detections = await faceapi.detectAllFaces(canvasToScan, options);
+        
+        return detections.map(d => {
+            const box = d.box;
+            return {
+                x: (box.x * scaleX) + offsetX,
+                y: (box.y * scaleY) + offsetY,
+                width: box.width * scaleX,
+                height: box.height * scaleY
+            };
+        });
+    }
+
+    imageUpload.addEventListener('change', async (e) => {
+        if (!modelsLoaded) return;
+        const file = e.target.files[0];
+        if (!file) return;
+
+        statusDiv.style.color = '#d93025';
+        statusDiv.textContent = 'İşleniyor, lütfen bekleyin...';
+        
+        const reader = new FileReader();
+        reader.onload = async function(event) {
+            hiddenImage.src = event.target.result;
+            
+            hiddenImage.onload = async () => {
+                canvasContainer.innerHTML = '';
+                const mainCanvas = document.createElement('canvas');
+                mainCanvas.width = hiddenImage.width;
+                mainCanvas.height = hiddenImage.height;
+                const mainCtx = mainCanvas.getContext('2d');
+                mainCtx.drawImage(hiddenImage, 0, 0);
+                canvasContainer.append(mainCanvas);
+
+                let allDetections = [];
+                
+                // 1. AŞAMA: TAM FOTOĞRAFI TARA
+                const fullDetections = await detectFacesOnCanvas(mainCanvas, 0, 0, 1, 1);
+                allDetections = allDetections.concat(fullDetections);
+                
+                // 2. AŞAMA: FOTOĞRAFI 4 PARÇAYA BÖLEREK TARA
+                const cols = 2, rows = 2;
+                const pieceWidth = hiddenImage.width / cols;
+                const pieceHeight = hiddenImage.height / rows;
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const pieceCanvas = document.createElement('canvas');
+                        pieceCanvas.width = pieceWidth;
+                        pieceCanvas.height = pieceHeight;
+                        const pCtx = pieceCanvas.getContext('2d');
+                        
+                        pCtx.drawImage(hiddenImage, 
+                            c * pieceWidth, r * pieceHeight, pieceWidth, pieceHeight, 
+                            0, 0, pieceWidth, pieceHeight
+                        );
+
+                        const offsetX = c * pieceWidth;
+                        const offsetY = r * pieceHeight;
+                        
+                        const pieceDetections = await detectFacesOnCanvas(pieceCanvas, offsetX, offsetY, 1, 1);
+                        allDetections = allDetections.concat(pieceDetections);
+                    }
+                }
+
+                statusDiv.style.color = '#137333';
+                statusDiv.textContent = 'Maskeleme tamamlandı.';
+
+                // TESPİT EDİLEN YÜZLERE SİYAH KUTU YERİNE RESİM (EMOJI) ÇİZME KISMI
+                allDetections.forEach(box => {
+                    // Yüz kutusundan biraz daha büyük olsun ki saçları vs. de kapatsın
+                    const padding = box.width * 0.2; 
+                    const drawX = box.x - (padding / 2);
+                    const drawY = box.y - (padding / 2) - (box.height * 0.1); // Biraz yukarı kaydır
+                    const drawWidth = box.width + padding;
+                    const drawHeight = box.height + padding + (box.height * 0.1); // Yüz oval olduğu için biraz uzun
+
+                    // Resmi çiz (drawImage: resimKaynağı, X, Y, Genişlik, Yükseklik)
+                    mainCtx.drawImage(maskImage, drawX, drawY, drawWidth, drawHeight);
+                });
+            };
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
+
+</body>
+</html>
