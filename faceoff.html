@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KVKK Uyumlu Yüz Gizleme ve Animasyon Aracı - rayılmazan</title>
+    <title>KVKK Uyumlu Yüz Gizleme Aracı - rayılmazan</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -13,7 +13,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             background: white;
             padding: 25px;
@@ -29,6 +29,7 @@
             background: #fafafa;
             cursor: pointer;
             margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
         .upload-box:hover { border-color: #1a73e8; background: #f1f7ff; }
         input[type="file"] { display: none; }
@@ -43,9 +44,6 @@
         }
         .btn:hover { background: #1557b0; }
         .canvas-container {
-            position: relative;
-            display: inline-block;
-            max-width: 100%;
             margin-top: 15px;
         }
         canvas {
@@ -61,16 +59,15 @@
         }
     </style>
 
-    <!-- MediaPipe Scriptleri -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
 <div class="container">
-    <h2>KVKK Uyumlu Yüz Gizleme ve Animasyon Aracı</h2>
+    <h2>KVKK Yüz Gizleme Aracı (Statik Grafik)</h2>
     <div class="info">
-        🔒 Tamamen tarayıcınızda çalışır. Sunucuya veri gitmez.
+        🔒 İşlemler yerel tarayıcınızda yapılır, sistemi yormaz ve dışarı veri aktarmaz.
     </div>
 
     <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
@@ -93,10 +90,8 @@
     const statusDiv = document.getElementById('status');
 
     let faceDetection = null;
-    let animationId = null;
-    let currentDetections = [];
-    let currentImg = null;
     let isModelReady = false;
+    let currentImg = null;
 
     async function initFaceDetection() {
         try {
@@ -104,9 +99,11 @@
                 locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
             });
 
+            // 'full' modeli çoklu yüzler ve uzak mesafeler için daha iyidir.
+            // Eşik değeri 0.2'ye düşürüldü ki belirsiz yüzleri de kaçırmasın.
             faceDetection.setOptions({
-                model: 'full', // 'short' yerine 'full' modeli birden fazla ve uzak yüzleri daha iyi yakalar
-                minDetectionConfidence: 0.35 // Eşik değerini düşürerek daha fazla yüz yakalanmasını sağladık
+                model: 'full', 
+                minDetectionConfidence: 0.2 
             });
 
             faceDetection.onResults(onResults);
@@ -116,8 +113,7 @@
             statusDiv.style.color = '#137333';
             statusDiv.textContent = 'Sistem hazır! Lütfen bir fotoğraf seçin.';
         } catch (error) {
-            statusDiv.textContent = 'Model yüklenirken hata oluştu: ' + error.message;
-            console.error(error);
+            statusDiv.textContent = 'Model yüklenirken hata: ' + error.message;
         }
     }
 
@@ -128,32 +124,38 @@
         if (!file) return;
 
         if (!isModelReady) {
-            alert("Yapay zeka modeli henüz yüklenmedi, lütfen birkaç saniye bekleyin.");
+            alert("Model henüz yüklenmedi, bekleyin.");
             return;
         }
 
         statusDiv.style.color = '#d93025';
-        statusDiv.textContent = 'Fotoğraf işleniyor ve yüzler tespit ediliyor...';
+        statusDiv.textContent = 'Yüzler aranıyor...';
 
         const reader = new FileReader();
         reader.onload = function(event) {
             const img = new Image();
             img.onload = async function() {
                 currentImg = img;
-                canvas.width = img.width;
-                canvas.height = img.height;
                 
-                // Resmi canvas'a çiz
-                ctx.drawImage(img, 0, 0);
+                // Performans ve çoklu yüz tespiti için aşırı büyük fotoğrafları ölçeklendiriyoruz
+                const MAX_WIDTH = 1200;
+                let scale = 1;
+                
+                if (img.width > MAX_WIDTH) {
+                    scale = MAX_WIDTH / img.width;
+                }
 
-                if (animationId) cancelAnimationFrame(animationId);
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+                
+                // Resmi canvas'a sadece bir kere çiziyoruz
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                 try {
-                    // Doğrudan canvas elemanını modele gönderiyoruz (en kararlı yöntem)
+                    // Yapay zekaya doğrudan canvas'ı besliyoruz
                     await faceDetection.send({ image: canvas });
                 } catch (err) {
-                    statusDiv.textContent = 'Yüz tespiti sırasında hata: ' + err.message;
-                    console.error(err);
+                    statusDiv.textContent = 'Hata oluştu: ' + err.message;
                 }
             }
             img.src = event.target.result;
@@ -162,59 +164,38 @@
     });
 
     function onResults(results) {
-        currentDetections = results.detections || [];
+        const detections = results.detections || [];
         
-        if (currentDetections.length === 0) {
+        if (detections.length === 0) {
             statusDiv.style.color = '#b06000';
-            statusDiv.textContent = 'Fotoğrafta yüz tespit edilemedi. Farklı bir açı veya net bir fotoğraf deneyebilirsiniz.';
-        } else {
-            statusDiv.style.color = '#137333';
-            statusDiv.textContent = `${currentDetections.length} adet yüz tespit edildi ve animasyon uygulanıyor.`;
+            statusDiv.textContent = 'Fotoğrafta yüz bulunamadı, orijinal fotoğraf yüklendi.';
+            return;
         }
 
-        startAnimationLoop();
-    }
+        statusDiv.style.color = '#137333';
+        statusDiv.textContent = `${detections.length} adet yüz bulundu ve başarıyla gizlendi.`;
 
-    let angle = 0;
-    function startAnimationLoop() {
-        if (!currentImg) return;
-
-        // Her karede orijinal resmi temizleyip tekrar çiziyoruz
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(currentImg, 0, 0, canvas.width, canvas.height);
-
-        // Tespit edilen her yüzün üzerine maske çiz
-        currentDetections.forEach((detection, index) => {
+        // Animasyon yok. Tespit edilen yüzlerin üzerine sadece BİR KERE sabit grafik çizilir.
+        detections.forEach((detection) => {
             const bbox = detection.boundingBox;
             const x = bbox.xCenter * canvas.width - (bbox.width * canvas.width) / 2;
             const y = bbox.yCenter * canvas.height - (bbox.height * canvas.height) / 2;
             const w = bbox.width * canvas.width;
             const h = bbox.height * canvas.height;
 
-            ctx.save();
-            ctx.translate(x + w / 2, y + h / 2);
-            
-            let scale = 1 + Math.sin(angle + index) * 0.05;
-            ctx.scale(scale, scale);
-
-            // Maske Arka Planı
-            ctx.fillStyle = 'rgba(26, 115, 232, 0.85)';
+            // Sabit KVKK Dikdörtgeni
+            ctx.fillStyle = '#1a73e8'; // Mavi arka plan
             ctx.beginPath();
-            ctx.roundRect(-w/2, -h/2, w, h, 10);
+            ctx.roundRect(x, y, w, h, 8); // Hafif yuvarlatılmış köşeler
             ctx.fill();
 
-            // Maske Yazısı
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `${Math.max(12, w / 6)}px sans-serif`;
+            // Sabit KVKK Yazısı
+            ctx.fillStyle = '#ffffff'; // Beyaz yazı
+            ctx.font = `bold ${Math.max(12, w / 4)}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('KVKK GİZLİ', 0, 0);
-
-            ctx.restore();
+            ctx.fillText('KVKK', x + w / 2, y + h / 2);
         });
-
-        angle += 0.1;
-        animationId = requestAnimationFrame(startAnimationLoop);
     }
 </script>
 
