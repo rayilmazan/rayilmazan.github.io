@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yüz Gizleme ve Animasyon Aracı - rayılmazan</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input[type="file"] { margin: 20px 0; }
+        canvas { max-width: 100%; height: auto; border-radius: 4px; margin-top: 10px; }
+    </style>
+    <!-- Yüz tespiti için hafif bir kütüphane entegrasyonu -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gizlilik Odaklı Yüz Animasyon ve Maskeleme Aracı</h2>
+    <p>Fotoğrafınız tarayıcınızda işlenir, sunucuya kesinlikle gönderilmez.</p>
+    
+    <input type="file" id="imageUpload" accept="image/*">
+    <br>
+    <canvas id="outputCanvas"></canvas>
+</div>
+
+<script>
+    const imageUpload = document.getElementById('imageUpload');
+    const canvas = document.getElementById('outputCanvas');
+    const ctx = canvas.getContext('2d');
+
+    imageUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            // Yüz tespiti ve animasyon/maske uygulama adımları buraya entegre edilir.
+            // Tespit edilen yüz koordinatlarına Canvas üzerindteyken efekt verilir.
+            applyPrivacyEffect();
+        };
+    });
+
+    function applyPrivacyEffect() {
+        // Örnek mantık: Tespit edilen alanlara animasyonlu maske veya pikselleştirme uygulanır.
+    }
+</script>
+
+</body>
+</html>
