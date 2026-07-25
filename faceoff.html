@@ -65,9 +65,9 @@
 <body>
 
 <div class="container">
-    <h2>KVKK Yüz Gizleme Aracı (Statik Grafik)</h2>
+    <h2>KVKK Yüz Gizleme Aracı (Sabit Maske)</h2>
     <div class="info">
-        🔒 İşlemler yerel tarayıcınızda yapılır, sistemi yormaz ve dışarı veri aktarmaz.
+        🔒 Tamamen tarayıcınızda çalışır. Animasyon içermez, sistemi yormaz.
     </div>
 
     <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
@@ -91,7 +91,6 @@
 
     let faceDetection = null;
     let isModelReady = false;
-    let currentImg = null;
 
     async function initFaceDetection() {
         try {
@@ -99,11 +98,11 @@
                 locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
             });
 
-            // 'full' modeli çoklu yüzler ve uzak mesafeler için daha iyidir.
-            // Eşik değeri 0.2'ye düşürüldü ki belirsiz yüzleri de kaçırmasın.
+            // 'full' modeli çoklu yüzler ve uzak mesafeler için daha hassastır.
+            // minDetectionConfidence 0.15'e düşürüldü ki flu/uzak yüzleri de okuyabilsin.
             faceDetection.setOptions({
                 model: 'full', 
-                minDetectionConfidence: 0.2 
+                minDetectionConfidence: 0.15 
             });
 
             faceDetection.onResults(onResults);
@@ -124,7 +123,7 @@
         if (!file) return;
 
         if (!isModelReady) {
-            alert("Model henüz yüklenmedi, bekleyin.");
+            alert("Model henüz tam yüklenmedi, lütfen birkaç saniye bekleyin.");
             return;
         }
 
@@ -135,25 +134,17 @@
         reader.onload = function(event) {
             const img = new Image();
             img.onload = async function() {
-                currentImg = img;
                 
-                // Performans ve çoklu yüz tespiti için aşırı büyük fotoğrafları ölçeklendiriyoruz
-                const MAX_WIDTH = 1200;
-                let scale = 1;
-                
-                if (img.width > MAX_WIDTH) {
-                    scale = MAX_WIDTH / img.width;
-                }
-
-                canvas.width = img.width * scale;
-                canvas.height = img.height * scale;
+                canvas.width = img.width;
+                canvas.height = img.height;
                 
                 // Resmi canvas'a sadece bir kere çiziyoruz
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                 try {
-                    // Yapay zekaya doğrudan canvas'ı besliyoruz
-                    await faceDetection.send({ image: canvas });
+                    // Yapay zekaya doğrudan HTMLImageElement'i besliyoruz.
+                    // (Önceki versiyonda canvas'ı beslemiştik, çoklu yüzlerde bazen veri kaybı yapabiliyor)
+                    await faceDetection.send({ image: img });
                 } catch (err) {
                     statusDiv.textContent = 'Hata oluştu: ' + err.message;
                 }
@@ -173,9 +164,9 @@
         }
 
         statusDiv.style.color = '#137333';
-        statusDiv.textContent = `${detections.length} adet yüz bulundu ve başarıyla gizlendi.`;
+        statusDiv.textContent = `${detections.length} adet yüz bulundu ve sabit maske uygulandı.`;
 
-        // Animasyon yok. Tespit edilen yüzlerin üzerine sadece BİR KERE sabit grafik çizilir.
+        // Yanıp sönen animasyon döngüsü yoktur. SADECE BİR KERE ÇİZİLİR.
         detections.forEach((detection) => {
             const bbox = detection.boundingBox;
             const x = bbox.xCenter * canvas.width - (bbox.width * canvas.width) / 2;
@@ -183,15 +174,21 @@
             const w = bbox.width * canvas.width;
             const h = bbox.height * canvas.height;
 
-            // Sabit KVKK Dikdörtgeni
-            ctx.fillStyle = '#1a73e8'; // Mavi arka plan
+            // Arka planı siyaha yakın, saydam bir rozet (Daha profesyonel görünür)
+            ctx.fillStyle = 'rgba(20, 20, 20, 0.9)'; 
             ctx.beginPath();
-            ctx.roundRect(x, y, w, h, 8); // Hafif yuvarlatılmış köşeler
+            
+            // Yuvarlatılmış dikdörtgen çizer
+            if (ctx.roundRect) {
+                ctx.roundRect(x, y, w, h, 8); 
+            } else {
+                ctx.rect(x, y, w, h); // Eski tarayıcılar için yedek
+            }
             ctx.fill();
 
-            // Sabit KVKK Yazısı
-            ctx.fillStyle = '#ffffff'; // Beyaz yazı
-            ctx.font = `bold ${Math.max(12, w / 4)}px sans-serif`;
+            // Ortaya beyaz KVKK yazısı
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${Math.max(14, w / 4)}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('KVKK', x + w / 2, y + h / 2);
