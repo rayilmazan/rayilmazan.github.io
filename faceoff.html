@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KVKK Uyumlu Yüz Gizleme Aracı - rayılmazan</title>
+    <title>Kalabalık Grup Yüz Gizleme (GitHub Uyumlu) - rayılmazan</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
@@ -29,7 +29,6 @@
             background: #fafafa;
             cursor: pointer;
             margin-bottom: 20px;
-            transition: all 0.3s ease;
         }
         .upload-box:hover { border-color: #1a73e8; background: #f1f7ff; }
         input[type="file"] { display: none; }
@@ -42,9 +41,11 @@
             font-size: 16px;
             cursor: pointer;
         }
-        .btn:hover { background: #1557b0; }
         .canvas-container {
+            position: relative;
+            display: inline-block;
             margin-top: 15px;
+            max-width: 100%;
         }
         canvas {
             max-width: 100%;
@@ -52,148 +53,156 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        #status {
-            font-weight: bold;
-            color: #d93025;
-            margin: 10px 0;
-        }
+        #status { font-weight: bold; color: #d93025; margin: 10px 0; }
+        #hiddenImage { display: none; }
+        #debug { font-size: 12px; color: #666; margin-top: 10px; font-family: monospace; white-space: pre-wrap;}
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js" crossorigin="anonymous"></script>
+    <!-- Face-API.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <h2>KVKK Yüz Gizleme Aracı (Sabit Maske)</h2>
+    <h2>Kalabalık Grup KVKK Yüz Gizleme</h2>
     <div class="info">
-        🔒 Tamamen tarayıcınızda çalışır. Animasyon içermez, sistemi yormaz.
+        🔒 İşlemler tarayıcıda yapılır. GitHub Pages üzerinde sorunsuz çalışması için optimize edilmiştir.
     </div>
 
     <div class="upload-box" onclick="document.getElementById('imageUpload').click()">
-        <p>Fotoğraf seçmek için tıklayın</p>
+        <p>Kalabalık fotoğrafı seçmek için tıklayın</p>
         <button class="btn">Dosya Seç</button>
         <input type="file" id="imageUpload" accept="image/*">
     </div>
 
-    <div id="status">Sistem yükleniyor, lütfen bekleyin...</div>
+    <div id="status">Yapay zeka modelleri yükleniyor (Yaklaşık 5-10 MB indirecek, lütfen bekleyin)...</div>
+    <div id="debug"></div>
 
-    <div class="canvas-container">
-        <canvas id="outputCanvas"></canvas>
-    </div>
+    <img id="hiddenImage" crossorigin="anonymous" />
+    <div class="canvas-container" id="canvasContainer"></div>
 </div>
 
 <script>
     const imageUpload = document.getElementById('imageUpload');
-    const canvas = document.getElementById('outputCanvas');
-    const ctx = canvas.getContext('2d');
+    const hiddenImage = document.getElementById('hiddenImage');
+    const canvasContainer = document.getElementById('canvasContainer');
     const statusDiv = document.getElementById('status');
+    const debugDiv = document.getElementById('debug');
 
-    let faceDetection = null;
-    let isModelReady = false;
+    let modelsLoaded = false;
 
-    async function initFaceDetection() {
+    function logDebug(msg) {
+        console.log(msg);
+        debugDiv.textContent += msg + "\n";
+    }
+
+    async function loadModels() {
+        // GitHub'dan modellerin indirilmesi bazen CORS hatası verebilir.
+        // Bu yüzden jsdelivr CDN üzerinden çekmek daha kararlı bir çözümdür.
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+        
         try {
-            faceDetection = new FaceDetection({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/${file}`
-            });
-
-            // 'full' modeli çoklu yüzler ve uzak mesafeler için daha hassastır.
-            // minDetectionConfidence 0.15'e düşürüldü ki flu/uzak yüzleri de okuyabilsin.
-            faceDetection.setOptions({
-                model: 'full', 
-                minDetectionConfidence: 0.15 
-            });
-
-            faceDetection.onResults(onResults);
-            await faceDetection.initialize();
+            logDebug("Modeller CDN'den yükleniyor...");
+            // Tiny Face Detector, kalabalık ve uzak yüzlerde SSD'ye göre daha hızlı çalışır ve daha az bellek harcar.
+            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
             
-            isModelReady = true;
+            modelsLoaded = true;
             statusDiv.style.color = '#137333';
-            statusDiv.textContent = 'Sistem hazır! Lütfen bir fotoğraf seçin.';
-        } catch (error) {
-            statusDiv.textContent = 'Model yüklenirken hata: ' + error.message;
+            statusDiv.textContent = 'Modeller başarıyla yüklendi! Lütfen fotoğraf seçin.';
+            logDebug("Model yükleme başarılı.");
+        } catch (err) {
+            statusDiv.textContent = 'Modeller yüklenirken hata oluştu! Konsolu inceleyin.';
+            logDebug("HATA: " + err.message);
         }
     }
 
-    initFaceDetection();
+    // Sayfa açıldığında modeli yüklemeye başla
+    loadModels();
 
-    imageUpload.addEventListener('change', (e) => {
+    imageUpload.addEventListener('change', async (e) => {
+        if (!modelsLoaded) {
+            alert("Modellerin yüklenmesi henüz bitmedi, lütfen bekleyin.");
+            return;
+        }
+
         const file = e.target.files[0];
         if (!file) return;
 
-        if (!isModelReady) {
-            alert("Model henüz tam yüklenmedi, lütfen birkaç saniye bekleyin.");
-            return;
-        }
-
         statusDiv.style.color = '#d93025';
-        statusDiv.textContent = 'Yüzler aranıyor...';
+        statusDiv.textContent = 'Kalabalık fotoğraf analiz ediliyor, tarayıcınız kilitlenebilir bekleyin...';
+        logDebug("Fotoğraf seçildi, okuma başlatılıyor.");
 
         const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = new Image();
-            img.onload = async function() {
+        reader.onload = async function(event) {
+            hiddenImage.src = event.target.result;
+            
+            hiddenImage.onload = async () => {
+                logDebug(`Fotoğraf boyutu: ${hiddenImage.width}x${hiddenImage.height}`);
+                canvasContainer.innerHTML = '';
                 
-                canvas.width = img.width;
-                canvas.height = img.height;
+                const canvas = faceapi.createCanvasFromMedia(hiddenImage);
+                canvasContainer.append(canvas);
                 
-                // Resmi canvas'a sadece bir kere çiziyoruz
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const displaySize = { width: hiddenImage.width, height: hiddenImage.height };
+                faceapi.matchDimensions(canvas, displaySize);
 
                 try {
-                    // Yapay zekaya doğrudan HTMLImageElement'i besliyoruz.
-                    // (Önceki versiyonda canvas'ı beslemiştik, çoklu yüzlerde bazen veri kaybı yapabiliyor)
-                    await faceDetection.send({ image: img });
-                } catch (err) {
-                    statusDiv.textContent = 'Hata oluştu: ' + err.message;
+                    logDebug("Yüz taraması yapılıyor...");
+                    
+                    // Kalabalık gruplardaki UFAK yüzleri yakalamak için eşik değeri çok düşürüldü (0.2)
+                    // inputSize büyütüldü (960) ki uzaktaki kişileri de görsün
+                    const options = new faceapi.TinyFaceDetectorOptions({ 
+                        inputSize: 960, 
+                        scoreThreshold: 0.2 
+                    });
+                    
+                    const detections = await faceapi.detectAllFaces(hiddenImage, options);
+                    
+                    logDebug(`Ham tespit sayısı: ${detections.length}`);
+                    
+                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+                    if (resizedDetections.length === 0) {
+                        statusDiv.style.color = '#b06000';
+                        statusDiv.textContent = 'Yüz bulunamadı veya yüzler çok küçük/bulanık.';
+                    } else {
+                        statusDiv.style.color = '#137333';
+                        statusDiv.textContent = `Toplam ${resizedDetections.length} yüz bulundu ve gizlendi.`;
+                    }
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(hiddenImage, 0, 0, hiddenImage.width, hiddenImage.height);
+
+                    resizedDetections.forEach(detection => {
+                        const box = detection.box;
+                        
+                        // Sabit KVKK Dikdörtgeni
+                        ctx.fillStyle = 'rgba(20, 20, 20, 0.9)'; 
+                        ctx.beginPath();
+                        
+                        if (ctx.roundRect) {
+                            ctx.roundRect(box.x, box.y, box.width, box.height, 8);
+                        } else {
+                            ctx.rect(box.x, box.y, box.width, box.height);
+                        }
+                        ctx.fill();
+
+                        // Metin
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = `bold ${Math.max(10, box.width / 3.5)}px sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('KVKK', box.x + box.width / 2, box.y + box.height / 2);
+                    });
+
+                } catch (error) {
+                    statusDiv.textContent = 'Yüz analizi sırasında teknik bir hata oluştu.';
+                    logDebug("TARAMA HATASI: " + error.message);
                 }
-            }
-            img.src = event.target.result;
-        }
+            };
+        };
         reader.readAsDataURL(file);
     });
-
-    function onResults(results) {
-        const detections = results.detections || [];
-        
-        if (detections.length === 0) {
-            statusDiv.style.color = '#b06000';
-            statusDiv.textContent = 'Fotoğrafta yüz bulunamadı, orijinal fotoğraf yüklendi.';
-            return;
-        }
-
-        statusDiv.style.color = '#137333';
-        statusDiv.textContent = `${detections.length} adet yüz bulundu ve sabit maske uygulandı.`;
-
-        // Yanıp sönen animasyon döngüsü yoktur. SADECE BİR KERE ÇİZİLİR.
-        detections.forEach((detection) => {
-            const bbox = detection.boundingBox;
-            const x = bbox.xCenter * canvas.width - (bbox.width * canvas.width) / 2;
-            const y = bbox.yCenter * canvas.height - (bbox.height * canvas.height) / 2;
-            const w = bbox.width * canvas.width;
-            const h = bbox.height * canvas.height;
-
-            // Arka planı siyaha yakın, saydam bir rozet (Daha profesyonel görünür)
-            ctx.fillStyle = 'rgba(20, 20, 20, 0.9)'; 
-            ctx.beginPath();
-            
-            // Yuvarlatılmış dikdörtgen çizer
-            if (ctx.roundRect) {
-                ctx.roundRect(x, y, w, h, 8); 
-            } else {
-                ctx.rect(x, y, w, h); // Eski tarayıcılar için yedek
-            }
-            ctx.fill();
-
-            // Ortaya beyaz KVKK yazısı
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `bold ${Math.max(14, w / 4)}px sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('KVKK', x + w / 2, y + h / 2);
-        });
-    }
 </script>
 
 </body>
