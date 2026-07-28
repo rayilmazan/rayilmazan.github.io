@@ -7,51 +7,81 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #111; }
-        #map { height: 100vh; width: 100vw; transition: transform 0.1s ease-out; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+        #map { height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; }
+        
         #overlay {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.85); color: white; padding: 15px; border-radius: 10px; z-index: 999;
-            font-family: sans-serif; pointer-events: none; text-align: center; border: 1px solid #333;
+            background: rgba(0,0,0,0.85); color: white; padding: 12px 20px; border-radius: 10px; z-index: 1000;
+            font-family: sans-serif; pointer-events: none; text-align: center; border: 1px solid #444; font-size: 14px;
         }
-        /* Ekranın ortasında sabit duracak, kıbleyi (cihazın üst yönünü) gösterecek belirgin yeşil ok */
-        #direction-arrow {
+
+        /* Seccade / Yön Çerçevesi ve Kabe'yi gösteren net ibre */
+        #compass-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 280px;
+            height: 280px;
+            margin-top: -140px;
+            margin-left: -140px;
+            z-index: 999;
+            pointer-events: none;
+            border-radius: 50%;
+            border: 3px dashed rgba(46, 204, 113, 0.6);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4); /* Çevreyi karartarak odak sağlar */
+        }
+
+        /* Doğrudan Kıbleyi (Yukarıyı/Seccade yönünü) gösteren belirgin yeşil ok */
+        #qibla-pointer {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            border-bottom: 45px solid #2ecc71;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.7));
+        }
+
+        .center-dot {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 0;
-            height: 0;
-            border-left: 22px solid transparent;
-            border-right: 22px solid transparent;
-            border-bottom: 60px solid #2ecc71; /* Belirgin yeşil renk */
-            z-index: 1000;
-            pointer-events: none;
-            filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.6));
+            width: 14px;
+            height: 14px;
+            background: #e74c3c;
+            border: 2px solid white;
+            border-radius: 50%;
+            z-index: 1001;
         }
     </style>
 </head>
 <body>
 
-    <div id="overlay">Telefonu düz tutun, üst yönü kıbleyi gösterecektir</div>
-    <div id="direction-arrow"></div>
+    <div id="overlay">Telefonu düz tutun: Yeşil ok ve seccade yönü Kabe'yi gösterir</div>
+    
+    <div id="compass-container">
+        <div id="qibla-pointer"></div>
+    </div>
+    <div class="center-dot"></div>
+
     <div id="map"></div>
 
     <script>
-        // Haritayı başlat
-        const map = L.map('map', { zoomControl: false }).setView([0, 0], 18);
+        const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([0, 0], 18);
 
-        // Uydu görüntüsü katmanı
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Uydu Görüntüsü'
-        }).addTo(map);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
         let userMarker;
         let userPos = null;
-        const kaabaPos = [21.4225, 39.8262]; // Kabe Koordinatları
+        const kaabaPos = [21.4225, 39.8262]; // Kabe koordinatları
 
-        // İki nokta arasındaki açı hesaplama (Kıble Açısı)
-        function calculateQiblaAngle(lat1, lon1, lat2, lon2) {
+        // İki nokta arasındaki tam açı hesabı (Great-circle bearing)
+        function calculateBearing(lat1, lon1, lat2, lon2) {
             const φ1 = lat1 * Math.PI / 180;
             const φ2 = lat2 * Math.PI / 180;
             const Δλ = (lon2 - lon1) * Math.PI / 180;
@@ -73,26 +103,55 @@
             console.error(err);
         }, { enableHighAccuracy: true });
 
-        // Cihaz yönünü dinle (Cihazın üstü ile kıbleyi eşleştirme)
-        window.addEventListener('deviceorientation', (event) => {
+        // Cihaz yönelimi (Pusula) işleyicisi
+        function handleOrientation(event) {
             if (!userPos) return;
 
-            let heading = event.webkitCompassHeading; // iOS için
-            if (heading === undefined && event.alpha !== null) {
-                heading = 360 - event.alpha; // Android için
+            let heading = null;
+
+            // iOS ve Android uyumlu pusula açısı alma
+            if (event.webkitCompassHeading !== undefined) {
+                heading = event.webkitCompassHeading; // Safari / iOS
+            } else if (event.alpha !== null) {
+                heading = 360 - event.alpha; // Android / Chrome
             }
 
-            if (heading !== undefined && !isNaN(heading)) {
-                // Bulunduğumuz konumdan Kabe'ye olan gerçek açı
-                const qiblaAngle = calculateQiblaAngle(userPos[0], userPos[1], kaabaPos[0], kaabaPos[1]);
-                
-                // Cihazın yönü ile Kabe açısını eşitleyecek harita dönüşü
-                let rotation = heading - qiblaAngle;
+            if (heading !== null && !isNaN(heading)) {
+                // Bulunulan konumdan Kabe'ye olan coğrafi açı
+                const qiblaBearing = calculateBearing(userPos[0], userPos[1], kaabaPos[0], kaabaPos[1]);
 
-                // Haritayı ters yönde döndürerek okun (cihazın üstünün) doğrudan kıbleye bakmasını sağla
-                document.getElementById('map').style.transform = `rotate(${-rotation}deg)`;
+                // Haritanın dönme açısı: Cihazın baktığı yön (heading) ile Kabe açısını hizala
+                const mapRotation = heading - qiblaBearing;
+
+                // Haritayı döndürerek ekranın üst kısmının ve yeşil okun tam Kabe'yi göstermesini sağla
+                map.getContainer().style.transform = `rotate(${-mapRotation}deg)`;
+                map.getContainer().style.transformOrigin = 'center center';
             }
-        }, true);
+        }
+
+        // Absolute orientation API desteği (modern Android cihazlar için daha kararlı)
+        if (window.AbsoluteOrientationSensor) {
+            try {
+                const sensor = new AbsoluteOrientationSensor({ frequency: 60 });
+                sensor.addEventListener('reading', () => {
+                    let q = sensor.quaternion;
+                    let yaw = Math.atan2(2.0 * (q[0] * q[1] + q[3] * q[2]), q[3] * q[3] + q[0] * q[0] - q[1] * q[1] - q[2] * q[2]);
+                    let heading = yaw * (180 / Math.PI);
+                    heading = (heading + 360) % 360;
+                    
+                    if (userPos) {
+                        const qiblaBearing = calculateBearing(userPos[0], userPos[1], kaabaPos[0], kaabaPos[1]);
+                        let mapRotation = heading - qiblaBearing;
+                        map.getContainer().style.transform = `rotate(${-mapRotation}deg)`;
+                    }
+                });
+                sensor.start();
+            } catch (e) {
+                window.addEventListener('deviceorientation', handleOrientation, true);
+            }
+        } else {
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        }
     </script>
 </body>
 </html>
