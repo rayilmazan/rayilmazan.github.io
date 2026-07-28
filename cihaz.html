@@ -1,758 +1,358 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayılmazan - Pardus Akıllı Tahta ve Sistem Yönetim Merkezi</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Sistem ve Donanım Bilgi Paneli</title>
     <style>
-        @keyframes pulse-fast {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.15);
+            --border: #334155;
+            --success: #4ade80;
+            --warning: #facc15;
+            --danger: #f87171;
         }
-        .scanning-pulse {
-            animation: pulse-fast 1s infinite;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        /* Custom scrollbar and theme tweaks */
-        body { background-color: #090d16; color: #f8fafc; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .log-box { background: #0f172a; color: #38bdf8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-        .tab-btn.active { background-color: #0284c7; color: white; border-color: #0284c7; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 10px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .value {
+            color: var(--text-main);
+            text-align: right;
+            font-weight: 500;
+            word-break: break-all;
+            max-left: 60%;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background-color: rgba(74, 222, 128, 0.15);
+            color: var(--success);
+        }
+
+        .status-offline {
+            background-color: rgba(248, 113, 113, 0.15);
+            color: var(--danger);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            font-size: 0.9rem;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen py-6 px-4 md:py-8">
+<body>
 
-    <div class="container mx-auto max-w-6xl">
-        <!-- Header -->
-        <header class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-xl flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <span class="text-3xl">🔍</span>
-                <div>
-                    <h1 class="text-2xl font-black text-cyan-400 tracking-tight">Rayılmazan Pardus Sistem ve Ağ Yönetim Merkezi</h1>
-                    <p class="text-slate-400 text-xs md:text-sm mt-0.5">Akıllı Tahta Donanım, Teşhis, Canlı Ağ Tarama ve Hızlı Komut Paneli</p>
-                </div>
-            </div>
-            <div id="global-status" class="text-xs font-semibold text-emerald-400 bg-emerald-950/40 px-4 py-2 rounded-full border border-emerald-800/60 shadow-inner">
-                🟢 Sistem Hazır
-            </div>
+    <div class="container">
+        <header>
+            <h1>Sistem ve Donanım Bilgi Paneli</h1>
+            <p>Cihaz, Tarayıcı, Donanım ve Ağ Bağlantı Durumu</p>
         </header>
 
-        <!-- Navigation Tabs -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-            <button onclick="switchTab('tab-diagnostics')" id="btn-tab-diagnostics" class="tab-btn active py-3 px-4 rounded-xl font-semibold text-xs md:text-sm border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 transition cursor-pointer shadow-md flex items-center justify-center gap-2">
-                <span>🛠️</span> Teşhis & Panel
-            </button>
-            <button onclick="switchTab('tab-detective')" id="btn-tab-detective" class="tab-btn py-3 px-4 rounded-xl font-semibold text-xs md:text-sm border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 transition cursor-pointer shadow-md flex items-center justify-center gap-2">
-                <span>⚡</span> Cihaz Dedektifi
-            </button>
-            <button onclick="switchTab('tab-netscanner')" id="btn-tab-netscanner" class="tab-btn py-3 px-4 rounded-xl font-semibold text-xs md:text-sm border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 transition cursor-pointer shadow-md flex items-center justify-center gap-2">
-                <span>🌐</span> Ağ Dedektifi
-            </button>
-            <button onclick="switchTab('tab-commands')" id="btn-tab-commands" class="tab-btn py-3 px-4 rounded-xl font-semibold text-xs md:text-sm border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 transition cursor-pointer shadow-md flex items-center justify-center gap-2">
-                <span>💻</span> Hızlı Komutlar
-            </button>
-        </div>
-
-        <!-- TAB 1: Teşhis & Panel (Source 1 & 3) -->
-        <div id="tab-diagnostics" class="space-y-6 tab-content">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- 1. Ağ / IP -->
-                <div id="card-net" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-emerald-500">
-                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Ağ / İnternet Durumu</h3>
-                    <div class="text-xl font-bold text-slate-100" id="val-net">Yükleniyor...</div>
-                    <small id="val-ip" class="text-slate-400 text-xs mt-1 block font-mono">IP Alınamadı</small>
+        <div class="grid">
+            <!-- Bağlantı Bilgileri -->
+            <div class="card">
+                <h2>🌐 Ağ ve Bağlantı</h2>
+                <div class="info-item">
+                    <span class="label">Bağlantı Durumu:</span>
+                    <span class="value" id="netStatus"><span class="status-badge status-online"><span class="dot"></span>Kontrol Ediliyor...</span></span>
                 </div>
-                <!-- 2. Disk -->
-                <div id="card-disk" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-emerald-500">
-                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Kök Disk Doluluğu</h3>
-                    <div class="text-xl font-bold text-slate-100" id="val-disk">Yükleniyor...</div>
-                    <small id="val-disk-detay" class="text-slate-400 text-xs mt-1 block">Kritik Sınır: %90</small>
+                <div class="info-item">
+                    <span class="label">Bağlantı Tipi (Eff. Type):</span>
+                    <span class="value" id="netEffectiveType">Bilinmiyor</span>
                 </div>
-                <!-- 3. NetworkManager -->
-                <div id="card-service" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-emerald-500">
-                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Ağ Yöneticisi (Servis)</h3>
-                    <div class="text-xl font-bold text-slate-100" id="val-service">Yükleniyor...</div>
-                    <small class="text-slate-400 text-xs mt-1 block">NetworkManager Durumu</small>
+                <div class="info-item">
+                    <span class="label">Tahmini Hız (Downlink):</span>
+                    <span class="value" id="netDownlink">-</span>
                 </div>
-                <!-- 4. Sıcaklık -->
-                <div id="card-temp" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-emerald-500">
-                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">İşlemci Sıcaklığı</h3>
-                    <div class="text-xl font-bold text-slate-100" id="val-temp">Yükleniyor...</div>
-                    <small class="text-slate-400 text-xs mt-1 block">Isınma Kaynaklı Kapanma Riski</small>
+                <div class="info-item">
+                    <span class="label">Gecikme (RTT):</span>
+                    <span class="value" id="netRtt">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Veri Tasarrufu (Data Saver):</span>
+                    <span class="value" id="netSaveData">Kapalı / Yok</span>
                 </div>
             </div>
 
-            <!-- Lokal Cihaz Takip Paneli (Source 3 entegrasyonu) -->
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-base font-bold text-cyan-300 flex items-center gap-2">🖥️ Lokal Tahta / Cihaz Takip Listesi</h2>
-                    <button onclick="kontrolEtCihazlar()" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer">Durumları Kontrol Et</button>
+            <!-- Donanım ve Sistem -->
+            <div class="card">
+                <h2>💻 Donanım / Sistem</h2>
+                <div class="info-item">
+                    <span class="label">İşlemci Çekirdek (CPU):</span>
+                    <span class="value" id="hardwareCores">-</span>
                 </div>
-                <div id="dashboard-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Dinamik cihazlar doldurulacak -->
+                <div class="info-item">
+                    <span class="label">Tahmini Bellek (RAM):</span>
+                    <span class="value" id="hardwareRam">-</span>
                 </div>
-            </div>
-
-            <!-- Log Kutusu -->
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-                <div class="font-bold text-amber-400 mb-2 text-sm flex items-center gap-2">⚠️ Tespit Edilen Sistem Hataları ve Uyarılar:</div>
-                <div class="log-box p-4 rounded-xl h-40 overflow-y-auto text-xs" id="logPanel">
-                    Sistem taranıyor...
+                <div class="info-item">
+                    <span class="label">İşletim Sistemi:</span>
+                    <span class="value" id="osInfo">Algılanıyor...</span>
                 </div>
-                <button onclick="sorunlariTara()" class="w-full mt-4 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg cursor-pointer text-sm">
-                    Sorunları Yeniden Tara
-                </button>
-                <div class="text-center mt-3 text-xs text-slate-500" id="son-guncelleme">Son Tarama: -</div>
-            </div>
-        </div>
-
-        <!-- TAB 2: Cihaz Dedektifi (Source 2) -->
-        <div id="tab-detective" class="space-y-6 tab-content hidden">
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl text-center">
-                <button id="startBtn" onclick="runFullAnalysis()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 px-10 rounded-xl transition duration-200 shadow-lg cursor-pointer text-base">
-                    Sistemi Tara ve Analiz Et
-                </button>
-            </div>
-
-            <div id="hardwareBox" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl hidden">
-                <h2 class="text-base font-bold text-indigo-300 mb-4 flex items-center gap-2">📋 Toplanan Donanım & Çevre Bilgileri</h2>
-                <div id="hardwareGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs"></div>
-            </div>
-
-            <div id="testBox" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl hidden">
-                <h2 class="text-base font-bold text-amber-400 mb-4 flex items-center gap-2">⚡ Canlı Performans Testleri</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 block text-xs mb-1">CPU Matematik İşleme</span>
-                        <span id="testCPU" class="font-bold text-amber-500 animate-pulse">Test ediliyor...</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 block text-xs mb-1">Depolama Payı</span>
-                        <span id="testStorage" class="font-bold text-amber-500 animate-pulse">Hesaplanıyor...</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                        <span class="text-slate-400 block text-xs mb-1">Ağ Hattı Kararlılığı</span>
-                        <span id="testNet" class="font-bold text-amber-500 animate-pulse">Ölçülüyor...</span>
-                    </div>
+                <div class="info-item">
+                    <span class="label">Platform:</span>
+                    <span class="value" id="platformInfo">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Dokunmatik Ekran:</span>
+                    <span class="value" id="touchSupport">-</span>
                 </div>
             </div>
 
-            <div id="scoreBox" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl hidden text-center">
-                <h2 class="text-lg font-bold mb-1 text-slate-200">Sistem Sağlık ve Performans Skoru</h2>
-                <div class="text-4xl md:text-5xl font-black my-3 transition-all duration-500" id="scoreText">0%</div>
-                <div class="w-full bg-slate-800 h-4 rounded-full overflow-hidden shadow-inner p-0.5 border border-slate-700">
-                    <div id="scoreBar" class="h-full rounded-full transition-all duration-1000 ease-out bg-red-500" style="width: 0%"></div>
+            <!-- Ekran ve Görüntü -->
+            <div class="card">
+                <h2>🖥️ Ekran ve Pencere</h2>
+                <div class="info-item">
+                    <span class="label">Ekran Çözünürlüğü:</span>
+                    <span class="value" id="screenRes">-</span>
                 </div>
-                <p id="scoreSummary" class="text-xs md:text-sm text-slate-400 mt-3 italic"></p>
+                <div class="info-item">
+                    <span class="label">Kullanılabilir Alan:</span>
+                    <span class="value" id="screenAvail">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Renk Derinliği:</span>
+                    <span class="value" id="screenColorDepth">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Piksel Oranı (DPR):</span>
+                    <span class="value" id="pixelRatio">-</span>
+                </div>
             </div>
 
-            <div id="reportBox" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl hidden">
-                <h2 class="text-base font-bold text-emerald-400 mb-4">📢 Olası Sorunlar ve Dedektif Tahminleri</h2>
-                <div id="reportContainer" class="space-y-4 text-xs md:text-sm"></div>
-            </div>
-        </div>
-
-        <!-- TAB 3: Ağ Dedektifi / Tarayıcı (Source 6) -->
-        <div id="tab-netscanner" class="space-y-6 tab-content hidden">
-            <section class="bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl">
-                <h2 class="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">⚙️ Lokal Ağ Tarama Ayarları</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Başlangıç IP</label>
-                        <input type="text" id="ip-start" value="192.168.1.1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-teal-500 font-mono transition text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Bitiş IP</label>
-                        <input type="text" id="ip-end" value="192.168.1.30" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-teal-500 font-mono transition text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Hedef Port</label>
-                        <input type="number" id="target-port" value="80" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-teal-500 font-mono transition text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Zaman Aşımı (ms)</label>
-                        <input type="number" id="timeout-ms" value="1200" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:border-teal-500 font-mono transition text-sm">
-                    </div>
+            <!-- Tarayıcı ve Yazılım -->
+            <div class="card">
+                <h2>🧭 Yazılım ve Tarayıcı</h2>
+                <div class="info-item">
+                    <span class="label">Tarayıcı:</span>
+                    <span class="value" id="browserName">-</span>
                 </div>
-
-                <div class="mt-6 flex flex-col sm:flex-row gap-3">
-                    <button id="btn-scan" onclick="startNetworkScan()" class="flex-1 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition duration-200 shadow-lg cursor-pointer">
-                        Ağı Taramaya Başla
-                    </button>
-                    <button id="btn-stop" onclick="stopScan()" disabled class="sm:w-32 bg-red-600/20 hover:bg-red-600/40 text-red-400 font-semibold py-3 px-6 rounded-xl border border-red-500/30 transition disabled:opacity-50 disabled:pointer-events-none cursor-pointer">
-                        Durdur
-                    </button>
+                <div class="info-item">
+                    <span class="label">Dil:</span>
+                    <span class="value" id="browserLang">-</span>
                 </div>
-            </section>
-
-            <section id="progress-container" class="hidden bg-slate-900 rounded-xl p-4 border border-slate-800">
-                <div class="flex justify-between text-xs text-slate-400 mb-2">
-                    <span>Tarama İlerlemesi</span>
-                    <span id="progress-percent">0%</span>
+                <div class="info-item">
+                    <span class="label">Çerez Durumu:</span>
+                    <span class="value" id="cookieStatus">-</span>
                 </div>
-                <div class="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800">
-                    <div id="progress-bar" class="bg-teal-500 h-full rounded-full transition-all duration-200" style="width: 0%"></div>
-                </div>
-            </section>
-
-            <section class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
-                    <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">Toplam Hedef</p>
-                    <p id="stat-total" class="text-2xl font-bold text-slate-200 font-mono">0</p>
-                </div>
-                <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
-                    <p class="text-xs text-emerald-400 uppercase tracking-wider mb-1">Açık Tahtalar</p>
-                    <p id="stat-online" class="text-2xl font-bold text-emerald-400 font-mono">0</p>
-                </div>
-                <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
-                    <p class="text-xs text-red-400 uppercase tracking-wider mb-1">Ulaşılamayan</p>
-                    <p id="stat-offline" class="text-2xl font-bold text-red-400 font-mono">0</p>
-                </div>
-                <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
-                    <p class="text-xs text-yellow-400 uppercase tracking-wider mb-1">Kalan</p>
-                    <p id="stat-remaining" class="text-2xl font-bold text-yellow-400 font-mono">0</p>
-                </div>
-            </section>
-
-            <section class="space-y-4">
-                <h3 class="text-lg font-semibold text-slate-200 flex items-center gap-2">
-                    🖥️ Sınıf / Cihaz Haritası <span class="text-xs text-slate-500">(Otomatik IP Sıralı)</span>
-                </h3>
-                <div id="device-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                    <div class="col-span-full text-center py-12 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-                        Tarama henüz başlatılmadı. Başlatmak için yukarıdaki butona tıklayın.
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- TAB 4: Hızlı Komutlar Kütüphanesi (Source 4 & 5) -->
-        <div id="tab-commands" class="space-y-6 tab-content hidden">
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl mb-6">
-                <h2 class="text-lg font-bold text-cyan-400 mb-1">Pardus e-Tahta Komut ve Müdahale Kütüphanesi</h2>
-                <p class="text-slate-400 text-xs md:text-sm">Akıllı tahta arıza ve yönetim işlemleri için hızlı kopyalanabilir terminal komutları.</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="command-grid">
-                <!-- Komut 1 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Ağ Servisini Yeniden Başlatma</div>
-                        <div class="text-slate-400 text-xs mb-3">İnternet veya IP alma sorunlarında NetworkManager'ı tetikler.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">sudo systemctl restart NetworkManager</div>
-                    </div>
-                    <button onclick="copyCode(this, 'sudo systemctl restart NetworkManager')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 2 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Paket Listesini Güncelleme</div>
-                        <div class="text-slate-400 text-xs mb-3">Depoları tazeler ve sistem paket listesini eşitler.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">sudo apt update</div>
-                    </div>
-                    <button onclick="copyCode(this, 'sudo apt update')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 3 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Sistem Yükseltme (Upgrade)</div>
-                        <div class="text-slate-400 text-xs mb-3">Mevcut paketleri ve uygulamaları günceller.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">sudo apt upgrade -y</div>
-                    </div>
-                    <button onclick="copyCode(this, 'sudo apt upgrade -y')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 4 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Boş Alan / Disk Temizliği</div>
-                        <div class="text-slate-400 text-xs mb-3">Gereksiz önbellek kalıntılarını ve artık paketleri temizler.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">sudo apt clean && sudo apt autoremove -y</div>
-                    </div>
-                    <button onclick="copyCode(this, 'sudo apt clean && sudo apt autoremove -y')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 5 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Dokunmatik Servisini Yeniden Başlat</div>
-                        <div class="text-slate-400 text-xs mb-3">Dokunmatik algılamayan tahtalarda sürücüyü tetikler.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">sudo systemctl restart etrust-touch</div>
-                    </div>
-                    <button onclick="copyCode(this, 'sudo systemctl restart etrust-touch')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 6 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Grafik Arayüzü Yeniden Başlatma</div>
-                        <div class="text-slate-400 text-xs mb-3">Donma durumunda masaüstü oturumunu baştan yükler.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">sudo systemctl restart lightdm</div>
-                    </div>
-                    <button onclick="copyCode(this, 'sudo systemctl restart lightdm')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 7 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Ağ Kartını Resetle (nmcli)</div>
-                        <div class="text-slate-400 text-xs mb-3">NetworkManager bağlantısını kapatıp açar.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">nmcli networking off && nmcli networking on</div>
-                    </div>
-                    <button onclick="copyCode(this, 'nmcli networking off && nmcli networking on')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
-                </div>
-                <!-- Komut 8 -->
-                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800 shadow-md flex flex-col justify-between">
-                    <div>
-                        <div class="font-bold text-slate-200 text-sm md:text-base mb-1">Askıda Kalan Uygulamayı Kapat (xkill)</div>
-                        <div class="text-slate-400 text-xs mb-3">İmlece tıklanan donanım pencerelerini zorla kapatır.</div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-cyan-400 mb-3 overflow-x-auto whitespace-nowrap">xkill</div>
-                    </div>
-                    <button onclick="copyCode(this, 'xkill')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 px-4 rounded-lg text-xs transition cursor-pointer w-full">Kopyala</button>
+                <div class="info-item">
+                    <span class="label">Çevrimdışı Mod (PWA):</span>
+                    <span class="value" id="onlineMode">-</span>
                 </div>
             </div>
         </div>
 
-        <!-- Toast Notification -->
-        <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-slate-100 border border-slate-700 px-5 py-3 rounded-xl shadow-2xl hidden transition transform duration-300 z-50 text-sm font-semibold">
-            ✨ İşlem başarılı!
+        <div class="actions">
+            <button onclick="updateSystemInfo()">Bilgileri Yenile</button>
         </div>
     </div>
 
     <script>
-        // Tab switching logic
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active', 'bg-sky-600', 'text-white'));
-            
-            document.getElementById(tabId).classList.remove('hidden');
-            const btn = document.getElementById('btn-' + tabId);
-            btn.classList.add('active', 'bg-sky-600', 'text-white');
-        }
-        // Initialize default active button style
-        document.getElementById('btn-tab-diagnostics').classList.add('bg-sky-600', 'text-white');
-
-        // Toast Helper
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.remove('hidden');
-            setTimeout(() => { toast.classList.add('hidden'); }, 2000);
-        }
-
-        // --- TAB 1 & 3 LOGIC (Teşhis ve Cihaz İzleme) ---
-        const cihazlar = [
-            { ad: "Tahta-1 (5/A)", ip: "192.168.1.10" },
-            { ad: "Tahta-2 (5/B)", ip: "192.168.1.11" },
-            { ad: "Yazıcı-Lab", ip: "192.168.1.50" },
-            { id: "Öğretmenler Odası", ip: "192.168.1.99" }
-        ];
-
-        function renderCihazlar() {
-            const dash = document.getElementById('dashboard-grid');
-            if(!dash) return;
-            dash.innerHTML = '';
-            cihazlar.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-950 p-4 rounded-xl border border-slate-800 border-l-4 border-l-slate-600';
-                card.innerHTML = `<strong class="text-slate-200 text-sm">${c.ad}</strong><br><span class="font-mono text-xs text-slate-400">${c.ip}</span><br><small class="text-yellow-500 font-semibold mt-1 block text-xs">Kontrol ediliyor...</small>`;
-                dash.appendChild(card);
-            });
-        }
-
-        async function kontrolEtCihazlar() {
-            renderCihazlar();
-            const cards = document.getElementById('dashboard-grid').children;
-            for(let i = 0; i < cihazlar.length; i++) {
-                const c = cihazlar[i];
-                const card = cards[i];
-                try {
-                    const controller = new AbortController();
-                    setTimeout(() => controller.abort(), 1500);
-                    await fetch('http://' + c.ip, { mode: 'no-cors', signal: controller.signal });
-                    card.className = 'bg-emerald-950/20 p-4 rounded-xl border border-emerald-900 border-l-4 border-l-emerald-500';
-                    card.querySelector('small').className = "text-emerald-400 font-semibold mt-1 block text-xs";
-                    card.querySelector('small').innerText = "Aktif (Çevrimiçi)";
-                } catch(e) {
-                    card.className = 'bg-red-950/20 p-4 rounded-xl border border-red-900 border-l-4 border-l-red-500';
-                    card.querySelector('small').className = "text-red-400 font-semibold mt-1 block text-xs";
-                    card.querySelector('small').innerText = "Yanıt Yok (Kapalı / Ulaşılamıyor)";
-                }
-            }
-        }
-
-        function sorunlariTara() {
-            const veri = {
-                ip: "10.15.1.88",
-                netDurumu: "OK",
-                diskYuzde: 84,
-                servisAktif: true,
-                sicaklik: "64°C",
-                hatalar: [
-                    "Uyarı: Kök dizin doluluk oranı %84 seviyesinde. Rutin temizlik önerilir.",
-                    "Bilgi: Fatih ağına ping yanıtı başarılı (Gecikme: 12ms).",
-                    "Normal: Ağ yöneticisi servisi NetworkManager kararlı çalışıyor."
-                ]
-            };
-
-            const netCard = document.getElementById('card-net');
-            document.getElementById('val-net').innerText = veri.netDurumu === "OK" ? "Bağlantı Sağlıklı" : "Ağ Kesik!";
-            document.getElementById('val-ip').innerText = "IP: " + veri.ip;
-            netCard.className = "bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 " + (veri.netDurumu === "OK" ? "border-l-emerald-500" : "border-l-red-500");
-
-            const diskCard = document.getElementById('card-disk');
-            document.getElementById('val-disk').innerText = veri.diskYuzde + "%";
-            if (veri.diskYuzde > 90) {
-                diskCard.className = "bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-red-500";
-                document.getElementById('val-disk-detay').innerText = "KRİTİK: Disk Dolmak Üzere!";
-            } else if (veri.diskYuzde > 80) {
-                diskCard.className = "bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-amber-500";
-                document.getElementById('val-disk-detay').innerText = "Dikkat: Alan Azalıyor";
-            } else {
-                diskCard.className = "bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 border-l-emerald-500";
-                document.getElementById('val-disk-detay').innerText = "Kök Dizin Durumu İyi";
-            }
-
-            const srvCard = document.getElementById('card-service');
-            document.getElementById('val-service').innerText = veri.servisAktif ? "Çalışıyor" : "Çöktü!";
-            srvCard.className = "bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 " + (veri.servisAktif ? "border-l-emerald-500" : "border-l-red-500");
-
-            const tempCard = document.getElementById('card-temp');
-            document.getElementById('val-temp').innerText = veri.sicaklik;
-            let sicaklikDeger = parseInt(veri.sicaklik);
-            tempCard.className = "bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl border-l-6 " + (sicaklikDeger > 75 ? "border-l-red-500" : sicaklikDeger > 65 ? "border-l-amber-500" : "border-l-emerald-500");
-
-            let logHTML = "";
-            veri.hatalar.forEach(hata => {
-                logHTML += `> ${hata}<br>`;
-            });
-            document.getElementById('logPanel').innerHTML = logHTML;
-            document.getElementById('son-guncelleme').innerText = "Son Tarama: " + new Date().toLocaleTimeString();
-        }
-
-        // --- TAB 2 LOGIC (Cihaz Dedektifi) ---
-        async function runFullAnalysis() {
-            const btn = document.getElementById('startBtn');
-            btn.disabled = true;
-            btn.innerText = "Derin Analiz Yapılıyor...";
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-
-            document.getElementById('hardwareBox').classList.remove('hidden');
-            document.getElementById('testBox').classList.remove('hidden');
-            document.getElementById('scoreBox').classList.add('hidden');
-            document.getElementById('reportBox').classList.add('hidden');
-
-            const sysData = await gatherAllSystemData();
-            renderHardwareGrid(sysData);
-
-            const testData = await runLiveTests();
-            const finalReport = analyzeAndCalculateScore(sysData, testData);
-
-            displayResults(finalReport);
-
-            btn.disabled = false;
-            btn.innerText = "Sistemi Yeniden Tara";
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        }
-
-        async function gatherAllSystemData() {
-            const ua = navigator.userAgent;
-            let os = "Bilinmeyen OS";
-            if (ua.indexOf("Win") !== -1) os = "Windows";
-            if (ua.indexOf("Mac") !== -1) os = "macOS";
-            if (ua.indexOf("Linux") !== -1) os = "Linux / Pardus";
-            if (ua.indexOf("Android") !== -1) os = "Android";
-
-            let gpu = "Entegre Grafik";
-            try {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl');
-                if (gl) {
-                    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                    gpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || gpu;
-                }
-            } catch(e){}
-
-            let batteryInfo = "Bilinmiyor";
-            try {
-                if (navigator.getBattery) {
-                    const bat = await navigator.getBattery();
-                    batteryInfo = `%${Math.round(bat.level * 100)} (${bat.charging ? 'Şarjda' : 'Pilde'})`;
-                }
-            } catch(e){}
-
+        function updateSystemInfo() {
+            // --- 1. AĞ VE BAĞLANTI ---
             const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-            let netType = conn ? `${conn.effectiveType || 'Bilinmiyor'} (~${conn.downlink || 0} Mbps)` : "Bilinmiyor";
-
-            return {
-                os: os,
-                cores: navigator.hardwareConcurrency || 2,
-                ram: navigator.deviceMemory || 4,
-                gpu: gpu,
-                screen: `${screen.width}x${screen.height}`,
-                network: netType,
-                battery: batteryInfo,
-                language: navigator.language,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-            };
-        }
-
-        function renderHardwareGrid(data) {
-            const grid = document.getElementById('hardwareGrid');
-            const items = [
-                { label: "İşletim Sistemi", val: data.os },
-                { label: "İşlemci (CPU)", val: `${data.cores} Çekirdek` },
-                { label: "Algılanan RAM", val: `~${data.ram} GB` },
-                { label: "Grafik Birimi (GPU)", val: data.gpu },
-                { label: "Ekran Çözünürlüğü", val: data.screen },
-                { label: "Bağlantı & Hız", val: data.network },
-                { label: "Güç / Batarya", val: data.battery },
-                { label: "Zaman Dilimi", val: data.timezone },
-                { label: "Sistem Dili", val: data.language }
-            ];
-
-            grid.innerHTML = items.map(i => `
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 shadow-sm">
-                    <span class="text-slate-400 block font-medium mb-0.5 text-[10px] uppercase tracking-wider">${i.label}</span>
-                    <span class="text-slate-100 font-semibold break-words">${i.val}</span>
-                </div>
-            `).join('');
-        }
-
-        async function runLiveTests() {
-            const cpuStart = performance.now();
-            let iterations = 0;
-            while(performance.now() - cpuStart < 300) {
-                Math.sin(Math.random()) * Math.cos(Math.random());
-                iterations++;
-            }
-            document.getElementById('testCPU').innerText = "Tamamlandı";
-            document.getElementById('testCPU').className = "font-bold text-green-400";
-
-            let storagePressure = false;
-            let storageText = "Normal";
-            if (navigator.storage && navigator.storage.estimate) {
-                const est = await navigator.storage.estimate();
-                const ratio = est.usage / est.quota;
-                if(ratio > 0.85 || est.quota < 4000000000) {
-                    storagePressure = true;
-                    storageText = "Kısıtlı";
+            const netStatusEl = document.getElementById('netStatus');
+            
+            function updateNetworkStatus() {
+                if (navigator.onLine) {
+                    netStatusEl.innerHTML = '<span class="status-badge status-online"><span class="dot"></span>Çevrim içi</span>';
+                } else {
+                    netStatusEl.innerHTML = '<span class="status-badge status-offline"><span class="dot"></span>Çevrim dışı</span>';
                 }
             }
-            document.getElementById('testStorage').innerText = storageText;
-            document.getElementById('testStorage').className = storagePressure ? "font-bold text-red-400" : "font-bold text-green-400";
+            updateNetworkStatus();
+            window.addEventListener('online', updateNetworkStatus);
+            window.addEventListener('offline', updateNetworkStatus);
 
-            let pings = [];
-            for (let i = 0; i < 2; i++) {
-                const pStart = performance.now();
-                try {
-                    await fetch('https://cdnjs.cloudflare.com/ajax/libs/keymaster/1.6.1/keymaster.min.js', { cache: 'no-store', mode: 'no-cors' });
-                    pings.push(performance.now() - pStart);
-                } catch (e) { pings.push(300); }
-            }
-            const avgPing = pings.reduce((a,b)=>a+b, 0) / pings.length;
-            const jitter = Math.max(...pings) - Math.min(...pings);
-
-            document.getElementById('testNet').innerText = `${Math.round(avgPing)}ms`;
-            document.getElementById('testNet').className = avgPing > 200 ? "font-bold text-red-400" : "font-bold text-green-400";
-
-            return { cpuScore: iterations, storagePressure, latency: avgPing, jitter };
-        }
-
-        function analyzeAndCalculateScore(sys, test) {
-            let score = 100;
-            let logs = [];
-
-            if (sys.ram < 4) {
-                score -= 15;
-                logs.push({
-                    title: "⚠️ Düşük RAM Kapasitesi",
-                    desc: `Sisteminizde yaklaşık ${sys.ram}GB RAM tespit edildi.`,
-                    guess: "RAYILMAZAN TAHMİNİ: Birden fazla sekme veya ağır akıllı tahta uygulamaları çalışırken arka planda yavaşlamalar olabilir."
-                });
-            }
-
-            if (test.latency > 180) {
-                score -= 15;
-                logs.push({
-                    title: "🌐 Kararsız Ağ Tepki Süresi",
-                    desc: `Ağ testinde gecikme süreniz ${Math.round(test.latency)}ms çıktı.`,
-                    guess: "RAYILMAZAN TAHMİNİ: Wi-Fi sinyali zayıf veya Fatih ağı yoğun olabilir."
-                });
-            }
-
-            score = Math.max(20, Math.min(100, score));
-            return { score, logs };
-        }
-
-        function displayResults(report) {
-            const scoreBox = document.getElementById('scoreBox');
-            const scoreText = document.getElementById('scoreText');
-            const scoreBar = document.getElementById('scoreBar');
-            const scoreSummary = document.getElementById('scoreSummary');
-            const reportBox = document.getElementById('reportBox');
-            const container = document.getElementById('reportContainer');
-
-            scoreBox.classList.remove('hidden');
-            scoreText.innerText = `${report.score}%`;
-            scoreBar.style.width = `${report.score}%`;
-            
-            if (report.score >= 80) {
-                scoreBar.className = "h-full rounded-full transition-all duration-1000 ease-out bg-green-500";
-                scoreText.className = "text-4xl md:text-5xl font-black my-3 text-green-400";
-                scoreSummary.innerText = "Cihazınızda ciddi bir donanım veya performans anomalisi tespit edilmedi.";
+            if (conn) {
+                document.getElementById('netEffectiveType').textContent = conn.effectiveType ? conn.effectiveType.toUpperCase() : 'Bilinmiyor';
+                document.getElementById('netDownlink').textContent = conn.downlink ? conn.downlink + ' Mbps (Yaklaşık)' : 'Bilinmiyor';
+                document.getElementById('netRtt').textContent = conn.rtt ? conn.rtt + ' ms' : 'Bilinmiyor';
+                document.getElementById('netSaveData').textContent = conn.saveData ? 'Aktif' : 'Kapalı';
             } else {
-                scoreBar.className = "h-full rounded-full transition-all duration-1000 ease-out bg-yellow-500";
-                scoreText.className = "text-4xl md:text-5xl font-black my-3 text-yellow-400";
-                scoreSummary.innerText = "Bazı performans tıkanıklıkları yakalandı.";
+                document.getElementById('netEffectiveType').textContent = 'Desteklenmiyor';
             }
 
-            container.innerHTML = '';
-            if (report.logs.length > 0) {
-                reportBox.classList.remove('hidden');
-                report.logs.forEach(log => {
-                    const card = document.createElement('div');
-                    card.className = "p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5 shadow-md";
-                    card.innerHTML = `
-                        <h3 class="font-bold text-slate-100 text-sm md:text-base">${log.title}</h3>
-                        <p class="text-slate-400 text-xs">${log.desc}</p>
-                        <p class="text-amber-400 bg-amber-950/20 p-3 rounded-lg border-l-2 border-amber-500 text-xs italic font-medium">${log.guess}</p>
-                    `;
-                    container.appendChild(card);
-                });
-            } else {
-                reportBox.classList.remove('hidden');
-                container.innerHTML = `<div class="text-green-400 font-medium p-4 bg-green-950/20 rounded-xl border border-green-900/40 text-center text-xs">Sistem stabil çalışıyor!</div>`;
-            }
-        }
-
-        // --- TAB 3 LOGIC (Ağ Dedektifi) ---
-        let isScanning = false;
-        let abortController = null;
-
-        function generateIPRange(startIp, endIp) {
-            const startParts = startIp.split('.').map(Number);
-            const endParts = endIp.split('.').map(Number);
-            if (startParts.length !== 4 || endParts.length !== 4) return [];
-            const startNum = (startParts[0] << 24) + (startParts[1] << 16) + (startParts[2] << 8) + startParts[3];
-            const endNum = (endParts[0] << 24) + (endParts[1] << 16) + (endParts[2] << 8) + endParts[3];
-            const ips = [];
-            for (let i = startNum; i <= endNum; i++) {
-                ips.push([(i >> 24) & 0xFF, (i >> 16) & 0xFF, (i >> 8) & 0xFF, i & 0xFF].join('.'));
-            }
-            return ips;
-        }
-
-        async function probeIP(ip, port, timeoutMs, signal) {
-            const startTime = performance.now();
-            const fetchController = new AbortController();
-            signal.addEventListener('abort', () => fetchController.abort());
-            const timeoutId = setTimeout(() => fetchController.abort(), timeoutMs);
-
-            try {
-                await fetch(`http://${ip}:${port}`, { mode: 'no-cors', signal: fetchController.signal, cache: 'no-store' });
-                clearTimeout(timeoutId);
-                return { ip, active: true };
-            } catch (error) {
-                clearTimeout(timeoutId);
-                const duration = performance.now() - startTime;
-                if (error.name === 'AbortError' && signal.aborted) throw new Error('stopped');
-                if (duration < (timeoutMs - 100)) return { ip, active: true };
-                return { ip, active: false };
-            }
-        }
-
-        async function startNetworkScan() {
-            if (isScanning) return;
-            const startIp = document.getElementById('ip-start').value.trim();
-            const endIp = document.getElementById('ip-end').value.trim();
-            const port = parseInt(document.getElementById('target-port').value) || 80;
-            const timeout = parseInt(document.getElementById('timeout-ms').value) || 1200;
-
-            const ipList = generateIPRange(startIp, endIp);
-            if (ipList.length === 0) { alert('Geçerli IP aralığı girin!'); return; }
-
-            isScanning = true;
-            abortController = new AbortController();
-            document.getElementById('btn-scan').disabled = true;
-            document.getElementById('btn-stop').disabled = false;
-            document.getElementById('progress-container').classList.remove('hidden');
-
-            const grid = document.getElementById('device-grid');
-            grid.innerHTML = '';
+            // --- 2. DONANIM VE SİSTEM ---
+            document.getElementById('hardwareCores').textContent = navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' Çekirdek' : 'Bilinmiyor';
+            document.getElementById('hardwareRam').textContent = navigator.deviceMemory ? '~' + navigator.deviceMemory + ' GB' : 'Bilinmiyor (Gizlilik kısıtı)';
             
-            ipList.forEach(ip => {
-                const card = document.createElement('div');
-                card.id = `card-${ip.replace(/\./g, '-')}`;
-                card.className = "bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col justify-between h-24";
-                card.innerHTML = `<div class="text-xs text-slate-500 font-mono">${ip}</div><div class="text-sm font-bold text-slate-300">Sorgulanıyor...</div><div class="flex items-center gap-1.5 mt-2"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500 scanning-pulse"></span><span class="text-[10px] text-yellow-500 uppercase font-semibold">Taranıyor</span></div>`;
-                grid.appendChild(card);
-            });
+            const ua = navigator.userAgent;
+            let os = "Bilinmiyor";
+            if (ua.indexOf("Win") !== -1) os = "Windows";
+            else if (ua.indexOf("Android") !== -1) os = "Android";
+            else if (ua.indexOf("like Mac") !== -1) os = "iOS (iPhone/iPad)";
+            else if (ua.indexOf("Mac") !== -1) os = "macOS";
+            else if (ua.indexOf("Linux") !== -1) os = "Linux";
+            else if (ua.indexOf("CrOS") !== -1) os = "Chrome OS";
+            
+            document.getElementById('osInfo').textContent = os;
+            document.getElementById('platformInfo').textContent = navigator.platform || 'Bilinmiyor';
+            document.getElementById('touchSupport').textContent = (navigator.maxTouchPoints > 0 || 'ontouchstart' in window) ? 'Var (' + navigator.maxTouchPoints + ' nokta)' : 'Yok';
 
-            let total = ipList.length, onlineCount = 0, offlineCount = 0, index = 0;
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-online').innerText = "0";
-            document.getElementById('stat-offline').innerText = "0";
-            document.getElementById('stat-remaining').innerText = total;
+            // --- 3. EKRAN ---
+            document.getElementById('screenRes').textContent = window.screen.width + " x " + window.screen.height + " px";
+            document.getElementById('screenAvail').textContent = window.screen.availWidth + " x " + window.screen.availHeight + " px";
+            document.getElementById('screenColorDepth').textContent = window.screen.colorDepth + " bit";
+            document.getElementById('pixelRatio').textContent = window.devicePixelRatio ? window.devicePixelRatio + 'x' : '1x';
 
-            const runWorker = async () => {
-                while (index < ipList.length && isScanning) {
-                    const ip = ipList[index++];
-                    const cardElement = document.getElementById(`card-${ip.replace(/\./g, '-')}`);
-                    try {
-                        const result = await probeIP(ip, port, timeout, abortController.signal);
-                        if (!isScanning) return;
-                        if (result.active) {
-                            onlineCount++;
-                            document.getElementById('stat-online').innerText = onlineCount;
-                            cardElement.className = "bg-emerald-950/20 p-3 rounded-xl border-2 border-emerald-500/80 shadow-lg flex flex-col justify-between h-24";
-                            cardElement.innerHTML = `<div class="text-xs text-emerald-400 font-mono font-semibold">${ip}</div><div class="text-sm font-bold text-slate-100">ET-LOKAL</div><div class="flex items-center gap-1.5 mt-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span><span class="text-[10px] text-emerald-400 uppercase font-bold">AÇIK</span></div>`;
-                        } else {
-                            offlineCount++;
-                            document.getElementById('stat-offline').innerText = offlineCount;
-                            cardElement.className = "bg-slate-950/40 p-3 rounded-xl border border-slate-900 flex flex-col justify-between h-24 opacity-60";
-                            cardElement.innerHTML = `<div class="text-xs text-slate-600 font-mono">${ip}</div><div class="text-sm font-semibold text-slate-500">Yanıt Yok</div><div class="flex items-center gap-1.5 mt-2"><span class="w-2.5 h-2.5 rounded-full bg-slate-700"></span><span class="text-[10px] text-slate-500 uppercase font-semibold">KAPALI</span></div>`;
-                        }
-                        const processed = onlineCount + offlineCount;
-                        document.getElementById('stat-remaining').innerText = total - processed;
-                        const pct = Math.round((processed / total) * 100);
-                        document.getElementById('progress-bar').style.width = `${pct}%`;
-                        document.getElementById('progress-percent').innerText = `${pct}%`;
-                    } catch (err) { if (err.message === 'stopped') return; }
-                }
-            };
-
-            await Promise.all(Array(Math.min(8, ipList.length)).fill(null).map(() => runWorker()));
-            finishScan();
+            // --- 4. YAZILIM VE TARAYICI ---
+            document.getElementById('browserName').textContent = getBrowserName(ua);
+            document.getElementById('browserLang').textContent = navigator.language || navigator.userLanguage || 'Bilinmiyor';
+            document.getElementById('cookieStatus').textContent = navigator.cookieEnabled ? 'Etkin' : 'Devre Dışı';
+            document.getElementById('onlineMode').textContent = navigator.onLine ? 'Standart' : 'Önbellek / Çevrimdışı';
         }
 
-        function stopScan() {
-            isScanning = false;
-            if (abortController) abortController.abort();
-            finishScan();
+        function getBrowserName(ua) {
+            if (ua.indexOf("Firefox") !== -1) return "Mozilla Firefox";
+            else if (ua.indexOf("SamsungBrowser") !== -1) return "Samsung Internet";
+            else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) return "Opera";
+            else if (ua.indexOf("Trident") !== -1) return "Internet Explorer";
+            else if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) return "Microsoft Edge";
+            else if (ua.indexOf("Chrome") !== -1) return "Google Chrome";
+            else if (ua.indexOf("Safari") !== -1) return "Apple Safari";
+            return "Bilinmeyen Tarayıcı";
         }
 
-        function finishScan() {
-            isScanning = false;
-            document.getElementById('btn-scan').disabled = false;
-            document.getElementById('btn-stop').disabled = true;
-        }
-
-        // --- TAB 4 LOGIC (Komut Kopyalama) ---
-        function copyCode(btn, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const orig = btn.innerText;
-                btn.innerText = "Kopyalandı!";
-                btn.classList.add("bg-emerald-600");
-                showToast("Komut panoya kopyalandı!");
-                setTimeout(() => {
-                    btn.innerText = orig;
-                    btn.classList.remove("bg-emerald-600");
-                }, 2000);
-            });
-        }
-
-        // Başlangıç tetiklemeleri
-        sorunlariTara();
-        renderCihazlar();
+        // Sayfa yüklendiğinde çalıştır
+        window.onload = updateSystemInfo;
     </script>
 </body>
 </html>
-rayilmazan_pardus_yonetim_merkezi.html
-rayilmazan_pardus_yonetim_merkezi.html görüntüleniyor.
