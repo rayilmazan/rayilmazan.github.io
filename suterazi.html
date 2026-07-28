@@ -2,78 +2,69 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bağımsız Su Terazisi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tam Ekran Su Terazisi</title>
     <style>
         /* Mobil Optimizasyonları */
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            height: 100vh;
-            background-color: #1a1a1a;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #ffffff;
+        html, body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh; /* Dynamic viewport height ile mobil adres çubuğu taşması engellendi */
+            background-color: #111111;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        /* Ana Gövde - Tüm Ekranı Kaplar */
+        .level-tool {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background-color: #1a1a1a;
+            
+            /* Güvenli kenar boşlukları */
+            padding: max(15px, env(safe-area-inset-top)) 
+                     max(15px, env(safe-area-inset-right)) 
+                     max(15px, env(safe-area-inset-bottom)) 
+                     max(15px, env(safe-area-inset-left));
+            
+            display: grid;
+            grid-template-columns: 1fr 60px; /* Dikey tüp genişliği 60px yapıldı */
+            grid-template-rows: 60px 1fr;    /* Yatay tüp yüksekliği 60px yapıldı */
+            gap: 15px;
             overflow: hidden;
         }
 
-        .header {
-            text-align: center;
-            margin-top: 8vh;
-        }
-
-        h2 {
-            margin: 0 0 10px 0;
-            font-size: 26px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        /* Ana Gövde / Cihaz Kasası */
-        .level-tool {
-            background-color: #2d2d2d;
-            width: 100%;
-            max-width: 320px;
-            aspect-ratio: 1 / 1;
-            padding: 25px;
-            border-radius: 24px;
-            border: 2px solid #3d3d3d;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 2px 5px rgba(255,255,255,0.05);
-            display: grid;
-            grid-template-columns: 1fr 40px;
-            grid-template-rows: 40px 1fr;
-            gap: 25px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Tüpler - Geçişlerin yumuşak olması için CSS transition eklendi */
+        /* Tüplerin Genel Yapısı */
         .vial {
-            border: 3px solid #111;
-            border-radius: 20px;
+            border: 3px solid #000000;
+            border-radius: 30px;
             position: relative;
             width: 100%;
             height: 100%;
             transition: background 0.2s ease, box-shadow 0.2s ease;
+            background: linear-gradient(to right, #ff4757, #ff6b81);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
 
-        /* YATAY TÜP */
+        /* YATAY TÜP (Üst kenara yaslı) */
         .horizontal {
             grid-column: 1;
             grid-row: 1;
         }
 
-        /* DIKEY TÜP */
+        /* DİKEY TÜP (Sağ kenara yaslı) */
         .vertical {
             grid-column: 2;
             grid-row: 2;
@@ -81,113 +72,103 @@
 
         /* Siyah Hizalama Halkaları */
         .horizontal::before, .horizontal::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2;
+            content: ''; position: absolute; top: 0; bottom: 0; width: 3px; background-color: rgba(0, 0, 0, 0.7); z-index: 2;
         }
-        .horizontal::before { left: 42%; }
-        .horizontal::after { right: 42%; }
+        .horizontal::before { left: calc(50% - 25px); }
+        .horizontal::after { left: calc(50% + 25px); }
 
         .vertical::before, .vertical::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2;
+            content: ''; position: absolute; left: 0; right: 0; height: 3px; background-color: rgba(0, 0, 0, 0.7); z-index: 2;
         }
-        .vertical::before { top: 42%; }
-        .vertical::after { bottom: 42%; }
+        .vertical::before { top: calc(50% - 25px); }
+        .vertical::after { top: calc(50% + 25px); }
 
         /* Cam Hava Kabarcığı Efekti */
         .bubble {
-            background: radial-gradient(circle, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.4) 60%, rgba(255,255,255,0) 100%);
-            border: 1px solid rgba(255,255,255,0.6);
+            background: radial-gradient(circle, rgba(255,255,255,0.95) 20%, rgba(255,255,255,0.5) 60%, rgba(255,255,255,0) 100%);
+            border: 2px solid rgba(255,255,255,0.8);
             border-radius: 50%;
             position: absolute;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.2);
-            transition: transform 0.02s ease-out;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 2px 5px rgba(0,0,0,0.4);
+            transition: transform 0.05s linear;
             z-index: 1;
         }
 
+        /* 60px tüp kalınlığına uygun kabarcık (44px) */
         .horizontal .bubble {
-            width: 28px;
-            height: 28px;
-            top: 3px;
-            left: calc(50% - 14px);
+            width: 44px; height: 44px; top: 5px; left: calc(50% - 22px);
         }
-
         .vertical .bubble {
-            width: 28px;
-            height: 28px;
-            left: 3px;
-            top: calc(50% - 14px);
+            width: 44px; height: 44px; left: 5px; top: calc(50% - 22px);
         }
 
-        /* Alt Panel ve Butonlar */
-        .footer-panel {
+        /* Sol Alt Kısım - Açı Değerleri ve Buton */
+        .dashboard {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
             width: 100%;
-            max-width: 320px;
-            text-align: center;
-            margin-bottom: 4vh;
+            height: 100%;
         }
 
         .info-text {
-            font-size: 14px;
-            color: #a0a0a0;
-            margin: 6px 0;
-        }
-
-        #status-msg {
-            font-weight: bold;
-            font-size: 16px;
-            transition: color 0.2s ease;
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 20px;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 260px;
+            text-align: center;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.08);
         }
 
         /* Başlatma Butonu */
         button {
             width: 100%;
-            padding: 16px;
+            max-width: 260px;
+            padding: 18px;
             font-size: 18px;
             background-color: #ffffff;
-            color: #1a1a1a;
+            color: #111111;
             font-weight: bold;
             border: none;
             border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
-            margin-bottom: 15px;
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+        }
+        button:active {
+            transform: scale(0.97);
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2>Su Terazisi</h2>
-        <p id="status-msg" style="color: #a0a0a0;">Sensör Başlatılmadı</p>
-    </div>
-    
     <div class="level-tool">
+        <!-- Yatay Tüp -->
         <div class="vial horizontal" id="h-vial">
             <div id="h-bubble" class="bubble"></div>
         </div>
         
-        <div></div><div></div>
+        <!-- Köşe boşluğu -->
+        <div></div>
 
+        <!-- Açı Göstergeleri ve Kontrol -->
+        <div class="dashboard">
+            <button id="start-btn">Teraziyi Aktif Et</button>
+            <div class="info-text" id="h-text">Yatay Eğim: 0°</div>
+            <div class="info-text" id="v-text">Dikey Eğim: 0°</div>
+        </div>
+
+        <!-- Dikey Tüp -->
         <div class="vial vertical" id="v-vial">
             <div id="v-bubble" class="bubble"></div>
         </div>
-    </div>
-
-    <div class="footer-panel">
-        <button id="start-btn">Teraziyi Aktif Et</button>
-        <div class="info-text" id="h-text">Yatay Eğim: 0°</div>
-        <div class="info-text" id="v-text">Dikey Eğim: 0°</div>
     </div>
 
     <script>
@@ -198,81 +179,54 @@
         const hText = document.getElementById('h-text');
         const vText = document.getElementById('v-text');
         const startBtn = document.getElementById('start-btn');
-        const statusMsg = document.getElementById('status-msg');
 
         const maxAngle = 15; 
+        const bubbleSize = 44; // Kabarcık boyutu güncellendi
 
-        // Renk stillerini tek noktadan yönetmek için sabit fonksiyonlar
         function setVialGreen(element) {
-            element.style.background = "linear-gradient(to bottom, #2ecc71, #27ae60)";
-            element.style.boxShadow = "inset 0 0 12px rgba(0,0,0,0.5), 0 0 20px rgba(46, 204, 113, 0.6)";
+            element.style.background = "linear-gradient(to right, #2ecc71, #27ae60)";
+            element.style.boxShadow = "inset 0 0 12px rgba(0,0,0,0.6), 0 0 20px rgba(46, 204, 113, 0.4)";
         }
 
         function setVialRed(element) {
-            element.style.background = "linear-gradient(to bottom, #ff4757, #ff6b81)";
-            element.style.boxShadow = "inset 0 0 12px rgba(0,0,0,0.7), 0 0 15px rgba(255, 71, 87, 0.3)";
+            element.style.background = "linear-gradient(to right, #ff4757, #ff6b81)";
+            element.style.boxShadow = "inset 0 0 12px rgba(0,0,0,0.8)";
         }
 
         function updateLevel(event) {
-            let beta = event.beta;   
-            let gamma = event.gamma; 
+            let beta = event.beta;   // Dikey (Ön/Arka)
+            let gamma = event.gamma; // Yatay (Sağ/Sol)
 
-            const horizontalVialWidth = hVial.clientWidth;
-            const verticalVialHeight = vVial.clientHeight;
-            
-            const maxMoveX = (horizontalVialWidth - 28) / 2 - 3;
-            const maxMoveY = (verticalVialHeight - 28) / 2 - 3;
+            const maxMoveX = (hVial.clientWidth - bubbleSize) / 2 - 3; 
+            const maxMoveY = (vVial.clientHeight - bubbleSize) / 2 - 3;
 
-            // 1. YATAY EKSEN (Hissiyat ve Hareket)
+            // 1. YATAY EKSEN 
             let hAngle = gamma;
             if (hAngle > maxAngle) hAngle = maxAngle;
             if (hAngle < -maxAngle) hAngle = -maxAngle;
             let moveX = (hAngle / maxAngle) * maxMoveX;
             hBubble.style.transform = `translateX(${moveX}px)`;
-            hText.innerText = `Yatay Eğim (Sağ/Sol): ${Math.round(gamma)}°`;
+            hText.innerText = `Yatay Eğim: ${Math.round(gamma)}°`;
 
-            // 2. DİKEY EKSEN (Hissiyat ve Hareket)
+            // 2. DİKEY EKSEN 
             let vAngle = beta;
             if (vAngle > maxAngle) vAngle = maxAngle;
             if (vAngle < -maxAngle) vAngle = -maxAngle;
             let moveY = (vAngle / maxAngle) * maxMoveY;
             vBubble.style.transform = `translateY(${moveY}px)`;
-            vText.innerText = `Dikey Eğim (Ön/Arka): ${Math.round(beta)}°`;
+            vText.innerText = `Dikey Eğim: ${Math.round(beta)}°`;
             
-            // 3. BAĞIMSIZ RENK KONTROLLERİ
+            // 3. RENK KONTROLLERİ
             const isHorizontalBalanced = Math.abs(Math.round(gamma)) <= 1;
             const isVerticalBalanced = Math.abs(Math.round(beta)) <= 1;
 
-            // Yatay tüp kendi durumuna göre renk alır
-            if (isHorizontalBalanced) {
-                setVialGreen(hVial);
-            } else {
-                setVialRed(hVial);
-            }
-
-            // Dikey tüp kendi durumuna göre renk alır
-            if (isVerticalBalanced) {
-                setVialGreen(vVial);
-            } else {
-                setVialRed(vVial);
-            }
-
-            // 4. DURUM METNİ GÜNCELLEME
-            if (isHorizontalBalanced && isVerticalBalanced) {
-                statusMsg.innerText = "TAM DENGEDE 🎯";
-                statusMsg.style.color = "#2ecc71"; // Yeşil
-            } else if (isHorizontalBalanced || isVerticalBalanced) {
-                statusMsg.innerText = "Kısmen Dengede ⚖️";
-                statusMsg.style.color = "#f1c40f"; // Sarı
-            } else {
-                statusMsg.innerText = "Dengede Değil ❌";
-                statusMsg.style.color = "#ff4757"; // Kırmızı
-            }
+            if (isHorizontalBalanced) setVialGreen(hVial); else setVialRed(hVial);
+            if (isVerticalBalanced) setVialGreen(vVial); else setVialRed(vVial);
         }
 
         // Sensör İzinleri
         startBtn.addEventListener('click', () => {
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(permissionState => {
                         if (permissionState === 'granted') {
@@ -291,4 +245,3 @@
     </script>
 </body>
 </html>
-
