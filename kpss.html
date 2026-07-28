@@ -5,251 +5,314 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>rayılmazan // KPSS Lisans P3 Hesaplayıcı</title>
     <style>
-        body {
-            background: #4e3629;
-            color: #e0d7d3;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            margin: 0;
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent-green: #16a34a;
+            --danger: #dc2626;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
 
-        .chassis {
-            max-width: 800px;
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 30px 15px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
             width: 100%;
-            background: #33241b;
-            border: 2px solid #5a4234;
-            padding: 25px;
-            position: relative;
-            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
-            background-size: 20px 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,0,0,0.5);
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: var(--shadow);
             box-sizing: border-box;
         }
 
-        .header-section {
+        .header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            border-bottom: 2px solid #4a3528;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
+            align-items: center;
+            border-bottom: 2px solid #f8fafc;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .logo-tag {
-            background: #4a3528;
-            color: #00e676;
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand span {
+            background: #eff6ff;
+            color: var(--primary);
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .sys-badge {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: #f8fafc;
             padding: 4px 10px;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            border-left: 4px solid #00e676;
-            white-space: nowrap;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
         }
 
-        .sys-status {
-            font-size: 11px;
-            color: #8c7365;
-        }
-
-        .panel-grid {
+        .grid-panel {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .test-box {
-            background: #1a110d;
-            border: 1px solid #291b15;
-            padding: 15px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        .test-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
             box-sizing: border-box;
         }
 
-        .test-title {
-            color: #00e676;
-            font-size: 13px;
-            font-weight: bold;
-            border-bottom: 1px solid #291b15;
-            padding-bottom: 6px;
-            margin-bottom: 12px;
+        .test-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .input-group {
+        .input-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        .input-group label {
-            font-size: 11px;
-            color: #a8958b;
-        }
-
-        .input-group input {
-            background: #2d2019;
-            border: 1px solid #4a3528;
-            color: #00e676;
-            font-family: 'Courier New', Courier, monospace;
+        .input-row label {
             font-size: 13px;
-            width: 65px;
-            padding: 5px 8px;
+            color: var(--text-muted);
+        }
+
+        .input-row input {
+            width: 70px;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            background: #ffffff;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
             text-align: center;
-            box-sizing: border-box;
             outline: none;
-        }
-
-        .input-group input:focus {
-            border-color: #00e676;
-            box-shadow: 0 0 5px rgba(0,230,118,0.3);
-        }
-
-        .net-display {
-            margin-top: 10px;
-            padding-top: 8px;
-            border-top: 1px dashed #291b15;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #e0d7d3;
-        }
-
-        .results-panel {
-            background: #1a110d;
-            border: 1px solid #00e676;
-            padding: 20px;
-            text-align: center;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.9);
-            margin-bottom: 20px;
-        }
-
-        .score-value {
-            font-size: 38px;
-            font-weight: bold;
-            color: #00e676;
-            margin: 10px 0;
-            text-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
-        }
-
-        .score-meta {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #291b15;
-            padding-top: 12px;
-            font-size: 11px;
-            color: #a8958b;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .meta-item span {
-            color: #e0d7d3;
-            font-weight: bold;
-        }
-
-        .greeble-btn {
-            background: #2d2019;
-            color: #a8958b;
-            border: 1px solid #4a3528;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            padding: 10px;
-            width: 100%;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             transition: all 0.2s ease;
         }
 
-        .greeble-btn:hover {
-            background: #3d2a20;
-            color: #00e676;
-            border-color: #00e676;
+        .input-row input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .net-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .net-value {
+            color: var(--accent-green);
+        }
+
+        .results-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .results-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .score-display {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 8px 0;
+            letter-spacing: -1px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .meta-item strong {
+            display: block;
+            font-size: 14px;
+            color: var(--text-main);
+            margin-top: 2px;
+        }
+
+        .btn-reset {
+            width: 100%;
+            background: #ffffff;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset:hover {
+            background: #f8fafc;
+            color: var(--text-main);
+            border-color: #cbd5e1;
         }
 
         .error-msg {
-            color: #ff1744;
-            font-size: 10px;
-            margin-top: 4px;
+            color: var(--danger);
+            font-size: 11px;
+            margin-top: -6px;
+            margin-bottom: 8px;
             display: none;
         }
 
+        .footer-note {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.4;
+        }
+
         @media (max-width: 600px) {
-            body { padding: 10px; }
-            .chassis { padding: 15px; }
-            .panel-grid { grid-template-columns: 1fr; gap: 15px; }
-            .score-value { font-size: 30px; }
+            .grid-panel { grid-template-columns: 1fr; }
+            .score-display { font-size: 34px; }
+            .container { padding: 18px; }
         }
     </style>
 </head>
 <body>
 
-<div class="chassis">
-    <div class="header-section">
-        <div class="logo-tag">rayılmazan // kpss_p3</div>
-        <div class="sys-status">[lisans_gk_gy_matrisi]</div>
+<div class="container">
+    <div class="header">
+        <div class="brand">
+            rayılmazan
+            <span>KPSS P3</span>
+        </div>
+        <div class="sys-badge">Genel Kültür & Genel Yetenek</div>
     </div>
 
-    <div class="panel-grid">
+    <div class="grid-panel">
         <!-- GENEL YETENEK -->
-        <div class="test-box">
-            <div class="test-title">> Genel Yetenek (60 Soru)</div>
-            <div class="input-group">
-                <label for="gy-d">Doğru Sayısı:</label>
+        <div class="test-card">
+            <div class="test-card-title">
+                Genel Yetenek
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">60 Soru</span>
+            </div>
+            <div class="input-row">
+                <label for="gy-d">Doğru</label>
                 <input type="number" id="gy-d" min="0" max="60" value="0" oninput="calculate()">
             </div>
-            <div class="input-group">
-                <label for="gy-y">Yanlış Sayısı:</label>
+            <div class="input-row">
+                <label for="gy-y">Yanlış</label>
                 <input type="number" id="gy-y" min="0" max="60" value="0" oninput="calculate()">
             </div>
-            <div id="gy-err" class="error-msg">Top Toplam soru 60'ı geçemez!</div>
-            <div class="net-display">
-                <span>GY Net:</span>
-                <strong id="gy-net" style="color:#00e676;">0.00</strong>
+            <div id="gy-err" class="error-msg">Soru sayısı 60'ı geçemez!</div>
+            <div class="net-info">
+                <span>Net:</span>
+                <span id="gy-net" class="net-value">0.00</span>
             </div>
         </div>
 
         <!-- GENEL KÜLTÜR -->
-        <div class="test-box">
-            <div class="test-title">> Genel Kültür (60 Soru)</div>
-            <div class="input-group">
-                <label for="gk-d">Doğru Sayısı:</label>
+        <div class="test-card">
+            <div class="test-card-title">
+                Genel Kültür
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">60 Soru</span>
+            </div>
+            <div class="input-row">
+                <label for="gk-d">Doğru</label>
                 <input type="number" id="gk-d" min="0" max="60" value="0" oninput="calculate()">
             </div>
-            <div class="input-group">
-                <label for="gk-y">Yanlış Sayısı:</label>
+            <div class="input-row">
+                <label for="gk-y">Yanlış</label>
                 <input type="number" id="gk-y" min="0" max="60" value="0" oninput="calculate()">
             </div>
-            <div id="gk-err" class="error-msg">Toplam soru 60'ı geçemez!</div>
-            <div class="net-display">
-                <span>GK Net:</span>
-                <strong id="gk-net" style="color:#00e676;">0.00</strong>
+            <div id="gk-err" class="error-msg">Soru sayısı 60'ı geçemez!</div>
+            <div class="net-info">
+                <span>Net:</span>
+                <span id="gk-net" class="net-value">0.00</span>
             </div>
         </div>
     </div>
 
-    <!-- SONUÇ EKRANI -->
-    <div class="results-panel">
-        <div style="font-size: 11px; color: #a8958b; letter-spacing: 1px;">TAHMİNİ KPSS P3 PUANI</div>
-        <div id="p3-score" class="score-value">00.000</div>
-        
-        <div class="score-meta">
-            <div class="meta-item">Toplam Net: <span id="total-net">0.00</span> / 120</div>
-            <div class="meta-item">Boş Soru: <span id="total-empty">120</span></div>
-            <div class="meta-item">Başarı Oranı: %<span id="success-rate">0.0</span></div>
+    <!-- SONUÇ PANELİ -->
+    <div class="results-card">
+        <div class="results-label">Tahmini KPSS P3 Puanı</div>
+        <div id="p3-score" class="score-display">00.000</div>
+
+        <div class="meta-grid">
+            <div class="meta-item">
+                Toplam Net
+                <strong id="total-net">0.00</strong>
+            </div>
+            <div class="meta-item">
+                Boş Soru
+                <strong id="total-empty">120</strong>
+            </div>
+            <div class="meta-item">
+                Başarı Oranı
+                <strong id="success-rate">%0.0</strong>
+            </div>
         </div>
     </div>
 
-    <button class="greeble-btn" onclick="resetForm()">[Sıfırla / Yeniden Hesapla]</button>
+    <button class="btn-reset" onclick="resetForm()">Sıfırla / Yeniden Temizle</button>
 
-    <div style="font-size: 9px; margin-top: 15px; color: #8c7365; text-align: center;">
-        * Hesaplama standardı: P3 = 40 + (GY_Net * 0.5) + (GK_Net * 0.5) bağıl öngörü algoritmasıdır.
+    <div class="footer-note">
+        * P3 Puan türü yalnızca Genel Kültür ve Genel Yetenek testlerinden oluşur.<br>
+        Hesaplama standart ÖSYM bağıl değerlendirme katsayıları baz alınarak yapılır.
     </div>
 </div>
 
@@ -260,45 +323,37 @@
         let gkD = parseFloat(document.getElementById('gk-d').value) || 0;
         let gkY = parseFloat(document.getElementById('gk-y').value) || 0;
 
-        // Doğrulama Kontrolleri (Sınırlandırma)
+        // Kontroller
         let gyErr = document.getElementById('gy-err');
-        if (gyD + gyY > 60) {
-            gyErr.style.display = 'block';
-        } else {
-            gyErr.style.display = 'none';
-        }
+        gyErr.style.display = (gyD + gyY > 60) ? 'block' : 'none';
 
         let gkErr = document.getElementById('gk-err');
-        if (gkD + gkY > 60) {
-            gkErr.style.display = 'block';
-        } else {
-            gkErr.style.display = 'none';
-        }
+        gkErr.style.display = (gkD + gkY > 60) ? 'block' : 'none';
 
-        // Net Hesaplama (4 Yanlış = -1 Doğru)
+        // Net Hesaplama (4 yanlış = -1 doğru)
         let gyNet = Math.max(0, gyD - (gyY / 4));
         let gkNet = Math.max(0, gkD - (gkY / 4));
         let totalNet = gyNet + gkNet;
 
-        // Boş Soru ve Başarı Yüzdesi
+        // İstatistikler
         let gyEmpty = Math.max(0, 60 - (gyD + gyY));
         let gkEmpty = Math.max(0, 60 - (gkD + gkY));
         let totalEmpty = gyEmpty + gkEmpty;
         let successRate = ((totalNet / 120) * 100);
 
-        // Tahmini KPSS P3 Puan Algoritması (ÖSYM Standart Sapma Modeli Yaklaşımı)
+        // Tahmini P3 Puanı
         let p3Score = 0;
         if (totalNet > 0) {
             p3Score = 40 + (gyNet * 0.50) + (gkNet * 0.50);
             if (p3Score > 100) p3Score = 100;
         }
 
-        // Arayüz Güncelleme
+        // Arayüzü Güncelle
         document.getElementById('gy-net').innerText = gyNet.toFixed(2);
         document.getElementById('gk-net').innerText = gkNet.toFixed(2);
         document.getElementById('total-net').innerText = totalNet.toFixed(2);
         document.getElementById('total-empty').innerText = totalEmpty;
-        document.getElementById('success-rate').innerText = successRate.toFixed(1);
+        document.getElementById('success-rate').innerText = '%' + successRate.toFixed(1);
         document.getElementById('p3-score').innerText = p3Score > 0 ? p3Score.toFixed(3) : "00.000";
     }
 
