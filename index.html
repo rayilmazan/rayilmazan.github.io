@@ -133,6 +133,36 @@
             color: #00e676;
         }
 
+        /* Araçlar Izgarası (Tools Grid) */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .tool-card {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 12px;
+            text-transform: none;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .tool-title {
+            color: #00e676;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .tool-desc {
+            color: #a8958b;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
         .footer-line {
             margin-top: 30px;
             height: 2px;
@@ -187,6 +217,7 @@
             .side-bar { border-left: none; border-top: 1px solid #4a3528; padding-left: 0; padding-top: 15px; }
             .data-row { flex-direction: column; align-items: flex-start; gap: 4px; }
             .highlight { text-align: left; }
+            .tools-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -205,6 +236,7 @@
     <div class="content-container">
         <div class="main-log">
             
+            <!-- CIHAZ BİLGİSİ EKRANI -->
             <div id="view-device-info">
                 <h2 style="font-size: 16px; margin-top:0; color: #00e676; border-bottom: 1px solid #291b15; padding-bottom: 8px;">> Bu Cihaz Hakkında</h2>
                 
@@ -246,6 +278,7 @@
                 </div>
             </div>
 
+            <!-- BENCHMARK EKRANI -->
             <div id="view-benchmark" style="display: none;">
                 <h2 style="font-size: 16px; margin-top:0; color: #00e676; border-bottom: 1px solid #291b15; padding-bottom: 8px;">> Cihaz Donanım Skoru</h2>
                 <p style="color: #a8958b; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü (1.0 - 10.0)</p>
@@ -278,6 +311,7 @@
                 <button class="greeble-btn" onclick="runBenchmark()" id="retry-btn" style="display: none; margin-top: 20px; width: auto;">Yeniden Test Et</button>
             </div>
 
+            <!-- HIZ TESTİ EKRANI -->
             <div id="view-speedtest" style="display: none;">
                 <h2 style="font-size: 16px; margin-top:0; color: #00e676; border-bottom: 1px solid #291b15; padding-bottom: 8px;">> Ağ Veri Transfer Hızı</h2>
                 <p style="color: #a8958b; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü</p>
@@ -305,6 +339,64 @@
                 <button class="greeble-btn" onclick="runSpeedTest()" id="speed-retry-btn" style="display: none; margin-top: 20px; width: auto;">Yeni Analiz Döngüsü</button>
             </div>
 
+            <!-- ARAÇLAR EKRANI (YENİ) -->
+            <div id="view-tools" style="display: none;">
+                <h2 style="font-size: 16px; margin-top:0; color: #00e676; border-bottom: 1px solid #291b15; padding-bottom: 8px;">> Sistem Araçları & Modüller</h2>
+                <p style="color: #a8958b; font-size: 12px; margin-top: 5px;">Çalıştırmak istediğiniz aracı seçin:</p>
+                
+                <div class="tools-grid">
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pdf')">
+                        <span class="tool-title">[PDF Araçları]</span>
+                        <span class="tool-desc">PDF belge düzenleme ve dönüştürme çözümleri</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suterazisi')">
+                        <span class="tool-title">[Su Terazisi]</span>
+                        <span class="tool-desc">Jiroskop ve açı sensörü tabanlı dijital terazi</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/cihaz')">
+                        <span class="tool-title">[Cihaz Analizi]</span>
+                        <span class="tool-desc">Sistem ve donanım bileşenleri tarayıcı aracı</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/convert')">
+                        <span class="tool-title">[Dönüştürücü]</span>
+                        <span class="tool-desc">Format, birim ve veri dönüştürme konsolu</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/kible')">
+                        <span class="tool-title">[Kıble Bulucu]</span>
+                        <span class="tool-desc">GPS ve pusula entegrasyonlu yön bulucu</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pardus')">
+                        <span class="tool-title">[Pardus Araçları]</span>
+                        <span class="tool-desc">Etkileşimli tahta ve işletim sistemi yardımcıları</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suratgizle')">
+                        <span class="tool-title">[Yüz Gizleyici]</span>
+                        <span class="tool-desc">KVKK uyumlu otomatik yüz maskeleme modülü</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/tahtatoz')">
+                        <span class="tool-title">[Tahta Temizleme]</span>
+                        <span class="tool-desc">Akıllı tahtalar için ekran toz/mod temizleyici</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/usb')">
+                        <span class="tool-title">[USB Yönetimi]</span>
+                        <span class="tool-desc">USB bellek hazırlama ve biçimlendirme rehberi</span>
+                    </button>
+
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/caocr')">
+                        <span class="tool-title">[OCR Okuyucu]</span>
+                        <span class="tool-desc">Görsellerden anlık metin tarama ve ayıklama</span>
+                    </button>
+                </div>
+            </div>
+
         </div>
 
         <div class="side-bar">
@@ -318,6 +410,7 @@
 
             [Mekanik arabirim]<br>
             <button class="greeble-btn" onclick="switchToDeviceInfo()">Ana Ekran</button>
+            <button class="greeble-btn" onclick="switchToTools()">Araçlar</button>
             <button class="greeble-btn" onclick="switchToSpeedTest()">İnternet Hızın</button>
             <button class="greeble-btn" onclick="switchToBenchmark()">Cihaz Değerlendir</button>
         </div>
@@ -328,24 +421,37 @@
 </div>
 
 <script>
-    function switchToDeviceInfo() {
+    function hideAllViews() {
+        document.getElementById('view-device-info').style.display = 'none';
         document.getElementById('view-benchmark').style.display = 'none';
         document.getElementById('view-speedtest').style.display = 'none';
+        document.getElementById('view-tools').style.display = 'none';
+    }
+
+    function switchToDeviceInfo() {
+        hideAllViews();
         document.getElementById('view-device-info').style.display = 'block';
     }
 
+    function switchToTools() {
+        hideAllViews();
+        document.getElementById('view-tools').style.display = 'block';
+    }
+
     function switchToBenchmark() {
-        document.getElementById('view-device-info').style.display = 'none';
-        document.getElementById('view-speedtest').style.display = 'none';
+        hideAllViews();
         document.getElementById('view-benchmark').style.display = 'block';
         runBenchmark(); 
     }
 
     function switchToSpeedTest() {
-        document.getElementById('view-device-info').style.display = 'none';
-        document.getElementById('view-benchmark').style.display = 'none';
+        hideAllViews();
         document.getElementById('view-speedtest').style.display = 'block';
         runSpeedTest();
+    }
+
+    function openTool(url) {
+        window.open(url, '_blank');
     }
 
     document.addEventListener("DOMContentLoaded", function() {
