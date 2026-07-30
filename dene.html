@@ -1,365 +1,591 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anadolu & Dünya Ley Hatları Haritası</title>
-  
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çevrimdışı KVKK Uyumlu Yaka Kartı & Kimlik Basım Sistemi</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --accent-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body, html {
-      height: 100%;
-      width: 100%;
-      background-color: #121212;
-      color: #e0e0e0;
-      overflow: hidden;
-    }
-    #app-container {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    #header {
-      background: #18181c;
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #2d2d35;
-      z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    }
-    #header h1 {
-      font-size: 1.1rem;
-      color: #ffd700;
-      letter-spacing: 0.5px;
-    }
-    .badge-sat {
-      background: #8b5cf6;
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: bold;
-      padding: 4px 10px;
-      border-radius: 12px;
-    }
-    #main-content {
-      display: flex;
-      flex: 1;
-      position: relative;
-    }
-    #map {
-      flex: 1;
-      height: 100%;
-      background: #000;
-    }
-    #sidebar {
-      width: 340px;
-      background: #18181c;
-      border-left: 1px solid #2d2d35;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      z-index: 1000;
-    }
-    .panel-box {
-      background: #222228;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 12px;
-    }
-    .panel-box h3 {
-      font-size: 0.85rem;
-      color: #ffd700;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #333;
-      padding-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .control-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-      font-size: 0.82rem;
-      cursor: pointer;
-    }
-    .control-item input[type="checkbox"] {
-      cursor: pointer;
-      accent-color: #ffd700;
-    }
-    .color-badge {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
-      display: inline-block;
-      flex-shrink: 0;
-    }
-    .site-list {
-      list-style: none;
-    }
-    .site-item {
-      padding: 6px 8px;
-      border-radius: 4px;
-      font-size: 0.78rem;
-      margin-bottom: 4px;
-      background: #2a2a32;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .site-item:hover {
-      background: #383845;
-      color: #ffd700;
-      transform: translateX(2px);
-    }
-    .site-item.intl {
-      border-left: 3px solid #ff00ea;
-    }
-    .site-item.tr {
-      border-left: 3px solid #ffd700;
-    }
-    /* Popup Stilleri */
-    .leaflet-popup-content-wrapper {
-      background: rgba(24, 24, 28, 0.95) !important;
-      color: #e0e0e0 !important;
-      border: 1px solid #ffd700;
-      border-radius: 6px;
-      backdrop-filter: blur(4px);
-    }
-    .leaflet-popup-tip {
-      background: rgba(24, 24, 28, 0.95) !important;
-    }
-    .popup-title {
-      color: #ffd700;
-      font-weight: bold;
-      margin-bottom: 5px;
-      font-size: 0.9rem;
-    }
-    .popup-desc {
-      font-size: 0.8rem;
-      line-height: 1.3;
-      color: #ccc;
-    }
-  </style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .no-print {
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-kvkk {
+            background: #10b981;
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .grid-config {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #475569;
+        }
+
+        input[type="text"], input[type="color"], select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .file-upload-box {
+            border: 2px dashed #94a3b8;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            background: #f1f5f9;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-upload-box:hover {
+            border-color: var(--accent-color);
+            background: #eff6ff;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .info-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #166534;
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* --- PRINT & PAGE LAYOUT --- */
+        .print-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 10mm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: grid;
+            gap: 6mm 8mm;
+            justify-content: center;
+            align-content: start;
+            box-sizing: border-box;
+            page-break-after: always;
+        }
+
+        /* Horizontal Layout (Yatay Kart - 85.6mm x 54mm) */
+        .a4-page.horizontal {
+            grid-template-columns: repeat(2, 85.6mm);
+            grid-auto-rows: 54mm;
+        }
+
+        /* Vertical Layout (Dikey Kart - 54mm x 85.6mm) */
+        .a4-page.vertical {
+            grid-template-columns: repeat(3, 54mm);
+            grid-auto-rows: 85.6mm;
+        }
+
+        /* CARD DESIGN */
+        .card {
+            width: 100%;
+            height: 100%;
+            border: 1px dashed #cbd5e1;
+            position: relative;
+            background: white;
+            overflow: hidden;
+            display: flex;
+            box-sizing: border-box;
+        }
+
+        /* Horizontal Card Interior */
+        .card.horizontal-card {
+            flex-direction: column;
+        }
+
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 6px 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-body-horizontal {
+            display: flex;
+            padding: 8px;
+            gap: 10px;
+            flex: 1;
+            align-items: center;
+        }
+
+        /* Biometric Photo Frame (3:4 Ratio Standard - 35mm x 45mm scaled) */
+        .biometric-photo-container {
+            width: 30mm;
+            height: 38mm;
+            min-width: 30mm;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .biometric-photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%; /* Face centered biometric focus */
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .card-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .card-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-transform: uppercase;
+        }
+
+        .card-meta {
+            font-size: 9px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .card-footer-bar {
+            height: 5px;
+            background-color: var(--primary-color);
+            width: 100%;
+        }
+
+        /* Vertical Card Interior */
+        .card.vertical-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card.vertical-card .card-header {
+            width: 100%;
+            padding: 6px 4px;
+            font-size: 10px;
+        }
+
+        .card.vertical-card .biometric-photo-container {
+            width: 32mm;
+            height: 40mm;
+            margin-top: 6px;
+        }
+
+        .card.vertical-card .card-details {
+            padding: 6px 4px;
+            align-items: center;
+        }
+
+        .card.vertical-card .card-name {
+            font-size: 12px;
+        }
+
+        /* PRINT MEDIA QUERIES */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                page-break-after: always !important;
+            }
+
+            .card {
+                border: 0.5pt dashed #94a3b8 !important; /* Micro cut lines */
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div id="app-container">
-  <header id="header">
-    <h1>Anadolu & Küresel Ley Hatları Ağ Haritası</h1>
-    <span class="badge-sat">🌍 Türkiye + Dünya Bağlantıları Aktif</span>
-  </header>
+    <!-- CONTROL PANEL (HIDDEN IN PRINT) -->
+    <div class="no-print">
+        <header>
+            <h1>🪪 KVKK Uyumlu Çevrimdışı Yaka Kartı Basım Aracı <span class="badge-kvkk">%100 Çevrimdışı & Güvenli</span></h1>
+        </header>
 
-  <div id="main-content">
-    <div id="map"></div>
-    <aside id="sidebar">
-      <div class="panel-box">
-        <h3>Hat Katmanları</h3>
-        <div class="control-item">
-          <input type="checkbox" id="chkUluslararasi" checked onchange="toggleLayer('uluslararasi')">
-          <span class="color-badge" style="background:#FF00EA;"></span>
-          <label for="chkUluslararasi">Küresel Kültür / Piramit Hatları</label>
+        <div class="grid-config">
+            <div class="form-group">
+                <label for="orgName">Kurum / Okul / Şirket Adı:</label>
+                <input type="text" id="orgName" value="KAHRAMANMARAŞ İL MİLLÎ EĞİTİM MÜDÜRLÜĞÜ" oninput="updateCards()">
+            </div>
+
+            <div class="form-group">
+                <label for="cardOrientation">Kart Yönü / Tipi:</label>
+                <select id="cardOrientation" onchange="updateCards()">
+                    <option value="horizontal">Yatay Kart (85.6mm x 54mm)</option>
+                    <option value="vertical">Dikey Kart (54mm x 85.6mm)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="themeColor">Ana Tema Rengi:</label>
+                <input type="color" id="themeColor" value="#1e3a8a" onchange="updateTheme()">
+            </div>
+
+            <div class="form-group">
+                <label>1. CSV Dosyası Yükle (Türkçe Karakter Korumalı):</label>
+                <div class="file-upload-box" onclick="document.getElementById('csvInput').click()">
+                    <span id="csvStatus">📄 CSV Seç (Örn: ad, soyad, unvan, sicil, fotograf)</span>
+                    <input type="file" id="csvInput" accept=".csv, .txt" style="display:none" onchange="handleCSV(this)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>2. Biyometrik Fotoğrafları Seç:</label>
+                <div class="file-upload-box" onclick="document.getElementById('photoInput').click()">
+                    <span id="photoStatus">🖼️ Fotoğrafları Toplu Seç (Çoklu Dosya)</span>
+                    <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+                </div>
+            </div>
         </div>
-        <div class="control-item">
-          <input type="checkbox" id="chkKuzey" checked onchange="toggleLayer('kuzey')">
-          <span class="color-badge" style="background:#FF0055;"></span>
-          <label for="chkKuzey">Kuzey Vektörü (Troya-Ağrı)</label>
+
+        <div class="info-box">
+            <strong>🔒 KVKK ve Veri Güvenliği Garantisi:</strong> Yüklenen hiçbir veri, isim veya fotoğraf internete veya harici bir sunucuya <u>gönderilmez</u>. Tüm işlemler tarayıcınızın kendi geçici belleğinde (RAM) gerçekleşir.
         </div>
-        <div class="control-item">
-          <input type="checkbox" id="chkEge" checked onchange="toggleLayer('ege')">
-          <span class="color-badge" style="background:#00F0FF;"></span>
-          <label for="chkEge">Ege - Kapadokya - Akdeniz Hattı</label>
+
+        <div class="btn-container">
+            <button class="btn-primary" onclick="window.print()">🖨️ Yazdır / PDF Olarak Kaydet</button>
+            <button class="btn-secondary" onclick="generateSampleCSV()">📥 Örnek Türkçe CSV İndir</button>
         </div>
-        <div class="control-item">
-          <input type="checkbox" id="chkGuneydogu" checked onchange="toggleLayer('guneydogu')">
-          <span class="color-badge" style="background:#FFD700;"></span>
-          <label for="chkGuneydogu">Güneydoğu Enerji Üçgeni</label>
-        </div>
-        <div class="control-item">
-          <input type="checkbox" id="chkKesisim" checked onchange="toggleLayer('kesisim')">
-          <span class="color-badge" style="background:#B026FF;"></span>
-          <label for="chkKesisim">İç Çapraz Kesişim Bağlantıları</label>
-        </div>
-      </div>
+    </div>
 
-      <div class="panel-box">
-        <h3>Noktalar (Türkiye & Dünya)</h3>
-        <ul class="site-list" id="siteList"></ul>
-      </div>
-    </aside>
-  </div>
-</div>
+    <!-- PRINT PREVIEW CONTAINER -->
+    <div class="print-container" id="printArea">
+        <!-- Dynamic A4 Pages will be injected here -->
+    </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let peopleData = [];
+        let photoMap = new Map();
 
-<script>
-  // Türkiye ve Uluslararası Düğüm Noktaları
-  const sites = [
-    // Türkiye Düğümleri
-    { id: "ayasofya", type: "tr", name: "TR: İstanbul (Ayasofya)", lat: 41.0086, lng: 28.9802, desc: "Doğu Roma ve Osmanlı inanç merkezi; Avrupa-Asya geçiş düğümü." },
-    { id: "troya", type: "tr", name: "TR: Çanakkale (Troya)", lat: 39.9575, lng: 26.2389, desc: "Pagan mitoloji ve Ege-Marmara geçiş merkezi." },
-    { id: "efes", type: "tr", name: "TR: İzmir (Efes)", lat: 37.9485, lng: 27.3639, desc: "Artemis Tapınağı ve İyonya kehanet merkezi." },
-    { id: "sardes", type: "tr", name: "TR: Manisa (Sardes)", lat: 38.4883, lng: 28.0403, desc: "Lidya krallık başkenti ve Ege fayı frekans noktası." },
-    { id: "hierapolis", type: "tr", name: "TR: Denizli (Hierapolis)", lat: 37.9256, lng: 29.1242, desc: "Plutonium (Cehennem Ağzı) kutsal alanı ve jeotermal odak." },
-    { id: "kapadokya", type: "tr", name: "TR: Nevşehir (Kapadokya)", lat: 38.6431, lng: 34.8303, desc: "Anadolu jeomanyetik merkez düğümü ve yeraltı şehirleri." },
-    { id: "hattusa", type: "tr", name: "TR: Çorum (Hattuşa)", lat: 40.0197, lng: 34.6153, desc: "Hititlerin Güneş Kursu merkezi ve kutsal yeşil taş." },
-    { id: "nemrut", type: "tr", name: "TR: Adıyaman (Nemrut Dağı)", lat: 37.9808, lng: 38.7406, desc: "Kommagene dev heykelleri ve kozmik hizalanma tümülüsü." },
-    { id: "gobeklitepe", type: "tr", name: "TR: Şanlıurfa (Göbeklitepe)", lat: 37.2233, lng: 38.9225, desc: "Tarihin bilinen en eski inanç ve astronomik tapınak kompleksi." },
-    { id: "harran", type: "tr", name: "TR: Şanlıurfa (Harran)", lat: 36.8611, lng: 39.0306, desc: "Ezoterik Sâbiîliğin ve kadim astronomi okullarının odağı." },
+        // Safe Turkish Character CSV Parsing (Handles UTF-8 with BOM & Windows-1254/ANSI)
+        function handleCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
 
-    // Dünya Düğümleri (Uluslararası)
-    { id: "giza", type: "intl", name: "MISIR: Giza Piramitleri", lat: 29.9792, lng: 31.1342, desc: "Dünyanın ana orantısal ve astral Ley hattı kesişim merkezi." },
-    { id: "stonehenge", type: "intl", name: "İNGİLTERE: Stonehenge", lat: 51.1789, lng: -1.8262, desc: "Megalitik astronomik gözlemevi ve Kuzey Avrupa düğümü." },
-    { id: "baalbek", type: "intl", name: "LÜBNAN: Baalbek Tapınağı", lat: 34.0069, lng: 36.2037, desc: "Devasa megalit taşları ile bilinen Güneş kenti." },
-    { id: "kudus", type: "intl", name: "İSRAİL: Kudüs (Kubbettüs Sahra)", lat: 31.7767, lng: 35.2345, desc: "Üç semavi dinin ve kadim tapınaklar zincirinin çekirdeği." },
-    { id: "delos", type: "intl", name: "YUNANİSTAN: Delos / Atina", lat: 37.9715, lng: 23.7267, desc: "Antik Yunan Apollon ve Parthenon kehanet aksı." },
-    { id: "roma", type: "intl", name: "İTALYA: Roma (Kolezyum/Vatikan)", lat: 41.8902, lng: 12.4922, desc: "Batı Akdeniz inanç ve imparatorluk aksı." },
-    { id: "persepolis", type: "intl", name: "İRAN: Persepolis Antik Kenti", lat: 29.9352, lng: 52.8899, desc: "Pers İmparatorluğu ve Zerdüştlük astral hizalanma noktası." }
-  ];
+            document.getElementById('csvStatus').innerText = `✅ Loaded: ${file.name}`;
 
-  // 1. Haritayı Geniş Açıyla Başlat (Genişletilmiş Coğrafya)
-  const map = L.map('map').setView([36.5, 33.0], 5);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const buffer = e.target.result;
+                
+                // Try decoding UTF-8 first
+                let text = new TextDecoder('utf-8').decode(buffer);
+                
+                // Check if decoding generated replacement characters for Turkish (indicates ANSI/Windows-1254)
+                if (text.includes('')) {
+                    text = new TextDecoder('windows-1254').decode(buffer);
+                }
 
-  // 2. KATMANLAR (Uydu + İl/İlçe/Köy/Ülke İsimleri)
-  const satTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Esri World Imagery', maxZoom: 18
-  });
+                parseCSVText(text);
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
-  const labelsTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Esri Places & Boundaries', maxZoom: 18
-  });
+        function parseCSVText(text) {
+            peopleData = [];
+            // Remove BOM if present
+            if (text.charCodeAt(0) === 0xFEFF) {
+                text = text.substr(1);
+            }
 
-  const roadsTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Esri Transportation', maxZoom: 18
-  });
+            const lines = text.split(/
+|
+/);
+            if (lines.length < 2) return;
 
-  const hybridSatGroup = L.layerGroup([satTile, roadsTile, labelsTile]);
-  hybridSatGroup.addTo(map);
+            // Detect delimiter (comma or semicolon)
+            const firstLine = lines[0];
+            const delimiter = firstLine.includes(';') ? ';' : ',';
 
-  const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: 'CartoDB Dark', subdomains: 'abcd', maxZoom: 19
-  });
+            const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase().replace(/"/g, ''));
 
-  L.control.layers({
-    "🛰️ Hibrit Uydu (İsimli)": hybridSatGroup,
-    "🌙 Koyu Vektör Harita": darkLayer
-  }, null, { position: 'topright' }).addTo(map);
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const cols = lines[i].split(delimiter).map(c => c.trim().replace(/"/g, ''));
+                
+                let person = {};
+                headers.forEach((h, idx) => {
+                    person[h] = cols[idx] || '';
+                });
 
-  // Ley Hatları Katman Grupları
-  const layers = {
-    uluslararasi: L.layerGroup().addTo(map),
-    kuzey: L.layerGroup().addTo(map),
-    ege: L.layerGroup().addTo(map),
-    guneydogu: L.layerGroup().addTo(map),
-    kesisim: L.layerGroup().addTo(map)
-  };
+                peopleData.push(person);
+            }
 
-  // 3. Noktaları Ekle (TR için Sarı, Uluslararası için Pembe/Magenta İşaretçiler)
-  const siteListEl = document.getElementById("siteList");
+            updateCards();
+        }
 
-  sites.forEach(site => {
-    const isIntl = site.type === "intl";
-    const markerColor = isIntl ? "#FF00EA" : "#FFD700";
+        // Handle Photo Loading and Mapping
+        function handlePhotos(input) {
+            const files = input.files;
+            if (!files.length) return;
 
-    const marker = L.circleMarker([site.lat, site.lng], {
-      radius: isIntl ? 9 : 7,
-      fillColor: markerColor,
-      color: "#FFFFFF",
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 1
-    });
+            photoMap.clear();
+            for (let file of files) {
+                // Map both full name and lowercase filename
+                photoMap.set(file.name.toLowerCase(), URL.createObjectURL(file));
+            }
 
-    marker.bindPopup(`
-      <div class="popup-title" style="color: ${markerColor}">${site.name}</div>
-      <div class="popup-desc">${site.desc}</div>
-    `);
+            document.getElementById('photoStatus').innerText = `✅ ${files.length} Fotoğraf Yüklendi`;
+            updateCards();
+        }
 
-    marker.addTo(map);
+        function updateTheme() {
+            const color = document.getElementById('themeColor').value;
+            document.documentElement.style.setProperty('--primary-color', color);
+        }
 
-    // Sidebar
-    const li = document.createElement("li");
-    li.className = `site-item ${site.type}`;
-    li.innerHTML = `<span>${site.name}</span> <span style="opacity:0.5;">➔</span>`;
-    li.onclick = () => {
-      map.flyTo([site.lat, site.lng], 8, { duration: 1.2 });
-      marker.openPopup();
-    };
-    siteListEl.appendChild(li);
-  });
+        // Render Cards into A4 Pages
+        function updateCards() {
+            const container = document.getElementById('printArea');
+            container.innerHTML = '';
 
-  function getPos(id) {
-    const s = sites.find(x => x.id === id);
-    return [s.lat, s.lng];
-  }
+            const orgName = document.getElementById('orgName').value || 'KURUM ADI';
+            const orientation = document.getElementById('cardOrientation').value;
 
-  // 4. HAT ÇİZİMLERİ
+            // Page limits: Horizontal = 8 cards/page (2x4), Vertical = 9 cards/page (3x3)
+            const cardsPerPage = orientation === 'horizontal' ? 8 : 9;
 
-  // A) ULUSLARARASI DÜNYA HATTLARI (Pembe/Magenta Çizgiler)
-  // Giza (Mısır) ➔ Göbeklitepe ➔ Baalbek ➔ Kudüs ➔ Giza Üçgeni
-  L.polyline([getPos('giza'), getPos('gobeklitepe'), getPos('baalbek'), getPos('kudus'), getPos('giza')], {
-    color: '#FF00EA', weight: 3, opacity: 0.9, dashArray: '6, 6'
-  }).addTo(layers.uluslararasi);
+            if (peopleData.length === 0) {
+                // Demo card if no data loaded
+                peopleData = [
+                    { ad: 'Ahmet', soyad: 'YILMAZ', unvan: 'Bilgi İşlem Sorumlusu', sicil: 'TR-10293', fotograf: 'ahmet.jpg' },
+                    { ad: 'Şule', soyad: 'ÖZTÜRK', unvan: 'Matematik Öğretmeni', sicil: 'TR-10294', fotograf: 'sule.jpg' },
+                    { ad: 'Çağrı', soyad: 'AĞAOĞLU', unvan: 'İdari İşler Uzmanı', sicil: 'TR-10295', fotograf: 'cagri.jpg' }
+                ];
+            }
 
-  // Stonehenge (İngiltere) ➔ Troya ➔ Ayasofya Aksı
-  L.polyline([getPos('stonehenge'), getPos('troya'), getPos('ayasofya')], {
-    color: '#FF00EA', weight: 3, opacity: 0.85
-  }).addTo(layers.uluslararasi);
+            let currentPage = null;
 
-  // Roma ➔ Delos/Atina ➔ Efes ➔ Kudüs Akdeniz Aksı
-  L.polyline([getPos('roma'), getPos('delos'), getPos('efes'), getPos('kudus')], {
-    color: '#FF00EA', weight: 3, opacity: 0.85
-  }).addTo(layers.uluslararasi);
+            peopleData.forEach((person, index) => {
+                if (index % cardsPerPage === 0) {
+                    currentPage = document.createElement('div');
+                    currentPage.className = `a4-page ${orientation}`;
+                    container.appendChild(currentPage);
+                }
 
-  // Harran ➔ Persepolis (İran Doğu Aksı)
-  L.polyline([getPos('harran'), getPos('persepolis')], {
-    color: '#FF00EA', weight: 3, opacity: 0.85, dashArray: '4, 4'
-  }).addTo(layers.uluslararasi);
+                const card = document.createElement('div');
+                card.className = `card ${orientation}-card`;
 
-  // B) TÜRKİYE İÇ HATTLARI
-  // Kuzey Vektörü
-  L.polyline([getPos('troya'), getPos('ayasofya'), getPos('hattusa'), getPos('nemrut')], {
-    color: '#FF0055', weight: 3.5, opacity: 0.9
-  }).addTo(layers.kuzey);
+                // Find matching photo
+                let photoSrc = '';
+                const photoFileName = (person.fotograf || person.foto || '').toLowerCase();
+                
+                if (photoMap.has(photoFileName)) {
+                    photoSrc = photoMap.get(photoFileName);
+                } else {
+                    // SVG Placeholder with 3:4 Biometric Proportion
+                    photoSrc = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="133" viewBox="0 0 100 133" fill="%23e2e8f0"><rect width="100" height="133"/><circle cx="50" cy="45" r="25" fill="%23cbd5e1"/><path d="M10 120 C 10 80, 90 80, 90 120 Z" fill="%23cbd5e1"/></svg>`;
+                }
 
-  // Ege - Kapadokya Hattı
-  L.polyline([getPos('efes'), getPos('sardes'), getPos('hierapolis'), getPos('kapadokya')], {
-    color: '#00F0FF', weight: 3.5, opacity: 0.9
-  }).addTo(layers.ege);
+                const ad = person.ad || person.isim || '';
+                const soyad = person.soyad || '';
+                const unvan = person.unvan || person.gorev || 'PERSONEL';
+                const sicil = person.sicil || person.tc || person.no || '';
 
-  // Güneydoğu Enerji Üçgeni
-  L.polyline([getPos('nemrut'), getPos('gobeklitepe'), getPos('harran'), getPos('nemrut')], {
-    color: '#FFD700', weight: 3.5, opacity: 1
-  }).addTo(layers.guneydogu);
+                if (orientation === 'horizontal') {
+                    card.innerHTML = `
+                        <div class="card-header">${orgName}</div>
+                        <div class="card-body-horizontal">
+                            <div class="biometric-photo-container">
+                                <img src="${photoSrc}" alt="Biyometrik Fotoğraf">
+                            </div>
+                            <div class="card-details">
+                                <div class="card-name">${ad}<br>${soyad}</div>
+                                <div class="card-title">${unvan}</div>
+                                ${sicil ? `<div class="card-meta">Sicil/ID: ${sicil}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="card-footer-bar"></div>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="card-header">${orgName}</div>
+                        <div class="biometric-photo-container">
+                            <img src="${photoSrc}" alt="Biyometrik Fotoğraf">
+                        </div>
+                        <div class="card-details">
+                            <div class="card-name">${ad} ${soyad}</div>
+                            <div class="card-title">${unvan}</div>
+                            ${sicil ? `<div class="card-meta">Sicil: ${sicil}</div>` : ''}
+                        </div>
+                        <div class="card-footer-bar"></div>
+                    `;
+                }
 
-  // Çapraz Kesişim Hatları
-  L.polyline([getPos('ayasofya'), getPos('kapadokya'), getPos('gobeklitepe'), getPos('hierapolis'), getPos('ayasofya')], {
-    color: '#B026FF', weight: 2.5, opacity: 0.7, dashArray: '8, 8'
-  }).addTo(layers.kesisim);
+                currentPage.appendChild(card);
+            });
+        }
 
-  function toggleLayer(layerKey) {
-    const chk = document.getElementById('chk' + layerKey.charAt(0).toUpperCase() + layerKey.slice(1));
-    if (chk.checked) {
-      map.addLayer(layers[layerKey]);
-    } else {
-      map.removeLayer(layers[layerKey]);
-    }
-  }
-</script>
+        // Generate Sample CSV with Turkish Characters
+        function generateSampleCSV() {
+            const csvContent = "ad;soyad;unvan;sicil;fotograf
+" +
+                               "Ahmet;YILMAZ;Bilgi İşlem Sorumlusu;TR-1001;ahmet.jpg
+" +
+                               "Şule;ÖZTÜRK;Matematik Öğretmeni;TR-1002;sule.jpg
+" +
+                               "Çağrı;AĞAOĞLU;İdari İşler Uzmanı;TR-1003;cagri.jpg
+" +
+                               "Gülşah;IŞIK;İnsan Kaynakları;TR-1004;gulsah.jpg
+" +
+                               "Ömer;ÇELİK;Güvenlik Amiri;TR-1005;omer.jpg";
 
+            // Add UTF-8 BOM so Excel opens it with Turkish characters automatically
+            const blob = new Blob(["﻿" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute("download", "ornek_personel_listesi.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initial Load
+        window.onload = function() {
+            updateCards();
+        };
+    </script>
 </body>
 </html>
+
