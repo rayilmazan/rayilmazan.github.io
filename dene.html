@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anadolu Ley Hatları ve Kesişim Haritası</title>
+  <title>Anadolu Ley Hatları Haritası (API Key Gerektirmez)</title>
+  
+  <!-- Leaflet CSS (Ücretsiz ve Açık Kaynak Harita Kütüphanesi) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
   <style>
     * {
       box-sizing: border-box;
@@ -24,13 +28,13 @@
       height: 100vh;
     }
     #header {
-      background: #1e1e24;
+      background: #18181c;
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #333;
-      z-index: 10;
+      border-bottom: 1px solid #2d2d35;
+      z-index: 1000;
       box-shadow: 0 2px 10px rgba(0,0,0,0.5);
     }
     #header h1 {
@@ -38,31 +42,13 @@
       color: #ffd700;
       letter-spacing: 0.5px;
     }
-    .api-input-group {
-      display: flex;
-      gap: 8px;
-    }
-    .api-input-group input {
-      background: #2a2a32;
-      border: 1px solid #444;
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      width: 260px;
-    }
-    .api-input-group button {
-      background: #ffd700;
-      color: #121212;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 4px;
+    .badge-no-api {
+      background: #22c55e;
+      color: #052e16;
+      font-size: 0.75rem;
       font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .api-input-group button:hover {
-      background: #e6c200;
+      padding: 4px 10px;
+      border-radius: 12px;
     }
     #main-content {
       display: flex;
@@ -72,7 +58,7 @@
     #map {
       flex: 1;
       height: 100%;
-      background: #242f3e;
+      background: #0e0e10;
     }
     #sidebar {
       width: 320px;
@@ -83,6 +69,7 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
+      z-index: 1000;
     }
     .panel-box {
       background: #222228;
@@ -107,6 +94,7 @@
     }
     .control-item input[type="checkbox"] {
       cursor: pointer;
+      accent-color: #ffd700;
     }
     .color-badge {
       width: 12px;
@@ -118,32 +106,42 @@
       list-style: none;
     }
     .site-item {
-      padding: 6px 8px;
+      padding: 8px;
       border-radius: 4px;
       font-size: 0.8rem;
       margin-bottom: 4px;
       background: #2a2a32;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
     .site-item:hover {
       background: #383845;
       color: #ffd700;
+      transform: translateX(2px);
     }
-    .info-window {
-      color: #121212;
-      padding: 5px;
-      max-width: 220px;
+    /* Leaflet Popup Özelleştirme */
+    .leaflet-popup-content-wrapper {
+      background: #1e1e24 !important;
+      color: #e0e0e0 !important;
+      border: 1px solid #ffd700;
+      border-radius: 6px;
     }
-    .info-window h4 {
-      color: #b8860b;
-      margin-bottom: 4px;
+    .leaflet-popup-tip {
+      background: #1e1e24 !important;
     }
-    .info-window p {
+    .popup-title {
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    .popup-desc {
       font-size: 0.8rem;
       line-height: 1.3;
+      color: #ccc;
     }
   </style>
 </head>
@@ -152,10 +150,7 @@
 <div id="app-container">
   <header id="header">
     <h1>Anadolu Ley Hatları ve Kesişim Ağları</h1>
-    <div class="api-input-group">
-      <input type="text" id="apiKeyInput" placeholder="Google Maps API Key Yapıştırın">
-      <button onclick="loadGoogleMaps()">Yükle</button>
-    </div>
+    <span class="badge-no-api">✓ API Key Gerektirmez (Leaflet.js)</span>
   </header>
 
   <div id="main-content">
@@ -164,24 +159,24 @@
       <div class="panel-box">
         <h3>Hat Katmanları</h3>
         <div class="control-item">
-          <input type="checkbox" id="chkKuzey" checked onclick="toggleLine('kuzey')">
+          <input type="checkbox" id="chkKuzey" checked onchange="toggleLayer('kuzey')">
           <span class="color-badge" style="background:#FF3366;"></span>
           <label for="chkKuzey">Kuzey Vektörü (Troya-Ağrı)</label>
         </div>
         <div class="control-item">
-          <input type="checkbox" id="chkEge" checked onclick="toggleLine('ege')">
+          <input type="checkbox" id="chkEge" checked onchange="toggleLayer('ege')">
           <span class="color-badge" style="background:#00E5FF;"></span>
           <label for="chkEge">Ege - Kapadokya Hattı</label>
         </div>
         <div class="control-item">
-          <input type="checkbox" id="chkGüneydogus" checked onclick="toggleLine('guneydogu')">
+          <input type="checkbox" id="chkGuneydogu" checked onchange="toggleLayer('guneydogu')">
           <span class="color-badge" style="background:#FFD700;"></span>
-          <label for="chkGüneydogus">Güneydoğu Enerji Üçgeni</label>
+          <label for="chkGuneydogu">Güneydoğu Enerji Üçgeni</label>
         </div>
         <div class="control-item">
-          <input type="checkbox" id="chkKesisim" checked onclick="toggleLine('kesisim')">
+          <input type="checkbox" id="chkKesisim" checked onchange="toggleLayer('kesisim')">
           <span class="color-badge" style="background:#A000FF;"></span>
-          <label for="chkKesisim">Ana Kesişim/Çapraz Hatlar</label>
+          <label for="chkKesisim">Çapraz Kesişim Bağlantıları</label>
         </div>
       </div>
 
@@ -193,187 +188,113 @@
   </div>
 </div>
 
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-  // Tüm Noktaların Koordinatları ve Bilgileri
+  // Noktaların Koordinatları ve Açıklamaları
   const sites = [
     { id: "ayasofya", name: "İstanbul (Ayasofya / Yûşâ)", lat: 41.0086, lng: 28.9802, desc: "Bizans ve Osmanlı inanç merkezi, kuzey hattının ana geçiş noktası." },
-    { id: "troya", name: "Çanakkale (Troya Antik Kenti)", lat: 39.9575, lng: 26.2389, desc: "Batı Anadolu pagan inanç ve mitoloji başlangıç düğümü." },
-    { id: "efes", name: "İzmir (Efes Antik Kenti)", lat: 37.9485, lng: 27.3639, desc: "Artemis Tapınağı ve İyonya kehanet merkezlerinin odağı." },
-    { id: "sardes", name: "Manisa (Sardes Antik Kenti)", lat: 38.4883, lng: 28.0403, desc: "Lidya krallık başkenti ve Ege fayı üzerindeki frekans noktası." },
-    { id: "hierapolis", name: "Denizli (Hierapolis / Pamukkale)", lat: 37.9256, lng: 29.1242, desc: "Plutonium (Cehennem Ağzı) kutsal alanı ve kaplıca enerjisi." },
-    { id: "kapadokya", name: "Nevşehir (Kapadokya / Göreme)", lat: 38.6431, lng: 34.8303, desc: "Anadolu'nun jeomanyetik merkez düğümü ve yeraltı şehirleri." },
-    { id: "hattusa", name: "Çorum (Hattuşa / Alacahöyük)", lat: 40.0197, lng: 34.6153, desc: "Hititlerin Güneş Kursu merkezi ve yeşil kutsal taş düğümü." },
-    { id: "nemrut", name: "Adıyaman (Nemrut Dağı)", lat: 37.9808, lng: 38.7406, desc: "Kommagene krallığı dev heykelleri ve kozmik hizalanma tümülüsü." },
+    { id: "troya", name: "Çanakkale (Troya)", lat: 39.9575, lng: 26.2389, desc: "Batı Anadolu pagan inanç ve mitoloji başlangıç düğümü." },
+    { id: "efes", name: "İzmir (Efes)", lat: 37.9485, lng: 27.3639, desc: "Artemis Tapınağı ve İyonya kehanet merkezlerinin odağı." },
+    { id: "sardes", name: "Manisa (Sardes)", lat: 38.4883, lng: 28.0403, desc: "Lidya krallık başkenti ve Ege fayı üzerindeki frekans noktası." },
+    { id: "hierapolis", name: "Denizli (Hierapolis)", lat: 37.9256, lng: 29.1242, desc: "Plutonium (Cehennem Ağzı) kutsal alanı ve kaplıca enerjisi." },
+    { id: "kapadokya", name: "Nevşehir (Kapadokya)", lat: 38.6431, lng: 34.8303, desc: "Anadolu'nun jeomanyetik merkez düğümü ve yeraltı şehirleri." },
+    { id: "hattusa", name: "Çorum (Hattuşa)", lat: 40.0197, lng: 34.6153, desc: "Hititlerin Güneş Kursu merkezi ve yeşil kutsal taş düğümü." },
+    { id: "nemrut", name: "Adıyaman (Nemrut Dağı)", lat: 37.9808, lng: 38.7406, desc: "Kommagene dev heykelleri ve kozmik hizalanma tümülüsü." },
     { id: "gobeklitepe", name: "Şanlıurfa (Göbeklitepe)", lat: 37.2233, lng: 38.9225, desc: "Tarihin bilinen en eski inanç ve astronomik tapınak kompleksi." },
-    { id: "harran", name: "Şanlıurfa (Harran Antik Kenti)", lat: 36.8611, lng: 39.0306, desc: "Kökü Ezoterik Sâbiîliğe ve astronomi okullarına dayanan merkez." }
+    { id: "harran", name: "Şanlıurfa (Harran)", lat: 36.8611, lng: 39.0306, desc: "Kökü Ezoterik Sâbiîliğe ve astronomi okullarına dayanan merkez." }
   ];
 
-  let map;
-  let markers = {};
-  let polylines = {};
+  // 1. Haritayı Başlat (Türkiye Merkezli)
+  const map = L.map('map').setView([38.9637, 35.2433], 6);
 
-  // Haritayı İlklendir
-  function initMap() {
-    // Türkiye Merkezli Harita Görünümü
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: 38.9637, lng: 35.2433 },
-      zoom: 6,
-      styles: getDarkMapStyle()
+  // 2. Koyu Tema Harita Katmanı (CartoDB Dark Matter - Ücretsiz ve API gerektirmez)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Katman Grupları
+  const layers = {
+    kuzey: L.layerGroup().addTo(map),
+    ege: L.layerGroup().addTo(map),
+    guneydogu: L.layerGroup().addTo(map),
+    kesisim: L.layerGroup().addTo(map)
+  };
+
+  const markersObj = {};
+
+  // 3. Noktaları (Işıltılı Daire İşaretçiler) Ekle
+  const siteListEl = document.getElementById("siteList");
+
+  sites.forEach(site => {
+    const marker = L.circleMarker([site.lat, site.lng], {
+      radius: 8,
+      fillColor: "#FFD700",
+      color: "#FFFFFF",
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.9
     });
 
-    const infoWindow = new google.maps.InfoWindow();
+    marker.bindPopup(`
+      <div class="popup-title">${site.name}</div>
+      <div class="popup-desc">${site.desc}</div>
+    `);
 
-    // 1. Noktaları (Markers) Ekle
-    const siteListEl = document.getElementById("siteList");
-    sites.forEach(site => {
-      const marker = new google.maps.Marker({
-        position: { lat: site.lat, lng: site.lng },
-        map: map,
-        title: site.name,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 7,
-          fillColor: "#FFD700",
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: "#121212"
-        }
-      });
+    marker.addTo(map);
+    markersObj[site.id] = marker;
 
-      marker.addListener("click", () => {
-        infoWindow.setContent(`
-          <div class="info-window">
-            <h4>${site.name}</h4>
-            <p>${site.desc}</p>
-          </div>
-        `);
-        infoWindow.open(map, marker);
-      });
+    // Sidebar Listesini Oluştur
+    const li = document.createElement("li");
+    li.className = "site-item";
+    li.innerHTML = `<span>${site.name}</span> <span style="opacity:0.5;">➔</span>`;
+    li.onclick = () => {
+      map.flyTo([site.lat, site.lng], 9, { duration: 1.2 });
+      marker.openPopup();
+    };
+    siteListEl.appendChild(li);
+  });
 
-      markers[site.id] = marker;
-
-      // Sidebar Listesini Doldur
-      const li = document.createElement("li");
-      li.className = "site-item";
-      li.innerHTML = `<span>${site.name}</span> <span>➔</span>`;
-      li.onclick = () => {
-        map.setZoom(9);
-        map.panTo(marker.getPosition());
-        google.maps.event.trigger(marker, 'click');
-      };
-      siteListEl.appendChild(li);
-    });
-
-    // 2. Hatları (Polylines) Çiz
-    drawLeyLines();
+  // Yardımcı Koordinat Getirici
+  function getPos(id) {
+    const s = sites.find(x => x.id === id);
+    return [s.lat, s.lng];
   }
 
-  function drawLeyLines() {
-    // Hat 1: Kuzey Vektörü (Kırmızı)
-    polylines['kuzey'] = new google.maps.Polyline({
-      path: [
-        getCoords('troya'),
-        getCoords('ayasofya'),
-        getCoords('hattusa'),
-        getCoords('nemrut')
-      ],
-      geodesic: true,
-      strokeColor: '#FF3366',
-      strokeOpacity: 0.8,
-      strokeWeight: 3,
-      map: map
-    });
+  // 4. Ley Hatlarını Çiz
+  // Kuzey Vektörü (Kırmızı)
+  L.polyline([getPos('troya'), getPos('ayasofya'), getPos('hattusa'), getPos('nemrut')], {
+    color: '#FF3366', weight: 3, opacity: 0.85
+  }).addTo(layers.kuzey);
 
-    // Hat 2: Ege - Kapadokya Hattı (Siyan)
-    polylines['ege'] = new google.maps.Polyline({
-      path: [
-        getCoords('efes'),
-        getCoords('sardes'),
-        getCoords('hierapolis'),
-        getCoords('kapadokya')
-      ],
-      geodesic: true,
-      strokeColor: '#00E5FF',
-      strokeOpacity: 0.8,
-      strokeWeight: 3,
-      map: map
-    });
+  // Ege - Kapadokya Hattı (Siyan)
+  L.polyline([getPos('efes'), getPos('sardes'), getPos('hierapolis'), getPos('kapadokya')], {
+    color: '#00E5FF', weight: 3, opacity: 0.85
+  }).addTo(layers.ege);
 
-    // Hat 3: Güneydoğu Enerji Üçgeni (Altın Sarı)
-    polylines['guneydogu'] = new google.maps.Polyline({
-      path: [
-        getCoords('nemrut'),
-        getCoords('gobeklitepe'),
-        getCoords('harran'),
-        getCoords('nemrut')
-      ],
-      geodesic: true,
-      strokeColor: '#FFD700',
-      strokeOpacity: 0.9,
-      strokeWeight: 3,
-      map: map
-    });
+  // Güneydoğu Enerji Üçgeni (Sarı)
+  L.polyline([getPos('nemrut'), getPos('gobeklitepe'), getPos('harran'), getPos('nemrut')], {
+    color: '#FFD700', weight: 3, opacity: 0.9
+  }).addTo(layers.guneydogu);
 
-    // Hat 4: Kesişim / Çapraz Bağlantı Hatları (Mor)
-    polylines['kesisim'] = new google.maps.Polyline({
-      path: [
-        getCoords('ayasofya'),
-        getCoords('kapadokya'),
-        getCoords('gobeklitepe'),
-        getCoords('hierapolis'),
-        getCoords('ayasofya')
-      ],
-      geodesic: true,
-      strokeColor: '#A000FF',
-      strokeOpacity: 0.6,
-      strokeWeight: 2,
-      map: map
-    });
-  }
+  // Çapraz Bağlantı Hatları (Mor)
+  L.polyline([getPos('ayasofya'), getPos('kapadokya'), getPos('gobeklitepe'), getPos('hierapolis'), getPos('ayasofya')], {
+    color: '#A000FF', weight: 2, opacity: 0.6, dashArray: '6, 6'
+  }).addTo(layers.kesisim);
 
-  function getCoords(id) {
-    const site = sites.find(s => s.id === id);
-    return { lat: site.lat, lng: site.lng };
-  }
-
-  function toggleLine(lineKey) {
-    if (polylines[lineKey]) {
-      const isVisible = polylines[lineKey].getMap() !== null;
-      polylines[lineKey].setMap(isVisible ? null : map);
+  // Katman Aç/Kapa Fonksiyonu
+  function toggleLayer(layerKey) {
+    const chk = document.getElementById('chk' + layerKey.charAt(0).toUpperCase() + layerKey.slice(1));
+    if (chk.checked) {
+      map.addLayer(layers[layerKey]);
+    } else {
+      map.removeLayer(layers[layerKey]);
     }
-  }
-
-  // Dinamik Google Maps API Yükleyici
-  function loadGoogleMaps() {
-    const key = document.getElementById("apiKeyInput").value.trim();
-    if (!key) {
-      alert("Lütfen geçerli bir Google Maps API Anahtarı girin.");
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&callback=initMap`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-  }
-
-  // Dark Koyu Tema Stil Yapılandırması
-  function getDarkMapStyle() {
-    return [
-      { "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] },
-      { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] },
-      { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] },
-      { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
-      { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] },
-      { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] },
-      { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] },
-      { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] },
-      { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] },
-      { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }
-    ];
   }
 </script>
 
 </body>
-  </html>
-
+</html>
