@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anadolu Ley Hatları - Yer İsimli Hibrit Uydu Haritası</title>
+  <title>Anadolu & Dünya Ley Hatları Haritası</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -43,7 +43,7 @@
       letter-spacing: 0.5px;
     }
     .badge-sat {
-      background: #16a34a;
+      background: #8b5cf6;
       color: #fff;
       font-size: 0.75rem;
       font-weight: bold;
@@ -61,7 +61,7 @@
       background: #000;
     }
     #sidebar {
-      width: 320px;
+      width: 340px;
       background: #18181c;
       border-left: 1px solid #2d2d35;
       padding: 15px;
@@ -78,18 +78,20 @@
       padding: 12px;
     }
     .panel-box h3 {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #ffd700;
       margin-bottom: 10px;
       border-bottom: 1px solid #333;
       padding-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .control-item {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
     }
     .control-item input[type="checkbox"] {
@@ -101,14 +103,15 @@
       height: 12px;
       border-radius: 2px;
       display: inline-block;
+      flex-shrink: 0;
     }
     .site-list {
       list-style: none;
     }
     .site-item {
-      padding: 8px;
+      padding: 6px 8px;
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       margin-bottom: 4px;
       background: #2a2a32;
       cursor: pointer;
@@ -121,6 +124,12 @@
       background: #383845;
       color: #ffd700;
       transform: translateX(2px);
+    }
+    .site-item.intl {
+      border-left: 3px solid #ff00ea;
+    }
+    .site-item.tr {
+      border-left: 3px solid #ffd700;
     }
     /* Popup Stilleri */
     .leaflet-popup-content-wrapper {
@@ -150,8 +159,8 @@
 
 <div id="app-container">
   <header id="header">
-    <h1>Anadolu Ley Hatları (Hibrit Uydu + Yer İsimleri)</h1>
-    <span class="badge-sat">🗺️ İl, İlçe & Köy Etiketleri Aktif</span>
+    <h1>Anadolu & Küresel Ley Hatları Ağ Haritası</h1>
+    <span class="badge-sat">🌍 Türkiye + Dünya Bağlantıları Aktif</span>
   </header>
 
   <div id="main-content">
@@ -160,6 +169,11 @@
       <div class="panel-box">
         <h3>Hat Katmanları</h3>
         <div class="control-item">
+          <input type="checkbox" id="chkUluslararasi" checked onchange="toggleLayer('uluslararasi')">
+          <span class="color-badge" style="background:#FF00EA;"></span>
+          <label for="chkUluslararasi">Küresel Kültür / Piramit Hatları</label>
+        </div>
+        <div class="control-item">
           <input type="checkbox" id="chkKuzey" checked onchange="toggleLayer('kuzey')">
           <span class="color-badge" style="background:#FF0055;"></span>
           <label for="chkKuzey">Kuzey Vektörü (Troya-Ağrı)</label>
@@ -167,7 +181,7 @@
         <div class="control-item">
           <input type="checkbox" id="chkEge" checked onchange="toggleLayer('ege')">
           <span class="color-badge" style="background:#00F0FF;"></span>
-          <label for="chkEge">Ege - Kapadokya Hattı</label>
+          <label for="chkEge">Ege - Kapadokya - Akdeniz Hattı</label>
         </div>
         <div class="control-item">
           <input type="checkbox" id="chkGuneydogu" checked onchange="toggleLayer('guneydogu')">
@@ -177,12 +191,12 @@
         <div class="control-item">
           <input type="checkbox" id="chkKesisim" checked onchange="toggleLayer('kesisim')">
           <span class="color-badge" style="background:#B026FF;"></span>
-          <label for="chkKesisim">Çapraz Kesişim Bağlantıları</label>
+          <label for="chkKesisim">İç Çapraz Kesişim Bağlantıları</label>
         </div>
       </div>
 
       <div class="panel-box">
-        <h3>Düğüm Noktaları (10 Nokta)</h3>
+        <h3>Noktalar (Türkiye & Dünya)</h3>
         <ul class="site-list" id="siteList"></ul>
       </div>
     </aside>
@@ -193,75 +207,77 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+  // Türkiye ve Uluslararası Düğüm Noktaları
   const sites = [
-    { id: "ayasofya", name: "İstanbul (Ayasofya / Yûşâ)", lat: 41.0086, lng: 28.9802, desc: "Bizans ve Osmanlı inanç merkezi, kuzey hattının ana geçiş noktası." },
-    { id: "troya", name: "Çanakkale (Troya)", lat: 39.9575, lng: 26.2389, desc: "Batı Anadolu pagan inanç ve mitoloji başlangıç düğümü." },
-    { id: "efes", name: "İzmir (Efes)", lat: 37.9485, lng: 27.3639, desc: "Artemis Tapınağı ve İyonya kehanet merkezlerinin odağı." },
-    { id: "sardes", name: "Manisa (Sardes)", lat: 38.4883, lng: 28.0403, desc: "Lidya krallık başkenti ve Ege fayı üzerindeki frekans noktası." },
-    { id: "hierapolis", name: "Denizli (Hierapolis)", lat: 37.9256, lng: 29.1242, desc: "Plutonium (Cehennem Ağzı) kutsal alanı ve kaplıca enerjisi." },
-    { id: "kapadokya", name: "Nevşehir (Kapadokya)", lat: 38.6431, lng: 34.8303, desc: "Anadolu'nun jeomanyetik merkez düğümü ve yeraltı şehirleri." },
-    { id: "hattusa", name: "Çorum (Hattuşa)", lat: 40.0197, lng: 34.6153, desc: "Hititlerin Güneş Kursu merkezi ve yeşil kutsal taş düğümü." },
-    { id: "nemrut", name: "Adıyaman (Nemrut Dağı)", lat: 37.9808, lng: 38.7406, desc: "Kommagene dev heykelleri ve kozmik hizalanma tümülüsü." },
-    { id: "gobeklitepe", name: "Şanlıurfa (Göbeklitepe)", lat: 37.2233, lng: 38.9225, desc: "Tarihin bilinen en eski inanç ve astronomik tapınak kompleksi." },
-    { id: "harran", name: "Şanlıurfa (Harran)", lat: 36.8611, lng: 39.0306, desc: "Kökü Ezoterik Sâbiîliğe ve astronomi okullarına dayanan merkez." }
+    // Türkiye Düğümleri
+    { id: "ayasofya", type: "tr", name: "TR: İstanbul (Ayasofya)", lat: 41.0086, lng: 28.9802, desc: "Doğu Roma ve Osmanlı inanç merkezi; Avrupa-Asya geçiş düğümü." },
+    { id: "troya", type: "tr", name: "TR: Çanakkale (Troya)", lat: 39.9575, lng: 26.2389, desc: "Pagan mitoloji ve Ege-Marmara geçiş merkezi." },
+    { id: "efes", type: "tr", name: "TR: İzmir (Efes)", lat: 37.9485, lng: 27.3639, desc: "Artemis Tapınağı ve İyonya kehanet merkezi." },
+    { id: "sardes", type: "tr", name: "TR: Manisa (Sardes)", lat: 38.4883, lng: 28.0403, desc: "Lidya krallık başkenti ve Ege fayı frekans noktası." },
+    { id: "hierapolis", type: "tr", name: "TR: Denizli (Hierapolis)", lat: 37.9256, lng: 29.1242, desc: "Plutonium (Cehennem Ağzı) kutsal alanı ve jeotermal odak." },
+    { id: "kapadokya", type: "tr", name: "TR: Nevşehir (Kapadokya)", lat: 38.6431, lng: 34.8303, desc: "Anadolu jeomanyetik merkez düğümü ve yeraltı şehirleri." },
+    { id: "hattusa", type: "tr", name: "TR: Çorum (Hattuşa)", lat: 40.0197, lng: 34.6153, desc: "Hititlerin Güneş Kursu merkezi ve kutsal yeşil taş." },
+    { id: "nemrut", type: "tr", name: "TR: Adıyaman (Nemrut Dağı)", lat: 37.9808, lng: 38.7406, desc: "Kommagene dev heykelleri ve kozmik hizalanma tümülüsü." },
+    { id: "gobeklitepe", type: "tr", name: "TR: Şanlıurfa (Göbeklitepe)", lat: 37.2233, lng: 38.9225, desc: "Tarihin bilinen en eski inanç ve astronomik tapınak kompleksi." },
+    { id: "harran", type: "tr", name: "TR: Şanlıurfa (Harran)", lat: 36.8611, lng: 39.0306, desc: "Ezoterik Sâbiîliğin ve kadim astronomi okullarının odağı." },
+
+    // Dünya Düğümleri (Uluslararası)
+    { id: "giza", type: "intl", name: "MISIR: Giza Piramitleri", lat: 29.9792, lng: 31.1342, desc: "Dünyanın ana orantısal ve astral Ley hattı kesişim merkezi." },
+    { id: "stonehenge", type: "intl", name: "İNGİLTERE: Stonehenge", lat: 51.1789, lng: -1.8262, desc: "Megalitik astronomik gözlemevi ve Kuzey Avrupa düğümü." },
+    { id: "baalbek", type: "intl", name: "LÜBNAN: Baalbek Tapınağı", lat: 34.0069, lng: 36.2037, desc: "Devasa megalit taşları ile bilinen Güneş kenti." },
+    { id: "kudus", type: "intl", name: "İSRAİL: Kudüs (Kubbettüs Sahra)", lat: 31.7767, lng: 35.2345, desc: "Üç semavi dinin ve kadim tapınaklar zincirinin çekirdeği." },
+    { id: "delos", type: "intl", name: "YUNANİSTAN: Delos / Atina", lat: 37.9715, lng: 23.7267, desc: "Antik Yunan Apollon ve Parthenon kehanet aksı." },
+    { id: "roma", type: "intl", name: "İTALYA: Roma (Kolezyum/Vatikan)", lat: 41.8902, lng: 12.4922, desc: "Batı Akdeniz inanç ve imparatorluk aksı." },
+    { id: "persepolis", type: "intl", name: "İRAN: Persepolis Antik Kenti", lat: 29.9352, lng: 52.8899, desc: "Pers İmparatorluğu ve Zerdüştlük astral hizalanma noktası." }
   ];
 
-  // 1. Haritayı Başlat
-  const map = L.map('map').setView([38.9637, 35.2433], 6);
+  // 1. Haritayı Geniş Açıyla Başlat (Genişletilmiş Coğrafya)
+  const map = L.map('map').setView([36.5, 33.0], 5);
 
-  // 2. KATMANLAR (Uydu + İl/İlçe/Köy Etiketleri + Yollar)
-  
-  // a) Ham Uydu Fotoğrafı
+  // 2. KATMANLAR (Uydu + İl/İlçe/Köy/Ülke İsimleri)
   const satTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Esri World Imagery',
-    maxZoom: 18
+    attribution: 'Esri World Imagery', maxZoom: 18
   });
 
-  // b) İl, İlçe, Belde, Köy İsimleri ve Ülke/İl Sınırları
   const labelsTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Esri Places & Boundaries',
-    maxZoom: 18
+    attribution: 'Esri Places & Boundaries', maxZoom: 18
   });
 
-  // c) Karayolu Ağları
   const roadsTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Esri Transportation',
-    maxZoom: 18
+    attribution: 'Esri Transportation', maxZoom: 18
   });
 
-  // Hibrit Grubu Oluştur ve Haritaya Ekle
   const hybridSatGroup = L.layerGroup([satTile, roadsTile, labelsTile]);
   hybridSatGroup.addTo(map);
 
-  // Alternatif Koyu Vektör Katman
   const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: 'CartoDB Dark',
-    subdomains: 'abcd',
-    maxZoom: 19
+    attribution: 'CartoDB Dark', subdomains: 'abcd', maxZoom: 19
   });
 
-  // Katman Seçici
-  const baseMaps = {
+  L.control.layers({
     "🛰️ Hibrit Uydu (İsimli)": hybridSatGroup,
     "🌙 Koyu Vektör Harita": darkLayer
-  };
-  L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+  }, null, { position: 'topright' }).addTo(map);
 
   // Ley Hatları Katman Grupları
   const layers = {
+    uluslararasi: L.layerGroup().addTo(map),
     kuzey: L.layerGroup().addTo(map),
     ege: L.layerGroup().addTo(map),
     guneydogu: L.layerGroup().addTo(map),
     kesisim: L.layerGroup().addTo(map)
   };
 
-  // 3. Noktaları Ekle
+  // 3. Noktaları Ekle (TR için Sarı, Uluslararası için Pembe/Magenta İşaretçiler)
   const siteListEl = document.getElementById("siteList");
 
   sites.forEach(site => {
+    const isIntl = site.type === "intl";
+    const markerColor = isIntl ? "#FF00EA" : "#FFD700";
+
     const marker = L.circleMarker([site.lat, site.lng], {
-      radius: 8,
-      fillColor: "#FFD700",
+      radius: isIntl ? 9 : 7,
+      fillColor: markerColor,
       color: "#FFFFFF",
       weight: 2,
       opacity: 1,
@@ -269,7 +285,7 @@
     });
 
     marker.bindPopup(`
-      <div class="popup-title">${site.name}</div>
+      <div class="popup-title" style="color: ${markerColor}">${site.name}</div>
       <div class="popup-desc">${site.desc}</div>
     `);
 
@@ -277,10 +293,10 @@
 
     // Sidebar
     const li = document.createElement("li");
-    li.className = "site-item";
+    li.className = `site-item ${site.type}`;
     li.innerHTML = `<span>${site.name}</span> <span style="opacity:0.5;">➔</span>`;
     li.onclick = () => {
-      map.flyTo([site.lat, site.lng], 9, { duration: 1.2 });
+      map.flyTo([site.lat, site.lng], 8, { duration: 1.2 });
       marker.openPopup();
     };
     siteListEl.appendChild(li);
@@ -291,21 +307,48 @@
     return [s.lat, s.lng];
   }
 
-  // 4. Hat Çizimlerini Yap
+  // 4. HAT ÇİZİMLERİ
+
+  // A) ULUSLARARASI DÜNYA HATTLARI (Pembe/Magenta Çizgiler)
+  // Giza (Mısır) ➔ Göbeklitepe ➔ Baalbek ➔ Kudüs ➔ Giza Üçgeni
+  L.polyline([getPos('giza'), getPos('gobeklitepe'), getPos('baalbek'), getPos('kudus'), getPos('giza')], {
+    color: '#FF00EA', weight: 3, opacity: 0.9, dashArray: '6, 6'
+  }).addTo(layers.uluslararasi);
+
+  // Stonehenge (İngiltere) ➔ Troya ➔ Ayasofya Aksı
+  L.polyline([getPos('stonehenge'), getPos('troya'), getPos('ayasofya')], {
+    color: '#FF00EA', weight: 3, opacity: 0.85
+  }).addTo(layers.uluslararasi);
+
+  // Roma ➔ Delos/Atina ➔ Efes ➔ Kudüs Akdeniz Aksı
+  L.polyline([getPos('roma'), getPos('delos'), getPos('efes'), getPos('kudus')], {
+    color: '#FF00EA', weight: 3, opacity: 0.85
+  }).addTo(layers.uluslararasi);
+
+  // Harran ➔ Persepolis (İran Doğu Aksı)
+  L.polyline([getPos('harran'), getPos('persepolis')], {
+    color: '#FF00EA', weight: 3, opacity: 0.85, dashArray: '4, 4'
+  }).addTo(layers.uluslararasi);
+
+  // B) TÜRKİYE İÇ HATTLARI
+  // Kuzey Vektörü
   L.polyline([getPos('troya'), getPos('ayasofya'), getPos('hattusa'), getPos('nemrut')], {
-    color: '#FF0055', weight: 4, opacity: 0.9
+    color: '#FF0055', weight: 3.5, opacity: 0.9
   }).addTo(layers.kuzey);
 
+  // Ege - Kapadokya Hattı
   L.polyline([getPos('efes'), getPos('sardes'), getPos('hierapolis'), getPos('kapadokya')], {
-    color: '#00F0FF', weight: 4, opacity: 0.9
+    color: '#00F0FF', weight: 3.5, opacity: 0.9
   }).addTo(layers.ege);
 
+  // Güneydoğu Enerji Üçgeni
   L.polyline([getPos('nemrut'), getPos('gobeklitepe'), getPos('harran'), getPos('nemrut')], {
-    color: '#FFD700', weight: 4, opacity: 1
+    color: '#FFD700', weight: 3.5, opacity: 1
   }).addTo(layers.guneydogu);
 
+  // Çapraz Kesişim Hatları
   L.polyline([getPos('ayasofya'), getPos('kapadokya'), getPos('gobeklitepe'), getPos('hierapolis'), getPos('ayasofya')], {
-    color: '#B026FF', weight: 3, opacity: 0.8, dashArray: '8, 8'
+    color: '#B026FF', weight: 2.5, opacity: 0.7, dashArray: '8, 8'
   }).addTo(layers.kesisim);
 
   function toggleLayer(layerKey) {
