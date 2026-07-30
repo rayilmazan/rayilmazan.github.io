@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anadolu Ley Hatları Haritası (API Key Gerektirmez)</title>
+  <title>Anadolu Ley Hatları - Uydu Görünümü</title>
   
-  <!-- Leaflet CSS (Ücretsiz ve Açık Kaynak Harita Kütüphanesi) -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
@@ -42,9 +42,9 @@
       color: #ffd700;
       letter-spacing: 0.5px;
     }
-    .badge-no-api {
-      background: #22c55e;
-      color: #052e16;
+    .badge-sat {
+      background: #0284c7;
+      color: #fff;
       font-size: 0.75rem;
       font-weight: bold;
       padding: 4px 10px;
@@ -58,7 +58,7 @@
     #map {
       flex: 1;
       height: 100%;
-      background: #0e0e10;
+      background: #000;
     }
     #sidebar {
       width: 320px;
@@ -122,15 +122,16 @@
       color: #ffd700;
       transform: translateX(2px);
     }
-    /* Leaflet Popup Özelleştirme */
+    /* Popup Stilleri */
     .leaflet-popup-content-wrapper {
-      background: #1e1e24 !important;
+      background: rgba(24, 24, 28, 0.95) !important;
       color: #e0e0e0 !important;
       border: 1px solid #ffd700;
       border-radius: 6px;
+      backdrop-filter: blur(4px);
     }
     .leaflet-popup-tip {
-      background: #1e1e24 !important;
+      background: rgba(24, 24, 28, 0.95) !important;
     }
     .popup-title {
       color: #ffd700;
@@ -149,8 +150,8 @@
 
 <div id="app-container">
   <header id="header">
-    <h1>Anadolu Ley Hatları ve Kesişim Ağları</h1>
-    <span class="badge-no-api">✓ API Key Gerektirmez (Leaflet.js)</span>
+    <h1>Anadolu Ley Hatları (Uydu Katmanı)</h1>
+    <span class="badge-sat">🛰️ Esri World Imagery (Ücretsiz Uydu)</span>
   </header>
 
   <div id="main-content">
@@ -160,12 +161,12 @@
         <h3>Hat Katmanları</h3>
         <div class="control-item">
           <input type="checkbox" id="chkKuzey" checked onchange="toggleLayer('kuzey')">
-          <span class="color-badge" style="background:#FF3366;"></span>
+          <span class="color-badge" style="background:#FF0055;"></span>
           <label for="chkKuzey">Kuzey Vektörü (Troya-Ağrı)</label>
         </div>
         <div class="control-item">
           <input type="checkbox" id="chkEge" checked onchange="toggleLayer('ege')">
-          <span class="color-badge" style="background:#00E5FF;"></span>
+          <span class="color-badge" style="background:#00F0FF;"></span>
           <label for="chkEge">Ege - Kapadokya Hattı</label>
         </div>
         <div class="control-item">
@@ -175,7 +176,7 @@
         </div>
         <div class="control-item">
           <input type="checkbox" id="chkKesisim" checked onchange="toggleLayer('kesisim')">
-          <span class="color-badge" style="background:#A000FF;"></span>
+          <span class="color-badge" style="background:#B026FF;"></span>
           <label for="chkKesisim">Çapraz Kesişim Bağlantıları</label>
         </div>
       </div>
@@ -192,7 +193,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // Noktaların Koordinatları ve Açıklamaları
   const sites = [
     { id: "ayasofya", name: "İstanbul (Ayasofya / Yûşâ)", lat: 41.0086, lng: 28.9802, desc: "Bizans ve Osmanlı inanç merkezi, kuzey hattının ana geçiş noktası." },
     { id: "troya", name: "Çanakkale (Troya)", lat: 39.9575, lng: 26.2389, desc: "Batı Anadolu pagan inanç ve mitoloji başlangıç düğümü." },
@@ -206,17 +206,33 @@
     { id: "harran", name: "Şanlıurfa (Harran)", lat: 36.8611, lng: 39.0306, desc: "Kökü Ezoterik Sâbiîliğe ve astronomi okullarına dayanan merkez." }
   ];
 
-  // 1. Haritayı Başlat (Türkiye Merkezli)
+  // 1. Haritayı Başlat
   const map = L.map('map').setView([38.9637, 35.2433], 6);
 
-  // 2. Koyu Tema Harita Katmanı (CartoDB Dark Matter - Ücretsiz ve API gerektirmez)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  // 2. Uydu Katmanı (Esri World Imagery)
+  const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    maxZoom: 18
+  });
+
+  // Alternatif Koyu Tema Katmanı
+  const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
     subdomains: 'abcd',
     maxZoom: 19
-  }).addTo(map);
+  });
 
-  // Katman Grupları
+  // Varsayılan olarak Uydu Haritasını ekle
+  satelliteLayer.addTo(map);
+
+  // Katman Seçici Kontrolü (Haritanın Sağ Üstüne Eklenir)
+  const baseMaps = {
+    "🛰️ Uydu Görüntüsü": satelliteLayer,
+    "🌙 Koyu Harita": darkLayer
+  };
+  L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+
+  // Çizgi ve Düğüm Katman Grupları
   const layers = {
     kuzey: L.layerGroup().addTo(map),
     ege: L.layerGroup().addTo(map),
@@ -224,19 +240,18 @@
     kesisim: L.layerGroup().addTo(map)
   };
 
-  const markersObj = {};
-
-  // 3. Noktaları (Işıltılı Daire İşaretçiler) Ekle
+  // 3. Noktaları Uydu Üzerinde Parlayacak Şekilde Ekle
   const siteListEl = document.getElementById("siteList");
 
   sites.forEach(site => {
+    // Uydu görüntüsünde belirgin olması için parlak sarı halka
     const marker = L.circleMarker([site.lat, site.lng], {
       radius: 8,
       fillColor: "#FFD700",
       color: "#FFFFFF",
       weight: 2,
       opacity: 1,
-      fillOpacity: 0.9
+      fillOpacity: 1
     });
 
     marker.bindPopup(`
@@ -245,9 +260,8 @@
     `);
 
     marker.addTo(map);
-    markersObj[site.id] = marker;
 
-    // Sidebar Listesini Oluştur
+    // Sidebar Listesi
     const li = document.createElement("li");
     li.className = "site-item";
     li.innerHTML = `<span>${site.name}</span> <span style="opacity:0.5;">➔</span>`;
@@ -258,34 +272,33 @@
     siteListEl.appendChild(li);
   });
 
-  // Yardımcı Koordinat Getirici
   function getPos(id) {
     const s = sites.find(x => x.id === id);
     return [s.lat, s.lng];
   }
 
-  // 4. Ley Hatlarını Çiz
+  // 4. Parlak Renkli Ley Hatlarını Çiz
   // Kuzey Vektörü (Kırmızı)
   L.polyline([getPos('troya'), getPos('ayasofya'), getPos('hattusa'), getPos('nemrut')], {
-    color: '#FF3366', weight: 3, opacity: 0.85
+    color: '#FF0055', weight: 4, opacity: 0.9
   }).addTo(layers.kuzey);
 
-  // Ege - Kapadokya Hattı (Siyan)
+  // Ege - Kapadokya Hattı (Parlak Turkuaz)
   L.polyline([getPos('efes'), getPos('sardes'), getPos('hierapolis'), getPos('kapadokya')], {
-    color: '#00E5FF', weight: 3, opacity: 0.85
+    color: '#00F0FF', weight: 4, opacity: 0.9
   }).addTo(layers.ege);
 
-  // Güneydoğu Enerji Üçgeni (Sarı)
+  // Güneydoğu Enerji Üçgeni (Altın Sarı)
   L.polyline([getPos('nemrut'), getPos('gobeklitepe'), getPos('harran'), getPos('nemrut')], {
-    color: '#FFD700', weight: 3, opacity: 0.9
+    color: '#FFD700', weight: 4, opacity: 1
   }).addTo(layers.guneydogu);
 
-  // Çapraz Bağlantı Hatları (Mor)
+  // Çapraz Kesişim Bağlantıları (Neon Mor)
   L.polyline([getPos('ayasofya'), getPos('kapadokya'), getPos('gobeklitepe'), getPos('hierapolis'), getPos('ayasofya')], {
-    color: '#A000FF', weight: 2, opacity: 0.6, dashArray: '6, 6'
+    color: '#B026FF', weight: 3, opacity: 0.8, dashArray: '8, 8'
   }).addTo(layers.kesisim);
 
-  // Katman Aç/Kapa Fonksiyonu
+  // Katman Aç/Kapa
   function toggleLayer(layerKey) {
     const chk = document.getElementById('chk' + layerKey.charAt(0).toUpperCase() + layerKey.slice(1));
     if (chk.checked) {
