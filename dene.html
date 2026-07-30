@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anadolu Ley Hatları - Uydu Görünümü</title>
+  <title>Anadolu Ley Hatları - Yer İsimli Hibrit Uydu Haritası</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -43,7 +43,7 @@
       letter-spacing: 0.5px;
     }
     .badge-sat {
-      background: #0284c7;
+      background: #16a34a;
       color: #fff;
       font-size: 0.75rem;
       font-weight: bold;
@@ -150,8 +150,8 @@
 
 <div id="app-container">
   <header id="header">
-    <h1>Anadolu Ley Hatları (Uydu Katmanı)</h1>
-    <span class="badge-sat">🛰️ Esri World Imagery (Ücretsiz Uydu)</span>
+    <h1>Anadolu Ley Hatları (Hibrit Uydu + Yer İsimleri)</h1>
+    <span class="badge-sat">🗺️ İl, İlçe & Köy Etiketleri Aktif</span>
   </header>
 
   <div id="main-content">
@@ -209,30 +209,45 @@
   // 1. Haritayı Başlat
   const map = L.map('map').setView([38.9637, 35.2433], 6);
 
-  // 2. Uydu Katmanı (Esri World Imagery)
-  const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+  // 2. KATMANLAR (Uydu + İl/İlçe/Köy Etiketleri + Yollar)
+  
+  // a) Ham Uydu Fotoğrafı
+  const satTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Esri World Imagery',
     maxZoom: 18
   });
 
-  // Alternatif Koyu Tema Katmanı
+  // b) İl, İlçe, Belde, Köy İsimleri ve Ülke/İl Sınırları
+  const labelsTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Esri Places & Boundaries',
+    maxZoom: 18
+  });
+
+  // c) Karayolu Ağları
+  const roadsTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Esri Transportation',
+    maxZoom: 18
+  });
+
+  // Hibrit Grubu Oluştur ve Haritaya Ekle
+  const hybridSatGroup = L.layerGroup([satTile, roadsTile, labelsTile]);
+  hybridSatGroup.addTo(map);
+
+  // Alternatif Koyu Vektör Katman
   const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    attribution: 'CartoDB Dark',
     subdomains: 'abcd',
     maxZoom: 19
   });
 
-  // Varsayılan olarak Uydu Haritasını ekle
-  satelliteLayer.addTo(map);
-
-  // Katman Seçici Kontrolü (Haritanın Sağ Üstüne Eklenir)
+  // Katman Seçici
   const baseMaps = {
-    "🛰️ Uydu Görüntüsü": satelliteLayer,
-    "🌙 Koyu Harita": darkLayer
+    "🛰️ Hibrit Uydu (İsimli)": hybridSatGroup,
+    "🌙 Koyu Vektör Harita": darkLayer
   };
   L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-  // Çizgi ve Düğüm Katman Grupları
+  // Ley Hatları Katman Grupları
   const layers = {
     kuzey: L.layerGroup().addTo(map),
     ege: L.layerGroup().addTo(map),
@@ -240,11 +255,10 @@
     kesisim: L.layerGroup().addTo(map)
   };
 
-  // 3. Noktaları Uydu Üzerinde Parlayacak Şekilde Ekle
+  // 3. Noktaları Ekle
   const siteListEl = document.getElementById("siteList");
 
   sites.forEach(site => {
-    // Uydu görüntüsünde belirgin olması için parlak sarı halka
     const marker = L.circleMarker([site.lat, site.lng], {
       radius: 8,
       fillColor: "#FFD700",
@@ -261,7 +275,7 @@
 
     marker.addTo(map);
 
-    // Sidebar Listesi
+    // Sidebar
     const li = document.createElement("li");
     li.className = "site-item";
     li.innerHTML = `<span>${site.name}</span> <span style="opacity:0.5;">➔</span>`;
@@ -277,28 +291,23 @@
     return [s.lat, s.lng];
   }
 
-  // 4. Parlak Renkli Ley Hatlarını Çiz
-  // Kuzey Vektörü (Kırmızı)
+  // 4. Hat Çizimlerini Yap
   L.polyline([getPos('troya'), getPos('ayasofya'), getPos('hattusa'), getPos('nemrut')], {
     color: '#FF0055', weight: 4, opacity: 0.9
   }).addTo(layers.kuzey);
 
-  // Ege - Kapadokya Hattı (Parlak Turkuaz)
   L.polyline([getPos('efes'), getPos('sardes'), getPos('hierapolis'), getPos('kapadokya')], {
     color: '#00F0FF', weight: 4, opacity: 0.9
   }).addTo(layers.ege);
 
-  // Güneydoğu Enerji Üçgeni (Altın Sarı)
   L.polyline([getPos('nemrut'), getPos('gobeklitepe'), getPos('harran'), getPos('nemrut')], {
     color: '#FFD700', weight: 4, opacity: 1
   }).addTo(layers.guneydogu);
 
-  // Çapraz Kesişim Bağlantıları (Neon Mor)
   L.polyline([getPos('ayasofya'), getPos('kapadokya'), getPos('gobeklitepe'), getPos('hierapolis'), getPos('ayasofya')], {
     color: '#B026FF', weight: 3, opacity: 0.8, dashArray: '8, 8'
   }).addTo(layers.kesisim);
 
-  // Katman Aç/Kapa
   function toggleLayer(layerKey) {
     const chk = document.getElementById('chk' + layerKey.charAt(0).toUpperCase() + layerKey.slice(1));
     if (chk.checked) {
