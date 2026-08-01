@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Dijital Cetvel & Kumpas</title>
+  <title>GPS Takometre & Altimetre</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --accent: #06b6d4;
-      --accent-bright: #22d3ee;
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --accent: #10b981;
+      --accent-bright: #34d399;
       --text: #f8fafc;
-      --text-dim: #94a3b8;
-      --ruler-mark: #cbd5e1;
+      --text-dim: #64748b;
+      --warning: #f59e0b;
+      --danger: #ef4444;
     }
 
     * {
@@ -21,27 +22,25 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      padding: 16px;
+      gap: 16px;
     }
 
     header {
-      background: var(--card-bg);
-      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #334155;
-      z-index: 10;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
     }
 
     .title {
@@ -50,15 +49,125 @@
       color: var(--accent-bright);
     }
 
-    .btn {
-      background: #334155;
-      color: var(--text);
-      border: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #1e293b;
+      color: var(--text-dim);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .status-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* Main Speedometer Gauge */
+    .speed-card {
+      background: linear-gradient(145deg, #131b2e, #0e1424);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid #1e293b;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .speed-val {
+      font-size: 4.8rem;
+      font-weight: 900;
+      font-family: monospace;
+      line-height: 1;
+      color: var(--accent-bright);
+      text-shadow: 0 0 20px rgba(52, 211, 153, 0.2);
+      margin: 10px 0;
+    }
+
+    .speed-unit {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      letter-spacing: 2px;
       font-weight: 600;
+    }
+
+    /* Stats Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    .coords-card {
+      grid-column: span 2;
+      background: var(--card-bg);
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-family: monospace;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .btn-primary {
@@ -66,250 +175,90 @@
       color: #000;
     }
 
-    /* Reading Display Panel */
-    .readout-panel {
-      background: #182232;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border-bottom: 1px solid #334155;
-      z-index: 5;
+    .btn-secondary {
+      background: #1e293b;
+      color: var(--text);
     }
 
-    .val-box {
-      text-align: center;
-    }
-
-    .val-num {
-      font-size: 1.8rem;
-      font-weight: 800;
-      font-family: monospace;
-      color: var(--accent-bright);
-    }
-
-    .val-unit {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Workspace */
-    .ruler-container {
-      flex: 1;
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      overflow: hidden;
-    }
-
-    canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Caliper Sliders */
-    .jaw {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      z-index: 4;
-      cursor: ns-resize;
-    }
-
-    .jaw-line {
-      position: absolute;
-      width: 100%;
-      height: 2px;
-      background: var(--accent);
-      box-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
-    }
-
-    .jaw-handle {
-      position: absolute;
-      right: 16px;
-      background: var(--accent);
-      color: #000;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    #jaw-top { top: 40px; }
-    #jaw-bottom { top: 240px; }
-
-    #jaw-top .jaw-line { top: 22px; }
-    #jaw-bottom .jaw-line { top: 22px; }
-
-    /* Modal / Overlay */
-    .modal {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.95);
-      z-index: 100;
-      display: none;
-      flex-direction: column;
-      padding: 24px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal.active { display: flex; }
-
-    .modal-card {
-      background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 360px;
-      border: 1px solid #334155;
-    }
-
-    .modal-title {
-      font-size: 1.2rem;
-      margin-bottom: 12px;
-      color: var(--accent-bright);
-    }
-
-    .modal-desc {
-      font-size: 0.85rem;
-      color: var(--text-dim);
-      margin-bottom: 20px;
-      line-height: 1.4;
-    }
-
-    .credit-card-sim {
-      height: 140px;
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      border-radius: 8px;
-      margin: 0 auto 20px auto;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 0.8rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      resize: horizontal;
-      overflow: hidden;
-      min-width: 150px;
-      max-width: 100%;
-    }
-
-    .controls-row {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 15px;
-    }
-
-    .slider-ctrl {
-      width: 100%;
-      margin: 10px 0;
+    .btn:active {
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="title">Kumpas & Cetvel</div>
-    <button class="btn" id="btn-calibrate">⚙ Kalibrasyon</button>
+    <div class="title">GPS Takometre & Altimetre</div>
+    <div class="status-badge">
+      <div class="status-dot" id="gps-dot"></div>
+      <span id="gps-status">Uydu Bekleniyor...</span>
+    </div>
   </header>
 
-  <div class="readout-panel">
-    <div class="val-box">
-      <div class="val-num" id="val-mm">0.0</div>
-      <div class="val-unit">Milimetre (mm)</div>
+  <!-- Main Speed Display -->
+  <div class="speed-card">
+    <div class="speed-unit">ANLIK HIZ</div>
+    <div class="speed-val" id="val-speed">0</div>
+    <div class="speed-unit">KM / SAAT</div>
+  </div>
+
+  <!-- Secondary Metrics Grid -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-label">🏔️ RAKIM (ALTİMETRE)</div>
+      <div class="card-value"><span id="val-alt">0</span> <small style="font-size:0.8rem">m</small></div>
     </div>
-    <div class="val-box">
-      <div class="val-num" id="val-cm">0.00</div>
-      <div class="val-unit">Santimetre (cm)</div>
+
+    <div class="card">
+      <div class="card-label">📏 KAT EDİLEN YOL</div>
+      <div class="card-value"><span id="val-dist">0.00</span> <small style="font-size:0.8rem">km</small></div>
     </div>
-    <div class="val-box">
-      <div class="val-num" id="val-inch">0.00</div>
-      <div class="val-unit">İnç (in)</div>
+
+    <div class="card">
+      <div class="card-label">🚀 MAKSİMUM HIZ</div>
+      <div class="card-value"><span id="val-max-speed">0</span> <small style="font-size:0.8rem">km/s</small></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">🧭 YÖN / HASSASİYET</div>
+      <div class="card-value" style="font-size:1.1rem" id="val-heading">--° (±<span id="val-acc">0</span>m)</div>
+    </div>
+
+    <div class="coords-card">
+      <span>📍 KONUM</span>
+      <span id="val-coords">0.00000, 0.00000</span>
     </div>
   </div>
 
-  <div class="ruler-container" id="ruler-box">
-    <canvas id="ruler-canvas"></canvas>
-
-    <!-- Top Caliper Jaw -->
-    <div class="jaw" id="jaw-top">
-      <div class="jaw-line"></div>
-      <div class="jaw-handle">▲ ÜST SINIR</div>
-    </div>
-
-    <!-- Bottom Caliper Jaw -->
-    <div class="jaw" id="jaw-bottom">
-      <div class="jaw-line"></div>
-      <div class="jaw-handle">▼ ALT SINIR</div>
-    </div>
-  </div>
-
-  <!-- Calibration Modal -->
-  <div class="modal" id="modal-calib">
-    <div class="modal-card">
-      <div class="modal-title">Ekran Kalibrasyonu</div>
-      <div class="modal-desc">
-        Milimetrik hassasiyet için standart bir <b>kredi kartını</b> ekrana dayayın. Mavi kutunun genişliğini aşağıdaki kaydırıcı ile kartınızın eniyle tam çakışacak şekilde ayarlayın.
-      </div>
-
-      <div class="credit-card-sim" id="card-box">
-        Kredi Kartı Hizalama Alanı<br>(En: 85.6 mm)
-      </div>
-
-      <input type="range" class="slider-ctrl" id="calib-slider" min="150" max="500" value="300">
-
-      <div class="controls-row">
-        <button class="btn" id="btn-reset-calib">Varsayılana Dön</button>
-        <button class="btn btn-primary" id="btn-save-calib">Kaydet ve Kapat</button>
-      </div>
-    </div>
+  <!-- Action Controls -->
+  <div class="controls">
+    <button class="btn btn-secondary" id="btn-reset">🔄 Verileri Sıfırla</button>
+    <button class="btn btn-primary" id="btn-toggle">▶️ GPS Başlat</button>
   </div>
 
   <script>
-    // System Constants & State
-    const CREDIT_CARD_MM = 85.60; // Standard credit card width in mm
-    let ppm = parseFloat(localStorage.getItem('caliper_ppm')) || 3.78; // Pixels per millimeter
+    // State Variables
+    let watchId = null;
+    let isTracking = false;
+    let maxSpeed = 0;
+    let totalDistance = 0; // in meters
+    let lastPosition = null;
 
-    const canvas = document.getElementById('ruler-canvas');
-    const ctx = canvas.getContext('2d');
-    const rulerBox = document.getElementById('ruler-box');
+    // DOM Elements
+    const valSpeed = document.getElementById('val-speed');
+    const valAlt = document.getElementById('val-alt');
+    const valDist = document.getElementById('val-dist');
+    const valMaxSpeed = document.getElementById('val-max-speed');
+    const valHeading = document.getElementById('val-heading');
+    const valAcc = document.getElementById('val-acc');
+    const valCoords = document.getElementById('val-coords');
     
-    const jawTop = document.getElementById('jaw-top');
-    const jawBottom = document.getElementById('jaw-bottom');
-    
-    const valMm = document.getElementById('val-mm');
-    const valCm = document.getElementById('val-cm');
-    const valInch = document.getElementById('val-inch');
+    const gpsDot = document.getElementById('gps-dot');
+    const gpsStatus = document.getElementById('gps-status');
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnReset = document.getElementById('btn-reset');
 
-    // Calibration UI elements
-    const modalCalib = document.getElementById('modal-calib');
-    const btnCalibrate = document.getElementById('btn-calibrate');
-    const btnSaveCalib = document.getElementById('btn-save-calib');
-    const btnResetCalib = document.getElementById('btn-reset-calib');
-    const cardBox = document.getElementById('card-box');
-    const calibSlider = document.getElementById('calib-slider');
-
-    let jawTopY = 40;
-    let jawBottomY = 240;
-
-    // Wake Lock handling
+    // Prevent Screen Sleep (Wake Lock)
     async function requestWakeLock() {
       try {
         if ('wakeLock' in navigator) {
@@ -317,184 +266,150 @@
         }
       } catch (err) {}
     }
-    requestWakeLock();
 
-    // Resize canvas dynamically
-    function resizeCanvas() {
-      canvas.width = rulerBox.clientWidth;
-      canvas.height = rulerBox.clientHeight;
-      drawRuler();
-    }
+    // Haversine Formula for Distance Calculation (meters)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // Earth radius in meters
+      const rad = Math.PI / 180;
+      const dLat = (lat2 - lat1) * rad;
+      const dLon = (lon2 - lon1) * rad;
 
-    // Draw ruler tick marks
-    function drawRuler() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * rad) * Math.cos(lat2 * rad) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
       
-      const width = canvas.width;
-      const height = canvas.height;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
 
-      ctx.fillStyle = '#cbd5e1';
-      ctx.strokeStyle = '#475569';
-      ctx.lineWidth = 1;
-      ctx.font = '10px monospace';
+    // Handle Position Updates
+    function handlePosition(position) {
+      const coords = position.coords;
 
-      // Draw Left Side Rulers (Metric - mm/cm)
-      const totalMm = Math.floor(height / ppm);
+      // Update Connection Status
+      gpsDot.classList.add('active');
+      gpsStatus.textContent = 'GPS Bağlı';
 
-      for (let mm = 0; mm <= totalMm; mm++) {
-        const y = mm * ppm;
+      // 1. Calculate Speed (m/s -> km/h)
+      let currentSpeedKmH = 0;
+      if (coords.speed !== null && coords.speed > 0) {
+        currentSpeedKmH = Math.round(coords.speed * 3.6);
+      }
+      valSpeed.textContent = currentSpeedKmH;
 
-        if (mm % 10 === 0) {
-          // 1 cm mark
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(32, y);
-          ctx.stroke();
+      // Update Max Speed
+      if (currentSpeedKmH > maxSpeed) {
+        maxSpeed = currentSpeedKmH;
+        valMaxSpeed.textContent = maxSpeed;
+      }
 
-          if (mm > 0) {
-            ctx.fillText(`${mm / 10}`, 36, y + 3);
+      // 2. Altitude (Rakım)
+      if (coords.altitude !== null) {
+        valAlt.textContent = Math.round(coords.altitude);
+      }
+
+      // 3. Distance Traveled
+      if (lastPosition) {
+        // Calculate distance only if accuracy is acceptable (< 25m)
+        if (coords.accuracy < 25) {
+          const distIncrement = calculateDistance(
+            lastPosition.coords.latitude,
+            lastPosition.coords.longitude,
+            coords.latitude,
+            coords.longitude
+          );
+
+          // Ignore tiny GPS drift noise when stationary
+          if (distIncrement > 2) {
+            totalDistance += distIncrement;
+            valDist.textContent = (totalDistance / 1000).toFixed(2);
           }
-        } else if (mm % 5 === 0) {
-          // 5 mm mark
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(20, y);
-          ctx.stroke();
-        } else {
-          // 1 mm mark
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(12, y);
-          ctx.stroke();
         }
       }
+      lastPosition = position;
 
-      // Draw Right Side Rulers (Imperial - Inches)
-      const ppi = ppm * 25.4; // Pixels per inch
-      const totalInches = height / ppi;
+      // 4. Heading & Accuracy
+      const headingTxt = coords.heading !== null && !isNaN(coords.heading) 
+        ? `${Math.round(coords.heading)}°` 
+        : '--°';
+      valHeading.textContent = `${headingTxt} (±${Math.round(coords.accuracy)}m)`;
+      valAcc.textContent = Math.round(coords.accuracy);
 
-      for (let i = 0; i <= totalInches * 16; i++) {
-        const y = i * (ppi / 16);
+      // 5. Coordinates
+      valCoords.textContent = `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`;
+    }
 
-        if (i % 16 === 0) {
-          // 1 Inch
-          ctx.beginPath();
-          ctx.moveTo(width, y);
-          ctx.lineTo(width - 32, y);
-          ctx.stroke();
-
-          const inchVal = i / 16;
-          if (inchVal > 0) {
-            ctx.fillText(`${inchVal}"`, width - 48, y + 3);
-          }
-        } else if (i % 8 === 0) {
-          // 1/2 Inch
-          ctx.beginPath();
-          ctx.moveTo(width, y);
-          ctx.lineTo(width - 22, y);
-          ctx.stroke();
-        } else if (i % 4 === 0) {
-          // 1/4 Inch
-          ctx.beginPath();
-          ctx.moveTo(width, y);
-          ctx.lineTo(width - 16, y);
-          ctx.stroke();
-        }
+    // Handle Errors
+    function handleError(error) {
+      gpsDot.classList.remove('active');
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          gpsStatus.textContent = 'Konum İzni Reddedildi';
+          alert("Uygulamanın çalışması için konum izni vermeniz gerekmektedir.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          gpsStatus.textContent = 'Sinyal Alınamıyor';
+          break;
+        case error.TIMEOUT:
+          gpsStatus.textContent = 'Sinyal Zaman Aşımı';
+          break;
       }
     }
 
-    // Update readout values
-    function updateReadout() {
-      const diffPx = Math.abs((jawBottomY + 22) - (jawTopY + 22));
-      const mm = diffPx / ppm;
-      const cm = mm / 10;
-      const inch = mm / 25.4;
-
-      valMm.textContent = mm.toFixed(1);
-      valCm.textContent = cm.toFixed(2);
-      valInch.textContent = inch.toFixed(2);
-
-      // Light haptic feedback on touch
-      if (navigator.vibrate && Math.round(mm) % 10 === 0) {
-        navigator.vibrate(2);
+    // Start GPS Tracking
+    function startTracking() {
+      if (!('geolocation' in navigator)) {
+        alert("Cihazınız veya tarayıcınız GPS özelliğini desteklemiyor.");
+        return;
       }
+
+      requestWakeLock();
+
+      const options = {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
+      };
+
+      watchId = navigator.geolocation.watchPosition(handlePosition, handleError, options);
+      isTracking = true;
+      btnToggle.textContent = '⏸️ GPS Durdur';
+      btnToggle.style.background = '#ef4444';
+      gpsStatus.textContent = 'Uydu Aranıyor...';
     }
 
-    // Dragging Logic for Caliper Jaws
-    function makeDraggable(element, isTop) {
-      let isDragging = false;
-
-      element.addEventListener('pointerdown', (e) => {
-        isDragging = true;
-        element.setPointerCapture(e.pointerId);
-      });
-
-      element.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-
-        const rect = rulerBox.getBoundingClientRect();
-        let newY = e.clientY - rect.top - 22; // Center jaw on pointer
-
-        // Boundaries
-        newY = Math.max(0, Math.min(rulerBox.clientHeight - 44, newY));
-
-        if (isTop) {
-          jawTopY = Math.min(newY, jawBottomY - 10);
-          element.style.top = `${jawTopY}px`;
-        } else {
-          jawBottomY = Math.max(newY, jawTopY + 10);
-          element.style.top = `${jawBottomY}px`;
-        }
-
-        updateReadout();
-      });
-
-      element.addEventListener('pointerup', (e) => {
-        isDragging = false;
-        element.releasePointerCapture(e.pointerId);
-      });
+    // Stop GPS Tracking
+    function stopTracking() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      isTracking = false;
+      gpsDot.classList.remove('active');
+      gpsStatus.textContent = 'Durduruldu';
+      btnToggle.textContent = '▶️ GPS Başlat';
+      btnToggle.style.background = '#10b981';
     }
 
-    makeDraggable(jawTop, true);
-    makeDraggable(jawBottom, false);
-
-    // Calibration Handlers
-    btnCalibrate.addEventListener('click', () => {
-      const currentCardWidthPx = CREDIT_CARD_MM * ppm;
-      calibSlider.value = currentCardWidthPx;
-      cardBox.style.width = `${currentCardWidthPx}px`;
-      modalCalib.classList.add('active');
+    // Toggle Button Event
+    btnToggle.addEventListener('click', () => {
+      if (isTracking) {
+        stopTracking();
+      } else {
+        startTracking();
+      }
     });
 
-    calibSlider.addEventListener('input', (e) => {
-      const px = e.target.value;
-      cardBox.style.width = `${px}px`;
-    });
-
-    btnSaveCalib.addEventListener('click', () => {
-      const cardPx = parseFloat(calibSlider.value);
-      ppm = cardPx / CREDIT_CARD_MM;
-      localStorage.setItem('caliper_ppm', ppm);
-      modalCalib.classList.remove('active');
-      drawRuler();
-      updateReadout();
-    });
-
-    btnResetCalib.addEventListener('click', () => {
-      ppm = 3.78;
-      localStorage.removeItem('caliper_ppm');
-      modalCalib.classList.remove('active');
-      drawRuler();
-      updateReadout();
-    });
-
-    // Init App
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('load', () => {
-      resizeCanvas();
-      jawTop.style.top = `${jawTopY}px`;
-      jawBottom.style.top = `${jawBottomY}px`;
-      updateReadout();
+    // Reset Data Event
+    btnReset.addEventListener('click', () => {
+      if (confirm("Maksimum hız ve mesafe verilerini sıfırlamak istiyor musunuz?")) {
+        maxSpeed = 0;
+        totalDistance = 0;
+        lastPosition = null;
+        valSpeed.textContent = '0';
+        valMaxSpeed.textContent = '0';
+        valDist.textContent = '0.00';
+      }
     });
   </script>
 </body>
