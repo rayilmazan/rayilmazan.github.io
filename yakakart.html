@@ -3,129 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nöbetçi Öğretmen Çizelgesi</title>
+    <title>Nöbetçi Öğretmen Çizelgesi - rayılmazan</title>
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background-color: #f4f7f6;
-            color: #333;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 15px;
+            min-height: 100vh;
         }
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: #ffffff;
-            padding: 25px;
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 20px;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #e2e8f0;
+        /* Başlık Alanı */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
             padding-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        header h1 {
-            font-size: 1.8rem;
-            color: #1e293b;
+        .app-header h1 {
+            font-size: 1.5rem;
+            color: #0f172a;
         }
 
-        header p {
+        .app-header .subtitle {
+            font-size: 0.85rem;
             color: #64748b;
-            font-size: 0.95rem;
-            margin-top: 5px;
         }
 
-        .table-wrapper {
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Form / Giriş Alanı */
+        .controls-panel {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input, select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* Filtre ve Arama */
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            max-width: 300px;
+            width: 100%;
+        }
+
+        /* Responsive Tablo */
+        .table-responsive {
             overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th, td {
-            padding: 12px 15px;
             text-align: left;
-            border-bottom: 1px solid #e2e8f0;
+            min-width: 600px;
         }
 
         th {
             background-color: #f8fafc;
-            color: #475569;
+            color: #334155;
+            padding: 12px;
             font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
         }
 
         tr:hover {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
+        }
+
+        .badge-day {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        /* Alt Bilgi */
+        .app-footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        /* Yazdırma Modu (A4 Görünümü) */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .app-container { box-shadow: none; border: none; padding: 0; width: 100%; max-width: 100%; }
+            .controls-panel, .header-actions, .filter-section, .btn-danger, th:last-child, td:last-child {
+                display: none !important;
+            }
+            .table-responsive { border: none; }
+            table { border: 1px solid #000; }
+            th, td { border: 1px solid #000; padding: 8px; font-size: 10pt; }
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-
-            header h1 {
-                font-size: 1.4rem;
-            }
-
-            th, td {
-                padding: 10px 8px;
-                font-size: 0.85rem;
-            }
+            .app-container { padding: 12px; }
+            .app-header h1 { font-size: 1.2rem; }
+            .controls-panel { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Nöbetçi Öğretmen Çizelgesi</h1>
-        <p>Günlük Güncel Nöbet Listesi</p>
+<div class="app-container">
+    <header class="app-header">
+        <div>
+            <h1>Nöbetçi Öğretmen Çizelgesi</h1>
+            <p class="subtitle">Haftalık Okul Nöbet Görev Dağılım Listesi</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" onclick="window.print()">Yazdır / PDF</button>
+            <button class="btn btn-danger" onclick="sifirlaVeriler()">Tümünü Sıfırla</button>
+        </div>
     </header>
 
-    <main class="table-wrapper">
+    <!-- Kayıt Ekleme Formu -->
+    <section class="controls-panel">
+        <div class="form-group">
+            <label for="gunSelect">Gün</label>
+            <select id="gunSelect">
+                <option value="Pazartesi">Pazartesi</option>
+                <option value="Salı">Salı</option>
+                <option value="Çarşamba">Çarşamba</option>
+                <option value="Perşembe">Perşembe</option>
+                <option value="Cuma">Cuma</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="nobetYeri">Nöbet Yeri</label>
+            <input type="text" id="nobetYeri" placeholder="Örn: Bahçe / 1. Kat">
+        </div>
+        <div class="form-group">
+            <label for="ogretmenAdi">Öğretmen Adı Soyadı</label>
+            <input type="text" id="ogretmenAdi" placeholder="Örn: Ahmet Yılmaz">
+        </div>
+        <div class="form-group">
+            <label for="saatAraligi">Görev Saati / Not</label>
+            <input type="text" id="saatAraligi" placeholder="Örn: 08:30 - 15:30">
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="nobetEkle()">Listeye Ekle</button>
+        </div>
+    </section>
+
+    <!-- Filtreleme ve Arama -->
+    <section class="filter-section">
+        <div class="search-box">
+            <input type="text" id="aramaInput" oninput="listeyiGuncelle()" placeholder="Öğretmen veya alan ara...">
+        </div>
+        <div>
+            <select id="filtreGun" onchange="listeyiGuncelle()">
+                <option value="Tümü">Tüm Günler</option>
+                <option value="Pazartesi">Pazartesi</option>
+                <option value="Salı">Salı</option>
+                <option value="Çarşamba">Çarşamba</option>
+                <option value="Perşembe">Perşembe</option>
+                <option value="Cuma">Cuma</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- Tablo -->
+    <main class="table-responsive">
         <table>
             <thead>
                 <tr>
+                    <th>Gün</th>
                     <th>Nöbet Yeri</th>
                     <th>Öğretmen Adı Soyadı</th>
-                    <th>Durum</th>
+                    <th>Görev Saati / Not</th>
+                    <th style="width: 70px; text-align: center;">İşlem</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Bahçe / Ana Giriş</td>
-                    <td>—</td>
-                    <td>Aktif</td>
-                </tr>
-                <tr>
-                    <td>1. Kat Koridoru</td>
-                    <td>—</td>
-                    <td>Aktif</td>
-                </tr>
-                <tr>
-                    <td>2. Kat Koridoru</td>
-                    <td>—</td>
-                    <td>Aktif</td>
-                </tr>
+            <tbody id="nobetTbody">
+                <!-- JavaScript ile doldurulur -->
             </tbody>
         </table>
     </main>
+
+    <footer class="app-footer">
+        Hazırlayan: <strong>rayılmazan</strong> | Çevrimdışı Çalışır
+    </footer>
 </div>
+
+<script>
+    // Başlangıç Örnek Verileri
+    const varsayilanList = [
+        { id: 1, gun: 'Pazartesi', yer: 'Bahçe / Ana Giriş', ogretmen: 'Ali Yılmaz', saat: '08:30 - 15:30' },
+        { id: 2, gun: 'Pazartesi', yer: '1. Kat Koridoru', ogretmen: 'Ayşe Kaya', saat: '08:30 - 15:30' },
+        { id: 3, gun: 'Salı', yer: '2. Kat Koridoru', ogretmen: 'Mehmet Demir', saat: '08:30 - 15:30' },
+        { id: 4, gun: 'Çarşamba', yer: 'Bahçe / Ana Giriş', ogretmen: 'Zeynep Çelik', saat: '08:30 - 15:30' }
+    ];
+
+    let nobetListesi = JSON.parse(localStorage.getItem('nobet_listesi_rayilmazan')) || varsayilanList;
+
+    function verileriKaydet() {
+        localStorage.setItem('nobet_listesi_rayilmazan', JSON.stringify(nobetListesi));
+    }
+
+    function listeyiGuncelle() {
+        const tbody = document.getElementById('nobetTbody');
+        const arama = document.getElementById('aramaInput').value.toLowerCase();
+        const seciliGun = document.getElementById('filtreGun').value;
+
+        tbody.innerHTML = '';
+
+        const filtrelenmis = nobetListesi.filter(item => {
+            const gunUyum = (seciliGun === 'Tümü' || item.gun === seciliGun);
+            const aramaUyum = item.ogretmen.toLowerCase().includes(arama) || 
+                               item.yer.toLowerCase().includes(arama);
+            return gunUyum && aramaUyum;
+        });
+
+        if (filtrelenmis.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">Gösterilecek kayıt bulunamadı.</td></tr>`;
+            return;
+        }
+
+        filtrelenmis.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="badge-day">${item.gun}</span></td>
+                <td><strong>${item.yer}</strong></td>
+                <td>${item.ogretmen}</td>
+                <td>${item.saat || '-'}</td>
+                <td style="text-align: center;">
+                    <button class="btn btn-danger" onclick="sil(${item.id})">Sil</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function nobetEkle() {
+        const gun = document.getElementById('gunSelect').value;
+        const yer = document.getElementById('nobetYeri').value.trim();
+        const ogretmen = document.getElementById('ogretmenAdi').value.trim();
+        const saat = document.getElementById('saatAraligi').value.trim();
+
+        if (!yer || !ogretmen) {
+            alert('Lütfen Nöbet Yeri ve Öğretmen Adı alanlarını doldurun.');
+            return;
+        }
+
+        const yeniEk = {
+            id: Date.now(),
+            gun: gun,
+            yer: yer,
+            ogretmen: ogretmen,
+            saat: saat || '08:30 - 15:30'
+        };
+
+        nobetListesi.push(yeniEk);
+        verileriKaydet();
+        listeyiGuncelle();
+
+        document.getElementById('nobetYeri').value = '';
+        document.getElementById('ogretmenAdi').value = '';
+        document.getElementById('saatAraligi').value = '';
+    }
+
+    function sil(id) {
+        if (confirm('Bu nöbet kaydını silmek istediğinize emin misiniz?')) {
+            nobetListesi = nobetListesi.filter(item => item.id !== id);
+            verileriKaydet();
+            listeyiGuncelle();
+        }
+    }
+
+    function sifirlaVeriler() {
+        if (confirm('Tüm listeyi sıfırlayıp varsayılan verilere dönmek istediğinize emin misiniz?')) {
+            nobetListesi = [...varsayilanList];
+            verileriKaydet();
+            listeyiGuncelle();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', listeyiGuncelle);
+</script>
 
 </body>
 </html>
