@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Toplu Belge & Sertifika Jeneratörü - rayılmazan</title>
-  <!-- jsPDF Kütüphanesi (Çevrimdışı çalışması için bu dosyayı indirebilirsin, şimdilik CDN) -->
+  <!-- jsPDF Kütüphanesi -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
@@ -150,7 +150,7 @@
 
     .canvas-container {
       width: 100%;
-      max-width: 842px; /* A4 Yatay Oranı */
+      max-width: 842px;
       background: #fff;
       border-radius: 4px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -195,9 +195,20 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Tarih</label>
-          <input type="text" id="docDate" class="form-input" value="12 Haziran 2026">
+          <label>Çerçeve Stili</label>
+          <select id="borderStyle" class="form-select">
+            <option value="klasik">1. Klasik Çizgi</option>
+            <option value="modern">2. Modern Köşebent</option>
+            <option value="artdeco">3. Art Deco Kademeli</option>
+            <option value="zarif">4. Zarif Kıvrım</option>
+            <option value="premium">5. Premium Rozetli</option>
+          </select>
         </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tarih</label>
+        <input type="text" id="docDate" class="form-input" value="12 Haziran 2026">
       </div>
 
       <div class="form-group">
@@ -249,7 +260,7 @@
     <div class="preview-panel">
       <div class="section-title" style="margin-bottom: 15px; border:none;">Canlı Önizleme (A4 Yatay)</div>
       <div class="canvas-container">
-        <!-- Canvas Boyutu: A4 150 DPI (1754 x 1240) yüksek çözünürlük için -->
+        <!-- Canvas Boyutu: A4 Yüksek Çözünürlük -->
         <canvas id="certCanvas" width="1754" height="1240"></canvas>
       </div>
     </div>
@@ -260,33 +271,29 @@
   </div>
 
   <script>
-    // Belge Türlerine Göre Renk ve Başlık Ayarları
     const DOC_CONFIG = {
-      basari: { title: "BAŞARI BELGESİ", color: "#b8860b", border: "#daa520" }, // Altın
-      katilim: { title: "KATILIM BELGESİ", color: "#059669", border: "#10b981" }, // Yeşil
-      tesekkur: { title: "TEŞEKKÜR BELGESİ", color: "#2563eb", border: "#3b82f6" }, // Mavi
-      onur: { title: "ONUR BELGESİ", color: "#9f1239", border: "#e11d48" } // Kırmızı/Bordo
+      basari: { title: "BAŞARI BELGESİ", color: "#b8860b", border: "#daa520" }, 
+      katilim: { title: "KATILIM BELGESİ", color: "#059669", border: "#10b981" }, 
+      tesekkur: { title: "TEŞEKKÜR BELGESİ", color: "#2563eb", border: "#3b82f6" }, 
+      onur: { title: "ONUR BELGESİ", color: "#9f1239", border: "#e11d48" } 
     };
 
     let loadedLogo = null;
     const canvas = document.getElementById('certCanvas');
     const ctx = canvas.getContext('2d');
 
-    // DOM Elementleri
     const inputs = [
-      'docType', 'docDate', 'schoolName', 'docText', 
+      'docType', 'borderStyle', 'docDate', 'schoolName', 'docText', 
       'sign1Name', 'sign1Title', 'sign2Name', 'sign2Title', 'studentNames'
     ].map(id => document.getElementById(id));
 
     const inputLogo = document.getElementById('inputLogo');
     const btnDownloadPDF = document.getElementById('btnDownloadPDF');
 
-    // Herhangi bir input değiştiğinde önizlemeyi güncelle
     inputs.forEach(input => {
       input.addEventListener('input', () => renderCertificate(document.getElementById('studentNames').value.split('\n')[0] || "Öğrenci Adı"));
     });
 
-    // Logo Yükleme İşlemi
     inputLogo.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -304,7 +311,6 @@
       }
     });
 
-    // Çok Satırlı Metni Canvas'a Çizme Fonksiyonu
     function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
       const words = text.split(' ');
       let line = '';
@@ -326,43 +332,104 @@
       ctx.fillText(line, x, currentY);
     }
 
-    // Belgeyi Canvas Üzerine Çizme
+    // Seçilen Stile Göre Çerçeve Çizimi
+    function drawFrame(ctx, style, w, h, mainColor, borderColor) {
+      const m = 40; // Dış marjin
+      const im = 65; // İç marjin
+      ctx.save();
+
+      if (style === "klasik") {
+        ctx.lineWidth = 15; ctx.strokeStyle = borderColor;
+        ctx.strokeRect(m, m, w - m*2, h - m*2);
+        ctx.lineWidth = 3; ctx.strokeStyle = mainColor;
+        ctx.strokeRect(im, im, w - im*2, h - im*2);
+        
+        ctx.fillStyle = mainColor; const cs = 40;
+        ctx.beginPath(); ctx.moveTo(m, m); ctx.lineTo(m+cs, m); ctx.lineTo(m, m+cs); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(w-m, m); ctx.lineTo(w-m-cs, m); ctx.lineTo(w-m, m+cs); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(m, h-m); ctx.lineTo(m+cs, h-m); ctx.lineTo(m, h-m-cs); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(w-m, h-m); ctx.lineTo(w-m-cs, h-m); ctx.lineTo(w-m, h-m-cs); ctx.fill();
+      } 
+      else if (style === "modern") {
+        ctx.lineWidth = 18; ctx.strokeStyle = borderColor; const len = 150;
+        ctx.beginPath(); ctx.moveTo(m, m+len); ctx.lineTo(m, m); ctx.lineTo(m+len, m); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(w-m-len, m); ctx.lineTo(w-m, m); ctx.lineTo(w-m, m+len); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(m, h-m-len); ctx.lineTo(m, h-m); ctx.lineTo(m+len, h-m); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(w-m-len, h-m); ctx.lineTo(w-m, h-m); ctx.lineTo(w-m, h-m-len); ctx.stroke();
+        
+        ctx.lineWidth = 2; ctx.strokeStyle = mainColor;
+        ctx.strokeRect(im, im, w - im*2, h - im*2);
+      }
+      else if (style === "artdeco") {
+        ctx.lineWidth = 6; ctx.strokeStyle = borderColor; const om = 35;
+        ctx.strokeRect(om, om, w - om*2, h - om*2);
+        ctx.lineWidth = 2; ctx.strokeStyle = mainColor;
+        ctx.strokeRect(om+15, om+15, w - (om+15)*2, h - (om+15)*2);
+        ctx.lineWidth = 8;
+        ctx.strokeRect(om+30, om+30, w - (om+30)*2, h - (om+30)*2);
+        
+        ctx.fillStyle = borderColor; const size = 35;
+        ctx.fillRect(om+15 - size/2, om+15 - size/2, size, size);
+        ctx.fillRect(w - (om+15) - size/2, om+15 - size/2, size, size);
+        ctx.fillRect(om+15 - size/2, h - (om+15) - size/2, size, size);
+        ctx.fillRect(w - (om+15) - size/2, h - (om+15) - size/2, size, size);
+      }
+      else if (style === "zarif") {
+        ctx.lineWidth = 4; ctx.strokeStyle = borderColor;
+        ctx.strokeRect(m, m, w - m*2, h - m*2);
+
+        ctx.lineWidth = 3; ctx.strokeStyle = mainColor;
+        const r = 50;
+        ctx.beginPath();
+        ctx.moveTo(im + r, im); ctx.lineTo(w - im - r, im); ctx.arcTo(w - im, im, w - im, im + r, r);
+        ctx.lineTo(w - im, h - im - r); ctx.arcTo(w - im, h - im, w - im - r, h - im, r);
+        ctx.lineTo(im + r, h - im); ctx.arcTo(im, h - im, im, h - im - r, r);
+        ctx.lineTo(im, im + r); ctx.arcTo(im, im, im + r, im, r);
+        ctx.stroke();
+        
+        ctx.fillStyle = borderColor;
+        ctx.beginPath(); ctx.arc(im+r/2, im+r/2, 6, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(w-im-r/2, im+r/2, 6, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(im+r/2, h-im-r/2, 6, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(w-im-r/2, h-im-r/2, 6, 0, Math.PI*2); ctx.fill();
+      }
+      else if (style === "premium") {
+        ctx.lineWidth = 20; ctx.strokeStyle = borderColor;
+        ctx.strokeRect(m, m, w - m*2, h - m*2);
+        ctx.lineWidth = 1; ctx.strokeStyle = '#334155';
+        ctx.strokeRect(m-12, m-12, w - (m-12)*2, h - (m-12)*2);
+        ctx.strokeRect(m+12, m+12, w - (m+12)*2, h - (m+12)*2);
+
+        ctx.lineWidth = 4; ctx.strokeStyle = mainColor;
+        ctx.strokeRect(im+10, im+10, w - (im+10)*2, h - (im+10)*2);
+        
+        ctx.fillStyle = mainColor;
+        const drawDiamond = (dx, dy) => {
+          ctx.beginPath(); ctx.moveTo(dx, dy-35); ctx.lineTo(dx+35, dy); 
+          ctx.lineTo(dx, dy+35); ctx.lineTo(dx-35, dy); ctx.fill();
+        };
+        drawDiamond(m, m); drawDiamond(w-m, m); drawDiamond(m, h-m); drawDiamond(w-m, h-m);
+      }
+      ctx.restore();
+    }
+
     function renderCertificate(studentName) {
       const type = document.getElementById('docType').value;
+      const borderStyle = document.getElementById('borderStyle').value;
       const config = DOC_CONFIG[type];
       const w = canvas.width;
       const h = canvas.height;
 
-      // 1. Arka Plan
+      // Arka Plan
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, w, h);
 
-      // 2. Dış Kenarlık
-      ctx.lineWidth = 15;
-      ctx.strokeStyle = config.border;
-      ctx.strokeRect(40, 40, w - 80, h - 80);
-      
-      // İç İnce Kenarlık
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = config.color;
-      ctx.strokeRect(65, 65, w - 130, h - 130);
+      // Çerçeve Çizimi İşlevi Çağrısı
+      drawFrame(ctx, borderStyle, w, h, config.color, config.border);
 
-      // Süsleme Köşeleri (Basit Geometri)
-      ctx.fillStyle = config.color;
-      const cornerSize = 40;
-      // Sol Üst
-      ctx.beginPath(); ctx.moveTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.lineTo(40, 40 + cornerSize); ctx.fill();
-      // Sağ Üst
-      ctx.beginPath(); ctx.moveTo(w - 40, 40); ctx.lineTo(w - 40 - cornerSize, 40); ctx.lineTo(w - 40, 40 + cornerSize); ctx.fill();
-      // Sol Alt
-      ctx.beginPath(); ctx.moveTo(40, h - 40); ctx.lineTo(40 + cornerSize, h - 40); ctx.lineTo(40, h - 40 - cornerSize); ctx.fill();
-      // Sağ Alt
-      ctx.beginPath(); ctx.moveTo(w - 40, h - 40); ctx.lineTo(w - 40 - cornerSize, h - 40); ctx.lineTo(w - 40, h - 40 - cornerSize); ctx.fill();
-
-      // 3. Okul Logosu (Eğer yüklendiyse)
-      let currentY = 120;
+      // İçerik Yerleşimi
+      let currentY = 140;
       if (loadedLogo) {
-        // Logoyu orantılı boyutlandır
         const maxLogoHeight = 150;
         const logoScale = maxLogoHeight / loadedLogo.height;
         const logoWidth = loadedLogo.width * logoScale;
@@ -372,46 +439,38 @@
         currentY += 50;
       }
 
-      // 4. Okul Adı
       ctx.fillStyle = "#334155";
       ctx.font = "bold 45px Georgia, serif";
       ctx.textAlign = "center";
       ctx.fillText(document.getElementById('schoolName').value.toUpperCase(), w / 2, currentY);
       
-      // 5. Belge Türü Başlığı
       currentY += 130;
       ctx.fillStyle = config.color;
       ctx.font = "bold 90px Georgia, serif";
       ctx.fillText(config.title, w / 2, currentY);
 
-      // 6. Sayın / Takdim Yazısı
       currentY += 80;
       ctx.fillStyle = "#64748b";
       ctx.font = "italic 35px Georgia, serif";
       ctx.fillText("Sayın", w / 2, currentY);
 
-      // 7. Öğrenci Adı (Dinamik)
       currentY += 100;
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 70px 'Segoe UI', Arial, sans-serif";
       ctx.fillText((studentName || "").trim().toUpperCase(), w / 2, currentY);
 
-      // 8. Açıklama Metni (Sarmalanmış)
       currentY += 100;
       ctx.fillStyle = "#334155";
       ctx.font = "35px Georgia, serif";
-      const textWidth = w - 300; // Kenar boşlukları
+      const textWidth = w - 300;
       drawWrappedText(ctx, document.getElementById('docText').value, w / 2, currentY, textWidth, 55);
 
-      // 9. Alt Bilgiler (Tarih ve İmzalar)
       const bottomY = h - 180;
       
-      // Tarih (Orta Alt)
       ctx.fillStyle = "#64748b";
       ctx.font = "30px Georgia, serif";
       ctx.fillText(document.getElementById('docDate').value, w / 2, bottomY - 60);
 
-      // Sol İmza
       ctx.textAlign = "left";
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 35px 'Segoe UI', Arial, sans-serif";
@@ -420,7 +479,6 @@
       ctx.font = "30px Georgia, serif";
       ctx.fillText(document.getElementById('sign1Title').value, 150, bottomY + 40);
 
-      // Sağ İmza
       ctx.textAlign = "right";
       ctx.fillStyle = "#0f172a";
       ctx.font = "bold 35px 'Segoe UI', Arial, sans-serif";
@@ -430,13 +488,10 @@
       ctx.fillText(document.getElementById('sign2Title').value, w - 150, bottomY + 40);
     }
 
-    // Toplu PDF Üretimi
     btnDownloadPDF.addEventListener('click', () => {
       const { jsPDF } = window.jspdf;
-      // A4 Boyutu (297mm x 210mm Yatay)
       const pdf = new jsPDF('l', 'mm', 'a4'); 
       
-      // Öğrenci listesini al ve boş satırları temizle
       const rawNames = document.getElementById('studentNames').value.split('\n');
       const namesList = rawNames.map(name => name.trim()).filter(name => name.length > 0);
 
@@ -445,45 +500,32 @@
         return;
       }
 
-      // Butonu bekleme moduna al
       const originalText = btnDownloadPDF.innerHTML;
       btnDownloadPDF.innerHTML = "⏳ PDF Oluşturuluyor Lütfen Bekleyin...";
       btnDownloadPDF.disabled = true;
 
-      // İşlemi asenkron yapmak arayüzün donmasını engeller
       setTimeout(() => {
         namesList.forEach((student, index) => {
-          // Her öğrenci için canvası tekrar çiz
           renderCertificate(student);
-          
-          // Canvası resim olarak al (Kalite 0.9 JPEG, dosya boyutunu optimum tutar)
           const imgData = canvas.toDataURL('image/jpeg', 0.9);
-          
-          // PDF'e tam sayfa A4 olarak ekle (A4 ebatı: 297x210)
           pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
 
-          // Eğer son öğrenci değilse yeni sayfa ekle
           if (index < namesList.length - 1) {
             pdf.addPage();
           }
         });
 
-        // Belge türüne göre dosya adı belirle
         const typeSelect = document.getElementById('docType');
         const typeText = typeSelect.options[typeSelect.selectedIndex].text.replace(" ", "_");
         
         pdf.save(`${typeText}_Toplu.pdf`);
 
-        // Butonu eski haline getir
         btnDownloadPDF.innerHTML = originalText;
         btnDownloadPDF.disabled = false;
-
-        // Ekrana tekrar ilk öğrenciyi çiz
         renderCertificate(namesList[0]);
       }, 100);
     });
 
-    // Sayfa açıldığında varsayılanı çiz
     window.onload = () => {
       renderCertificate(document.getElementById('studentNames').value.split('\n')[0]);
     };
