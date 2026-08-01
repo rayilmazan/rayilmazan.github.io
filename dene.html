@@ -1,591 +1,501 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Çevrimdışı KVKK Uyumlu Yaka Kartı & Kimlik Basım Sistemi</title>
-    <style>
-        :root {
-            --primary-color: #1e3a8a;
-            --accent-color: #2563eb;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --border-color: #cbd5e1;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Dijital Cetvel & Kumpas</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #06b6d4;
+      --accent-bright: #22d3ee;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --ruler-mark: #cbd5e1;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 20px;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-        .no-print {
-            max-width: 1200px;
-            margin: 0 auto 30px auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border: 1px solid var(--border-color);
-        }
+    header {
+      background: var(--card-bg);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      z-index: 10;
+    }
 
-        header {
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-bright);
+    }
 
-        h1 {
-            font-size: 22px;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .btn {
+      background: #334155;
+      color: var(--text);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-        .badge-kvkk {
-            background: #10b981;
-            color: white;
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
 
-        .grid-config {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
+    /* Reading Display Panel */
+    .readout-panel {
+      background: #182232;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+      z-index: 5;
+    }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+    .val-box {
+      text-align: center;
+    }
 
-        label {
-            font-weight: 600;
-            font-size: 13px;
-            color: #475569;
-        }
+    .val-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      font-family: monospace;
+      color: var(--accent-bright);
+    }
 
-        input[type="text"], input[type="color"], select {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-        }
+    .val-unit {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-        .file-upload-box {
-            border: 2px dashed #94a3b8;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            background: #f1f5f9;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+    /* Workspace */
+    .ruler-container {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      overflow: hidden;
+    }
 
-        .file-upload-box:hover {
-            border-color: var(--accent-color);
-            background: #eff6ff;
-        }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-        .btn-container {
-            display: flex;
-            gap: 12px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
+    /* Caliper Sliders */
+    .jaw {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      z-index: 4;
+      cursor: ns-resize;
+    }
 
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .jaw-line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+    }
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
+    .jaw-handle {
+      position: absolute;
+      right: 16px;
+      background: var(--accent);
+      color: #000;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-        .btn-primary:hover {
-            background-color: #1d4ed8;
-        }
+    #jaw-top { top: 40px; }
+    #jaw-bottom { top: 240px; }
 
-        .btn-secondary {
-            background-color: #64748b;
-            color: white;
-        }
+    #jaw-top .jaw-line { top: 22px; }
+    #jaw-bottom .jaw-line { top: 22px; }
 
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
+    /* Modal / Overlay */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.95);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      padding: 24px;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .info-box {
-            background-color: #f0fdf4;
-            border-left: 4px solid #16a34a;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 13px;
-            color: #166534;
-            border-radius: 0 6px 6px 0;
-        }
+    .modal.active { display: flex; }
 
-        /* --- PRINT & PAGE LAYOUT --- */
-        .print-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .modal-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid #334155;
+    }
 
-        .a4-page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 10mm;
-            background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: grid;
-            gap: 6mm 8mm;
-            justify-content: center;
-            align-content: start;
-            box-sizing: border-box;
-            page-break-after: always;
-        }
+    .modal-title {
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+      color: var(--accent-bright);
+    }
 
-        /* Horizontal Layout (Yatay Kart - 85.6mm x 54mm) */
-        .a4-page.horizontal {
-            grid-template-columns: repeat(2, 85.6mm);
-            grid-auto-rows: 54mm;
-        }
+    .modal-desc {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
 
-        /* Vertical Layout (Dikey Kart - 54mm x 85.6mm) */
-        .a4-page.vertical {
-            grid-template-columns: repeat(3, 54mm);
-            grid-auto-rows: 85.6mm;
-        }
+    .credit-card-sim {
+      height: 140px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 8px;
+      margin: 0 auto 20px auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      resize: horizontal;
+      overflow: hidden;
+      min-width: 150px;
+      max-width: 100%;
+    }
 
-        /* CARD DESIGN */
-        .card {
-            width: 100%;
-            height: 100%;
-            border: 1px dashed #cbd5e1;
-            position: relative;
-            background: white;
-            overflow: hidden;
-            display: flex;
-            box-sizing: border-box;
-        }
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
 
-        /* Horizontal Card Interior */
-        .card.horizontal-card {
-            flex-direction: column;
-        }
-
-        .card-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 6px 10px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-body-horizontal {
-            display: flex;
-            padding: 8px;
-            gap: 10px;
-            flex: 1;
-            align-items: center;
-        }
-
-        /* Biometric Photo Frame (3:4 Ratio Standard - 35mm x 45mm scaled) */
-        .biometric-photo-container {
-            width: 30mm;
-            height: 38mm;
-            min-width: 30mm;
-            border: 1px solid #94a3b8;
-            border-radius: 4px;
-            overflow: hidden;
-            background: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .biometric-photo-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center 20%; /* Face centered biometric focus */
-        }
-
-        .card-details {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 3px;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .card-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0f172a;
-            line-height: 1.2;
-        }
-
-        .card-title {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--accent-color);
-            text-transform: uppercase;
-        }
-
-        .card-meta {
-            font-size: 9px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .card-footer-bar {
-            height: 5px;
-            background-color: var(--primary-color);
-            width: 100%;
-        }
-
-        /* Vertical Card Interior */
-        .card.vertical-card {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .card.vertical-card .card-header {
-            width: 100%;
-            padding: 6px 4px;
-            font-size: 10px;
-        }
-
-        .card.vertical-card .biometric-photo-container {
-            width: 32mm;
-            height: 40mm;
-            margin-top: 6px;
-        }
-
-        .card.vertical-card .card-details {
-            padding: 6px 4px;
-            align-items: center;
-        }
-
-        .card.vertical-card .card-name {
-            font-size: 12px;
-        }
-
-        /* PRINT MEDIA QUERIES */
-        @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-
-            .a4-page {
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                page-break-after: always !important;
-            }
-
-            .card {
-                border: 0.5pt dashed #94a3b8 !important; /* Micro cut lines */
-            }
-        }
-    </style>
+    .slider-ctrl {
+      width: 100%;
+      margin: 10px 0;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- CONTROL PANEL (HIDDEN IN PRINT) -->
-    <div class="no-print">
-        <header>
-            <h1>🪪 KVKK Uyumlu Çevrimdışı Yaka Kartı Basım Aracı <span class="badge-kvkk">%100 Çevrimdışı & Güvenli</span></h1>
-        </header>
+  <header>
+    <div class="title">Kumpas & Cetvel</div>
+    <button class="btn" id="btn-calibrate">⚙ Kalibrasyon</button>
+  </header>
 
-        <div class="grid-config">
-            <div class="form-group">
-                <label for="orgName">Kurum / Okul / Şirket Adı:</label>
-                <input type="text" id="orgName" value="KAHRAMANMARAŞ İL MİLLÎ EĞİTİM MÜDÜRLÜĞÜ" oninput="updateCards()">
-            </div>
+  <div class="readout-panel">
+    <div class="val-box">
+      <div class="val-num" id="val-mm">0.0</div>
+      <div class="val-unit">Milimetre (mm)</div>
+    </div>
+    <div class="val-box">
+      <div class="val-num" id="val-cm">0.00</div>
+      <div class="val-unit">Santimetre (cm)</div>
+    </div>
+    <div class="val-box">
+      <div class="val-num" id="val-inch">0.00</div>
+      <div class="val-unit">İnç (in)</div>
+    </div>
+  </div>
 
-            <div class="form-group">
-                <label for="cardOrientation">Kart Yönü / Tipi:</label>
-                <select id="cardOrientation" onchange="updateCards()">
-                    <option value="horizontal">Yatay Kart (85.6mm x 54mm)</option>
-                    <option value="vertical">Dikey Kart (54mm x 85.6mm)</option>
-                </select>
-            </div>
+  <div class="ruler-container" id="ruler-box">
+    <canvas id="ruler-canvas"></canvas>
 
-            <div class="form-group">
-                <label for="themeColor">Ana Tema Rengi:</label>
-                <input type="color" id="themeColor" value="#1e3a8a" onchange="updateTheme()">
-            </div>
-
-            <div class="form-group">
-                <label>1. CSV Dosyası Yükle (Türkçe Karakter Korumalı):</label>
-                <div class="file-upload-box" onclick="document.getElementById('csvInput').click()">
-                    <span id="csvStatus">📄 CSV Seç (Örn: ad, soyad, unvan, sicil, fotograf)</span>
-                    <input type="file" id="csvInput" accept=".csv, .txt" style="display:none" onchange="handleCSV(this)">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>2. Biyometrik Fotoğrafları Seç:</label>
-                <div class="file-upload-box" onclick="document.getElementById('photoInput').click()">
-                    <span id="photoStatus">🖼️ Fotoğrafları Toplu Seç (Çoklu Dosya)</span>
-                    <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
-                </div>
-            </div>
-        </div>
-
-        <div class="info-box">
-            <strong>🔒 KVKK ve Veri Güvenliği Garantisi:</strong> Yüklenen hiçbir veri, isim veya fotoğraf internete veya harici bir sunucuya <u>gönderilmez</u>. Tüm işlemler tarayıcınızın kendi geçici belleğinde (RAM) gerçekleşir.
-        </div>
-
-        <div class="btn-container">
-            <button class="btn-primary" onclick="window.print()">🖨️ Yazdır / PDF Olarak Kaydet</button>
-            <button class="btn-secondary" onclick="generateSampleCSV()">📥 Örnek Türkçe CSV İndir</button>
-        </div>
+    <!-- Top Caliper Jaw -->
+    <div class="jaw" id="jaw-top">
+      <div class="jaw-line"></div>
+      <div class="jaw-handle">▲ ÜST SINIR</div>
     </div>
 
-    <!-- PRINT PREVIEW CONTAINER -->
-    <div class="print-container" id="printArea">
-        <!-- Dynamic A4 Pages will be injected here -->
+    <!-- Bottom Caliper Jaw -->
+    <div class="jaw" id="jaw-bottom">
+      <div class="jaw-line"></div>
+      <div class="jaw-handle">▼ ALT SINIR</div>
     </div>
+  </div>
 
-    <script>
-        let peopleData = [];
-        let photoMap = new Map();
+  <!-- Calibration Modal -->
+  <div class="modal" id="modal-calib">
+    <div class="modal-card">
+      <div class="modal-title">Ekran Kalibrasyonu</div>
+      <div class="modal-desc">
+        Milimetrik hassasiyet için standart bir <b>kredi kartını</b> ekrana dayayın. Mavi kutunun genişliğini aşağıdaki kaydırıcı ile kartınızın eniyle tam çakışacak şekilde ayarlayın.
+      </div>
 
-        // Safe Turkish Character CSV Parsing (Handles UTF-8 with BOM & Windows-1254/ANSI)
-        function handleCSV(input) {
-            const file = input.files[0];
-            if (!file) return;
+      <div class="credit-card-sim" id="card-box">
+        Kredi Kartı Hizalama Alanı<br>(En: 85.6 mm)
+      </div>
 
-            document.getElementById('csvStatus').innerText = `✅ Loaded: ${file.name}`;
+      <input type="range" class="slider-ctrl" id="calib-slider" min="150" max="500" value="300">
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const buffer = e.target.result;
-                
-                // Try decoding UTF-8 first
-                let text = new TextDecoder('utf-8').decode(buffer);
-                
-                // Check if decoding generated replacement characters for Turkish (indicates ANSI/Windows-1254)
-                if (text.includes('')) {
-                    text = new TextDecoder('windows-1254').decode(buffer);
-                }
+      <div class="controls-row">
+        <button class="btn" id="btn-reset-calib">Varsayılana Dön</button>
+        <button class="btn btn-primary" id="btn-save-calib">Kaydet ve Kapat</button>
+      </div>
+    </div>
+  </div>
 
-                parseCSVText(text);
-            };
-            reader.readAsArrayBuffer(file);
+  <script>
+    // System Constants & State
+    const CREDIT_CARD_MM = 85.60; // Standard credit card width in mm
+    let ppm = parseFloat(localStorage.getItem('caliper_ppm')) || 3.78; // Pixels per millimeter
+
+    const canvas = document.getElementById('ruler-canvas');
+    const ctx = canvas.getContext('2d');
+    const rulerBox = document.getElementById('ruler-box');
+    
+    const jawTop = document.getElementById('jaw-top');
+    const jawBottom = document.getElementById('jaw-bottom');
+    
+    const valMm = document.getElementById('val-mm');
+    const valCm = document.getElementById('val-cm');
+    const valInch = document.getElementById('val-inch');
+
+    // Calibration UI elements
+    const modalCalib = document.getElementById('modal-calib');
+    const btnCalibrate = document.getElementById('btn-calibrate');
+    const btnSaveCalib = document.getElementById('btn-save-calib');
+    const btnResetCalib = document.getElementById('btn-reset-calib');
+    const cardBox = document.getElementById('card-box');
+    const calibSlider = document.getElementById('calib-slider');
+
+    let jawTopY = 40;
+    let jawBottomY = 240;
+
+    // Wake Lock handling
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {}
+    }
+    requestWakeLock();
+
+    // Resize canvas dynamically
+    function resizeCanvas() {
+      canvas.width = rulerBox.clientWidth;
+      canvas.height = rulerBox.clientHeight;
+      drawRuler();
+    }
+
+    // Draw ruler tick marks
+    function drawRuler() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const width = canvas.width;
+      const height = canvas.height;
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 1;
+      ctx.font = '10px monospace';
+
+      // Draw Left Side Rulers (Metric - mm/cm)
+      const totalMm = Math.floor(height / ppm);
+
+      for (let mm = 0; mm <= totalMm; mm++) {
+        const y = mm * ppm;
+
+        if (mm % 10 === 0) {
+          // 1 cm mark
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(32, y);
+          ctx.stroke();
+
+          if (mm > 0) {
+            ctx.fillText(`${mm / 10}`, 36, y + 3);
+          }
+        } else if (mm % 5 === 0) {
+          // 5 mm mark
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(20, y);
+          ctx.stroke();
+        } else {
+          // 1 mm mark
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(12, y);
+          ctx.stroke();
+        }
+      }
+
+      // Draw Right Side Rulers (Imperial - Inches)
+      const ppi = ppm * 25.4; // Pixels per inch
+      const totalInches = height / ppi;
+
+      for (let i = 0; i <= totalInches * 16; i++) {
+        const y = i * (ppi / 16);
+
+        if (i % 16 === 0) {
+          // 1 Inch
+          ctx.beginPath();
+          ctx.moveTo(width, y);
+          ctx.lineTo(width - 32, y);
+          ctx.stroke();
+
+          const inchVal = i / 16;
+          if (inchVal > 0) {
+            ctx.fillText(`${inchVal}"`, width - 48, y + 3);
+          }
+        } else if (i % 8 === 0) {
+          // 1/2 Inch
+          ctx.beginPath();
+          ctx.moveTo(width, y);
+          ctx.lineTo(width - 22, y);
+          ctx.stroke();
+        } else if (i % 4 === 0) {
+          // 1/4 Inch
+          ctx.beginPath();
+          ctx.moveTo(width, y);
+          ctx.lineTo(width - 16, y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Update readout values
+    function updateReadout() {
+      const diffPx = Math.abs((jawBottomY + 22) - (jawTopY + 22));
+      const mm = diffPx / ppm;
+      const cm = mm / 10;
+      const inch = mm / 25.4;
+
+      valMm.textContent = mm.toFixed(1);
+      valCm.textContent = cm.toFixed(2);
+      valInch.textContent = inch.toFixed(2);
+
+      // Light haptic feedback on touch
+      if (navigator.vibrate && Math.round(mm) % 10 === 0) {
+        navigator.vibrate(2);
+      }
+    }
+
+    // Dragging Logic for Caliper Jaws
+    function makeDraggable(element, isTop) {
+      let isDragging = false;
+
+      element.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        element.setPointerCapture(e.pointerId);
+      });
+
+      element.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+
+        const rect = rulerBox.getBoundingClientRect();
+        let newY = e.clientY - rect.top - 22; // Center jaw on pointer
+
+        // Boundaries
+        newY = Math.max(0, Math.min(rulerBox.clientHeight - 44, newY));
+
+        if (isTop) {
+          jawTopY = Math.min(newY, jawBottomY - 10);
+          element.style.top = `${jawTopY}px`;
+        } else {
+          jawBottomY = Math.max(newY, jawTopY + 10);
+          element.style.top = `${jawBottomY}px`;
         }
 
-        function parseCSVText(text) {
-            peopleData = [];
-            // Remove BOM if present
-            if (text.charCodeAt(0) === 0xFEFF) {
-                text = text.substr(1);
-            }
+        updateReadout();
+      });
 
-            const lines = text.split(/
-|
-/);
-            if (lines.length < 2) return;
+      element.addEventListener('pointerup', (e) => {
+        isDragging = false;
+        element.releasePointerCapture(e.pointerId);
+      });
+    }
 
-            // Detect delimiter (comma or semicolon)
-            const firstLine = lines[0];
-            const delimiter = firstLine.includes(';') ? ';' : ',';
+    makeDraggable(jawTop, true);
+    makeDraggable(jawBottom, false);
 
-            const headers = firstLine.split(delimiter).map(h => h.trim().toLowerCase().replace(/"/g, ''));
+    // Calibration Handlers
+    btnCalibrate.addEventListener('click', () => {
+      const currentCardWidthPx = CREDIT_CARD_MM * ppm;
+      calibSlider.value = currentCardWidthPx;
+      cardBox.style.width = `${currentCardWidthPx}px`;
+      modalCalib.classList.add('active');
+    });
 
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                const cols = lines[i].split(delimiter).map(c => c.trim().replace(/"/g, ''));
-                
-                let person = {};
-                headers.forEach((h, idx) => {
-                    person[h] = cols[idx] || '';
-                });
+    calibSlider.addEventListener('input', (e) => {
+      const px = e.target.value;
+      cardBox.style.width = `${px}px`;
+    });
 
-                peopleData.push(person);
-            }
+    btnSaveCalib.addEventListener('click', () => {
+      const cardPx = parseFloat(calibSlider.value);
+      ppm = cardPx / CREDIT_CARD_MM;
+      localStorage.setItem('caliper_ppm', ppm);
+      modalCalib.classList.remove('active');
+      drawRuler();
+      updateReadout();
+    });
 
-            updateCards();
-        }
+    btnResetCalib.addEventListener('click', () => {
+      ppm = 3.78;
+      localStorage.removeItem('caliper_ppm');
+      modalCalib.classList.remove('active');
+      drawRuler();
+      updateReadout();
+    });
 
-        // Handle Photo Loading and Mapping
-        function handlePhotos(input) {
-            const files = input.files;
-            if (!files.length) return;
-
-            photoMap.clear();
-            for (let file of files) {
-                // Map both full name and lowercase filename
-                photoMap.set(file.name.toLowerCase(), URL.createObjectURL(file));
-            }
-
-            document.getElementById('photoStatus').innerText = `✅ ${files.length} Fotoğraf Yüklendi`;
-            updateCards();
-        }
-
-        function updateTheme() {
-            const color = document.getElementById('themeColor').value;
-            document.documentElement.style.setProperty('--primary-color', color);
-        }
-
-        // Render Cards into A4 Pages
-        function updateCards() {
-            const container = document.getElementById('printArea');
-            container.innerHTML = '';
-
-            const orgName = document.getElementById('orgName').value || 'KURUM ADI';
-            const orientation = document.getElementById('cardOrientation').value;
-
-            // Page limits: Horizontal = 8 cards/page (2x4), Vertical = 9 cards/page (3x3)
-            const cardsPerPage = orientation === 'horizontal' ? 8 : 9;
-
-            if (peopleData.length === 0) {
-                // Demo card if no data loaded
-                peopleData = [
-                    { ad: 'Ahmet', soyad: 'YILMAZ', unvan: 'Bilgi İşlem Sorumlusu', sicil: 'TR-10293', fotograf: 'ahmet.jpg' },
-                    { ad: 'Şule', soyad: 'ÖZTÜRK', unvan: 'Matematik Öğretmeni', sicil: 'TR-10294', fotograf: 'sule.jpg' },
-                    { ad: 'Çağrı', soyad: 'AĞAOĞLU', unvan: 'İdari İşler Uzmanı', sicil: 'TR-10295', fotograf: 'cagri.jpg' }
-                ];
-            }
-
-            let currentPage = null;
-
-            peopleData.forEach((person, index) => {
-                if (index % cardsPerPage === 0) {
-                    currentPage = document.createElement('div');
-                    currentPage.className = `a4-page ${orientation}`;
-                    container.appendChild(currentPage);
-                }
-
-                const card = document.createElement('div');
-                card.className = `card ${orientation}-card`;
-
-                // Find matching photo
-                let photoSrc = '';
-                const photoFileName = (person.fotograf || person.foto || '').toLowerCase();
-                
-                if (photoMap.has(photoFileName)) {
-                    photoSrc = photoMap.get(photoFileName);
-                } else {
-                    // SVG Placeholder with 3:4 Biometric Proportion
-                    photoSrc = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="133" viewBox="0 0 100 133" fill="%23e2e8f0"><rect width="100" height="133"/><circle cx="50" cy="45" r="25" fill="%23cbd5e1"/><path d="M10 120 C 10 80, 90 80, 90 120 Z" fill="%23cbd5e1"/></svg>`;
-                }
-
-                const ad = person.ad || person.isim || '';
-                const soyad = person.soyad || '';
-                const unvan = person.unvan || person.gorev || 'PERSONEL';
-                const sicil = person.sicil || person.tc || person.no || '';
-
-                if (orientation === 'horizontal') {
-                    card.innerHTML = `
-                        <div class="card-header">${orgName}</div>
-                        <div class="card-body-horizontal">
-                            <div class="biometric-photo-container">
-                                <img src="${photoSrc}" alt="Biyometrik Fotoğraf">
-                            </div>
-                            <div class="card-details">
-                                <div class="card-name">${ad}<br>${soyad}</div>
-                                <div class="card-title">${unvan}</div>
-                                ${sicil ? `<div class="card-meta">Sicil/ID: ${sicil}</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="card-footer-bar"></div>
-                    `;
-                } else {
-                    card.innerHTML = `
-                        <div class="card-header">${orgName}</div>
-                        <div class="biometric-photo-container">
-                            <img src="${photoSrc}" alt="Biyometrik Fotoğraf">
-                        </div>
-                        <div class="card-details">
-                            <div class="card-name">${ad} ${soyad}</div>
-                            <div class="card-title">${unvan}</div>
-                            ${sicil ? `<div class="card-meta">Sicil: ${sicil}</div>` : ''}
-                        </div>
-                        <div class="card-footer-bar"></div>
-                    `;
-                }
-
-                currentPage.appendChild(card);
-            });
-        }
-
-        // Generate Sample CSV with Turkish Characters
-        function generateSampleCSV() {
-            const csvContent = "ad;soyad;unvan;sicil;fotograf
-" +
-                               "Ahmet;YILMAZ;Bilgi İşlem Sorumlusu;TR-1001;ahmet.jpg
-" +
-                               "Şule;ÖZTÜRK;Matematik Öğretmeni;TR-1002;sule.jpg
-" +
-                               "Çağrı;AĞAOĞLU;İdari İşler Uzmanı;TR-1003;cagri.jpg
-" +
-                               "Gülşah;IŞIK;İnsan Kaynakları;TR-1004;gulsah.jpg
-" +
-                               "Ömer;ÇELİK;Güvenlik Amiri;TR-1005;omer.jpg";
-
-            // Add UTF-8 BOM so Excel opens it with Turkish characters automatically
-            const blob = new Blob(["﻿" + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.setAttribute("download", "ornek_personel_listesi.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Initial Load
-        window.onload = function() {
-            updateCards();
-        };
-    </script>
+    // Init App
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('load', () => {
+      resizeCanvas();
+      jawTop.style.top = `${jawTopY}px`;
+      jawBottom.style.top = `${jawBottomY}px`;
+      updateReadout();
+    });
+  </script>
 </body>
 </html>
-
