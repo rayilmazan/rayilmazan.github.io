@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>GPS Takometre & Altimetre</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --accent: #10b981;
+      --accent-bright: #34d399;
+      --text: #f8fafc;
+      --text-dim: #64748b;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-bright);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #1e293b;
+      color: var(--text-dim);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .status-dot.active {
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* Main Speedometer Gauge */
+    .speed-card {
+      background: linear-gradient(145deg, #131b2e, #0e1424);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid #1e293b;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .speed-val {
+      font-size: 4.8rem;
+      font-weight: 900;
+      font-family: monospace;
+      line-height: 1;
+      color: var(--accent-bright);
+      text-shadow: 0 0 20px rgba(52, 211, 153, 0.2);
+      margin: 10px 0;
+    }
+
+    .speed-unit {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+
+    /* Stats Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: var(--text);
+    }
+
+    .coords-card {
+      grid-column: span 2;
+      background: var(--card-bg);
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-family: monospace;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: var(--text);
+    }
+
+    .btn:active {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">GPS Takometre & Altimetre</div>
+    <div class="status-badge">
+      <div class="status-dot" id="gps-dot"></div>
+      <span id="gps-status">Uydu Bekleniyor...</span>
+    </div>
+  </header>
+
+  <!-- Main Speed Display -->
+  <div class="speed-card">
+    <div class="speed-unit">ANLIK HIZ</div>
+    <div class="speed-val" id="val-speed">0</div>
+    <div class="speed-unit">KM / SAAT</div>
+  </div>
+
+  <!-- Secondary Metrics Grid -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-label">🏔️ RAKIM (ALTİMETRE)</div>
+      <div class="card-value"><span id="val-alt">0</span> <small style="font-size:0.8rem">m</small></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">📏 KAT EDİLEN YOL</div>
+      <div class="card-value"><span id="val-dist">0.00</span> <small style="font-size:0.8rem">km</small></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">🚀 MAKSİMUM HIZ</div>
+      <div class="card-value"><span id="val-max-speed">0</span> <small style="font-size:0.8rem">km/s</small></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">🧭 YÖN / HASSASİYET</div>
+      <div class="card-value" style="font-size:1.1rem" id="val-heading">--° (±<span id="val-acc">0</span>m)</div>
+    </div>
+
+    <div class="coords-card">
+      <span>📍 KONUM</span>
+      <span id="val-coords">0.00000, 0.00000</span>
+    </div>
+  </div>
+
+  <!-- Action Controls -->
+  <div class="controls">
+    <button class="btn btn-secondary" id="btn-reset">🔄 Verileri Sıfırla</button>
+    <button class="btn btn-primary" id="btn-toggle">▶️ GPS Başlat</button>
+  </div>
+
+  <script>
+    // State Variables
+    let watchId = null;
+    let isTracking = false;
+    let maxSpeed = 0;
+    let totalDistance = 0; // in meters
+    let lastPosition = null;
+
+    // DOM Elements
+    const valSpeed = document.getElementById('val-speed');
+    const valAlt = document.getElementById('val-alt');
+    const valDist = document.getElementById('val-dist');
+    const valMaxSpeed = document.getElementById('val-max-speed');
+    const valHeading = document.getElementById('val-heading');
+    const valAcc = document.getElementById('val-acc');
+    const valCoords = document.getElementById('val-coords');
+    
+    const gpsDot = document.getElementById('gps-dot');
+    const gpsStatus = document.getElementById('gps-status');
+    const btnToggle = document.getElementById('btn-toggle');
+    const btnReset = document.getElementById('btn-reset');
+
+    // Prevent Screen Sleep (Wake Lock)
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {}
+    }
+
+    // Haversine Formula for Distance Calculation (meters)
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // Earth radius in meters
+      const rad = Math.PI / 180;
+      const dLat = (lat2 - lat1) * rad;
+      const dLon = (lon2 - lon1) * rad;
+
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * rad) * Math.cos(lat2 * rad) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    // Handle Position Updates
+    function handlePosition(position) {
+      const coords = position.coords;
+
+      // Update Connection Status
+      gpsDot.classList.add('active');
+      gpsStatus.textContent = 'GPS Bağlı';
+
+      // 1. Calculate Speed (m/s -> km/h)
+      let currentSpeedKmH = 0;
+      if (coords.speed !== null && coords.speed > 0) {
+        currentSpeedKmH = Math.round(coords.speed * 3.6);
+      }
+      valSpeed.textContent = currentSpeedKmH;
+
+      // Update Max Speed
+      if (currentSpeedKmH > maxSpeed) {
+        maxSpeed = currentSpeedKmH;
+        valMaxSpeed.textContent = maxSpeed;
+      }
+
+      // 2. Altitude (Rakım)
+      if (coords.altitude !== null) {
+        valAlt.textContent = Math.round(coords.altitude);
+      }
+
+      // 3. Distance Traveled
+      if (lastPosition) {
+        // Calculate distance only if accuracy is acceptable (< 25m)
+        if (coords.accuracy < 25) {
+          const distIncrement = calculateDistance(
+            lastPosition.coords.latitude,
+            lastPosition.coords.longitude,
+            coords.latitude,
+            coords.longitude
+          );
+
+          // Ignore tiny GPS drift noise when stationary
+          if (distIncrement > 2) {
+            totalDistance += distIncrement;
+            valDist.textContent = (totalDistance / 1000).toFixed(2);
+          }
+        }
+      }
+      lastPosition = position;
+
+      // 4. Heading & Accuracy
+      const headingTxt = coords.heading !== null && !isNaN(coords.heading) 
+        ? `${Math.round(coords.heading)}°` 
+        : '--°';
+      valHeading.textContent = `${headingTxt} (±${Math.round(coords.accuracy)}m)`;
+      valAcc.textContent = Math.round(coords.accuracy);
+
+      // 5. Coordinates
+      valCoords.textContent = `${coords.latitude.toFixed(5)}, ${coords.longitude.toFixed(5)}`;
+    }
+
+    // Handle Errors
+    function handleError(error) {
+      gpsDot.classList.remove('active');
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          gpsStatus.textContent = 'Konum İzni Reddedildi';
+          alert("Uygulamanın çalışması için konum izni vermeniz gerekmektedir.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          gpsStatus.textContent = 'Sinyal Alınamıyor';
+          break;
+        case error.TIMEOUT:
+          gpsStatus.textContent = 'Sinyal Zaman Aşımı';
+          break;
+      }
+    }
+
+    // Start GPS Tracking
+    function startTracking() {
+      if (!('geolocation' in navigator)) {
+        alert("Cihazınız veya tarayıcınız GPS özelliğini desteklemiyor.");
+        return;
+      }
+
+      requestWakeLock();
+
+      const options = {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
+      };
+
+      watchId = navigator.geolocation.watchPosition(handlePosition, handleError, options);
+      isTracking = true;
+      btnToggle.textContent = '⏸️ GPS Durdur';
+      btnToggle.style.background = '#ef4444';
+      gpsStatus.textContent = 'Uydu Aranıyor...';
+    }
+
+    // Stop GPS Tracking
+    function stopTracking() {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      isTracking = false;
+      gpsDot.classList.remove('active');
+      gpsStatus.textContent = 'Durduruldu';
+      btnToggle.textContent = '▶️ GPS Başlat';
+      btnToggle.style.background = '#10b981';
+    }
+
+    // Toggle Button Event
+    btnToggle.addEventListener('click', () => {
+      if (isTracking) {
+        stopTracking();
+      } else {
+        startTracking();
+      }
+    });
+
+    // Reset Data Event
+    btnReset.addEventListener('click', () => {
+      if (confirm("Maksimum hız ve mesafe verilerini sıfırlamak istiyor musunuz?")) {
+        maxSpeed = 0;
+        totalDistance = 0;
+        lastPosition = null;
+        valSpeed.textContent = '0';
+        valMaxSpeed.textContent = '0';
+        valDist.textContent = '0.00';
+      }
+    });
+  </script>
+</body>
+</html>
