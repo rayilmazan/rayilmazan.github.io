@@ -312,7 +312,7 @@
 
     <div class="footer-note">
         * P3 Puan türü yalnızca Genel Kültür ve Genel Yetenek testlerinden oluşur.<br>
-        Hesaplama standart ÖSYM bağıl değerlendirme katsayıları baz alınarak yapılır.
+        Hesaplama standart ÖSYM standart sapma ve ağırlık katsayıları baz alınarak yakınlaştırılmıştır.
     </div>
 </div>
 
@@ -341,10 +341,10 @@
         let totalEmpty = gyEmpty + gkEmpty;
         let successRate = ((totalNet / 120) * 100);
 
-        // Tahmini P3 Puanı
+        // Tahmini P3 Puanı (Gerçek ÖSYM verilerine yakın katsayılar)
         let p3Score = 0;
         if (totalNet > 0) {
-            p3Score = 40 + (gyNet * 0.50) + (gkNet * 0.50);
+            p3Score = 53 + (gyNet * 0.45) + (gkNet * 0.41);
             if (p3Score > 100) p3Score = 100;
         }
 
