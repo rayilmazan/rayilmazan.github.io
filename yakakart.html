@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Okul Yaka Kartı Oluşturucu</title>
+  <!-- jsPDF & html2canvas CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-bg: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--panel-bg);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 { font-size: 1.25rem; font-weight: 700; color: #38bdf8; }
+
+    .app-container {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .app-container { flex-direction: column; }
+    }
+
+    /* Sol Panel - Form */
+    .controls-panel {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-title { font-size: 0.95rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Şablon Seçimi Grid */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+    }
+
+    .template-btn {
+      background: #0f172a;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .template-btn.active {
+      border-color: #38bdf8;
+      background: #1e3a8a;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    
+    .form-input {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .form-input:focus { border-color: #38bdf8; }
+
+    .file-input-wrapper {
+      position: relative;
+      background: #0f172a;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
+    }
+
+    .btn-submit {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #0369a1; }
+
+    /* Sağ Panel - Önizleme */
+    .preview-panel {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-preview-container {
+      width: 320px;
+      height: 450px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cardCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Fotoğraf Ayarlama Kontrolleri */
+    .photo-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .photo-controls label { font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📇 Okul Yaka Kartı Jeneratörü</h1>
+    <span style="font-size:0.85rem; color:var(--text-muted)">Baskıya Hazır A4 PDF Düzeni</span>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- SOL KONTROL PANELİ -->
+    <div class="controls-panel">
+      <div class="section-title">1. Şablon Seçimi</div>
+      <div class="template-grid">
+        <button class="template-btn active" data-template="nobetci_ogrenci">Nöbetçi Öğrenci</button>
+        <button class="template-btn" data-template="nobetci_ogretmen">Nöbetçi Öğretmen</button>
+        <button class="template-btn" data-template="ogretmen">Öğretmen</button>
+        <button class="template-btn" data-template="ziyaretci">Ziyaretçi</button>
+      </div>
+
+      <div class="section-title">2. Kart Bilgileri</div>
+
+      <div class="form-group">
+        <label for="inputSchool">Okul Adı</label>
+        <input type="text" id="inputSchool" class="form-input" value="ATATÜRK ORTAOKULU" placeholder="Örn: MİLLİ EĞİTİM VAKFI İLKOKULU">
+      </div>
+
+      <div class="form-group" id="groupName">
+        <label for="inputName">Adı Soyadı</label>
+        <input type="text" id="inputName" class="form-input" value="AHMET YILMAZ" placeholder="Örn: AHMET YILMAZ">
+      </div>
+
+      <div class="form-group" id="groupSub">
+        <label for="inputSub">Alt Bilgi (Branş / Görev / Tarih)</label>
+        <input type="text" id="inputSub" class="form-input" value="BİLİŞİM TEKNOLOJİLERİ" placeholder="Örn: Matematik Öğretmeni">
+      </div>
+
+      <div class="form-group" id="groupPhoto">
+        <label>Fotoğraf Yükle</label>
+        <div class="file-input-wrapper">
+          <span id="fileName">📷 Fotoğraf Seç (İsteğe Bağlı)</span>
+          <input type="file" id="inputPhoto" accept="image/*">
+        </div>
+        
+        <div class="photo-controls">
+          <label>Ölçek:</label>
+          <input type="range" id="photoScale" min="0.5" max="2.5" step="0.05" value="1" style="flex:1">
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btnDownloadPDF">
+        📄 A4 Baskı PDF İndir (8 Adet)
+      </button>
+    </div>
+
+    <!-- SAĞ ÖNİZLEME PANELİ -->
+    <div class="preview-panel">
+      <div class="section-title" style="margin-bottom: 15px;">Canlı Kart Önizlemesi</div>
+      <div class="card-preview-container">
+        <canvas id="cardCanvas" width="600" height="850"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Şablon Renk & Tasarım Konfigürasyonları
+    const TEMPLATES = {
+      nobetci_ogrenci: {
+        title: "NÖBETÇİ ÖĞRENCİ",
+        color: "#2563EB", // Mavi
+        hasPhoto: false,
+        hasName: false,
+        giantLetter: "N",
+        letterPos: "center"
+      },
+      nobetci_ogretmen: {
+        title: "NÖBETÇİ ÖĞRETMEN",
+        color: "#EF4444", // Kırmızı
+        hasPhoto: true,
+        hasName: true,
+        giantLetter: "N",
+        letterPos: "bottom-left"
+      },
+      ogretmen: {
+        title: "ÖĞRETMEN",
+        color: "#06B6D4", // Turkuaz/Cyan
+        hasPhoto: true,
+        hasName: true,
+        giantLetter: null
+      },
+      ziyaretci: {
+        title: "ZİYARETÇİ",
+        color: "#FF4D4D", // Mercan Kırmızı
+        hasPhoto: false,
+        hasName: false,
+        giantLetter: "Z",
+        letterPos: "center"
+      }
+    };
+
+    let activeTemplate = "nobetci_ogrenci";
+    let loadedImage = null;
+
+    // DOM Elemanları
+    const canvas = document.getElementById('cardCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const inputSchool = document.getElementById('inputSchool');
+    const inputName = document.getElementById('inputName');
+    const inputSub = document.getElementById('inputSub');
+    const inputPhoto = document.getElementById('inputPhoto');
+    const photoScale = document.getElementById('photoScale');
+    const groupName = document.getElementById('groupName');
+    const groupSub = document.getElementById('groupSub');
+    const groupPhoto = document.getElementById('groupPhoto');
+    const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+
+    // Şablon Değiştirme
+    document.querySelectorAll('.template-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTemplate = btn.dataset.template;
+        updateFormVisibility();
+        renderCard();
+      });
+    });
+
+    function updateFormVisibility() {
+      const config = TEMPLATES[activeTemplate];
+      groupPhoto.style.display = config.hasPhoto ? 'flex' : 'none';
+      groupName.style.display = config.hasName ? 'flex' : 'none';
+      groupSub.style.display = config.hasName ? 'flex' : 'none';
+    }
+
+    // Fotoğraf Yükleme
+    inputPhoto.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('fileName').textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            loadedImage = img;
+            renderCard();
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Form Değişikliklerini Dinle
+    [inputSchool, inputName, inputSub, photoScale].forEach(el => {
+      el.addEventListener('input', renderCard);
+    });
+
+    // Ana Kart Çizim Fonksiyonu (Vektörel Çözünürlük: 600x850 px)
+    function renderCard() {
+      const config = TEMPLATES[activeTemplate];
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Arka planı temizle
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, w, h);
+
+      // 1. Üst Yaka İpi Askı Deliği Kılavuzu
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(w / 2 - 50, 15, 100, 25);
+
+      // 2. Okul Adı (Üst Başlık)
+      ctx.fillStyle = config.color;
+      ctx.font = "bold 34px Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(inputSchool.value.toUpperCase() || "OKUL ADI", w / 2, 85);
+
+      // 3. Orta Alan: Dev Harf VEYA Fotoğraflı Alan
+      if (config.giantLetter && config.letterPos === "center") {
+        ctx.fillStyle = config.color;
+        ctx.font = "900 380px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(config.giantLetter, w / 2, h / 2 - 20);
+        ctx.textBaseline = "alphabetic"; // reset
+      }
+
+      if (config.hasPhoto) {
+        // Yuvarlak Fotoğraf Çerçevesi
+        const centerX = w / 2;
+        const centerY = 310;
+        const radius = 140;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = config.color;
+        ctx.lineWidth = 12;
+        ctx.stroke();
+        ctx.clip();
+
+        if (loadedImage) {
+          const scale = parseFloat(photoScale.value);
+          const imgW = loadedImage.width * scale;
+          const imgH = loadedImage.height * scale;
+          // Ortala
+          const ix = centerX - imgW / 2;
+          const iy = centerY - imgH / 2;
+          ctx.drawImage(loadedImage, ix, iy, imgW, imgH);
+        } else {
+          // Varsayılan Fotoğraf Alanı Metni
+          ctx.fillStyle = "#f1f5f9";
+          ctx.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
+          ctx.fillStyle = "#475569";
+          ctx.font = "bold 28px Arial, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("FOTOĞRAF", centerX, centerY + 10);
+        }
+        ctx.restore();
+
+        // 4. İsim ve Alt Bilgi
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 40px Arial, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(inputName.value.toUpperCase() || "ADI SOYADI", w / 2, 530);
+
+        ctx.fillStyle = config.color;
+        ctx.font = "bold 26px Arial, sans-serif";
+        ctx.fillText(inputSub.value.toUpperCase() || "ALT BİLGI", w / 2, 575);
+      }
+
+      // 5. Alt Bant (Solid Bar)
+      const barHeight = 160;
+      const barY = h - barHeight;
+
+      ctx.fillStyle = config.color;
+      ctx.fillRect(0, barY, w, barHeight);
+
+      // Nöbetçi Öğretmen Şablonunda Sol Alttaki Dev "N" Harfi
+      if (config.giantLetter && config.letterPos === "bottom-left") {
+        ctx.fillStyle = config.color;
+        ctx.font = "900 240px Arial, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(config.giantLetter, 15, h - 35);
+      }
+
+      // Alt Bant Metni
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "900 62px Arial, sans-serif";
+      ctx.textAlign = "center";
+      
+      // Çift Satırlı Metin Kontrolü (NÖBETÇİ ÖĞRENCİ / ÖĞRETMEN)
+      const titleParts = config.title.split(" ");
+      if (titleParts.length > 1) {
+        ctx.fillText(titleParts[0], w / 2 + (config.letterPos === "bottom-left" ? 40 : 0), barY + 62);
+        ctx.fillText(titleParts[1], w / 2 + (config.letterPos === "bottom-left" ? 40 : 0), barY + 130);
+      } else {
+        ctx.fillText(config.title, w / 2, barY + 105);
+      }
+    }
+
+    // A4 PDF İndirme (2 Sütun x 4 Satır = 8 Yaka Kartı + Kesim Çizgileri)
+    btnDownloadPDF.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const cardImgData = canvas.toDataURL('image/jpeg', 0.95);
+
+      // Kart Standart Boyutları (mm)
+      const cardW = 70;
+      const cardH = 99;
+      
+      // A4 Marjinleri (210 x 297 mm)
+      const startX = 25;
+      const startY = 20;
+      const gapX = 20;
+      const gapY = 15;
+
+      let count = 0;
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 2; col++) {
+          const x = startX + col * (cardW + gapX);
+          const y = startY + row * (cardH + gapY);
+
+          // Kartı çiz
+          pdf.addImage(cardImgData, 'JPEG', x, y, cardW, cardH);
+
+          // Kesim Çizgileri (Köşe kılavuzları)
+          pdf.setDrawColor(180, 180, 180);
+          pdf.setLineWidth(0.2);
+          
+          // Sol-Üst Kılavuz
+          pdf.line(x - 3, y, x, y);
+          pdf.line(x, y - 3, x, y);
+
+          // Sağ-Üst Kılavuz
+          pdf.line(x + cardW, y, x + cardW + 3, y);
+          pdf.line(x + cardW, y - 3, x + cardW, y);
+
+          // Sol-Alt Kılavuz
+          pdf.line(x - 3, y + cardH, x, y + cardH);
+          pdf.line(x, y + cardH, x, y + cardH + 3);
+
+          // Sağ-Alt Kılavuz
+          pdf.line(x + cardW, y + cardH, x + cardW + 3, y + cardH);
+          pdf.line(x + cardW, y + cardH, x + cardW, y + cardH + 3);
+
+          count++;
+        }
+      }
+
+      pdf.save(`${activeTemplate}_yaka_kartlari_a4.pdf`);
+    });
+
+    // İlk Çalıştırma
+    updateFormVisibility();
+    renderCard();
+  </script>
+</body>
+</html>
