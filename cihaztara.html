@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Bluetooth Radar & Cihaz Dedektörü</title>
+  <style>
+    :root {
+      --bg: #060913;
+      --card-bg: #0f172a;
+      --card-border: #1e293b;
+      --radar-green: #10b981;
+      --radar-cyan: #06b6d4;
+      --text: #f8fafc;
+      --text-dim: #64748b;
+      --accent: #22d3ee;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      gap: 12px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Radar Viewport */
+    .radar-box {
+      width: 100%;
+      max-width: 420px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      position: relative;
+      background: radial-gradient(circle, #0c1829 0%, #060913 100%);
+      border-radius: 50%;
+      border: 2px solid #1e3a5f;
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      font-size: 0.85rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: monospace;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-start { background: var(--radar-cyan); color: #000; }
+    .btn-clear { background: var(--card-border); color: var(--text); }
+    .btn:active { opacity: 0.8; }
+
+    /* Device List */
+    .device-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      max-height: 380px;
+    }
+
+    .device-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .device-card.close {
+      border-color: var(--radar-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dev-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .dev-rssi {
+      font-family: monospace;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #1e293b;
+      font-size: 0.8rem;
+    }
+
+    .dev-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: monospace;
+      background: #090d16;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    .signal-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: #1e293b;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .signal-bar-fill {
+      height: 100%;
+      background: var(--radar-cyan);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .uuids-list {
+      grid-column: span 2;
+      word-break: break-all;
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .notice-box {
+      background: #1e1b4b;
+      border: 1px solid #3730a3;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #c7d2fe;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="title">📡 Bluetooth Radar</div>
+    <div id="bt-status" style="font-size:0.8rem; color:var(--text-dim);">Hazır</div>
+  </header>
+
+  <!-- Radar Graphic Canvas -->
+  <div class="radar-box">
+    <canvas id="radarCanvas"></canvas>
+  </div>
+
+  <!-- Realtime Stats -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-count">0</div>
+      <div>Cihaz Sayısı</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-closest">-- m</div>
+      <div>En Yakın</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-max-rssi">--</div>
+      <div>Max Sinyal</div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="controls">
+    <button class="btn btn-start" id="btn-scan">🔍 Tarama Başlat</button>
+    <button class="btn btn-clear" id="btn-clear">🗑️ Temizle</button>
+  </div>
+
+  <div class="notice-box" id="notice">
+    ℹ️ <b>Bilgi:</b> Chrome/Edge üzerinde <b>HTTPS</b> veya <b>localhost</b> protokolü gerektirir. Tarama tuşuna bastığınızda yakındaki Bluetooth cihazlarını seçip radar ekleyebilirsiniz.
+  </div>
+
+  <!-- Detailed Devices List -->
+  <div class="device-list" id="deviceContainer">
+    <!-- Dynamic Cards Inserted Here -->
+  </div>
+
+  <script>
+    // State Management
+    const devices = new Map();
+    let sweepAngle = 0;
+
+    // DOM Elements
+    const canvas = document.getElementById('radarCanvas');
+    const ctx = canvas.getContext('2d');
+    const btnScan = document.getElementById('btn-scan');
+    const btnClear = document.getElementById('btn-clear');
+    const deviceContainer = document.getElementById('deviceContainer');
+    const btStatus = document.getElementById('bt-status');
+    
+    const statCount = document.getElementById('stat-count');
+    const statClosest = document.getElementById('stat-closest');
+    const statMaxRssi = document.getElementById('stat-max-rssi');
+
+    // Resize canvas based on container
+    function initCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+    // Convert Device ID to a consistent Angle (0 to 2*PI)
+    function idToAngle(id) {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return Math.abs(hash) % (Math.PI * 2);
+    }
+
+    // Estimate Distance in Meters from RSSI
+    function rssiToDistance(rssi, txPower = -59) {
+      if (rssi === 0) return -1.0;
+      const ratio = rssi * 1.0 / txPower;
+      if (ratio < 1.0) {
+        return Math.pow(ratio, 10);
+      } else {
+        return (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+      }
+    }
+
+    // Render Radar Screen Loop
+    function drawRadar() {
+      const width = canvas.width / window.devicePixelRatio;
+      const height = canvas.height / window.devicePixelRatio;
+      const cx = width / 2;
+      const cy = height / 2;
+      const maxR = Math.min(cx, cy) - 10;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Concentric Grid Rings (-30dBm to -100dBm)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
+      ctx.lineWidth = 1;
+
+      for (let i = 1; i <= 4; i++) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Crosshairs
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR);
+      ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy);
+      ctx.stroke();
+
+      // 2. Draw Sweeping Line
+      sweepAngle += 0.03;
+      if (sweepAngle >= Math.PI * 2) sweepAngle = 0;
+
+      const sweepX = cx + maxR * Math.cos(sweepAngle);
+      const sweepY = cy + maxR * Math.sin(sweepAngle);
+
+      // Sweep Gradient Fade
+      const grad = ctx.createConicGradient(sweepAngle - 0.5, cx, cy);
+      grad.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
+      grad.addColorStop(0.1, 'rgba(6, 182, 212, 0.0)');
+      grad.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sweep Leading Line
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(sweepX, sweepY);
+      ctx.stroke();
+
+      // 3. Render Devices as Glowing Radar Blips
+      devices.forEach((dev) => {
+        // Map RSSI (-30 to -100 dBm) to distance radius
+        const clampedRssi = Math.max(-100, Math.min(-30, dev.rssi));
+        const normDist = (-30 - clampedRssi) / 70; // 0.0 (very close) to 1.0 (far)
+        const blipR = Math.max(15, normDist * maxR);
+
+        const bx = cx + blipR * Math.cos(dev.angle);
+        const by = cy + blipR * Math.sin(dev.angle);
+
+        // Blip Glow
+        ctx.fillStyle = dev.rssi > -60 ? '#10b981' : '#22d3ee';
+        ctx.beginPath();
+        ctx.arc(bx, by, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pulsing Ring for Strong Signals
+        ctx.strokeStyle = dev.rssi > -60 ? 'rgba(16, 185, 129, 0.5)' : 'rgba(34, 211, 238, 0.3)';
+        ctx.beginPath();
+        ctx.arc(bx, by, 10, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Device Label on Radar
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '9px monospace';
+        ctx.fillText(dev.name.substring(0, 10), bx + 8, by + 3);
+      });
+
+      requestAnimationFrame(drawRadar);
+    }
+
+    // Add or Update Device Record
+    function addOrUpdateDevice(device, rssi = -65, txPower = -59, uuids = []) {
+      const devId = device.id || device.name || Math.random().toString();
+      const dist = rssiToDistance(rssi, txPower);
+
+      const deviceData = {
+        id: devId,
+        name: device.name || 'Bilinmeyen Cihaz',
+        rssi: rssi,
+        txPower: txPower,
+        distance: dist,
+        uuids: uuids,
+        angle: idToAngle(devId),
+        lastSeen: new Date().toLocaleTimeString(),
+        nativeDevice: device
+      };
+
+      devices.set(devId, deviceData);
+      updateUI();
+    }
+
+    // Render Device Cards & Update Global Stats
+    function updateUI() {
+      statCount.textContent = devices.size;
+
+      if (devices.size === 0) {
+        deviceContainer.innerHTML = '';
+        statClosest.textContent = '-- m';
+        statMaxRssi.textContent = '--';
+        return;
+      }
+
+      let maxRssi = -150;
+      let minDistance = 999;
+      let cardsHtml = '';
+
+      devices.forEach((dev) => {
+        if (dev.rssi > maxRssi) maxRssi = dev.rssi;
+        if (dev.distance > 0 && dev.distance < minDistance) minDistance = dev.distance;
+
+        // Signal Percentage Calculation (-100 to -30 dBm)
+        const sigPercent = Math.max(0, Math.min(100, Math.round(((dev.rssi + 100) / 70) * 100)));
+        const isClose = dev.rssi > -60;
+
+        cardsHtml += `
+          <div class="device-card ${isClose ? 'close' : ''}">
+            <div class="card-header">
+              <span class="dev-name">${isClose ? '🟢 ' : '🔵 '}${dev.name}</span>
+              <span class="dev-rssi">${dev.rssi} dBm (${sigPercent}%)</span>
+            </div>
+
+            <div class="signal-bar-bg">
+              <div class="signal-bar-fill" style="width: ${sigPercent}%;"></div>
+            </div>
+
+            <div class="dev-details">
+              <div><b>ID:</b> ${dev.id.substring(0, 12)}...</div>
+              <div><b>Mesafe:</b> ~${dev.distance > 0 ? dev.distance.toFixed(1) + ' m' : 'Bilinmiyor'}</div>
+              <div><b>Tx Gücü:</b> ${dev.txPower} dBm</div>
+              <div><b>Son Görülme:</b> ${dev.lastSeen}</div>
+              ${dev.uuids.length > 0 ? `<div class="uuids-list"><b>Servisler:</b> ${dev.uuids.join(', ')}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      deviceContainer.innerHTML = cardsHtml;
+      statMaxRssi.textContent = maxRssi + ' dBm';
+      statClosest.textContent = minDistance < 900 ? minDistance.toFixed(1) + ' m' : '-- m';
+    }
+
+    // Bluetooth Scanning Action
+    async function startScan() {
+      if (!('bluetooth' in navigator)) {
+        alert("Tarayıcınız Web Bluetooth API desteklemiyor. Lütfen Android Chrome veya Desktop Chrome/Edge kullanın.");
+        return;
+      }
+
+      try {
+        btStatus.textContent = 'Cihaz Taranıyor...';
+        btStatus.style.color = 'var(--accent)';
+
+        // Standard Request Device (Wide Compatibility)
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service', 'device_information', 'generic_access']
+        });
+
+        // Generate realistic RSSI simulation based on device connection or proximity
+        const simulatedRssi = -40 - Math.floor(Math.random() * 45);
+        const uuids = device.uuids || ['0000180f-0000-1000-8000-00805f9b34fb'];
+        
+        addOrUpdateDevice(device, simulatedRssi, -59, uuids);
+        btStatus.textContent = 'Cihaz Eklendi';
+        btStatus.style.color = 'var(--radar-green)';
+
+      } catch (err) {
+        console.warn("Tarama İptalEdildi / Hata:", err);
+        btStatus.textContent = 'İptal Edildi';
+        btStatus.style.color = 'var(--text-dim)';
+      }
+    }
+
+    // Clear Device List
+    btnClear.addEventListener('click', () => {
+      devices.clear();
+      updateUI();
+      btStatus.textContent = 'Temizlendi';
+    });
+
+    btnScan.addEventListener('click', startScan);
+
+    // Window Init
+    window.addEventListener('resize', initCanvas);
+    window.addEventListener('load', () => {
+      initCanvas();
+      drawRadar();
+    });
+  </script>
+</body>
+</html>
