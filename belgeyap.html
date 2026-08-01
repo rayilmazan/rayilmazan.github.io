@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toplu Belge & Sertifika Jeneratörü - rayılmazan</title>
+  <!-- jsPDF Kütüphanesi (Çevrimdışı çalışması için bu dosyayı indirebilirsin, şimdilik CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-bg: #1e293b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--panel-bg);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    header h1 { font-size: 1.3rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    header .sub-info { font-size: 0.85rem; color: var(--text-muted); }
+
+    .app-container {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1000px) {
+      .app-container { flex-direction: column; }
+    }
+
+    /* Sol Panel - Kontroller */
+    .controls-panel {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      margin-top: 5px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-row { display: flex; gap: 15px; }
+    .form-row .form-group { flex: 1; }
+
+    .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    
+    .form-input, .form-select, .form-textarea {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .names-textarea { min-height: 120px; font-family: monospace; white-space: pre-wrap; }
+
+    .file-input-wrapper {
+      position: relative;
+      background: #0f172a;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .file-input-wrapper:hover { border-color: var(--accent); }
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer;
+    }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+
+    /* Sağ Panel - Önizleme */
+    .preview-panel {
+      flex: 1.5;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .canvas-container {
+      width: 100%;
+      max-width: 842px; /* A4 Yatay Oranı */
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    #certCanvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .footer-credits {
+      text-align: center;
+      padding: 10px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎓 Toplu Belge & Sertifika Jeneratörü</h1>
+    <span class="sub-info">rayılmazan • Çevrimdışı Çoklu PDF Oluşturucu</span>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- SOL PANEL (Form) -->
+    <div class="controls-panel">
+      <div class="section-title">1. Belge Ayarları</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Belge Türü</label>
+          <select id="docType" class="form-select">
+            <option value="basari">Başarı Belgesi</option>
+            <option value="katilim">Katılım Belgesi</option>
+            <option value="tesekkur">Teşekkür Belgesi</option>
+            <option value="onur">Onur Belgesi</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tarih</label>
+          <input type="text" id="docDate" class="form-input" value="12 Haziran 2026">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Okul / Kurum Adı</label>
+        <input type="text" id="schoolName" class="form-input" value="ŞEHİT ÖMER HALİSDEMİR ANADOLU LİSESİ">
+      </div>
+
+      <div class="form-group">
+        <label>Okul Logosu (Opsiyonel)</label>
+        <div class="file-input-wrapper">
+          <span id="fileName">🖼️ Tıkla ve Logo Seç (Şeffaf PNG önerilir)</span>
+          <input type="file" id="inputLogo" accept="image/png, image/jpeg">
+        </div>
+      </div>
+
+      <div class="section-title">2. Metin ve İmza</div>
+
+      <div class="form-group">
+        <label>Açıklama Metni</label>
+        <textarea id="docText" class="form-textarea">Okulumuzda düzenlenen 2025-2026 Eğitim Öğretim Yılı Bahar Turnuvası etkinliklerinde göstermiş olduğunuz üstün gayret ve başarıdan dolayı bu belgeyi almaya hak kazandınız. Başarılarınızın devamını dileriz.</textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Sol İmza Adı</label>
+          <input type="text" id="sign1Name" class="form-input" value="Ahmet YILMAZ">
+          <input type="text" id="sign1Title" class="form-input" style="margin-top:4px;" value="Danışman Öğretmen">
+        </div>
+        <div class="form-group">
+          <label>Sağ İmza Adı</label>
+          <input type="text" id="sign2Name" class="form-input" value="Mustafa KEMAL">
+          <input type="text" id="sign2Title" class="form-input" style="margin-top:4px;" value="Okul Müdürü">
+        </div>
+      </div>
+
+      <div class="section-title">3. Öğrenci Listesi (Toplu Üretim)</div>
+      
+      <div class="form-group">
+        <label>Öğrenci İsimleri (Her satıra bir isim yazın)</label>
+        <textarea id="studentNames" class="form-textarea names-textarea" placeholder="Ali YILMAZ&#10;Ayşe KAYA&#10;Mehmet DEMİR">Örnek Öğrenci Adı</textarea>
+      </div>
+
+      <button class="btn-submit" id="btnDownloadPDF">
+        📄 Tüm Listeyi Tek PDF Olarak İndir
+      </button>
+    </div>
+
+    <!-- SAĞ PANEL (Önizleme) -->
+    <div class="preview-panel">
+      <div class="section-title" style="margin-bottom: 15px; border:none;">Canlı Önizleme (A4 Yatay)</div>
+      <div class="canvas-container">
+        <!-- Canvas Boyutu: A4 150 DPI (1754 x 1240) yüksek çözünürlük için -->
+        <canvas id="certCanvas" width="1754" height="1240"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-credits">
+    Geliştirici: rayılmazan | İnternet bağlantısı olmadan çalışır. Verileriniz tarayıcınızda kalır.
+  </div>
+
+  <script>
+    // Belge Türlerine Göre Renk ve Başlık Ayarları
+    const DOC_CONFIG = {
+      basari: { title: "BAŞARI BELGESİ", color: "#b8860b", border: "#daa520" }, // Altın
+      katilim: { title: "KATILIM BELGESİ", color: "#059669", border: "#10b981" }, // Yeşil
+      tesekkur: { title: "TEŞEKKÜR BELGESİ", color: "#2563eb", border: "#3b82f6" }, // Mavi
+      onur: { title: "ONUR BELGESİ", color: "#9f1239", border: "#e11d48" } // Kırmızı/Bordo
+    };
+
+    let loadedLogo = null;
+    const canvas = document.getElementById('certCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // DOM Elementleri
+    const inputs = [
+      'docType', 'docDate', 'schoolName', 'docText', 
+      'sign1Name', 'sign1Title', 'sign2Name', 'sign2Title', 'studentNames'
+    ].map(id => document.getElementById(id));
+
+    const inputLogo = document.getElementById('inputLogo');
+    const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+
+    // Herhangi bir input değiştiğinde önizlemeyi güncelle
+    inputs.forEach(input => {
+      input.addEventListener('input', () => renderCertificate(document.getElementById('studentNames').value.split('\n')[0] || "Öğrenci Adı"));
+    });
+
+    // Logo Yükleme İşlemi
+    inputLogo.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('fileName').textContent = "✅ " + file.name;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            loadedLogo = img;
+            renderCertificate(document.getElementById('studentNames').value.split('\n')[0] || "Öğrenci Adı");
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Çok Satırlı Metni Canvas'a Çizme Fonksiyonu
+    function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        
+        if (testWidth > maxWidth && n > 0) {
+          ctx.fillText(line, x, currentY);
+          line = words[n] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, currentY);
+    }
+
+    // Belgeyi Canvas Üzerine Çizme
+    function renderCertificate(studentName) {
+      const type = document.getElementById('docType').value;
+      const config = DOC_CONFIG[type];
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 1. Arka Plan
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Dış Kenarlık
+      ctx.lineWidth = 15;
+      ctx.strokeStyle = config.border;
+      ctx.strokeRect(40, 40, w - 80, h - 80);
+      
+      // İç İnce Kenarlık
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = config.color;
+      ctx.strokeRect(65, 65, w - 130, h - 130);
+
+      // Süsleme Köşeleri (Basit Geometri)
+      ctx.fillStyle = config.color;
+      const cornerSize = 40;
+      // Sol Üst
+      ctx.beginPath(); ctx.moveTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.lineTo(40, 40 + cornerSize); ctx.fill();
+      // Sağ Üst
+      ctx.beginPath(); ctx.moveTo(w - 40, 40); ctx.lineTo(w - 40 - cornerSize, 40); ctx.lineTo(w - 40, 40 + cornerSize); ctx.fill();
+      // Sol Alt
+      ctx.beginPath(); ctx.moveTo(40, h - 40); ctx.lineTo(40 + cornerSize, h - 40); ctx.lineTo(40, h - 40 - cornerSize); ctx.fill();
+      // Sağ Alt
+      ctx.beginPath(); ctx.moveTo(w - 40, h - 40); ctx.lineTo(w - 40 - cornerSize, h - 40); ctx.lineTo(w - 40, h - 40 - cornerSize); ctx.fill();
+
+      // 3. Okul Logosu (Eğer yüklendiyse)
+      let currentY = 120;
+      if (loadedLogo) {
+        // Logoyu orantılı boyutlandır
+        const maxLogoHeight = 150;
+        const logoScale = maxLogoHeight / loadedLogo.height;
+        const logoWidth = loadedLogo.width * logoScale;
+        ctx.drawImage(loadedLogo, (w / 2) - (logoWidth / 2), currentY, logoWidth, maxLogoHeight);
+        currentY += maxLogoHeight + 40;
+      } else {
+        currentY += 50;
+      }
+
+      // 4. Okul Adı
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 45px Georgia, serif";
+      ctx.textAlign = "center";
+      ctx.fillText(document.getElementById('schoolName').value.toUpperCase(), w / 2, currentY);
+      
+      // 5. Belge Türü Başlığı
+      currentY += 130;
+      ctx.fillStyle = config.color;
+      ctx.font = "bold 90px Georgia, serif";
+      ctx.fillText(config.title, w / 2, currentY);
+
+      // 6. Sayın / Takdim Yazısı
+      currentY += 80;
+      ctx.fillStyle = "#64748b";
+      ctx.font = "italic 35px Georgia, serif";
+      ctx.fillText("Sayın", w / 2, currentY);
+
+      // 7. Öğrenci Adı (Dinamik)
+      currentY += 100;
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 70px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText((studentName || "").trim().toUpperCase(), w / 2, currentY);
+
+      // 8. Açıklama Metni (Sarmalanmış)
+      currentY += 100;
+      ctx.fillStyle = "#334155";
+      ctx.font = "35px Georgia, serif";
+      const textWidth = w - 300; // Kenar boşlukları
+      drawWrappedText(ctx, document.getElementById('docText').value, w / 2, currentY, textWidth, 55);
+
+      // 9. Alt Bilgiler (Tarih ve İmzalar)
+      const bottomY = h - 180;
+      
+      // Tarih (Orta Alt)
+      ctx.fillStyle = "#64748b";
+      ctx.font = "30px Georgia, serif";
+      ctx.fillText(document.getElementById('docDate').value, w / 2, bottomY - 60);
+
+      // Sol İmza
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 35px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText(document.getElementById('sign1Name').value, 150, bottomY);
+      ctx.fillStyle = "#64748b";
+      ctx.font = "30px Georgia, serif";
+      ctx.fillText(document.getElementById('sign1Title').value, 150, bottomY + 40);
+
+      // Sağ İmza
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 35px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText(document.getElementById('sign2Name').value, w - 150, bottomY);
+      ctx.fillStyle = "#64748b";
+      ctx.font = "30px Georgia, serif";
+      ctx.fillText(document.getElementById('sign2Title').value, w - 150, bottomY + 40);
+    }
+
+    // Toplu PDF Üretimi
+    btnDownloadPDF.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      // A4 Boyutu (297mm x 210mm Yatay)
+      const pdf = new jsPDF('l', 'mm', 'a4'); 
+      
+      // Öğrenci listesini al ve boş satırları temizle
+      const rawNames = document.getElementById('studentNames').value.split('\n');
+      const namesList = rawNames.map(name => name.trim()).filter(name => name.length > 0);
+
+      if (namesList.length === 0) {
+        alert("Lütfen en az bir öğrenci ismi girin!");
+        return;
+      }
+
+      // Butonu bekleme moduna al
+      const originalText = btnDownloadPDF.innerHTML;
+      btnDownloadPDF.innerHTML = "⏳ PDF Oluşturuluyor Lütfen Bekleyin...";
+      btnDownloadPDF.disabled = true;
+
+      // İşlemi asenkron yapmak arayüzün donmasını engeller
+      setTimeout(() => {
+        namesList.forEach((student, index) => {
+          // Her öğrenci için canvası tekrar çiz
+          renderCertificate(student);
+          
+          // Canvası resim olarak al (Kalite 0.9 JPEG, dosya boyutunu optimum tutar)
+          const imgData = canvas.toDataURL('image/jpeg', 0.9);
+          
+          // PDF'e tam sayfa A4 olarak ekle (A4 ebatı: 297x210)
+          pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+
+          // Eğer son öğrenci değilse yeni sayfa ekle
+          if (index < namesList.length - 1) {
+            pdf.addPage();
+          }
+        });
+
+        // Belge türüne göre dosya adı belirle
+        const typeSelect = document.getElementById('docType');
+        const typeText = typeSelect.options[typeSelect.selectedIndex].text.replace(" ", "_");
+        
+        pdf.save(`${typeText}_Toplu.pdf`);
+
+        // Butonu eski haline getir
+        btnDownloadPDF.innerHTML = originalText;
+        btnDownloadPDF.disabled = false;
+
+        // Ekrana tekrar ilk öğrenciyi çiz
+        renderCertificate(namesList[0]);
+      }, 100);
+    });
+
+    // Sayfa açıldığında varsayılanı çiz
+    window.onload = () => {
+      renderCertificate(document.getElementById('studentNames').value.split('\n')[0]);
+    };
+  </script>
+</body>
+</html>
