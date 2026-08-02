@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sınıf Oturma Düzeni Planlayıcı - rayılmazan</title>
+  <!-- jsPDF Kütüphanesi -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --panel-bg: #1e293b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--panel-bg);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    header h1 { font-size: 1.3rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    header .sub-info { font-size: 0.85rem; color: var(--text-muted); }
+
+    .app-container {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+      .app-container { flex-direction: column; }
+    }
+
+    /* Sol Panel - Kontroller */
+    .controls-panel {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+      max-height: calc(100vh - 100px);
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      margin-top: 5px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-row { display: flex; gap: 15px; }
+    .form-row .form-group { flex: 1; }
+
+    .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+    
+    .form-input, .form-select, .form-textarea {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+
+    .form-textarea { resize: vertical; min-height: 100px; font-family: monospace; white-space: pre-wrap; }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+
+    /* Sağ Panel - Önizleme */
+    .preview-panel {
+      flex: 1.6;
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .canvas-container {
+      width: 100%;
+      max-width: 900px;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    #seatingCanvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .footer-credits {
+      text-align: center;
+      padding: 10px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🪑 Sınıf Oturma Düzeni Planlayıcı</h1>
+    <span class="sub-info">rayılmazan • Çevrimdışı Sınıf Yerleşim Aracı</span>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- SOL PANEL (Form) -->
+    <div class="controls-panel">
+      <div class="section-title">1. Sınıf ve Yerleşim Ayarları</div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Sınıf Adı</label>
+          <input type="text" id="className" class="form-input" value="9 / A Sınıfı">
+        </div>
+        <div class="form-group">
+          <label>Kapı Yönü</label>
+          <select id="doorPos" class="form-select">
+            <option value="left">Sol Duvar</option>
+            <option value="right">Sağ Duvar</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Öğretmen Masası / Tahta Konumu</label>
+          <select id="teacherPos" class="form-select">
+            <option value="center">Ön - Orta</option>
+            <option value="left">Ön - Sol</option>
+            <option value="right">Ön - Sağ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sıra Düzeni (Kolon x Sıra)</label>
+          <select id="gridSize" class="form-select">
+            <option value="3x4">3 Kolon x 4 Sıra (İkili)</option>
+            <option value="4x4" selected>4 Kolon x 4 Sıra (İkili)</option>
+            <option value="4x5">4 Kolon x 5 Sıra (İkili)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">2. Öğrenci Listeleri (Kız / Erkek Ayrımı)</div>
+      
+      <div class="form-group">
+        <label>Kız Öğrenciler (Her satıra bir isim)</label>
+        <textarea id="femaleNames" class="form-textarea" placeholder="Ayşe YILMAZ&#10;Zeynep DEMİR&#10;Elif KAYA">Ayşe YILMAZ
+Zeynep DEMİR
+Elif KAYA
+Merve ÇELİK
+Fatma ŞAHİN
+Betül YILDIZ
+Esra DEMİRCİ
+Hacer KOÇ</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Erkek Öğrenciler (Her satıra bir isim)</label>
+        <textarea id="maleNames" class="form-textarea" placeholder="Ahmet YILMAZ&#10;Mehmet DEMİR&#10;Mustafa KAYA">Ahmet YILMAZ
+Mehmet DEMİR
+Mustafa KAYA
+Ali DEMİRCİ
+Emre ŞAHİN
+Burak YILDIZ
+Kerem KOÇ
+Can ÇELİK</textarea>
+      </div>
+
+      <button class="btn-submit" id="btnDownloadPDF">
+        📄 Oturma Planını PDF Olarak İndir
+      </button>
+    </div>
+
+    <!-- SAĞ PANEL (Önizleme) -->
+    <div class="preview-panel">
+      <div class="section-title" style="margin-bottom: 15px; border:none;">Canlı Önizleme (A4 Yatay)</div>
+      <div class="canvas-container">
+        <!-- Canvas Boyutu: A4 Yüksek Çözünürlük Yatay (1754 x 1240) -->
+        <canvas id="seatingCanvas" width="1754" height="1240"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-credits">
+    Geliştirici: rayılmazan | İnternet bağlantısı olmadan çalışır. Verileriniz tarayıcınızda saklanır.
+  </div>
+
+  <script>
+    const canvas = document.getElementById('seatingCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const inputs = [
+      'className', 'doorPos', 'teacherPos', 'gridSize', 
+      'femaleNames', 'maleNames'
+    ].map(id => document.getElementById(id));
+
+    const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+
+    inputs.forEach(input => {
+      input.addEventListener('input', drawSeatingPlan);
+      input.addEventListener('change', drawSeatingPlan);
+    });
+
+    function parseNames(text) {
+      return text.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+    }
+
+    function drawSeatingPlan() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Arka Plan
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, w, h);
+
+      // Sınırlar / Çerçeve
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.strokeRect(40, 40, w - 80, h - 80);
+
+      // Başlık & Sınıf Adı
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 45px 'Segoe UI', Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(document.getElementById('className').value.toUpperCase(), w / 2, 110);
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "24px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("SINIF OTURMA PLANI", w / 2, 145);
+
+      // Kapı Çizimi
+      const doorPos = document.getElementById('doorPos').value;
+      ctx.fillStyle = "#f1f5f9";
+      ctx.strokeStyle = "#64748b";
+      ctx.lineWidth = 4;
+      if (doorPos === 'left') {
+        ctx.fillRect(36, 450, 8, 120);
+        ctx.strokeRect(36, 450, 8, 120);
+        ctx.fillStyle = "#475569"; ctx.font = "bold 18px sans-serif";
+        ctx.fillText("KAPI", 70, 515);
+      } else {
+        ctx.fillRect(w - 44, 450, 8, 120);
+        ctx.strokeRect(w - 44, 450, 8, 120);
+        ctx.fillStyle = "#475569"; ctx.font = "bold 18px sans-serif";
+        ctx.fillText("KAPI", w - 70, 515);
+      }
+
+      // Tahta ve Öğretmen Masası Çizimi
+      const teacherPos = document.getElementById('teacherPos').value;
+      let boardX = w / 2 - 300;
+      let boardW = 600;
+      
+      // Tahta
+      ctx.fillStyle = "#065f46";
+      ctx.fillRect(boardX, 180, boardW, 35);
+      ctx.strokeStyle = "#047857";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(boardX, 180, boardW, 35);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 18px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("YAZI TAHTASI", w / 2, 204);
+
+      // Öğretmen Masası
+      let deskX = w / 2 - 100;
+      if (teacherPos === 'left') deskX = 200;
+      if (teacherPos === 'right') deskX = w - 400;
+
+      ctx.fillStyle = "#b45309";
+      ctx.fillRect(deskX, 235, 200, 50);
+      ctx.strokeStyle = "#92400e";
+      ctx.strokeRect(deskX, 235, 200, 50);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 16px sans-serif";
+      ctx.fillText("ÖĞRETMEN MASASI", deskX + 100, 266);
+
+      // Öğrenci Listelerini Hazırla (Kızlar ve Erkekler ayrı ayrı bloklanacak)
+      const females = parseNames(document.getElementById('femaleNames').value);
+      const males = parseNames(document.getElementById('maleNames').value);
+
+      // Sıra Izgara Yapısı (Örn: 4x4 -> 4 Kolon, 4 Sıra. Her Kolon çift masa -> 2'li sıra = 2 koltuk)
+      const gridSize = document.getElementById('gridSize').value.split('x');
+      const cols = parseInt(gridSize[0]);
+      const rows = parseInt(gridSize[1]);
+
+      // Toplam İkili Masa Blok Sayısı = cols * rows
+      // Her ikili masada 2 koltuk var. Kural gereği aynı masada kız ve erkek karışık OLMAYACAK.
+      // Bu yüzden önce tamamen kız masalarını, sonra tamamen erkek masalarını dolduralım.
+      
+      let fIndex = 0;
+      let mIndex = 0;
+
+      // İkili masa boyutları ve konumlandırma
+      const startY = 320;
+      const totalAreaH = h - startY - 80;
+      const rowH = totalAreaH / rows;
+      
+      const totalAreaW = w - 300; // Kenar boşlukları
+      const colW = totalAreaW / cols;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const deskBlockX = 150 + (c * colW) + (colW - 220) / 2;
+          const deskBlockY = startY + (r * rowH) + (rowH - 100) / 2;
+
+          // İkili masanın iki koltuğu (Sol Koltuk, Sağ Koltuk)
+          // Masanın türüne karar verelim: Eğer henüz yerleştirilmemiş kızlar varsa kız masası yapalım, yoksa erkek masası.
+          // Veya dengelemek için blok bazlı gidelim.
+          let seat1Name = "";
+          let seat2Name = "";
+          let isFemaleDesk = false;
+
+          // Basit mantık: Elimizde kız varsa kız oturtalım, kız bittiyse erkek oturtalım. 
+          // Ancak AYNI MASADA (aynı ikili blokta) kesinlikle 1 kız 1 erkek olmayacak. İkisi de kız ya da ikisi de erkek olacak.
+          
+          let canPutFemale = (fIndex < females.length);
+          let canPutMale = (mIndex < males.length);
+
+          if (canPutFemale && (fIndex % 2 === 0 || mIndex >= males.length)) {
+            // İkili masayı kız masası yapalım (2 kız alabilir)
+            isFemaleDesk = true;
+            seat1Name = fIndex < females.length ? females[fIndex++] : "";
+            seat2Name = fIndex < females.length ? females[fIndex++] : "";
+          } else if (canPutMale) {
+            // İkili masayı erkek masası yapalım (2 erkek alabilir)
+            isFemaleDesk = false;
+            seat1Name = mIndex < males.length ? males[mIndex++] : "";
+            seat2Name = mIndex < males.length ? males[mIndex++] : "";
+          } else if (canPutFemale) {
+            isFemaleDesk = true;
+            seat1Name = fIndex < females.length ? females[fIndex++] : "";
+            seat2Name = fIndex < females.length ? females[fIndex++] : "";
+          }
+
+          // Çiftli Masayı Çiz
+          drawDoubleDesk(deskBlockX, deskBlockY, seat1Name, seat2Name, isFemaleDesk);
+        }
+      }
+    }
+
+    function drawDoubleDesk(x, y, name1, name2, isFemale) {
+      const seatW = 100;
+      const seatH = 75;
+      const gap = 15;
+
+      // Renk paleti (Kızlar için pembe/mor tonları, Erkekler için mavi tonları)
+      const bgCol1 = name1 ? (isFemale ? "#fce7f3" : "#e0f2fe") : "#f8fafc";
+      const borderCol1 = name1 ? (isFemale ? "#ec4899" : "#0284c7") : "#cbd5e1";
+      const textCol1 = name1 ? (isFemale ? "#831843" : "#0369a1") : "#94a3b8";
+
+      const bgCol2 = name2 ? (isFemale ? "#fce7f3" : "#e0f2fe") : "#f8fafc";
+      const borderCol2 = name2 ? (isFemale ? "#ec4899" : "#0284c7") : "#cbd5e1";
+      const textCol2 = name2 ? (isFemale ? "#831843" : "#0369a1") : "#94a3b8";
+
+      // Sol Koltuk
+      ctx.fillStyle = bgCol1;
+      ctx.strokeStyle = borderCol1;
+      ctx.lineWidth = 2;
+      ctx.fillRect(x, y, seatW, seatH);
+      ctx.strokeRect(x, y, seatW, seatH);
+
+      ctx.fillStyle = textCol1;
+      ctx.font = "bold 13px 'Segoe UI', Arial, sans-serif";
+      ctx.textAlign = "center";
+      wrapText(ctx, name1 || "(Boş)", x + seatW / 2, y + 30, seatW - 10, 16);
+
+      // Sağ Koltuk
+      ctx.fillStyle = bgCol2;
+      ctx.strokeStyle = borderCol2;
+      ctx.lineWidth = 2;
+      ctx.fillRect(x + seatW + gap, y, seatW, seatH);
+      ctx.strokeRect(x + seatW + gap, y, seatW, seatH);
+
+      ctx.fillStyle = textCol2;
+      ctx.font = "bold 13px 'Segoe UI', Arial, sans-serif";
+      ctx.textAlign = "center";
+      wrapText(ctx, name2 || "(Boş)", x + seatW + gap + seatW / 2, y + 30, seatW - 10, 16);
+    }
+
+    // Uzun isimleri kutuya sığdırma fonksiyonu
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let currentY = y;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, currentY);
+          line = words[n] + ' ';
+          currentY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, currentY);
+    }
+
+    // PDF İndirme İşlemi
+    btnDownloadPDF.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('l', 'mm', 'a4'); // Yatay A4
+
+      const originalText = btnDownloadPDF.innerHTML;
+      btnDownloadPDF.innerHTML = "⏳ PDF Oluşturuluyor...";
+      btnDownloadPDF.disabled = true;
+
+      setTimeout(() => {
+        drawSeatingPlan();
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+
+        const className = document.getElementById('className').value.replace(/[^a-zA-Z0-9]/g, "_");
+        pdf.save(`Oturma_Plani_${className}.pdf`);
+
+        btnDownloadPDF.innerHTML = originalText;
+        btnDownloadPDF.disabled = false;
+      }, 100);
+    });
+
+    // İlk açılışta çiz
+    window.onload = () => {
+      drawSeatingPlan();
+    };
+  </script>
+</body>
+</html>
