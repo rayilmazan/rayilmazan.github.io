@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teknoloji RSS Canlı Akışı</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --primary-color: #2563eb;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #1e293b;
+        }
+        .refresh-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .refresh-btn:hover {
+            background-color: #1d4ed8;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .feed-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            height: 480px;
+            overflow: hidden;
+        }
+        .feed-header {
+            padding: 14px 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            font-size: 1rem;
+            color: #0f172a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .feed-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .feed-items {
+            padding: 14px 16px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .news-item {
+            margin-bottom: 14px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .news-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .news-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        .news-title:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+        .news-date {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        .loading, .error {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        .error {
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Teknoloji RSS Canlı Akışı</h1>
+            <button class="refresh-btn" onclick="loadAllFeeds()">Tümünü Yenile</button>
+        </header>
+        <div class="grid" id="feedGrid"></div>
+    </div>
+
+    <script>
+        const feeds = [
+            { name: "Donanım Haber", url: "https://www.donanimhaber.com/rss/tum/" },
+            { name: "CHIP Online", url: "https://www.chip.com.tr/rss" },
+            { name: "NTV Teknoloji", url: "https://www.ntv.com.tr/teknoloji.rss" },
+            { name: "Technopat", url: "https://www.technopat.net/feed/" },
+            { name: "Webtekno", url: "https://www.webtekno.com/rss.xml" }
+        ];
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        async function loadFeed(feed, container) {
+            const card = document.createElement('div');
+            card.className = 'feed-card';
+            card.innerHTML = `
+                <div class="feed-header">
+                    <span>${feed.name}</span>
+                    <span class="feed-badge">Canlı</span>
+                </div>
+                <div class="feed-items">
+                    <div class="loading">Yükleniyor...</div>
+                </div>
+            `;
+            container.appendChild(card);
+
+            const itemsContainer = card.querySelector('.feed-items');
+
+            try {
+                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.status === 'ok' && data.items) {
+                    itemsContainer.innerHTML = '';
+                    data.items.forEach(item => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'news-item';
+                        itemEl.innerHTML = `
+                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-title">${item.title}</a>
+                            <div class="news-date">${formatDate(item.pubDate)}</div>
+                        `;
+                        itemsContainer.appendChild(itemEl);
+                    });
+                } else {
+                    itemsContainer.innerHTML = `<div class="error">Akış yüklenemedi.</div>`;
+                }
+            } catch (error) {
+                itemsContainer.innerHTML = `<div class="error">Bağlantı hatası oluştu.</div>`;
+            }
+        }
+
+        function loadAllFeeds() {
+            const grid = document.getElementById('feedGrid');
+            grid.innerHTML = '';
+            feeds.forEach(feed => loadFeed(feed, grid));
+        }
+
+        // Sayfa açıldığında yükle
+        loadAllFeeds();
+    </script>
+</body>
+</html>
