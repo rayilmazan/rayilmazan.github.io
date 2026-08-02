@@ -326,15 +326,16 @@
         color: "#EF4444",
         hasPhoto: true,
         hasName: true,
-        giantLetter: null, // BÜYÜK N HARFİ BURADAN KALDIRILDI
-        letterPos: "bottom-left"
+        giantLetter: null,
+        letterPos: "center" // <-- HATA BURADAYDI, bottom-left yerine center yapıldı.
       },
       ogretmen: {
         title: "ÖĞRETMEN",
         color: "#06B6D4",
         hasPhoto: true,
         hasName: true,
-        giantLetter: null
+        giantLetter: null,
+        letterPos: "center"
       },
       ziyaretci: {
         title: "ZİYARETÇİ",
@@ -525,15 +526,42 @@
       const w = canvas.width;
       const h = canvas.height;
 
+      // 1. ZEMİN VE GÜVENLİK DESENİ (YENİ EKLENDİ)
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, w, h);
 
+      // Desen oluştur (Noktalı ve ince çizgili şık bir patern)
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 30;
+      pCanvas.height = 30;
+      const pCtx = pCanvas.getContext('2d');
+      
+      // Desen: Nokta
+      pCtx.fillStyle = "#cbd5e1"; // Yumuşak gri-mavi
+      pCtx.beginPath();
+      pCtx.arc(15, 15, 1.5, 0, Math.PI * 2);
+      pCtx.fill();
+      
+      // Desen: Çapraz Çizgi
+      pCtx.strokeStyle = "rgba(203, 213, 225, 0.4)"; 
+      pCtx.lineWidth = 1;
+      pCtx.beginPath();
+      pCtx.moveTo(0, 30);
+      pCtx.lineTo(30, 0);
+      pCtx.stroke();
+
+      const pattern = ctx.createPattern(pCanvas, 'repeat');
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. ÜST BÖLÜM - OKUL ADI
       ctx.strokeStyle = "#94a3b8";
       ctx.lineWidth = 2;
       ctx.strokeRect(w / 2 - 50, 15, 100, 25);
 
       drawWrappedText(ctx, inputSchool.value.toUpperCase() || "OKUL ADI", w / 2, 90, w - 60, 32, config.color, "bold", 2);
 
+      // 3. ORTA BÖLÜM - BÜYÜK HARF VEYA FOTOĞRAF
       if (config.giantLetter && config.letterPos === "center") {
         ctx.fillStyle = config.color;
         ctx.font = "900 380px Arial, sans-serif";
@@ -547,6 +575,14 @@
         const centerX = w / 2;
         const centerY = 315;
         const radius = 135;
+
+        // Arka plana beyaz daire atalım ki desen fotoğrafın arkasından veya kenarından taşmasın
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius + 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+        ctx.restore();
 
         ctx.save();
         ctx.beginPath();
@@ -578,10 +614,19 @@
         }
         ctx.restore();
 
+        // İsimlerin altına hafif beyaz gölge ekleyelim ki desende okunabilirlik artsın
+        ctx.shadowColor = "white";
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
         drawWrappedText(ctx, inputName.value.toUpperCase() || "ADI SOYADI", w / 2, 515, w - 50, 38, "#000000", "bold", 2);
         drawWrappedText(ctx, inputSub.value.toUpperCase() || "ALT BİLGİ", w / 2, 595, w - 60, 26, config.color, "bold", 2);
+        
+        ctx.shadowColor = "transparent"; // Gölgeyi sıfırla
       }
 
+      // 4. ALT BÖLÜM - RENKLİ ŞERİT VE UNVAN
       const barHeight = 170;
       const barY = h - barHeight;
 
@@ -620,7 +665,9 @@
       ctx.textAlign = "center";
 
       const titleParts = config.title.split(" ");
-      const textXShift = (config.letterPos === "bottom-left") ? 45 : 0;
+      
+      // HATA DÜZELTİLDİ: Sadece giantLetter varsa ve bottom-left ise yazıyı sağa kaydır
+      const textXShift = (config.giantLetter && config.letterPos === "bottom-left") ? 45 : 0;
 
       if (titleParts.length > 1) {
         ctx.fillText(titleParts[0], (w / 2) + textXShift, barY + 65);
