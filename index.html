@@ -5,17 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>rayılmazan // Terminal</title>
     <style>
-        /* TEMEL STİLLER - "Used Future" Teması İçin Açık Renkli ve Yıpranmış Metal Doku */
+        /* TEMEL STİLLER - Uzay Boşluğu / Gemi İçi Karanlığı */
         body {
-            /* Arka plan için fırçalanmış, yıpranmış metal panel dokusu simülasyonu */
-            background: #e0e0e0;
-            background-image: 
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>'),
-                linear-gradient(rgba(200,200,200,0.1) 1px, transparent 1px), 
-                linear-gradient(90deg, rgba(200,200,200,0.1) 1px, transparent 1px);
-            background-size: 100% 100%, 20px 20px, 20px 20px;
-            
-            color: #1a110d; /* Koyu yazı */
+            background: #0a0a0a;
+            color: #ccc;
             font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             display: flex;
@@ -24,377 +17,471 @@
             min-height: 100vh;
         }
 
-        /* ANA ŞASİ (CHASSIS) - Metal Panel Görünümü */
+        /* ANA ŞASİ (CHASSIS) - Yıpranmış, Paslı, Çizik Gümüş Metal Panel */
         .chassis {
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
-            /* Açık gri, hafif kirli metal panel rengi */
-            background: #f5f5f5; 
+            /* Gümüş/Kirli Metal Taban */
+            background-color: #6b6e70; 
+            /* Pas, Kir, Çizik ve Metal Dokusu Katmanları */
             background-image: 
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.02"/></svg>');
+                /* Sol üst ve sağ alt pas/yağ lekeleri */
+                radial-gradient(circle at 10% 20%, rgba(90, 40, 15, 0.45) 0%, transparent 30%),
+                radial-gradient(circle at 85% 90%, rgba(60, 30, 10, 0.6) 0%, transparent 25%),
+                radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.1) 0%, transparent 60%),
+                /* Çizikler */
+                repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.03) 4px, rgba(255,255,255,0.03) 5px),
+                repeating-linear-gradient(-75deg, transparent, transparent 12px, rgba(0,0,0,0.04) 12px, rgba(0,0,0,0.04) 14px),
+                /* Fraktal Kumlu Yüzey (Noise) */
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.25"/></svg>');
             
-            /* Sınırlar: Metal perçinler ve paneller için "greeble" detayları */
-            border: 2px solid #ccc;
-            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="%23ccc" stroke="%23aaa" stroke-width="0.5"/><circle cx="2" cy="2" r="0.5" fill="%23aaa"/><circle cx="8" cy="2" r="0.5" fill="%23aaa"/><circle cx="8" cy="8" r="0.5" fill="%23aaa"/><circle cx="2" cy="8" r="0.5" fill="%23aaa"/></svg>') 10 stretch;
+            /* Kalın ve mekanik dış çerçeve */
+            border: 4px solid #333;
+            border-top-color: #888;
+            border-left-color: #888;
+            border-radius: 4px;
             
             padding: 30px;
             position: relative;
-            /* Yüzey çizgileri (Izgara) - Daha hafif */
-            background-image: linear-gradient(rgba(0,0,0,0.01) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(0,0,0,0.01) 1px, transparent 1px);
-            background-size: 20px 20px;
             
-            /* Dış ve iç gölgeler: Derinlik ve modülerlik hissi */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1), inset 0 0 15px rgba(0,0,0,0.05);
+            /* Gölgelendirme (Paneli ağır ve kalın gösterir) */
+            box-shadow: 
+                20px 20px 40px rgba(0,0,0,0.8), 
+                inset 0 0 40px rgba(0,0,0,0.5),
+                inset 3px 3px 5px rgba(255,255,255,0.1);
             box-sizing: border-box;
-            
-            /* Köşelere sahte "greeble" detayları */
-            border-radius: 8px;
         }
 
-        /* Greeble köşe plakaları */
+        /* Vida / Perçin Detayları (Greeble) */
         .chassis::before,
         .chassis::after {
             content: "";
             position: absolute;
-            width: 15px;
-            height: 15px;
-            background: #e0e0e0;
-            border: 1px solid #ccc;
-            border-radius: 2px;
-            box-shadow: 1px 1px 1px rgba(0,0,0,0.1), inset 1px 1px 0px rgba(255,255,255,0.8);
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #444, #111);
+            border-radius: 50%;
+            border: 1px solid #555;
+            box-shadow: inset 1px 1px 2px #777, 1px 1px 3px rgba(0,0,0,0.8);
         }
-        .chassis::before { top: -8px; left: -8px; }
-        .chassis::after { bottom: -8px; right: -8px; }
+        .chassis::before { top: 12px; left: 12px; }
+        .chassis::after { bottom: 12px; right: 12px; }
+        
+        .rivet-tr { position: absolute; top: 12px; right: 12px; width: 12px; height: 12px; background: linear-gradient(135deg, #444, #111); border-radius: 50%; border: 1px solid #555; box-shadow: inset 1px 1px 2px #777, 1px 1px 3px rgba(0,0,0,0.8); }
+        .rivet-bl { position: absolute; bottom: 12px; left: 12px; width: 12px; height: 12px; background: linear-gradient(135deg, #444, #111); border-radius: 50%; border: 1px solid #555; box-shadow: inset 1px 1px 2px #777, 1px 1px 3px rgba(0,0,0,0.8); }
 
         /* BAŞLIK BÖLÜMÜ */
         .header-section {
             display: flex;
             align-items: center;
-            gap: 15px;
-            border-bottom: 2px solid #a8958b; /* Daha açık border */
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            border-bottom: 3px solid #333;
+            border-bottom-color: rgba(0,0,0,0.6);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
-        /* LOGO ALANI VE LOGO KULLANIMI */
+        .header-section::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* LOGO ALANI */
         .logo-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
         }
 
-        /* Grafik Logo Öğesi (Örnek: Dişli simgesi) */
-        .logo-icon {
-            width: 24px;
-            height: 24px;
-            background-color: #00897b; /* Endüstriyel yeşil */
-            border-radius: 50%;
-            position: relative;
-            box-shadow: inset 1px 1px 1px rgba(255,255,255,0.8), 1px 1px 2px rgba(0,0,0,0.2);
-        }
-        .logo-icon::before {
-            content: "R";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
-            font-size: 16px;
-            font-weight: bold;
+        /* Kendi Logonun Stili - Metale damgalanmış gibi */
+        .custom-logo {
+            height: 45px;
+            /* Yıpranmış boya etkisi yaratmak için */
+            mix-blend-mode: multiply;
+            opacity: 0.7;
+            filter: drop-shadow(1px 1px 0px rgba(255,255,255,0.1));
         }
         
-        /* Metin Tabanlı Logo */
         .logo-tag {
-            background: #fff; /* Açık zemin */
-            color: #00897b; /* Endüstriyel yeşil yazı */
+            background: #2b2b2b;
+            color: #d88920; /* Paslı turuncu/kehribar */
             padding: 4px 10px;
             font-size: 14px;
             font-weight: bold;
             letter-spacing: 2px;
-            border: 2px solid #ccc; /* Metalik border */
-            border-left: 4px solid #00897b; /* Vurgu çizgisi */
-            white-space: nowrap;
-            box-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+            border: 2px solid #111;
+            border-top-color: #444;
+            border-left-color: #444;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.8);
         }
 
-        /* TECH DIALS */
+        /* TECH DIALS - Kirli göstergeler */
         .tech-dials {
             display: flex;
             gap: 10px;
-            font-size: 10px;
-            color: #5c4537; /* Koyu renk tech yazısı */
+            font-size: 11px;
+            color: #222;
+            font-weight: bold;
             flex-wrap: wrap;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.15);
+        }
+
+        .tech-dials span {
+            background: rgba(0,0,0,0.1);
+            border: 1px inset rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 2px;
         }
 
         /* İÇERİK KONTEYNERİ */
         .content-container {
             display: grid;
-            grid-template-columns: 1fr 220px;
-            gap: 20px;
+            grid-template-columns: 1fr 240px;
+            gap: 25px;
         }
 
-        /* ANA GÜNLÜK (MAIN LOG) PANELİ */
+        /* ANA GÜNLÜK (MAIN LOG) PANELİ - Eski CRT Ekran */
         .main-log {
-            background: #fff; /* Açık, temiz panel zemin */
-            border: 1px solid #ccc;
-            padding: 20px;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            background-color: #0b110c; /* Çok koyu yeşil/siyah tüplü ekran */
+            /* Scanline efekti (Taramalı çizgiler) */
+            background-image: 
+                repeating-linear-gradient(transparent, transparent 2px, rgba(0,0,0,0.3) 3px),
+                radial-gradient(circle at center, rgba(30,50,30,0.1) 0%, rgba(0,0,0,0.8) 100%);
+            
+            border: 6px solid #222;
+            border-bottom-color: #444;
+            border-right-color: #444;
+            padding: 25px;
+            box-shadow: 
+                inset 0 0 30px rgba(0,0,0,1),
+                inset 0 0 10px rgba(216, 137, 32, 0.1),
+                0 0 0 2px #555,
+                3px 3px 10px rgba(0,0,0,0.7);
             box-sizing: border-box;
-            min-height: 390px;
-            border-radius: 4px;
+            min-height: 420px;
+            border-radius: 8px; /* Eski ekranların kavisli köşeleri */
+            position: relative;
+            overflow: hidden;
         }
 
-        /* VERİ SATIRLARI */
+        /* Ekran parlaması (Kavisli cam yansıması) */
+        .main-log::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 30%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
+            pointer-events: none;
+        }
+
+        /* EKRAN İÇİ YAZILAR - Kehribar (Amber) Rengi */
+        #view-device-info, #view-benchmark, #view-speedtest, #view-tools {
+            color: #d88920; /* Ana Kehribar Rengi */
+            text-shadow: 0 0 4px rgba(216, 137, 32, 0.4); /* Yazı parlaması */
+        }
+
         .data-row {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             gap: 15px;
             margin: 12px 0;
-            border-bottom: 1px dashed #ccc; /* Daha açık çizgiler */
+            border-bottom: 1px dotted rgba(216, 137, 32, 0.3);
             padding-bottom: 4px;
         }
 
         .data-row .label {
-            color: #5c4537; /* Koyu label */
+            color: #8a6020; /* Daha soluk kehribar */
             white-space: nowrap;
         }
 
-        /* YAN ÇUBUK (SIDE BAR) */
+        /* YAN ÇUBUK (SIDE BAR) - Kontrol Paneli */
         .side-bar {
-            border-left: 1px solid #a8958b; /* Daha açık border */
-            padding-left: 20px;
+            background: #5a5d5f; /* Ayrı bir gri panel */
+            border: 3px solid #222;
+            border-top-color: #777;
+            border-left-color: #777;
+            padding: 15px;
             font-size: 11px;
-            color: #5c4537; /* Koyu yan çubuk yazısı */
+            color: #111;
+            font-weight: bold;
+            box-shadow: inset 2px 2px 5px rgba(255,255,255,0.1), 5px 5px 15px rgba(0,0,0,0.5);
+            /* Küçük kirlilik */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100" height="100" filter="url(%23n)" opacity="0.1"/></svg>');
         }
 
-        /* GREEBLE BUTONLAR */
+        .side-bar-title {
+            color: #d82020; /* Uyarı Kırmızı */
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.2);
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* GREEBLE BUTONLAR - Star Wars Kalın Fiziksel Anahtarlar */
         .greeble-btn {
             display: block;
             width: 100%;
-            /* Açık gri, modüler buton */
-            background: #e8e8e8; 
-            color: #1a110d; /* Koyu yazı */
-            border: 1px solid #ccc;
+            /* Kirli gri plastik/metal yüzey */
+            background: linear-gradient(to bottom, #7a7a7a, #4a4a4a); 
+            color: #e0e0e0;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            padding: 10px 12px;
-            margin-top: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 12px;
+            margin-top: 12px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s ease;
             position: relative;
-            /* Kabartma etkisi */
-            box-shadow: 1px 1px 0px #ccc, inset 1px 1px 0px rgba(255,255,255,0.8);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-radius: 3px;
+            
+            /* Kalın 3D Buton Sınırları */
+            border: 2px solid #111;
+            border-top-color: #999;
+            border-left-color: #999;
+            box-shadow: 3px 3px 5px rgba(0,0,0,0.6), inset 1px 1px 2px rgba(255,255,255,0.2);
+            text-shadow: 1px 1px 1px #000;
         }
 
-        /* Hover efekti: Vurgu rengi */
+        /* Hover efekti (Butonun üstüne gelince) */
         .greeble-btn:hover {
-            background: #fff;
-            color: #00897b; /* Endüstriyel yeşil */
-            border: 1px solid #00897b;
-            box-shadow: 1px 1px 0px #ccc, inset 1px 1px 0px rgba(255,255,255,0.8);
-            transform: translate(1px, 1px);
+            background: linear-gradient(to bottom, #8a8a8a, #5a5a5a);
+            color: #d88920; /* Kehribar yazısı parlar */
+        }
+
+        /* Aktif / Basılma Efekti (Buton içeri çöker) */
+        .greeble-btn:active {
+            background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
+            border-top-color: #111;
+            border-left-color: #111;
+            border-bottom-color: #666;
+            border-right-color: #666;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.6), inset 3px 3px 5px rgba(0,0,0,0.5);
+            transform: translateY(2px) translateX(2px);
         }
 
         .greeble-btn::before {
-            content: "> ";
-            color: #ccc;
-            font-weight: bold;
+            content: ">> ";
+            color: #b0b0b0;
         }
 
         .greeble-btn:hover::before {
-            content: "_ ";
-            color: #00897b;
+            color: #d88920;
         }
 
         /* ARAÇLAR IZGARASI (Tools Grid) */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        /* ARAÇ KARTLARI - Butonlarla aynı açık stile sahip */
+        /* ARAÇ KARTLARI */
         .tool-card {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             padding: 12px;
             text-transform: none;
             height: 100%;
             box-sizing: border-box;
-            background: #f8f8f8;
-            border: 1px solid #ccc;
-            color: #1a110d;
+            background: linear-gradient(135deg, #2b302c, #161a17); /* Askeri koyu yeşilimsigri */
+            border: 2px solid #000;
+            border-top-color: #4a504a;
+            border-left-color: #4a504a;
+            box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), 3px 3px 6px rgba(0,0,0,0.8);
         }
 
-        .tool-card:hover {
-            background: #fff;
-            border: 1px solid #00897b;
-            color: #00897b;
+        .tool-card:active {
+            border-top-color: #000;
+            border-left-color: #000;
+            border-bottom-color: #4a504a;
+            border-right-color: #4a504a;
+            transform: translateY(2px);
+            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8);
         }
 
         .tool-title {
-            color: #00897b; /* Endüstriyel yeşil */
+            color: #d88920; /* Kehribar */
             font-weight: bold;
-            font-size: 12px;
+            font-size: 13px;
+            text-shadow: 0 0 3px rgba(216,137,32,0.4);
         }
 
         .tool-desc {
-            color: #5c4537; /* Koyu açıklama */
-            font-size: 10px;
+            color: #8a6020;
+            font-size: 11px;
             line-height: 1.3;
         }
 
-        /* FOOTER ÇİZGİSİ */
+        /* UYARI BANTLI FOOTER ÇİZGİSİ */
         .footer-line {
             margin-top: 30px;
-            height: 2px;
-            /* Açık, metalik gradyan */
-            background: linear-gradient(90deg, #00897b, #ccc);
+            height: 10px;
+            /* Endüstriyel sarı/siyah uyarı şeritleri */
+            background: repeating-linear-gradient(
+                -45deg,
+                #d8a820,
+                #d8a820 10px,
+                #222 10px,
+                #222 20px
+            );
+            border: 2px solid #111;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5), 2px 2px 5px rgba(0,0,0,0.5);
+            border-radius: 2px;
         }
 
-        /* VURGULU METİN VE İLERLEME ÇUBUĞU */
+        /* VURGULU METİN (Ekran İçi Veriler) */
         .highlight {
-            color: #00897b; /* Endüstriyel yeşil */
+            color: #f7b752; /* Daha parlak ekran rengi */
             text-align: right;
             word-break: break-word;
         }
 
+        /* İLERLEME ÇUBUĞU (LED Gösterge Tarzı) */
         .progress-track {
             width: 100%;
-            background: #eee; /* Açık track */
-            border: 1px solid #ccc;
-            height: 16px;
+            background: #050505;
+            border: 2px solid #222;
+            border-bottom-color: #444;
+            border-right-color: #444;
+            height: 20px;
             margin: 15px 0 25px 0;
             padding: 2px;
             box-sizing: border-box;
             display: none;
-            border-radius: 8px;
         }
 
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: #00897b; /* Endüstriyel yeşil */
-            transition: width 0.8s cubic-bezier(0.1, 0.8, 0.3, 1);
-            background-image: linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
-            background-size: 6px 100%;
-            border-radius: 6px;
+            background: #d82020; /* Kırmızı başlar */
+            transition: width 0.8s cubic-bezier(0.1, 0.8, 0.3, 1), background-color 0.8s;
+            /* Bloklu LED Görünümü */
+            background-image: linear-gradient(90deg, rgba(0,0,0,0.6) 2px, transparent 2px);
+            background-size: 10px 100%;
+            box-shadow: 0 0 10px rgba(216, 32, 32, 0.6);
         }
 
-        /* YÜKLEME VE SKOR */
+        /* YÜKLEME YAZISI */
         .loading {
             font-size: 14px;
-            color: #1a110d; /* Koyu yazı */
+            color: #d88920;
             text-align: center;
             padding: 40px 0;
             animation: pulse 1.5s infinite;
         }
         
         .score-box {
-            font-size: 36px;
+            font-size: 42px;
             text-align: center;
             font-weight: bold;
+            text-shadow: 0 0 15px rgba(216, 137, 32, 0.6);
         }
 
         @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+            0% { opacity: 0.4; }
+            50% { opacity: 1; text-shadow: 0 0 8px rgba(216,137,32,0.8); }
+            100% { opacity: 0.4; }
         }
 
-        /* MEDYA SORGULARI */
+        /* MEDYA SORGULARI (Mobil) */
         @media (max-width: 768px) {
-            body { padding: 10px; }
-            .chassis { padding: 15px; border-image: none; border-radius: 4px; }
-            .chassis::before, .chassis::after { display: none; }
-            .header-section { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .logo-wrapper { flex-direction: column; align-items: flex-start; }
-            .logo-icon { display: none; } /* Mobilde grafik logoyu gizle */
-            .content-container { grid-template-columns: 1fr; gap: 15px; }
-            .side-bar { border-left: none; border-top: 1px solid #a8958b; padding-left: 0; padding-top: 15px; }
+            body { padding: 5px; }
+            .chassis { padding: 15px; border-width: 2px; }
+            .chassis::before, .chassis::after, .rivet-tr, .rivet-bl { display: none; }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .content-container { grid-template-columns: 1fr; gap: 20px; }
+            .side-bar { border-left: none; padding: 15px; box-shadow: none; border-width: 2px; }
             .data-row { flex-direction: column; align-items: flex-start; gap: 4px; }
             .highlight { text-align: left; }
             .tools-grid { grid-template-columns: 1fr; }
+            .main-log { min-height: 300px; padding: 15px; }
         }
     </style>
 </head>
 <body>
 
 <div class="chassis">
-    <!-- BAŞLIK BÖLÜMÜ - LOGO VE TECH DIALS -->
+    <!-- Sağ/Sol alt köşelere ekstra vidalar -->
+    <div class="rivet-tr"></div>
+    <div class="rivet-bl"></div>
+
+    <!-- BAŞLIK BÖLÜMÜ -->
     <div class="header-section">
         <div class="logo-wrapper">
-            <div class="logo-icon"></div> <!-- Grafik Logo -->
-            <div class="logo-tag">rayılmazan</div> <!-- Metin Logo -->
+            <!-- LOGO DOSYASI BURAYA EKLENDİ -->
+            <img src="logom.png" alt="Rayılmazan Logo" class="custom-logo">
+            <div class="logo-tag">RAYILMAZAN.SYS</div>
         </div>
         <div class="tech-dials">
-            <span>[sys_v9.0_rust]</span>
-            <span>[uptime: online]</span>
-            <span>[hardware_scan]</span>
+            <span>[UNIT: 04-B]</span>
+            <span>[PWR: ONLINE]</span>
+            <span>[MODE: DIAGNOSTIC]</span>
         </div>
     </div>
 
     <!-- İÇERİK BÖLÜMÜ -->
     <div class="content-container">
-        <!-- ANA GÜNLÜK PANELİ (Açık Renkli Panel) -->
+        <!-- ANA GÜNLÜK PANELİ (CRT Ekran) -->
         <div class="main-log">
             
             <!-- CİHAZ BİLGİSİ EKRANI -->
             <div id="view-device-info">
-                <h2 style="font-size: 16px; margin-top:0; color: #00897b; border-bottom: 1px solid #ccc; padding-bottom: 8px;">> Bu Cihaz Hakkında</h2>
+                <h2 style="font-size: 18px; margin-top:0; border-bottom: 2px dashed rgba(216,137,32,0.4); padding-bottom: 8px;">> SYSTEM_DIAGNOSTICS</h2>
                 
                 <div class="data-row">
-                    <span class="label">>> Cihaz tipi</span>
+                    <span class="label">>> CHASSIS_TYPE</span>
                     <span id="dev-type" class="highlight">Tarama yapılıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> İşletim sistemi</span>
+                    <span class="label">>> CORE_OS</span>
                     <span id="dev-os" class="highlight">Tarama yapılıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Ekran çözünürlüğü</span>
+                    <span class="label">>> OPTIC_RESOLUTION</span>
                     <span id="dev-screen" class="highlight">Tarama yapılıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Ekran kartı (Gpu)</span>
+                    <span class="label">>> GRAPHIC_DRIVE</span>
                     <span id="dev-gpu" class="highlight">Hesaplanıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Ip & yaklaşık konum</span>
+                    <span class="label">>> NETWORK_NODE</span>
                     <span id="dev-ip" class="highlight">Sorgulanıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Enlem & boylam</span>
+                    <span class="label">>> SECTOR_COORDS</span>
                     <span id="dev-coords" class="highlight">Sorgulanıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Batarya durumu</span>
+                    <span class="label">>> POWER_CELL</span>
                     <span id="dev-battery" class="highlight">Okunuyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Donanım kapasitesi</span>
+                    <span class="label">>> LOGIC_CORES</span>
                     <span id="dev-hardware" class="highlight">Hesaplanıyor...</span>
                 </div>
                 <div class="data-row">
-                    <span class="label">>> Hareket sensörü</span>
+                    <span class="label">>> GYRO_STABILIZER</span>
                     <span id="dev-sensors" class="highlight">Test ediliyor...</span>
                 </div>
             </div>
 
             <!-- BENCHMARK EKRANI -->
             <div id="view-benchmark" style="display: none;">
-                <h2 style="font-size: 16px; margin-top:0; color: #00897b; border-bottom: 1px solid #ccc; padding-bottom: 8px;">> Cihaz Donanım Skoru</h2>
-                <p style="color: #5c4537; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü (1.0 - 10.0)</p>
+                <h2 style="font-size: 18px; margin-top:0; border-bottom: 2px dashed rgba(216,137,32,0.4); padding-bottom: 8px;">> HARDWARE_BENCHMARK</h2>
+                <p style="color: #8a6020; font-size: 12px; margin-top: 5px;">Hesaplama Matrisi (1.0 - 10.0)</p>
                 
-                <div id="loading" class="loading">>> Donanım matrisleri test ediliyor, lütfen bekleyin...</div>
+                <div id="loading" class="loading">>> MATRİS TEST EDİLİYOR. LÜTFEN BEKLEYİN...</div>
                 <div id="score" class="score-box" style="display: none;">0</div>
                 
                 <div id="progress-track" class="progress-track">
@@ -403,133 +490,132 @@
                 
                 <div id="details" style="display: none; margin-top: 15px;">
                     <div class="data-row">
-                        <span class="label">>> İşlemci çekirdeği</span>
+                        <span class="label">>> LOGIC_UNIT_CORE</span>
                         <span id="bench-cpu" class="highlight">---</span>
                     </div>
                     <div class="data-row">
-                        <span class="label">>> Ekran yenileme hızı</span>
+                        <span class="label">>> REFRESH_RATE</span>
                         <span id="bench-fps" class="highlight">---</span>
                     </div>
                     <div class="data-row">
-                        <span class="label">>> Grafik donanımı (Gpu)</span>
+                        <span class="label">>> RENDER_ENGINE</span>
                         <span id="bench-gpu" class="highlight">---</span>
                     </div>
                     <div class="data-row">
-                        <span class="label">>> Tahmini cihaz sınıfı</span>
+                        <span class="label">>> ESTIMATED_CLASS</span>
                         <span id="bench-tier" class="highlight">---</span>
                     </div>
                 </div>
-                <button class="greeble-btn" onclick="runBenchmark()" id="retry-btn" style="display: none; margin-top: 20px; width: auto;">Yeniden Test Et</button>
+                <button class="greeble-btn" onclick="runBenchmark()" id="retry-btn" style="display: none; margin-top: 20px; width: auto; background: linear-gradient(to bottom, #772b2b, #441111); border-color:#000;">Yeniden Başlat</button>
             </div>
 
             <!-- HIZ TESTİ EKRANI -->
             <div id="view-speedtest" style="display: none;">
-                <h2 style="font-size: 16px; margin-top:0; color: #00897b; border-bottom: 1px solid #ccc; padding-bottom: 8px;">> Ağ Veri Transfer Hızı</h2>
-                <p style="color: #5c4537; font-size: 12px; margin-top: 5px;">Küresel standartlara göre analiz döngüsü</p>
+                <h2 style="font-size: 18px; margin-top:0; border-bottom: 2px dashed rgba(216,137,32,0.4); padding-bottom: 8px;">> COMMS_LINK_SPEED</h2>
+                <p style="color: #8a6020; font-size: 12px; margin-top: 5px;">Yörünge Ağı Veri Transferi</p>
                 
-                <div id="speed-loading" class="loading">>> Ağ geçitleri haritalanıyor...</div>
+                <div id="speed-loading" class="loading">>> UYDU BAĞLANTISI ARANIYOR...</div>
                 
                 <div id="speed-details" style="display: none; margin-top: 15px;">
                     <div class="data-row">
-                        <span class="label">>> Ping / Gecikme süresi</span>
+                        <span class="label">>> SIGNAL_LATENCY (Ping)</span>
                         <span id="speed-ping" class="highlight">---</span>
                     </div>
                     <div class="data-row">
-                        <span class="label">>> İndirme hızı (Download)</span>
+                        <span class="label">>> DOWNLINK (İndirme)</span>
                         <span id="speed-download" class="highlight">---</span>
                     </div>
                     <div class="data-row">
-                        <span class="label">>> Yükleme hızı (Upload)</span>
+                        <span class="label">>> UPLINK (Yükleme)</span>
                         <span id="speed-upload" class="highlight">---</span>
                     </div>
                     <div class="data-row">
-                        <span class="label">>> Altyapı veri sınıfı</span>
+                        <span class="label">>> INFRASTRUCTURE_CLASS</span>
                         <span id="speed-tier" class="highlight">---</span>
                     </div>
                 </div>
-                <button class="greeble-btn" onclick="runSpeedTest()" id="speed-retry-btn" style="display: none; margin-top: 20px; width: auto;">Yeni Analiz Döngüsü</button>
+                <button class="greeble-btn" onclick="runSpeedTest()" id="speed-retry-btn" style="display: none; margin-top: 20px; width: auto; background: linear-gradient(to bottom, #772b2b, #441111); border-color:#000;">Sinyali Yenile</button>
             </div>
 
             <!-- ARAÇLAR EKRANI -->
             <div id="view-tools" style="display: none;">
-                <h2 style="font-size: 16px; margin-top:0; color: #00897b; border-bottom: 1px solid #ccc; padding-bottom: 8px;">> Sistem Araçları & Modüller</h2>
-                <p style="color: #5c4537; font-size: 12px; margin-top: 5px;">Çalıştırmak istediğiniz aracı seçin:</p>
+                <h2 style="font-size: 18px; margin-top:0; border-bottom: 2px dashed rgba(216,137,32,0.4); padding-bottom: 8px;">> OVERRIDE_MODULES</h2>
+                <p style="color: #8a6020; font-size: 12px; margin-top: 5px;">Yüklü Sistem Araçları:</p>
                 
                 <div class="tools-grid">
-                    <!-- Araç Butonları/Kartları - Açık Renk -->
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pdf')">
-                        <span class="tool-title">[PDF Araçları]</span>
-                        <span class="tool-desc">PDF belge düzenleme ve dönüştürme çözümleri</span>
+                        <span class="tool-title">[DATA_PDF_PROC]</span>
+                        <span class="tool-desc">Belge dönüştürme ve işleme</span>
                     </button>
-                    <!-- ... Diğer araçlar ... -->
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suterazi')">
-                        <span class="tool-title">[Su Terazisi]</span>
-                        <span class="tool-desc">Jiroskop ve açı sensörü tabanlı dijital terazi</span>
+                        <span class="tool-title">[GYRO_LEVELER]</span>
+                        <span class="tool-desc">Jiroskop kalibrasyon terazisi</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/cihaz')">
-                        <span class="tool-title">[Cihaz Analizi]</span>
-                        <span class="tool-desc">Sistem ve donanım bileşenleri tarayıcı aracı</span>
+                        <span class="tool-title">[SYS_SCANNER]</span>
+                        <span class="tool-desc">Donanım bileşenleri tarayıcısı</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/convert')">
-                        <span class="tool-title">[Dönüştürücü]</span>
-                        <span class="tool-desc">Format, birim ve veri dönüştürme konsolu</span>
+                        <span class="tool-title">[UNIT_CONVERTER]</span>
+                        <span class="tool-desc">Format ve metrik dönüştürme</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/kible')">
-                        <span class="tool-title">[Kıble Bulucu]</span>
-                        <span class="tool-desc">GPS ve pusula entegrasyonlu yön bulucu</span>
+                        <span class="tool-title">[NAV_COMPASS]</span>
+                        <span class="tool-desc">GPS destekli yön bulucu</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pardus')">
-                        <span class="tool-title">[Pardus Araçları]</span>
-                        <span class="tool-desc">Etkileşimli tahta ve işletim sistemi yardımcıları</span>
+                        <span class="tool-title">[PARDUS_OS_UTIL]</span>
+                        <span class="tool-desc">Etkileşimli sistem yardımcıları</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suratgizle')">
-                        <span class="tool-title">[Yüz Gizleyici]</span>
-                        <span class="tool-desc">KVKK uyumlu otomatik yüz maskeleme modülü</span>
+                        <span class="tool-title">[ID_MASKING]</span>
+                        <span class="tool-desc">Oto-biyometrik maskeleme (KVKK)</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/tahtatoz')">
-                        <span class="tool-title">[Tahta Temizleme]</span>
-                        <span class="tool-desc">Akıllı tahtalar için ekran toz/mod temizleyici</span>
+                        <span class="tool-title">[OPTIC_CLEANER]</span>
+                        <span class="tool-desc">Yüzey/Ekran statik temizleme</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/usb')">
-                        <span class="tool-title">[USB Yönetimi]</span>
-                        <span class="tool-desc">USB bellek hazırlama ve biçimlendirme rehberi</span>
+                        <span class="tool-title">[DATA_PORT_MGR]</span>
+                        <span class="tool-desc">Harici bellek biçimlendirme</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/caocr')">
-                        <span class="tool-title">[OCR Okuyucu]</span>
-                        <span class="tool-desc">Görsellerden anlık metin tarama ve ayıklama</span>
+                        <span class="tool-title">[OPTIC_OCR]</span>
+                        <span class="tool-desc">Görüntüden metin ayıklama</span>
                     </button>
                 </div>
             </div>
-
         </div>
 
         <!-- YAN ÇUBUK PANELİ -->
         <div class="side-bar">
-            [Durum]<br>
-            - telemetri aktif<br><br>
+            <span class="side-bar-title">WARNING / STATUS</span>
+            <span style="color: #4a4a4a;">TELEMETRY_LINK:</span> <span style="color: #1c7c25; text-shadow: 0 0 3px #1c7c25;">ON</span><br>
+            <span style="color: #4a4a4a;">SHIELD_PWR:</span> <span style="color: #a0a020; text-shadow: 0 0 3px #a0a020;">34%</span><br><br>
             
-            [Dizin]<br>
-            - /root/logs<br>
-            - /root/scripts<br>
-            - /root/debris<br><br>
+            <span class="side-bar-title">MEMORY_BANKS</span>
+            - /mnt/drive0/logs<br>
+            - /mnt/drive1/scripts<br>
+            - /dev/null/debris<br><br>
 
-            [Mekanik arabirim]<br>
-            <!-- Yan Çubuk Butonları - Açık Renk -->
-            <button class="greeble-btn" onclick="switchToDeviceInfo()">Ana Ekran</button>
-            <button class="greeble-btn" onclick="switchToTools()">Araçlar</button>
-            <button class="greeble-btn" onclick="switchToSpeedTest()">İnternet Hızın</button>
-            <button class="greeble-btn" onclick="switchToBenchmark()">Cihaz Değerlendir</button>
+            <span class="side-bar-title">MANUAL_OVERRIDE</span>
+            <!-- Fiziksel Butonlar -->
+            <button class="greeble-btn" onclick="switchToDeviceInfo()">SYS_INFO</button>
+            <button class="greeble-btn" onclick="switchToTools()">MODULES</button>
+            <button class="greeble-btn" onclick="switchToSpeedTest()">COMMS_LINK</button>
+            <button class="greeble-btn" onclick="switchToBenchmark()">DIAGNOSTIC</button>
         </div>
     </div>
 
-    <!-- FOOTER VE DİAGNOSTICS BİLGİSİ -->
+    <!-- ALT BÖLÜM -->
     <div class="footer-line"></div>
-    <div style="font-size: 9px; margin-top: 5px; color: #5c4537;">id_ref: 0x4492-a // rust_diagnostics // rayilmazan_terminal</div>
+    <div style="font-size: 10px; margin-top: 8px; color: #222; font-weight:bold; text-shadow: 1px 1px 0px rgba(255,255,255,0.15);">
+        ASSET_TAG: 0x4492-a // RUST_DIAGNOSTICS // PROPERTY OF GALACTIC OUTPOST
+    </div>
 </div>
 
 <script>
-    // --- Mevcut Script Kodları (Dokunulmadı) ---
-
+    // JS Fonksiyonları (Eski kodlar sorunsuz aktarıldı, sadece renkler temaya uyarlandı)
     function hideAllViews() {
         document.getElementById('view-device-info').style.display = 'none';
         document.getElementById('view-benchmark').style.display = 'none';
@@ -565,13 +651,13 @@
 
     document.addEventListener("DOMContentLoaded", function() {
         const ua = navigator.userAgent;
-        let os = "Bilinmeyen sistem";
-        let type = "Masaüstü (Desktop)";
+        let os = "UNKNOWN_SYS";
+        let type = "STATIONARY (Desktop)";
 
-        if (/android/i.test(ua)) { os = "Android"; type = "Mobil cihaz"; }
-        else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) { os = "iOS / Apple"; type = "Mobil cihaz"; }
+        if (/android/i.test(ua)) { os = "Android"; type = "PORTABLE"; }
+        else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) { os = "iOS / Apple"; type = "PORTABLE"; }
         else if (/Macintosh/.test(ua)) { os = "macOS"; }
-        else if (/Windows/.test(ua)) { os = "Windows"; if (navigator.maxTouchPoints > 1) type = "Tablet / hibrit"; }
+        else if (/Windows/.test(ua)) { os = "Windows"; if (navigator.maxTouchPoints > 1) type = "HYBRID_PAD"; }
         else if (/Linux/.test(ua)) { os = "Linux"; }
 
         let versionMatch = ua.match(/(Windows NT |Android |OS |Version\/)([\d._]+)/);
@@ -595,54 +681,54 @@
             .then(response => response.json())
             .then(data => {
                 if(data.ip) {
-                    document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'Bilinmiyor'}, ${data.country_name || 'Bilinmiyor'}`;
+                    document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'UNKNOWN'}, ${data.country_name || 'UNKNOWN'}`;
                     if (data.latitude && data.longitude) {
-                        document.getElementById("dev-coords").innerText = `Lat: ${data.latitude} // Long: ${data.longitude}`;
+                        document.getElementById("dev-coords").innerText = `LAT: ${data.latitude} // LNG: ${data.longitude}`;
                     } else {
-                        document.getElementById("dev-coords").innerText = "[Koordinat yok]";
+                        document.getElementById("dev-coords").innerText = "[NO_DATA]";
                     }
                 } else {
-                    document.getElementById("dev-ip").innerText = "[Korumalı]";
-                    document.getElementById("dev-coords").innerText = "[Bilinmiyor]";
+                    document.getElementById("dev-ip").innerText = "[SHIELDED]";
+                    document.getElementById("dev-coords").innerText = "[UNKNOWN]";
                 }
             })
             .catch(() => {
-                document.getElementById("dev-ip").innerText = "[Kısıtlı / Ad-Blocker]";
-                document.getElementById("dev-coords").innerText = "[Erişilemedi]";
+                document.getElementById("dev-ip").innerText = "[BLOCKED / JAMMED]";
+                document.getElementById("dev-coords").innerText = "[OFFLINE]";
             });
 
         if (navigator.getBattery) {
             navigator.getBattery().then(function(battery) {
                 function updateBatteryInfo() {
                     const level = Math.round(battery.level * 100);
-                    const charging = battery.charging ? "Şarj ediliyor" : "Bağlı değil";
-                    document.getElementById("dev-battery").innerText = `%${level} [${charging}]`;
+                    const charging = battery.charging ? "CHARGING" : "DISCHARGING";
+                    document.getElementById("dev-battery").innerText = `CELL: ${level}% [${charging}]`;
                 }
                 updateBatteryInfo();
                 battery.addEventListener('levelchange', updateBatteryInfo);
                 battery.addEventListener('chargingchange', updateBatteryInfo);
             });
         } else {
-            document.getElementById("dev-battery").innerText = "[Desteklenmiyor]";
+            document.getElementById("dev-battery").innerText = "[NO_CELL_DATA]";
         }
 
-        const cores = navigator.hardwareConcurrency || "Bilinmiyor";
-        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Gizlilik Kısıtlaması";
-        document.getElementById("dev-hardware").innerText = `CPU: ${cores} Çekirdek // RAM: ${ram}`;
+        const cores = navigator.hardwareConcurrency || "UNKNOWN";
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "RESTRICTED";
+        document.getElementById("dev-hardware").innerText = `CORES: ${cores} // MEM: ${ram}`;
 
         if ('DeviceOrientationEvent' in window || 'DeviceMotionEvent' in window) {
-            document.getElementById("dev-sensors").innerText = "Mevcut [Aktif]";
+            document.getElementById("dev-sensors").innerText = "ONLINE [ACTIVE]";
         } else {
-            document.getElementById("dev-sensors").innerText = "[Donanım Kısıtlı]";
+            document.getElementById("dev-sensors").innerText = "[OFFLINE/RESTRICTED]";
         }
     });
 
     function getGPUInfo() {
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return "Bilinmiyor";
+        if (!gl) return "UNKNOWN";
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        if (!debugInfo) return "Bilinmiyor";
+        if (!debugInfo) return "UNKNOWN";
         return gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
     }
 
@@ -699,11 +785,13 @@
         else if (gpuLower.includes('mali-g5') || gpuLower.includes('adreno(tm) 61')) baseScore -= 1;
 
         let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
-        let scoreColor = '#00897b';
-        let tierText = 'Üst Segment (Amiral Gemisi)';
         
-        if (finalScore < 4) { scoreColor = '#ff1744'; tierText = 'Giriş Segmenti'; } 
-        else if (finalScore < 7) { scoreColor = '#ffea00'; tierText = 'Orta Segment'; }
+        // Star Wars tema renkleri
+        let scoreColor = '#32cd32'; // İyi (Yeşil)
+        let tierText = 'CLASS A (FLAGSHIP)';
+        
+        if (finalScore < 4) { scoreColor = '#d82020'; tierText = 'CLASS C (JUNK/ENTRY)'; } 
+        else if (finalScore < 7) { scoreColor = '#d8a820'; tierText = 'CLASS B (STANDARD)'; }
 
         setTimeout(() => {
             document.getElementById('loading').style.display = 'none';
@@ -711,6 +799,7 @@
             const scoreEl = document.getElementById('score');
             scoreEl.innerText = finalScore.toFixed(1);
             scoreEl.style.color = scoreColor;
+            scoreEl.style.textShadow = `0 0 15px ${scoreColor}`;
             scoreEl.style.display = 'block';
 
             const progressTrack = document.getElementById('progress-track');
@@ -719,13 +808,15 @@
             
             setTimeout(() => {
                 progressBar.style.backgroundColor = scoreColor;
+                progressBar.style.boxShadow = `0 0 10px ${scoreColor}`;
                 progressBar.style.width = (finalScore * 10) + '%';
             }, 50);
 
-            document.getElementById('bench-cpu').innerText = cpuCores + " Çekirdek";
+            document.getElementById('bench-cpu').innerText = cpuCores + " CORES";
             document.getElementById('bench-fps').innerText = fps + " FPS";
             document.getElementById('bench-gpu').innerText = gpu.replace("ANGLE (", "").replace(")", "");
             document.getElementById('bench-tier').innerText = tierText;
+            document.getElementById('bench-tier').style.color = scoreColor;
 
             document.getElementById('details').style.display = 'block';
             document.getElementById('retry-btn').style.display = 'inline-block';
@@ -741,14 +832,14 @@
         detailsEl.style.display = 'none';
         retryBtn.style.display = 'none';
 
-        loadingEl.innerText = ">> [AŞAMA 01] Küresel DNS sunucularına ping atılıyor...";
+        loadingEl.innerText = ">> [PHASE 01] Pinging outer rim relays...";
         
         setTimeout(() => {
-            loadingEl.innerText = ">> [AŞAMA 02] Downlink kanalları açılıyor, paket transfer hızı ölçülüyor...";
+            loadingEl.innerText = ">> [PHASE 02] Opening downlink channels, testing packet drop...";
         }, 800);
 
         setTimeout(() => {
-            loadingEl.innerText = ">> [AŞAMA 03] Uplink sinyal kararlılığı ve yükleme bandı doğrulanıyor...";
+            loadingEl.innerText = ">> [PHASE 03] Verifying uplink stability...";
         }, 1600);
 
         setTimeout(() => {
@@ -759,11 +850,11 @@
             const generatedDownload = (Math.random() * (isMobile ? 80 : 450) + (isMobile ? 20 : 50)).toFixed(1);
             const generatedUpload = (generatedDownload * (Math.random() * 0.15 + 0.10)).toFixed(1);
 
-            let netTier = "Gelişmiş Fiber Optik Altyapı";
-            let netColor = "#00897b";
+            let netTier = "HYPER-FIBER (OPTIC)";
+            let netColor = "#32cd32";
 
-            if (generatedDownload < 35) { netTier = "Giriş Seviyesi Standart DSL"; netColor = "#ff1744"; }
-            else if (generatedDownload < 100) { netTier = "Yüksek Hızlı VDSL / 4.5G Mobil Giga"; netColor = "#ffea00"; }
+            if (generatedDownload < 35) { netTier = "LOW-BAND (COPPER)"; netColor = "#d82020"; }
+            else if (generatedDownload < 100) { netTier = "MID-BAND (STANDARD)"; netColor = "#d8a820"; }
 
             document.getElementById('speed-ping').innerText = `${generatedPing} ms`;
             document.getElementById('speed-download').innerText = `${generatedDownload} Mbps`;
