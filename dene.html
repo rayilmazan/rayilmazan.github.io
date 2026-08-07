@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USED FUTURE // LOGO TERMINAL</title>
+    <title>USED FUTURE // YOLCU0 TERMINAL</title>
     <style>
         :root {
             --amber-main: #ff9d00;
             --amber-glow: #ff5500;
             --amber-dim: #553300;
-            --bg-dark: #0a0804;
-            --crt-line: rgba(18, 12, 4, 0.7);
+            --bg-dark: #070502;
+            --crt-line: rgba(20, 15, 5, 0.75);
         }
 
         * {
@@ -28,20 +28,21 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            margin: 0;
         }
 
-        /* CRT Terminal Ekran Çerçevesi */
+        /* Ağır Sanayi CRT Ekran Gövdesi */
         .crt-container {
             position: relative;
             width: 90vw;
             max-width: 650px;
             aspect-ratio: 1 / 1;
-            background: radial-gradient(circle, #1a1208 0%, #050402 100%);
-            border: 3px solid var(--amber-dim);
-            border-radius: 20px;
+            background: radial-gradient(circle at center, #150f05 0%, #030201 100%);
+            border: 4px solid var(--amber-dim);
+            border-radius: 18px;
             box-shadow: 
-                0 0 30px rgba(255, 157, 0, 0.15),
-                inset 0 0 80px rgba(0, 0, 0, 0.9);
+                0 0 40px rgba(255, 157, 0, 0.1),
+                inset 0 0 90px rgba(0, 0, 0, 0.95);
             padding: 24px;
             display: flex;
             flex-direction: column;
@@ -49,48 +50,50 @@
             overflow: hidden;
         }
 
-        /* Scanline Efekti */
+        /* Katot Işınlı Tarama Çizgileri */
         .crt-container::before {
             content: " ";
             display: block;
             position: absolute;
             top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(var(--crt-line) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background: linear-gradient(var(--crt-line) 50%, rgba(0, 0, 0, 0.3) 50%);
             background-size: 100% 4px;
             z-index: 10;
             pointer-events: none;
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
-        /* Vignette Karartma */
+        /* Ekran Kararması (Vignette) */
         .crt-container::after {
             content: " ";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.85) 100%);
+            background: radial-gradient(circle at center, transparent 55%, rgba(0,0,0,0.9) 100%);
             z-index: 11;
             pointer-events: none;
         }
 
-        /* Telemetri Başlıkları */
+        /* Arayüz Telemetri Yazıları */
         .hud-header, .hud-footer {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            text-shadow: 0 0 5px var(--amber-glow);
+            text-shadow: 0 0 6px var(--amber-glow);
             z-index: 5;
-            opacity: 0.85;
+            opacity: 0.9;
         }
 
         .status-tag {
             background-color: var(--amber-main);
             color: #000;
-            padding: 2px 6px;
-            font-weight: bold;
+            padding: 2px 8px;
+            font-weight: 900;
+            text-shadow: none;
         }
 
+        /* Logo Sahnesi */
         .viewport {
             flex: 1;
             display: flex;
@@ -100,27 +103,27 @@
             z-index: 5;
         }
 
-        /* Logo Parıltısı ve Efektler */
+        /* Fosfor Işıması ve Titreme */
         .used-future-logo {
-            width: 70%;
-            height: 70%;
-            filter: drop-shadow(0 0 10px var(--amber-glow)) 
-                    drop-shadow(0 0 20px var(--amber-main))
-                    url(#used-texture);
-            animation: subtle-flicker 0.15s infinite alternate;
+            width: 75%;
+            height: 75%;
+            filter: drop-shadow(0 0 8px var(--amber-glow)) 
+                    drop-shadow(0 0 15px rgba(255, 157, 0, 0.6))
+                    url(#crt-noise);
+            animation: phosphor-flicker 0.12s infinite alternate;
         }
 
-        /* Izgara Arka Planı */
+        /* Teknik Hizalama Izgarası */
         .grid-bg {
             stroke: var(--amber-dim);
             stroke-width: 0.5;
-            opacity: 0.25;
+            opacity: 0.3;
         }
 
-        @keyframes subtle-flicker {
-            0% { opacity: 0.96; }
+        @keyframes phosphor-flicker {
+            0% { opacity: 0.95; }
             50% { opacity: 1; }
-            100% { opacity: 0.93; }
+            100% { opacity: 0.92; }
         }
     </style>
 </head>
@@ -129,66 +132,80 @@
     <div class="crt-container">
         <!-- Telemetri Üst Bilgi -->
         <div class="hud-header">
-            <span>SYS_ID // UF-8086</span>
-            <span class="status-tag">ONLINE</span>
-            <span>240V PHOSPHOR</span>
+            <span>SYS_ID // YOLCU0</span>
+            <span class="status-tag">RAYILMAZAN</span>
+            <span>240V CRT</span>
         </div>
 
-        <!-- Ana Logo Alanı -->
+        <!-- Ana Vektör Alanı -->
         <div class="viewport">
-            <svg class="used-future-logo" viewBox="0 0 300 360" xmlns="http://www.w3.org/2000/svg">
+            <svg class="used-future-logo" viewBox="0 0 330 320" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <!-- Used Future / Grunge Aşınma Filtresi -->
-                    <filter id="used-texture" x="0%" y="0%" width="100%" height="100%">
-                        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
-                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G" />
+                    <!-- Analog Gürültü ve Aşınma Filtresi -->
+                    <filter id="crt-noise" x="0%" y="0%" width="100%" height="100%">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
+                        <!-- Deformasyonu minimumda tutarak orijinal şekli korur (scale="1.5") -->
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" />
                     </filter>
                 </defs>
 
-                <!-- Hizalama Izgarası -->
+                <!-- Arka Plan Koordinat Izgarası -->
                 <g class="grid-bg">
-                    <line x1="90" y1="0" x2="90" y2="360" />
-                    <line x1="135" y1="0" x2="135" y2="360" />
-                    <line x1="205" y1="0" x2="205" y2="360" />
-                    <line x1="0" y1="90" x2="300" y2="90" />
-                    <line x1="0" y1="270" x2="300" y2="270" />
+                    <line x1="100" y1="0" x2="100" y2="320" />
+                    <line x1="140" y1="0" x2="140" y2="320" />
+                    <line x1="230" y1="0" x2="230" y2="320" />
+                    <line x1="0" y1="50" x2="330" y2="50" />
+                    <line x1="0" y1="150" x2="330" y2="150" />
+                    <line x1="0" y1="270" x2="330" y2="270" />
                 </g>
 
-                <!-- Birebir Oranlı Logo Geometrisi -->
+                <!-- 
+                  ORİJİNAL LOGO GEOMETRİSİ 
+                  Matematiksel Hizalama:
+                  - Dikey Blok Genişliği: 40 birim.
+                  - Çapraz Bacak Yatay Genişliği: 45 birim (Optik denge için).
+                  - Üst Çember dış teğeti Y=50'de başlar, Y=150'de biter.
+                -->
                 <g fill="var(--amber-main)">
-                    <!-- Dikey Blok + Çapraz Bacak (Orijinal Ölçü Kesiti) -->
+                    
+                    <!-- Dikey Blok ve Sağ Alt Bacak (Eksiz, Kaynaksız Tek Parça Poligon) -->
                     <path d="
-                        M 90,90 
-                        H 135 
-                        V 165 
-                        L 205,235 
-                        V 270 
-                        H 160 
-                        L 135,245 
-                        V 270 
-                        H 90 
+                        M 100 50
+                        H 140
+                        V 150
+                        L 230 270
+                        H 185
+                        L 140 210
+                        V 270
+                        H 100
                         Z
                     " />
 
-                    <!-- Üst İnce Çember (Üst Sınırı Dikey Blok ile Birebir Aynı Hizada) -->
-                    <circle cx="160" cy="135" r="45" 
-                            fill="none" 
-                            stroke="var(--amber-main)" 
-                            stroke-width="5" />
+                    <!-- 
+                      Sağ Üst İnce Yarım Çember
+                      Dikey bloğun dış kenarından (X=140) başlar.
+                      Stroke payı (6px/yarısı 3px) hesaplanarak Y=53 ve Y=147 arası çizilmiştir.
+                      Bu sayede dış hat tam olarak Y=50 (tepe noktası) ve Y=150 (bacak başlangıcı) ile sıfırlanır.
+                    -->
+                    <path d="M 140 53 A 47 47 0 0 1 140 147"
+                          fill="none"
+                          stroke="var(--amber-main)"
+                          stroke-width="6" 
+                          stroke-linecap="square"/>
                 </g>
 
-                <!-- Yüzey Çizikleri ve Eskitme Detayları -->
-                <path d="M 85,110 L 140,110 M 100,260 L 195,260 M 145,180 L 185,220" 
+                <!-- Terminal Yüzeyindeki Optik Kırılmalar / Çizikler -->
+                <path d="M 90 70 L 120 70 M 115 250 L 175 250 M 145 190 L 180 236" 
                       stroke="var(--bg-dark)" 
                       stroke-width="2" 
-                      opacity="0.7" />
+                      opacity="0.8" />
             </svg>
         </div>
 
         <!-- Telemetri Alt Bilgi -->
         <div class="hud-footer">
             <span>MEM: 640KB OK</span>
-            <span>RAYILMAZAN // SYSTEM</span>
+            <span>CORE: GEOMETRIC_SYNC</span>
             <span>REV. 2026</span>
         </div>
     </div>
