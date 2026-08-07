@@ -1,1553 +1,498 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>R // FUTURE GREEBLE SYSTEM</title>
-
-<style>
-
-:root{
-    --bg:#08090b;
-    --panel:#111318;
-    --panel2:#171a20;
-    --line:#353a43;
-    --line2:#565d68;
-    --white:#e8ebef;
-    --muted:#7f8792;
-    --accent:#ff7a00;
-    --accent2:#ff9d38;
-}
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-html,body{
-    min-height:100%;
-}
-
-body{
-    background:
-        radial-gradient(circle at 70% 20%,rgba(255,120,0,.05),transparent 30%),
-        linear-gradient(135deg,#07080a,#111318 50%,#08090b);
-    color:var(--white);
-    font-family:Arial,Helvetica,sans-serif;
-    padding:25px;
-}
-
-/* =========================================================
-   ANA ŞASE
-========================================================= */
-
-.chassis{
-
-    width:min(1100px,100%);
-    margin:auto;
-
-    background:
-        linear-gradient(145deg,#17191e,#0d0f13);
-
-    border:1px solid #3b4048;
-
-    box-shadow:
-        0 0 0 4px #090a0c,
-        inset 0 0 35px rgba(0,0,0,.8),
-        0 25px 70px rgba(0,0,0,.7);
-
-    padding:28px;
-
-    position:relative;
-    overflow:hidden;
-}
-
-/* metal çizgiler */
-
-.chassis:before{
-    content:"";
-    position:absolute;
-    inset:8px;
-    border:1px solid rgba(255,255,255,.04);
-    pointer-events:none;
-}
-
-.chassis:after{
-    content:"";
-    position:absolute;
-    width:300px;
-    height:1px;
-    right:-50px;
-    top:45px;
-    background:var(--accent);
-    box-shadow:0 0 12px rgba(255,122,0,.4);
-}
-
-/* =========================================================
-   ÜST BAŞLIK
-========================================================= */
-
-.header{
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    border-bottom:1px solid #2d3138;
-
-    padding:0 0 18px 0;
-    margin-bottom:25px;
-}
-
-.header-left{
-    display:flex;
-    align-items:center;
-    gap:14px;
-}
-
-.status-light{
-
-    width:9px;
-    height:9px;
-
-    background:var(--accent);
-
-    border-radius:50%;
-
-    box-shadow:
-        0 0 8px var(--accent);
-
-}
-
-.header-title{
-
-    font-family:"Courier New",monospace;
-    font-weight:bold;
-
-    letter-spacing:4px;
-
-    font-size:15px;
-}
-
-.header-right{
-
-    font-family:"Courier New",monospace;
-    font-size:10px;
-
-    color:var(--muted);
-
-    letter-spacing:2px;
-
-}
-
-/* =========================================================
-   R GÖVDE
-========================================================= */
-
-.r-system{
-
-    position:relative;
-
-    min-height:650px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(255,255,255,.015),
-            transparent 40%
-        );
-
-    border:1px solid #24282e;
-
-    overflow:hidden;
-}
-
-/* grid */
-
-.r-system:before{
-
-    content:"";
-
-    position:absolute;
-    inset:0;
-
-    background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-
-    background-size:30px 30px;
-
-    opacity:.35;
-
-}
-
-/* =========================================================
-   SOL DİKEY R GÖVDESİ
-========================================================= */
-
-.r-stem{
-
-    position:absolute;
-
-    left:55px;
-    top:55px;
-    bottom:55px;
-
-    width:145px;
-
-    background:
-        linear-gradient(
-            90deg,
-            #0e1014,
-            #1b1e24,
-            #101216
-        );
-
-    border:2px solid #343942;
-
-    box-shadow:
-        inset 5px 0 8px rgba(255,255,255,.03),
-        inset -5px 0 8px rgba(0,0,0,.8);
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    justify-content:flex-start;
-
-    padding-top:50px;
-
-    z-index:2;
-}
-
-/* turuncu üst detay */
-
-.r-stem:before{
-
-    content:"";
-
-    position:absolute;
-
-    top:-2px;
-    left:-2px;
-    right:-2px;
-
-    height:4px;
-
-    background:var(--accent);
-
-    box-shadow:0 0 10px rgba(255,122,0,.3);
-
-}
-
-/* logo */
-
-.r-stem img{
-
-    width:95px;
-    height:95px;
-
-    object-fit:contain;
-
-    filter:
-        grayscale(1)
-        contrast(1.3)
-        brightness(1.3)
-        drop-shadow(0 4px 7px #000);
-
-    margin-bottom:22px;
-}
-
-.brand{
-
-    font-family:"Courier New",monospace;
-
-    font-size:12px;
-
-    font-weight:bold;
-
-    letter-spacing:3px;
-
-    color:#dfe3e8;
-
-    writing-mode:vertical-rl;
-
-    transform:rotate(180deg);
-
-}
-
-/* =========================================================
-   R ÜST KAVİSİ
-========================================================= */
-
-.r-loop{
-
-    position:absolute;
-
-    left:175px;
-    top:70px;
-
-    width:590px;
-    height:245px;
-
-    border:4px solid #414650;
-
-    border-left:none;
-
-    border-radius:0 170px 170px 0;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(255,255,255,.02),
-            transparent
-        );
-
-    z-index:1;
-}
-
-/* üst turuncu çizgi */
-
-.r-loop:before{
-
-    content:"";
-
-    position:absolute;
-
-    top:-4px;
-    left:30px;
-
-    width:190px;
-    height:4px;
-
-    background:var(--accent);
-
-}
-
-/* =========================================================
-   ÇAPRAZ R KOLU
-========================================================= */
-
-.r-diagonal{
-
-    position:absolute;
-
-    left:165px;
-    top:285px;
-
-    width:640px;
-    height:230px;
-
-    border-top:4px solid #444952;
-
-    transform:rotate(31deg);
-
-    transform-origin:left center;
-
-    z-index:1;
-
-}
-
-/* =========================================================
-   ALT R AYAĞI
-========================================================= */
-
-.r-foot{
-
-    position:absolute;
-
-    left:205px;
-    bottom:80px;
-
-    width:390px;
-    height:110px;
-
-    border-bottom:4px solid #444952;
-
-    border-left:4px solid #444952;
-
-    transform:skewX(32deg);
-
-    z-index:1;
-
-}
-
-/* =========================================================
-   BİLGİ MODÜLLERİ
-========================================================= */
-
-.node{
-
-    position:absolute;
-
-    background:
-        linear-gradient(
-            145deg,
-            #1a1d23,
-            #101216
-        );
-
-    border:1px solid #3c424b;
-
-    min-height:68px;
-
-    padding:12px 15px;
-
-    box-shadow:
-        inset 2px 2px 8px rgba(255,255,255,.025),
-        5px 7px 15px rgba(0,0,0,.5);
-
-    z-index:5;
-
-}
-
-/* mekanik köşe */
-
-.node:before{
-
-    content:"";
-
-    position:absolute;
-
-    width:7px;
-    height:7px;
-
-    left:-4px;
-    top:-4px;
-
-    background:#0b0c0e;
-
-    border:1px solid #656b74;
-
-}
-
-.node:after{
-
-    content:"";
-
-    position:absolute;
-
-    right:8px;
-    top:8px;
-
-    width:5px;
-    height:5px;
-
-    background:var(--accent);
-
-    box-shadow:0 0 6px var(--accent);
-
-}
-
-/* etiket */
-
-.node-label{
-
-    display:block;
-
-    font-family:"Courier New",monospace;
-
-    font-size:9px;
-
-    color:#858d98;
-
-    letter-spacing:1px;
-
-    margin-bottom:7px;
-
-}
-
-/* değer */
-
-.node-value{
-
-    display:block;
-
-    font-family:"Courier New",monospace;
-
-    font-size:13px;
-
-    font-weight:bold;
-
-    color:var(--accent2);
-
-    max-width:250px;
-
-    word-break:break-word;
-
-}
-
-/* =========================================================
-   X NOKTALARINA GÖRE KONUM
-========================================================= */
-
-/* X1 - üst kavis */
-
-.node-ip{
-
-    left:390px;
-    top:120px;
-
-    width:300px;
-
-}
-
-/* X2 - çapraz kol üst */
-
-.node-location{
-
-    right:45px;
-    top:300px;
-
-    width:260px;
-
-}
-
-/* X3 - çapraz kol orta */
-
-.node-cpu{
-
-    right:120px;
-    top:405px;
-
-    width:260px;
-
-}
-
-/* X4 - alt sol */
-
-.node-gpu{
-
-    left:300px;
-    bottom:50px;
-
-    width:245px;
-
-}
-
-/* X5 - alt */
-
-.node-memory{
-
-    left:550px;
-    bottom:30px;
-
-    width:245px;
-
-}
-
-/* =========================================================
-   TEKNİK ÇİZGİLER
-========================================================= */
-
-.tech-line{
-
-    position:absolute;
-
-    height:1px;
-
-    background:#4a5058;
-
-    z-index:3;
-
-}
-
-.line-ip{
-
-    left:335px;
-    top:155px;
-    width:55px;
-
-}
-
-.line-location{
-
-    right:300px;
-    top:335px;
-    width:75px;
-
-}
-
-.line-cpu{
-
-    right:370px;
-    top:438px;
-    width:90px;
-
-}
-
-.line-gpu{
-
-    left:270px;
-    bottom:85px;
-    width:30px;
-
-}
-
-.line-memory{
-
-    left:510px;
-    bottom:68px;
-    width:40px;
-
-}
-
-/* =========================================================
-   NODE NUMARALARI
-========================================================= */
-
-.node-number{
-
-    position:absolute;
-
-    top:-9px;
-    left:12px;
-
-    background:#0a0b0d;
-
-    border:1px solid #444;
-
-    padding:2px 6px;
-
-    font-family:"Courier New",monospace;
-
-    font-size:8px;
-
-    color:#aaa;
-
-}
-
-/* =========================================================
-   ALT BENCHMARK PANELİ
-========================================================= */
-
-.benchmark{
-
-    margin-top:25px;
-
-    background:#0c0e11;
-
-    border:1px solid #30343b;
-
-    padding:22px;
-
-}
-
-.benchmark-title{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    border-bottom:1px solid #292d33;
-
-    padding-bottom:12px;
-
-    margin-bottom:18px;
-
-}
-
-.benchmark-title span:first-child{
-
-    font-family:"Courier New",monospace;
-
-    font-size:12px;
-
-    letter-spacing:2px;
-
-}
-
-.benchmark-title span:last-child{
-
-    font-family:"Courier New",monospace;
-
-    color:var(--accent);
-
-    font-size:10px;
-
-}
-
-.loading{
-
-    font-family:"Courier New",monospace;
-
-    color:#a0a6ae;
-
-    font-size:12px;
-
-}
-
-.score{
-
-    display:none;
-
-    font-family:"Courier New",monospace;
-
-    font-size:55px;
-
-    font-weight:bold;
-
-    color:var(--accent);
-
-    text-shadow:0 0 18px rgba(255,122,0,.35);
-
-    text-align:center;
-
-}
-
-.progress{
-
-    display:none;
-
-    height:8px;
-
-    background:#050607;
-
-    border:1px solid #292d33;
-
-    margin:18px 0;
-
-}
-
-.progress-fill{
-
-    height:100%;
-
-    width:0%;
-
-    background:var(--accent);
-
-    transition:width 1s ease;
-
-}
-
-.details{
-
-    display:none;
-
-    text-align:center;
-
-    font-family:"Courier New",monospace;
-
-    font-size:11px;
-
-    color:#858b94;
-
-}
-
-.details span{
-
-    color:var(--accent2);
-
-}
-
-.retry{
-
-    display:none;
-
-    margin:18px auto 0;
-
-    padding:10px 20px;
-
-    background:#1c2026;
-
-    color:#ddd;
-
-    border:1px solid #4b515b;
-
-    font-family:"Courier New",monospace;
-
-    font-size:11px;
-
-    cursor:pointer;
-
-}
-
-.retry:hover{
-
-    border-color:var(--accent);
-
-    color:var(--accent);
-
-}
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.footer{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    margin-top:18px;
-
-    font-family:"Courier New",monospace;
-
-    font-size:9px;
-
-    color:#555c66;
-
-    letter-spacing:1px;
-
-}
-
-.footer .orange{
-
-    color:var(--accent);
-
-}
-
-/* =========================================================
-   MOBİL
-========================================================= */
-
-@media(max-width:850px){
-
-    body{
-        padding:10px;
-    }
-
-    .chassis{
-        padding:15px;
-    }
-
-    .r-system{
-        min-height:850px;
-    }
-
-    .r-stem{
-
-        left:20px;
-        top:35px;
-        bottom:35px;
-
-        width:90px;
-
-    }
-
-    .r-stem img{
-        width:65px;
-        height:65px;
-    }
-
-    .r-loop{
-
-        left:105px;
-        top:50px;
-
-        width:calc(100% - 120px);
-
-        height:190px;
-
-    }
-
-    .r-diagonal{
-        left:100px;
-        top:250px;
-        width:450px;
-    }
-
-    .r-foot{
-        left:130px;
-        bottom:90px;
-        width:270px;
-    }
-
-    .node-ip{
-        left:140px;
-        top:95px;
-        width:210px;
-    }
-
-    .node-location{
-        right:20px;
-        top:290px;
-        width:210px;
-    }
-
-    .node-cpu{
-        right:25px;
-        top:420px;
-        width:210px;
-    }
-
-    .node-gpu{
-        left:120px;
-        bottom:70px;
-        width:190px;
-    }
-
-    .node-memory{
-        left:auto;
-        right:20px;
-        bottom:20px;
-        width:190px;
-    }
-
-    .tech-line{
-        display:none;
-    }
-
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rayılmazan // GREEBLE KONTROL MERKEZİ v4.0</title>
+    <style>
+        :root {
+            --greeble-bg: #121317;
+            --greeble-panel: #1b1d23;
+            --greeble-dark: #0a0b0e;
+            --greeble-light: #2c303b;
+            --accent-orange: #ff7700;
+            --accent-glow: rgba(255, 119, 0, 0.4);
+            --text-main: #f0f4f8;
+            --text-muted: #8a99ad;
+            --text-highlight: #ff9d00;
+            --tech-border: #363b48;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #07080a;
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .chassis {
+            max-width: 900px;
+            width: 100%;
+            background-color: var(--greeble-panel);
+            border: 3px solid #000;
+            border-top: 4px solid #505868;
+            border-left: 4px solid #505868;
+            border-radius: 6px;
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Endüstriyel Vidalar / Perçinler */
+        .chassis::before, .chassis::after {
+            content: ""; position: absolute; width: 10px; height: 10px;
+            background: #0d0e11; border-radius: 50%;
+            box-shadow: inset 1px 1px 2px #444, 1px 1px 2px rgba(0,0,0,0.9);
+        }
+        .chassis::before { top: 12px; left: 12px; }
+        .chassis::after { bottom: 12px; right: 12px; }
+        .rivet-tr { position: absolute; top: 12px; right: 12px; width: 10px; height: 10px; background: #0d0e11; border-radius: 50%; box-shadow: inset 1px 1px 2px #444, 1px 1px 2px rgba(0,0,0,0.9); }
+        .rivet-bl { position: absolute; bottom: 12px; left: 12px; width: 10px; height: 10px; background: #0d0e11; border-radius: 50%; box-shadow: inset 1px 1px 2px #444, 1px 1px 2px rgba(0,0,0,0.9); }
+
+        /* 1. ÜST KISIM: LOGO VE ALTINDA RAYILMAZAN (GREEBLE COŞKULU) */
+        .brand-header-hub {
+            background: var(--greeble-dark);
+            border: 2px solid #000;
+            border-bottom: 3px solid var(--accent-orange);
+            padding: 20px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        /* Greeble Dekoratif Çizgiler ve Göstergeler */
+        .brand-header-hub::before {
+            content: "SYS_ID // 0808-RX";
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .sys-status-indicator {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            color: #4CAF50;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .logo-box {
+            width: 90px;
+            height: 90px;
+            background: var(--greeble-panel);
+            border: 2px solid var(--tech-border);
+            border-top: 3px solid var(--accent-orange);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 12px var(--accent-glow);
+            margin-bottom: 10px;
+            margin-top: 10px;
+            padding: 10px;
+        }
+
+        .logo-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.7));
+        }
+
+        .brand-title {
+            color: var(--text-main);
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 10px var(--accent-glow);
+            text-transform: uppercase;
+        }
+
+        /* 2. TEK EKRAN BİLGİ PANELİ (TÜM BİLGİLER BİR ARADA) */
+        .unified-info-screen {
+            background-color: var(--greeble-bg);
+            border: 2px solid #000;
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 4px;
+            padding: 18px;
+            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.7);
+        }
+
+        .screen-title {
+            font-size: 11px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed var(--tech-border);
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .info-card {
+            background: var(--greeble-panel);
+            border: 1px solid var(--tech-border);
+            padding: 10px 12px;
+            border-radius: 3px;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .info-card .label {
+            color: var(--text-muted);
+            font-size: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .info-card .val {
+            color: var(--text-highlight);
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        /* 3. ANA BENCHMARK VE SKOR EKRANI */
+        .main-display {
+            background-color: var(--greeble-bg);
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: inset 4px 4px 10px rgba(0,0,0,0.6);
+            text-align: center;
+        }
+
+        .view-section h2 {
+            font-size: 13px;
+            color: var(--text-main);
+            background: var(--greeble-dark);
+            padding: 10px 15px;
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 2px;
+            letter-spacing: 1px;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .loading { 
+            font-size: 13px; 
+            color: var(--text-highlight); 
+            padding: 15px 0; 
+            font-family: 'Courier New', Courier, monospace; 
+        }
+
+        .score-box { 
+            font-size: 48px; 
+            font-weight: 900; 
+            margin: 10px 0; 
+            font-family: 'Courier New', Courier, monospace; 
+            color: var(--accent-orange); 
+            text-shadow: 0 0 15px var(--accent-glow); 
+        }
+
+        /* HER ZAMAN KULLANDIĞIMIZ İLERLEME ÇUBUĞU */
+        .progress-track { 
+            width: 100%; 
+            background: #0a0b0e; 
+            border: 1px solid var(--tech-border); 
+            height: 20px; 
+            border-radius: 3px; 
+            margin: 20px 0; 
+            overflow: hidden; 
+            display: none; 
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.9);
+        }
+
+        .progress-fill { 
+            height: 100%; 
+            width: 0%; 
+            background: var(--accent-orange); 
+            transition: width 1s ease-out; 
+            box-shadow: 0 0 10px var(--accent-orange);
+        }
+
+        .greeble-btn {
+            display: inline-block;
+            background: var(--greeble-light);
+            color: var(--text-main); 
+            font-family: 'Courier New', Courier, monospace; 
+            font-weight: bold;
+            font-size: 13px; 
+            padding: 12px 25px; 
+            cursor: pointer;
+            border: 1px solid #111; 
+            border-top: 1px solid #555; 
+            border-left: 1px solid #555;
+            border-radius: 3px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+            transition: all 0.15s ease;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .greeble-btn:hover { background: #3b4252; color: #fff; border-color: var(--accent-orange); }
+        .greeble-btn:active { transform: translateY(2px); color: var(--accent-orange); }
+
+        /* ALT GREEBLE ŞERİDİ */
+        .footer-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .hazard-stripe {
+            flex-grow: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(45deg, var(--accent-orange), var(--accent-orange) 10px, #15161a 10px, #15161a 20px);
+            border: 1px solid #000; 
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+            margin-right: 15px;
+        }
+        
+        .asset-tag { 
+            font-size: 10px; 
+            color: var(--text-muted); 
+            font-weight: bold; 
+            font-family: 'Courier New', Courier, monospace; 
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            .chassis { padding: 15px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-
 <body>
 
 <div class="chassis">
+    <div class="rivet-tr"></div>
+    <div class="rivet-bl"></div>
 
-    <!-- HEADER -->
-
-    <div class="header">
-
-        <div class="header-left">
-
-            <div class="status-light"></div>
-
-            <div class="header-title">
-                R // SYSTEM ARCHITECTURE
-            </div>
-
+    <!-- 1. ÜST KISIM: LOGO VE ALTINDA RAYILMAZAN YAZISI -->
+    <div class="brand-header-hub">
+        <div class="sys-status-indicator">
+            <span>ONLINE</span>
+            <div class="status-dot"></div>
         </div>
-
-        <div class="header-right">
-            FUTURE GREEBLE // UNIT-01
+        
+        <div class="logo-box">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan logo" onerror="this.src='https://rayilmazan.github.io/logo.png'">
         </div>
-
+        <div class="brand-title">rayılmazan</div>
     </div>
 
-
-    <!-- =====================================================
-         R ŞABLONU
-    ====================================================== -->
-
-    <div class="r-system">
-
-        <!-- SOL DİKEY GÖVDE -->
-
-        <div class="r-stem">
-
-            <img
-                src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png"
-                alt="Logo"
-            >
-
-            <div class="brand">
-                RAYILMAZAN
-            </div>
-
+    <!-- 2. TEK EKRAN BİLGİ PANELİ (TÜM BİLGİLER BİR ARADA) -->
+    <div class="unified-info-screen">
+        <div class="screen-title">
+            <span>TELEMETRY_HUB // SİSTEM VE AĞ BİLGİLERİ</span>
+            <span>STATUS: SECURE</span>
         </div>
-
-
-        <!-- ÜST R KAVİSİ -->
-
-        <div class="r-loop"></div>
-
-
-        <!-- R ÇAPRAZ KOLU -->
-
-        <div class="r-diagonal"></div>
-
-
-        <!-- R ALT AYAĞI -->
-
-        <div class="r-foot"></div>
-
-
-        <!-- TEKNİK BAĞLANTI ÇİZGİLERİ -->
-
-        <div class="tech-line line-ip"></div>
-        <div class="tech-line line-location"></div>
-        <div class="tech-line line-cpu"></div>
-        <div class="tech-line line-gpu"></div>
-        <div class="tech-line line-memory"></div>
-
-
-        <!-- =================================================
-             X1
-        ================================================== -->
-
-        <div class="node node-ip">
-
-            <div class="node-number">
-                X01
+        <div class="info-grid">
+            <div class="info-card">
+                <span class="label">COMMS_IP (Ağ Adresi)</span>
+                <span id="dev-ip" class="val">Sorgulanıyor...</span>
             </div>
-
-            <span class="node-label">
-                COMMS_IP // NETWORK
-            </span>
-
-            <span
-                id="dev-ip"
-                class="node-value">
-                SORGULANIYOR...
-            </span>
-
-        </div>
-
-
-        <!-- =================================================
-             X2
-        ================================================== -->
-
-        <div class="node node-location">
-
-            <div class="node-number">
-                X02
+            <div class="info-card">
+                <span class="label">SECTOR_LOC (Enlem / Boylam)</span>
+                <span id="dev-coords" class="val">Sorgulanıyor...</span>
             </div>
-
-            <span class="node-label">
-                SECTOR_LOC // POSITION
-            </span>
-
-            <span
-                id="dev-coords"
-                class="node-value">
-                SORGULANIYOR...
-            </span>
-
-        </div>
-
-
-        <!-- =================================================
-             X3
-        ================================================== -->
-
-        <div class="node node-cpu">
-
-            <div class="node-number">
-                X03
+            <div class="info-card">
+                <span class="label">LOGIC_GATES (İşlemci / Çekirdek)</span>
+                <span id="dev-hardware" class="val">Hesaplanıyor...</span>
             </div>
-
-            <span class="node-label">
-                LOGIC_GATES // CPU
-            </span>
-
-            <span
-                id="dev-hardware"
-                class="node-value">
-                HESAPLANIYOR...
-            </span>
-
-        </div>
-
-
-        <!-- =================================================
-             X4
-        ================================================== -->
-
-        <div class="node node-gpu">
-
-            <div class="node-number">
-                X04
+            <div class="info-card">
+                <span class="label">RENDER_NODE (Grafik Birimi / RAM)</span>
+                <span id="dev-gpu" class="val">Hesaplanıyor...</span>
             </div>
-
-            <span class="node-label">
-                RENDER_NODE // GPU
-            </span>
-
-            <span
-                id="dev-gpu"
-                class="node-value">
-                HESAPLANIYOR...
-            </span>
-
         </div>
-
-
-        <!-- =================================================
-             X5
-        ================================================== -->
-
-        <div class="node node-memory">
-
-            <div class="node-number">
-                X05
-            </div>
-
-            <span class="node-label">
-                MEMORY_BUS // RAM
-            </span>
-
-            <span
-                id="dev-memory"
-                class="node-value">
-                HESAPLANIYOR...
-            </span>
-
-        </div>
-
     </div>
 
-
-    <!-- =====================================================
-         BENCHMARK
-    ====================================================== -->
-
-    <div class="benchmark">
-
-        <div class="benchmark-title">
-
-            <span>
-                CORE_BENCHMARK // PERFORMANCE
-            </span>
-
-            <span>
-                ONLINE
-            </span>
-
-        </div>
-
-        <div
-            id="loading"
-            class="loading">
-
-            SYSTEM HARDWARE SCAN IN PROGRESS...
-
-        </div>
-
-
-        <div
-            id="score"
-            class="score">
-
-            0.0
-
-        </div>
-
-
-        <div
-            id="progress-track"
-            class="progress">
-
-            <div
-                id="progress-bar"
-                class="progress-fill">
+    <!-- 3. ANA BENCHMARK VE SKOR EKRANI -->
+    <div class="main-display">
+        <div class="view-section">
+            <h2>CORE_BENCHMARK // SİSTEM PERFORMANS TESTİ</h2>
+            
+            <div id="loading" class="loading">Donanım sınırları test ediliyor, lütfen bekleyin...</div>
+            <div id="score" class="score-box" style="display: none;">0.0</div>
+            
+            <!-- Her zaman kullandığımız ilerleme çubuğu -->
+            <div id="progress-track" class="progress-track">
+                <div id="progress-bar" class="progress-fill"></div>
+            </div>
+            
+            <div id="details" style="display: none; margin-top: 15px; font-family: 'Courier New', Courier, monospace; color: var(--text-muted); font-size: 12px;">
+                SINIF: <span id="bench-tier" class="val">---</span> | ROR/FPS: <span id="bench-fps" class="val">---</span>
             </div>
 
+            <button class="greeble-btn" onclick="runBenchmark()" id="retry-btn" style="display: none;">[ TESTİ TEKRARLA ]</button>
         </div>
-
-
-        <div
-            id="details"
-            class="details">
-
-            CLASS:
-            <span id="bench-tier">---</span>
-
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-
-            FPS:
-            <span id="bench-fps">---</span>
-
-        </div>
-
-
-        <button
-            id="retry-btn"
-            class="retry"
-            onclick="runBenchmark()">
-
-            RUN SYSTEM TEST
-
-        </button>
-
     </div>
 
-
-    <!-- FOOTER -->
-
-    <div class="footer">
-
-        <span>
-            ASSET_ID:
-            <span class="orange">Y0-8086</span>
-        </span>
-
-        <span>
-            PROPERTY OF RAYILMAZAN
-        </span>
-
-        <span>
-            GREEBLE_OS v1.0
-        </span>
-
+    <!-- ALT GREEBLE ŞERİDİ -->
+    <div class="footer-strip">
+        <div class="hazard-stripe"></div>
+        <div class="asset-tag">ASSET_ID: Y0-8086 // RAYILMAZAN.CORE</div>
     </div>
-
 </div>
 
-
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // İşlemci ve Bellek Bilgisi
+        const cores = navigator.hardwareConcurrency || "BİLİNMİYOR";
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "KORUMALI";
+        document.getElementById("dev-hardware").innerText = `${cores} Çekirdek İşlemci`;
 
-/* =========================================================
-   DONANIM BİLGİLERİ
-========================================================= */
+        // Grafik Birimi (GPU) ve Bellek
+        const gpuName = getGPUInfo();
+        document.getElementById("dev-gpu").innerText = `${gpuName.replace("ANGLE (", "").replace(")", "")} // ${ram} RAM`;
 
-document.addEventListener("DOMContentLoaded", function(){
-
-    const cores =
-        navigator.hardwareConcurrency ||
-        "UNKNOWN";
-
-    const ram =
-        navigator.deviceMemory
-        ? navigator.deviceMemory + " GB"
-        : "PROTECTED";
-
-
-    document.getElementById("dev-hardware")
-        .innerText =
-        cores + " CORE CPU";
-
-
-    document.getElementById("dev-memory")
-        .innerText =
-        ram + " SYSTEM MEMORY";
-
-
-    /* GPU */
-
-    const gpu =
-        getGPUInfo();
-
-    document.getElementById("dev-gpu")
-        .innerText =
-        gpu
-        .replace("ANGLE (","")
-        .replace(")","");
-
-
-    /* IP / LOCATION */
-
-    fetch("https://ipapi.co/json/")
-
-        .then(response => response.json())
-
-        .then(data => {
-
-            if(data.ip){
-
-                document.getElementById("dev-ip")
-                    .innerText =
-                    data.ip +
-                    " // " +
-                    (data.city || "UNKNOWN");
-
-                if(
-                    data.latitude !== undefined &&
-                    data.longitude !== undefined
-                ){
-
-                    document.getElementById("dev-coords")
-                        .innerText =
-                        data.latitude +
-                        " , " +
-                        data.longitude;
-
+        // IP ve Konum Bilgisi (Enlem / Boylam)
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                if(data.ip) {
+                    document.getElementById("dev-ip").innerText = `${data.ip} (${data.city || 'Bilinmiyor'})`;
+                    document.getElementById("dev-coords").innerText = (data.latitude && data.longitude) ? `${data.latitude}, ${data.longitude}` : "Mevcut Değil";
+                } else {
+                    document.getElementById("dev-ip").innerText = "GİZLİ";
+                    document.getElementById("dev-coords").innerText = "BİLİNMİYOR";
                 }
+            }).catch(() => {
+                document.getElementById("dev-ip").innerText = "ÇEVRİMDIŞI";
+                document.getElementById("dev-coords").innerText = "ERİŞİLEMEDİ";
+            });
 
-            }
-
-        })
-
-        .catch(() => {
-
-            document.getElementById("dev-ip")
-                .innerText =
-                "OFFLINE";
-
-            document.getElementById("dev-coords")
-                .innerText =
-                "UNAVAILABLE";
-
-        });
-
-
-    runBenchmark();
-
-});
-
-
-/* =========================================================
-   GPU
-========================================================= */
-
-function getGPUInfo(){
-
-    const canvas =
-        document.createElement("canvas");
-
-    const gl =
-        canvas.getContext("webgl") ||
-        canvas.getContext("experimental-webgl");
-
-    if(!gl)
-        return "UNKNOWN GPU";
-
-
-    const debugInfo =
-        gl.getExtension(
-            "WEBGL_debug_renderer_info"
-        );
-
-
-    return debugInfo
-        ? gl.getParameter(
-            debugInfo.UNMASKED_RENDERER_WEBGL
-          )
-        : "UNKNOWN GPU";
-
-}
-
-
-/* =========================================================
-   FPS TEST
-========================================================= */
-
-function measureFPS(){
-
-    return new Promise(resolve => {
-
-        let start =
-            performance.now();
-
-        let frames = 0;
-
-
-        function frame(){
-
-            frames++;
-
-            const elapsed =
-                performance.now() - start;
-
-
-            if(elapsed >= 1000){
-
-                resolve(
-                    Math.round(
-                        frames * 1000 / elapsed
-                    )
-                );
-
-            }
-            else{
-
-                requestAnimationFrame(frame);
-
-            }
-
-        }
-
-
-        requestAnimationFrame(frame);
-
+        runBenchmark();
     });
 
-}
-
-
-/* =========================================================
-   CPU TEST
-========================================================= */
-
-function cpuBenchmark(){
-
-    const start =
-        performance.now();
-
-    let x = 0;
-
-
-    for(
-        let i = 0;
-        i < 40000000;
-        i++
-    ){
-
-        x +=
-            Math.sqrt(i) *
-            Math.sin(i);
-
+    function getGPUInfo() {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) return "BİLİNMİYOR";
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "BİLİNMİYOR";
     }
 
+    function measureFPS() {
+        return new Promise((resolve) => {
+            let startTime = performance.now();
+            let frames = 0;
+            function check() {
+                frames++;
+                let duration = performance.now() - startTime;
+                if (duration >= 1000) { resolve(Math.round((frames * 1000) / duration)); } 
+                else { requestAnimationFrame(check); }
+            }
+            requestAnimationFrame(check);
+        });
+    }
 
-    return performance.now() - start;
+    function cpuBenchmark() {
+        const start = performance.now();
+        let x = 0;
+        for (let i = 0; i < 40000000; i++) { x += Math.sqrt(i) * Math.sin(i); }
+        return performance.now() - start;
+    }
 
-}
+    async function runBenchmark() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('score').style.display = 'none';
+        document.getElementById('progress-track').style.display = 'none';
+        document.getElementById('progress-bar').style.width = '0%';
+        document.getElementById('details').style.display = 'none';
+        document.getElementById('retry-btn').style.display = 'none';
 
+        const cpuCores = navigator.hardwareConcurrency || 4;
+        const fps = await measureFPS();
+        const cpuTime = cpuBenchmark();
 
-/* =========================================================
-   BENCHMARK
-========================================================= */
+        let baseScore = 5; 
+        if (cpuCores >= 8) baseScore += 1.5; else if (cpuCores <= 4) baseScore -= 1.5;
+        if (fps > 100) baseScore += 2; else if (fps > 80) baseScore += 1; else if (fps < 50) baseScore -= 1;
+        if (cpuTime < 80) baseScore += 1.5; else if (cpuTime < 150) baseScore += 0.5; else if (cpuTime > 300) baseScore -= 1.5;
 
-async function runBenchmark(){
-
-    const loading =
-        document.getElementById("loading");
-
-    const score =
-        document.getElementById("score");
-
-    const progress =
-        document.getElementById("progress-track");
-
-    const progressBar =
-        document.getElementById("progress-bar");
-
-    const details =
-        document.getElementById("details");
-
-    const retry =
-        document.getElementById("retry-btn");
-
-
-    loading.style.display =
-        "block";
-
-    score.style.display =
-        "none";
-
-    progress.style.display =
-        "none";
-
-    details.style.display =
-        "none";
-
-    retry.style.display =
-        "none";
-
-
-    const cores =
-        navigator.hardwareConcurrency || 4;
-
-
-    const fps =
-        await measureFPS();
-
-
-    const cpuTime =
-        cpuBenchmark();
-
-
-    let baseScore = 5;
-
-
-    if(cores >= 8)
-        baseScore += 1.5;
-
-    else if(cores <= 4)
-        baseScore -= 1.5;
-
-
-    if(fps > 100)
-        baseScore += 2;
-
-    else if(fps > 80)
-        baseScore += 1;
-
-    else if(fps < 50)
-        baseScore -= 1;
-
-
-    if(cpuTime < 80)
-        baseScore += 1.5;
-
-    else if(cpuTime < 150)
-        baseScore += .5;
-
-    else if(cpuTime > 300)
-        baseScore -= 1.5;
-
-
-    const finalScore =
-        Math.min(
-            10,
-            Math.max(
-                1,
-                Math.round(baseScore * 10) / 10
-            )
-        );
-
-
-    let tier;
-
-
-    if(finalScore < 4)
-
-        tier =
-        "C // LOW";
-
-
-    else if(finalScore < 7)
-
-        tier =
-        "B // STANDARD";
-
-
-    else
-
-        tier =
-        "A // HIGH";
-
-
-    setTimeout(() => {
-
-        loading.style.display =
-            "none";
-
-
-        score.innerText =
-            finalScore.toFixed(1);
-
-
-        score.style.display =
-            "block";
-
-
-        progress.style.display =
-            "block";
-
+        let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
+        let scoreColor = finalScore < 4 ? '#ff5500' : (finalScore < 7 ? '#ff9d00' : '#4CAF50');
+        let tierText = finalScore < 4 ? 'C SINIFI (ZAYIF)' : (finalScore < 7 ? 'B SINIFI (STANDART)' : 'A SINIFI (YÜKSEK)');
 
         setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            
+            const scoreEl = document.getElementById('score');
+            scoreEl.innerText = finalScore.toFixed(1);
+            scoreEl.style.display = 'block';
 
-            progressBar.style.width =
-                (finalScore * 10) + "%";
+            // Her zaman kullandığımız ilerleme çubuğu animasyonu
+            document.getElementById('progress-track').style.display = 'block';
+            setTimeout(() => {
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.backgroundColor = scoreColor;
+                progressBar.style.width = (finalScore * 10) + '%';
+            }, 50);
 
-        },50);
-
-
-        document.getElementById("bench-tier")
-            .innerText =
-            tier;
-
-
-        document.getElementById("bench-fps")
-            .innerText =
-            fps + " FPS";
-
-
-        details.style.display =
-            "block";
-
-
-        retry.style.display =
-            "block";
-
-
-    },1200);
-
-}
-
+            document.getElementById('bench-tier').innerText = tierText;
+            document.getElementById('bench-fps').innerText = fps + " FPS";
+            document.getElementById('details').style.display = 'block';
+            document.getElementById('retry-btn').style.display = 'inline-block';
+        }, 1200);
+    }
 </script>
 
 </body>
