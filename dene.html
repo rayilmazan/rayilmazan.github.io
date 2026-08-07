@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan // GREEBLE KONTROL MERKEZİ v5.0</title>
+    <title>rayılmazan // RUSTED SILVER GREEBLE HUD v6.0</title>
     <style>
         :root {
-            --greeble-bg: #121317;
-            --greeble-panel: #181a20;
-            --greeble-dark: #0a0b0e;
-            --greeble-light: #2c303b;
-            --accent-orange: #ff7700;
-            --accent-glow: rgba(255, 119, 0, 0.4);
-            --text-main: #f0f4f8;
-            --text-muted: #8a99ad;
-            --text-highlight: #ff9d00;
-            --tech-border: #2e3440;
+            /* Gri, Gümüş ve Paslanmış Metal Renk Paleti */
+            --greeble-bg: #1c1e22;
+            --greeble-panel: #282c33;
+            --greeble-dark: #141619;
+            --greeble-light: #434a56;
+            --silver-metal: #8c96a8;
+            --silver-dark: #555e6e;
+            
+            /* Yeşil Yazı ve Vurgular */
+            --accent-green: #00ff66;
+            --accent-glow: rgba(0, 255, 102, 0.35);
+            
+            /* Paslanmış Detay Tonları */
+            --rust-accent: #a65e31;
+            --rust-dark: #6e3d1e;
+            
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-highlight: #00ff66;
+            --tech-border: #4a5263;
         }
 
         * {
@@ -25,7 +35,7 @@
         }
 
         body {
-            background-color: #07080a;
+            background-color: #0e0f12;
             color: var(--text-main);
             font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
             padding: 20px;
@@ -33,39 +43,43 @@
             justify-content: center;
             min-height: 100vh;
             background-image: 
-                linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
+        /* Gümüş & Paslanmış Endüstriyel Şasi */
         .chassis {
             max-width: 900px;
             width: 100%;
-            background-color: var(--greeble-panel);
-            border: 2px solid #000;
-            border-top: 3px solid #434c5e;
-            border-left: 3px solid #434c5e;
-            border-radius: 4px;
+            background: linear-gradient(135deg, #2b303b 0%, #1f232b 100%);
+            border: 3px solid #141619;
+            border-top: 4px solid var(--silver-metal);
+            border-left: 4px solid var(--silver-metal);
+            border-right: 4px solid #3d4452;
+            border-bottom: 4px solid var(--rust-dark);
+            border-radius: 6px;
             padding: 25px;
             position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.4);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), inset 0 0 35px rgba(0,0,0,0.6);
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        /* Endüstriyel Vidalar / Perçinler */
+        /* Paslanmış / Eskitilmiş Metal Vidalar */
         .chassis::before, .chassis::after {
-            content: ""; position: absolute; width: 8px; height: 8px;
-            background: #0d0e11; border-radius: 50%;
-            box-shadow: inset 1px 1px 2px #444, 1px 1px 2px rgba(0,0,0,0.9);
+            content: ""; position: absolute; width: 9px; height: 9px;
+            background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 70%, #0d0e11 100%);
+            border-radius: 50%;
+            box-shadow: inset 1px 1px 2px #ff9e6b, 1px 1px 3px rgba(0,0,0,0.9);
         }
-        .chassis::before { top: 10px; left: 10px; }
-        .chassis::after { bottom: 10px; right: 10px; }
-        .rivet-tr { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: #0d0e11; border-radius: 50%; box-shadow: inset 1px 1px 2px #444, 1px 1px 2px rgba(0,0,0,0.9); }
-        .rivet-bl { position: absolute; bottom: 10px; left: 10px; width: 8px; height: 8px; background: #0d0e11; border-radius: 50%; box-shadow: inset 1px 1px 2px #444, 1px 1px 2px rgba(0,0,0,0.9); }
+        .chassis::before { top: 12px; left: 12px; }
+        .chassis::after { bottom: 12px; right: 12px; }
+        .rivet-tr { position: absolute; top: 12px; right: 12px; width: 9px; height: 9px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 70%, #0d0e11 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ff9e6b, 1px 1px 3px rgba(0,0,0,0.9); }
+        .rivet-bl { position: absolute; bottom: 12px; left: 12px; width: 9px; height: 9px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 70%, #0d0e11 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ff9e6b, 1px 1px 3px rgba(0,0,0,0.9); }
 
-        /* LOGO VE KÜÇÜK HARF BRAND (Sayfayla Bütünleşen Çerçevesiz Yapı) */
+        /* LOGO VE KÜÇÜK HARF BRAND (Çerçevesiz, Sayfayla Bütünleşen Yapı) */
         .brand-header-seamless {
             display: flex;
             flex-direction: column;
@@ -76,20 +90,20 @@
         }
 
         .logo-seamless {
-            width: 75px;
-            height: 75px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
             filter: drop-shadow(0 0 10px var(--accent-glow));
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .brand-title {
-            color: var(--text-main);
+            color: var(--accent-green);
             font-size: 16px;
             font-weight: 900;
             letter-spacing: 4px;
             font-family: 'Courier New', Courier, monospace;
-            text-shadow: 0 0 8px var(--accent-glow);
+            text-shadow: 0 0 10px var(--accent-glow);
             text-transform: lowercase;
         }
 
@@ -102,8 +116,8 @@
             gap: 6px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 9px;
-            color: #4CAF50;
-            background: rgba(0,0,0,0.3);
+            color: var(--accent-green);
+            background: rgba(0,0,0,0.4);
             padding: 3px 8px;
             border-radius: 2px;
             border: 1px solid var(--tech-border);
@@ -112,9 +126,9 @@
         .status-dot {
             width: 5px;
             height: 5px;
-            background-color: #4CAF50;
+            background-color: var(--accent-green);
             border-radius: 50%;
-            box-shadow: 0 0 5px #4CAF50;
+            box-shadow: 0 0 6px var(--accent-green);
             animation: pulse 1.5s infinite;
         }
 
@@ -124,14 +138,16 @@
             100% { opacity: 0.3; }
         }
 
-        /* TEK EKRAN BİRLEŞTİRİLMİŞ SİSTEM & BENCHMARK PANELİ */
+        /* TEK EKRAN BİRLEŞTİRİLMİŞ SİSTEM & BENCHMARK PANELİ (Gümüş / Paslanmış Stil) */
         .unified-control-screen {
             background-color: var(--greeble-bg);
-            border: 2px solid #000;
-            border-left: 4px solid var(--accent-orange);
+            border: 2px solid #141619;
+            border-left: 4px solid var(--accent-green);
+            border-right: 2px solid #3d4452;
+            border-bottom: 2px solid #3d4452;
             border-radius: 4px;
             padding: 20px;
-            box-shadow: inset 3px 3px 10px rgba(0,0,0,0.8);
+            box-shadow: inset 3px 3px 12px rgba(0,0,0,0.85);
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -140,7 +156,7 @@
         .screen-title {
             font-size: 11px;
             font-family: 'Courier New', Courier, monospace;
-            color: var(--text-muted);
+            color: var(--silver-metal);
             text-transform: uppercase;
             letter-spacing: 1.5px;
             border-bottom: 1px dashed var(--tech-border);
@@ -159,9 +175,10 @@
         .info-card {
             background: var(--greeble-panel);
             border: 1px solid var(--tech-border);
+            border-top: 2px solid var(--silver-dark);
             padding: 10px 12px;
             border-radius: 3px;
-            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.6);
         }
 
         .info-card .label {
@@ -179,16 +196,18 @@
             font-family: 'Courier New', Courier, monospace;
             font-size: 12px;
             word-break: break-all;
+            text-shadow: 0 0 6px rgba(0,255,102,0.2);
         }
 
         /* BENCHMARK BÖLÜMÜ (AYNI EKRAN İÇİNDE) */
         .benchmark-section {
             background: var(--greeble-dark);
             border: 1px solid var(--tech-border);
+            border-top: 2px solid var(--rust-accent);
             border-radius: 4px;
             padding: 20px;
             text-align: center;
-            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.6);
+            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.7);
         }
 
         .benchmark-header {
@@ -196,7 +215,7 @@
             color: var(--text-main);
             background: var(--greeble-panel);
             padding: 8px 12px;
-            border-left: 3px solid var(--accent-orange);
+            border-left: 3px solid var(--accent-green);
             border-radius: 2px;
             letter-spacing: 1px;
             font-family: 'Courier New', Courier, monospace;
@@ -212,58 +231,59 @@
         }
 
         .score-box { 
-            font-size: 42px; 
+            font-size: 44px; 
             font-weight: 900; 
             margin: 5px 0; 
             font-family: 'Courier New', Courier, monospace; 
-            color: var(--accent-orange); 
-            text-shadow: 0 0 12px var(--accent-glow); 
+            color: var(--accent-green); 
+            text-shadow: 0 0 15px var(--accent-glow); 
         }
 
-        /* İlerleme Çubuğu */
+        /* İlerleme Çubuğu (Yeşil) */
         .progress-track { 
             width: 100%; 
-            background: #07080a; 
+            background: #0e0f12; 
             border: 1px solid var(--tech-border); 
             height: 16px; 
             border-radius: 2px; 
             margin: 15px 0; 
             overflow: hidden; 
             display: none; 
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.9);
+            box-shadow: inset 2px 2px 6px rgba(0,0,0,0.9);
         }
 
         .progress-fill { 
             height: 100%; 
             width: 0%; 
-            background: var(--accent-orange); 
+            background: var(--accent-green); 
             transition: width 1s ease-out; 
-            box-shadow: 0 0 8px var(--accent-orange);
+            box-shadow: 0 0 10px var(--accent-green);
         }
 
         .greeble-btn {
             display: inline-block;
-            background: var(--greeble-light);
-            color: var(--text-main); 
+            background: linear-gradient(135deg, #434a56 0%, #2f353f 100%);
+            color: var(--accent-green); 
             font-family: 'Courier New', Courier, monospace; 
             font-weight: bold;
             font-size: 12px; 
-            padding: 10px 20px; 
+            padding: 10px 22px; 
             cursor: pointer;
-            border: 1px solid #111; 
-            border-top: 1px solid #444; 
-            border-left: 1px solid #444;
+            border: 1px solid #141619; 
+            border-top: 1px solid var(--silver-metal); 
+            border-left: 1px solid var(--silver-metal);
             border-radius: 3px;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.7);
             transition: all 0.15s ease;
             margin-top: 10px;
             letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(0,255,102,0.4);
         }
         
-        .greeble-btn:hover { background: #3b4252; color: #fff; border-color: var(--accent-orange); }
-        .greeble-btn:active { transform: translateY(2px); color: var(--accent-orange); }
+        .greeble-btn:hover { background: #555e6e; color: #fff; border-color: var(--accent-green); }
+        .greeble-btn:active { transform: translateY(2px); color: var(--accent-green); }
 
-        /* ALT GREEBLE ŞERİDİ */
+        /* ALT GREEBLE ŞERİDİ (Paslanmış / İhtar Çizgileri) */
         .footer-strip {
             display: flex;
             justify-content: space-between;
@@ -273,17 +293,17 @@
 
         .hazard-stripe {
             flex-grow: 1;
-            height: 5px;
+            height: 6px;
             border-radius: 2px;
-            background: repeating-linear-gradient(45deg, var(--accent-orange), var(--accent-orange) 8px, #15161a 8px, #15161a 16px);
+            background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #1c1e22 8px, #1c1e22 16px);
             border: 1px solid #000; 
-            box-shadow: inset 0 0 3px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
             margin-right: 15px;
         }
         
         .asset-tag { 
             font-size: 9px; 
-            color: var(--text-muted); 
+            color: var(--silver-metal); 
             font-weight: bold; 
             font-family: 'Courier New', Courier, monospace; 
             letter-spacing: 1px;
@@ -447,7 +467,6 @@
         if (cpuTime < 80) baseScore += 1.5; else if (cpuTime < 150) baseScore += 0.5; else if (cpuTime > 300) baseScore -= 1.5;
 
         let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
-        let scoreColor = finalScore < 4 ? '#ff5500' : (finalScore < 7 ? '#ff9d00' : '#4CAF50');
         let tierText = finalScore < 4 ? 'C SINIFI (ZAYIF)' : (finalScore < 7 ? 'B SINIFI (STANDART)' : 'A SINIFI (YÜKSEK)');
 
         setTimeout(() => {
@@ -460,7 +479,6 @@
             document.getElementById('progress-track').style.display = 'block';
             setTimeout(() => {
                 const progressBar = document.getElementById('progress-bar');
-                progressBar.style.backgroundColor = scoreColor;
                 progressBar.style.width = (finalScore * 10) + '%';
             }, 50);
 
