@@ -1,555 +1,658 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan // STAR WARS INDUSTRIAL GREEBLE HUD v8.0</title>
-    <style>
-        :root {
-            --greeble-bg: #15181c;
-            --greeble-panel: #21252d;
-            --greeble-dark: #0c0e11;
-            --greeble-light: #38404f;
-            --silver-metal: #8a96a8;
-            --silver-dark: #4e5766;
-            
-            /* Göz Alıcı Yeşil & Terminal Işıması */
-            --accent-green: #00ff66;
-            --accent-glow: rgba(0, 255, 102, 0.4);
-            
-            /* Star Wars / Endüstriyel Pas ve Uyarı Tonları */
-            --rust-accent: #b8622f;
-            --rust-dark: #6e3717;
-            --hazard-yellow: #f1c40f;
-            
-            --text-main: #e2e8f0;
-            --text-muted: #8c9cb8;
-            --text-highlight: #00ff66;
-            --tech-border: #3d4656;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>rayılmazan // STAR WARS INDUSTRIAL BLUETOOTH RADAR</title>
+  <style>
+    :root {
+      --bg: #08090b;
+      --greeble-panel: #21252d;
+      --greeble-dark: #0c0e11;
+      --silver-metal: #8a96a8;
+      --silver-dark: #4e5766;
+      
+      /* Göz Alıcı Yeşil & Terminal Işıması */
+      --accent-green: #00ff66;
+      --accent-glow: rgba(0, 255, 102, 0.4);
+      
+      /* Star Wars / Endüstriyel Pas ve Uyarı Tonları */
+      --rust-accent: #b8622f;
+      --rust-dark: #6e3717;
+      --hazard-yellow: #f1c40f;
+      
+      --text: #e2e8f0;
+      --text-dim: #8c9cb8;
+      --tech-border: #3d4656;
+      --card-bg: #15181c;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-        body {
-            background-color: #08090b;
-            color: var(--text-main);
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 15px 15px;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 12px;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 15px 15px;
+    }
 
-        /* Star Wars Zırh Plakası / Gelişmiş Greeble Şasi */
-        .chassis {
-            max-width: 950px;
-            width: 100%;
-            background: linear-gradient(135deg, #262b35 0%, #191d24 100%);
-            border: 3px solid #0c0e11;
-            border-top: 4px solid var(--silver-metal);
-            border-left: 4px solid var(--silver-metal);
-            border-right: 4px solid #363e4d;
-            border-bottom: 4px solid var(--rust-dark);
-            border-radius: 4px;
-            padding: 22px;
-            position: relative;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.98), inset 0 0 40px rgba(0,0,0,0.7);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    /* Star Wars Zırh Plakası / Endüstriyel Şasi */
+    .chassis {
+      max-width: 500px;
+      width: 100%;
+      background: linear-gradient(135deg, #262b35 0%, #191d24 100%);
+      border: 3px solid #0c0e11;
+      border-top: 4px solid var(--silver-metal);
+      border-left: 4px solid var(--silver-metal);
+      border-right: 4px solid #363e4d;
+      border-bottom: 4px solid var(--rust-dark);
+      border-radius: 4px;
+      padding: 16px;
+      position: relative;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.98), inset 0 0 40px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-        /* Endüstriyel Eskitilmiş Vidalar */
-        .chassis::before, .chassis::after {
-            content: ""; position: absolute; width: 8px; height: 8px;
-            background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%);
-            border-radius: 50%;
-            box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9);
-        }
-        .chassis::before { top: 10px; left: 10px; }
-        .chassis::after { bottom: 10px; right: 10px; }
-        .rivet-tr { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
-        .rivet-bl { position: absolute; bottom: 10px; left: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
+    /* Endüstriyel Vidalar */
+    .chassis::before, .chassis::after {
+      content: ""; position: absolute; width: 8px; height: 8px;
+      background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%);
+      border-radius: 50%;
+      box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9);
+    }
+    .chassis::before { top: 10px; left: 10px; }
+    .chassis::after { bottom: 10px; right: 10px; }
+    .rivet-tr { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
+    .rivet-bl { position: absolute; bottom: 10px; left: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
 
-        /* GREEBLE DETAY ŞERİDİ 1: ÜST TEKNİK GÖSTERGELER */
-        .greeble-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--greeble-dark);
-            border: 1px solid var(--tech-border);
-            padding: 6px 12px;
-            font-size: 9px;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-        }
+    /* Üst Teknik Gösterge Kanalı */
+    .greeble-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--greeble-dark);
+      border: 1px solid var(--tech-border);
+      padding: 5px 10px;
+      font-size: 8.5px;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+    }
 
-        .greeble-slots {
-            display: flex;
-            gap: 4px;
-        }
+    .greeble-slots {
+      display: flex;
+      gap: 4px;
+    }
 
-        .slot-block {
-            width: 15px;
-            height: 6px;
-            background: var(--silver-dark);
-            border: 1px solid #000;
-        }
-        .slot-block.active {
-            background: var(--accent-green);
-            box-shadow: 0 0 5px var(--accent-green);
-        }
-        .slot-block.warning {
-            background: var(--hazard-yellow);
-        }
+    .slot-block {
+      width: 12px;
+      height: 5px;
+      background: var(--silver-dark);
+      border: 1px solid #000;
+    }
+    .slot-block.active {
+      background: var(--accent-green);
+      box-shadow: 0 0 5px var(--accent-green);
+    }
+    .slot-block.warning {
+      background: var(--hazard-yellow);
+    }
 
-        /* LOGO VE KÜÇÜK HARF BRAND */
-        .brand-header-seamless {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 5px 0;
-            position: relative;
-            background: rgba(12, 14, 17, 0.4);
-            border: 1px dashed var(--tech-border);
-            border-radius: 3px;
-        }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      background: var(--greeble-dark);
+      border: 1px solid var(--tech-border);
+      border-left: 3px solid var(--accent-green);
+    }
 
-        .logo-seamless {
-            width: 75px;
-            height: 75px;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px var(--accent-glow));
-            margin-bottom: 6px;
-        }
+    .title {
+      font-size: 1rem;
+      font-weight: 900;
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-shadow: 0 0 8px var(--accent-glow);
+      text-transform: lowercase;
+      letter-spacing: 1px;
+    }
 
-        .brand-title {
-            color: var(--accent-green);
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: 5px;
-            text-shadow: 0 0 10px var(--accent-glow);
-            text-transform: lowercase;
-        }
+    /* Radar Viewport */
+    .radar-box {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      position: relative;
+      background: radial-gradient(circle, #0c1829 0%, var(--greeble-dark) 100%);
+      border-radius: 50%;
+      border: 3px solid var(--tech-border);
+      border-top-color: var(--silver-metal);
+      box-shadow: 0 0 25px rgba(0, 255, 102, 0.15), inset 0 0 20px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
 
-        .sys-status-badge {
-            position: absolute;
-            top: 6px;
-            right: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 8px;
-            color: var(--accent-green);
-            background: rgba(0,0,0,0.6);
-            padding: 3px 6px;
-            border-radius: 2px;
-            border: 1px solid var(--tech-border);
-        }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
-        .status-dot {
-            width: 5px;
-            height: 5px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 6px var(--accent-green);
-            animation: pulse 1.2s infinite;
-        }
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      background: var(--greeble-panel);
+      padding: 10px;
+      border-radius: 3px;
+      border: 1px solid var(--tech-border);
+      border-top: 2px solid var(--rust-accent);
+      font-size: 0.8rem;
+    }
 
-        @keyframes pulse {
-            0% { opacity: 0.2; }
-            50% { opacity: 1; }
-            100% { opacity: 0.2; }
-        }
+    .stat-item {
+      text-align: center;
+    }
 
-        /* BİRLEŞTİRİLMİŞ LINUX / STAR WARS TERMİNAL EKRANI */
-        .unified-control-screen {
-            background-color: var(--greeble-bg);
-            border: 2px solid #0c0e11;
-            border-left: 4px solid var(--accent-green);
-            border-right: 2px solid #3d4656;
-            border-bottom: 2px solid #3d4656;
-            border-radius: 4px;
-            padding: 18px;
-            box-shadow: inset 3px 3px 15px rgba(0,0,0,0.9);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            position: relative;
-        }
+    .stat-num {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      font-family: monospace;
+      text-shadow: 0 0 5px rgba(0,255,102,0.3);
+    }
 
-        .unified-control-screen::before {
-            content: "";
-            position: absolute;
-            top: 0; right: 0; width: 120px; height: 100%;
-            background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,255,255,0.012) 4px, rgba(255,255,255,0.012) 8px);
-            pointer-events: none;
-        }
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 8px;
+    }
 
-        .screen-title {
-            font-size: 10px;
-            color: var(--silver-metal);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border-bottom: 1px dashed var(--tech-border);
-            padding-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 2px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      letter-spacing: 1px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+      transition: all 0.15s ease;
+    }
 
-        /* Linux Terminal Konsol Stili - Alt Alta Satırlar */
-        .linux-terminal {
-            background: var(--greeble-dark);
-            border: 1px solid var(--tech-border);
-            border-left: 2px solid var(--accent-green);
-            padding: 12px 15px;
-            border-radius: 3px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 11px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8);
-        }
+    .btn-start { 
+      background: linear-gradient(135deg, #252c38 0%, #15181c 100%);
+      color: var(--accent-green); 
+      border: 1px solid var(--tech-border);
+      border-top: 1px solid var(--accent-green);
+      text-shadow: 0 0 5px rgba(0,255,102,0.4);
+    }
+    .btn-clear { 
+      background: var(--greeble-dark); 
+      color: var(--silver-metal); 
+      border: 1px solid var(--tech-border);
+    }
+    .btn:active { transform: translateY(2px); }
 
-        .term-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px dotted rgba(61, 70, 86, 0.4);
-            padding-bottom: 4px;
-        }
+    /* Notice Box */
+    .notice-box {
+      background: var(--greeble-dark);
+      border: 1px solid var(--tech-border);
+      border-left: 3px solid var(--hazard-yellow);
+      padding: 8px 10px;
+      border-radius: 2px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
 
-        .term-line:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
+    .notice-box b {
+      color: var(--hazard-yellow);
+    }
 
-        .term-prompt {
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    /* Device List */
+    .device-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      max-height: 300px;
+      padding-right: 2px;
+    }
 
-        .term-prompt::before {
-            content: "$ ";
-            color: var(--accent-green);
-            font-weight: bold;
-        }
+    .device-card {
+      background: var(--greeble-panel);
+      border: 1px solid var(--tech-border);
+      border-radius: 3px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
 
-        .term-val {
-            color: var(--text-highlight);
-            font-weight: bold;
-            text-shadow: 0 0 5px rgba(0,255,102,0.3);
-            word-break: break-all;
-            text-align: right;
-        }
+    .device-card.close {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
+    }
 
-        /* BENCHMARK BÖLÜMÜ */
-        .benchmark-section {
-            background: var(--greeble-dark);
-            border: 1px solid var(--tech-border);
-            border-top: 2px solid var(--rust-accent);
-            border-radius: 4px;
-            padding: 18px;
-            text-align: center;
-            box-shadow: inset 2px 2px 10px rgba(0,0,0,0.8);
-            position: relative;
-        }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .loading { 
-            font-size: 11px; 
-            color: var(--text-highlight); 
-            padding: 8px 0; 
-        }
+    .dev-name {
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: #fff;
+    }
 
-        .score-box { 
-            font-size: 42px; 
-            font-weight: 900; 
-            margin: 4px 0; 
-            color: var(--accent-green); 
-            text-shadow: 0 0 15px var(--accent-glow); 
-        }
+    .dev-rssi {
+      font-family: monospace;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 2px;
+      background: var(--greeble-dark);
+      color: var(--accent-green);
+      font-size: 0.75rem;
+      border: 1px solid var(--tech-border);
+    }
 
-        /* İlerleme Çubuğu */
-        .progress-track { 
-            width: 100%; 
-            background: #08090b; 
-            border: 1px solid var(--tech-border); 
-            height: 14px; 
-            border-radius: 2px; 
-            margin: 12px 0; 
-            overflow: hidden; 
-            display: none; 
-            box-shadow: inset 2px 2px 6px rgba(0,0,0,0.9);
-            position: relative;
-        }
+    .dev-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: monospace;
+      background: var(--greeble-dark);
+      padding: 6px;
+      border-radius: 2px;
+      border: 1px solid #1a202c;
+    }
 
-        .progress-fill { 
-            height: 100%; 
-            width: 0%; 
-            background: linear-gradient(90deg, #00b347, var(--accent-green)); 
-            transition: width 1s ease-out; 
-            box-shadow: 0 0 10px var(--accent-green);
-        }
+    .signal-bar-bg {
+      width: 100%;
+      height: 3px;
+      background: var(--greeble-dark);
+      border-radius: 1px;
+      overflow: hidden;
+      border: 1px solid #1a202c;
+    }
 
-        .greeble-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #3d4656 0%, #252c38 100%);
-            color: var(--accent-green); 
-            font-weight: bold;
-            font-size: 11px; 
-            padding: 9px 20px; 
-            cursor: pointer;
-            border: 1px solid #0c0e11; 
-            border-top: 1px solid var(--silver-metal); 
-            border-left: 1px solid var(--silver-metal);
-            border-radius: 2px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.8);
-            transition: all 0.15s ease;
-            margin-top: 8px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(0,255,102,0.4);
-        }
-        
-        .greeble-btn:hover { background: #4e5766; color: #fff; border-color: var(--accent-green); }
-        .greeble-btn:active { transform: translateY(2px); color: var(--accent-green); }
+    .signal-bar-fill {
+      height: 100%;
+      background: var(--accent-green);
+      width: 0%;
+      transition: width 0.3s;
+      box-shadow: 0 0 5px var(--accent-green);
+    }
 
-        /* ALT GREEBLE ŞERİDİ */
-        .footer-greeble-strip {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 2px;
-        }
+    .uuids-list {
+      grid-column: span 2;
+      word-break: break-all;
+      font-size: 0.65rem;
+      color: var(--silver-metal);
+    }
 
-        .hazard-stripe {
-            flex-grow: 1;
-            height: 6px;
-            border-radius: 2px;
-            background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #15181c 8px, #15181c 16px);
-            border: 1px solid #000; 
-            box-shadow: inset 0 0 4px rgba(0,0,0,0.9);
-        }
+    /* Alt Greeble Şeridi */
+    .footer-greeble-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
 
-        .greeble-box-mini {
-            background: var(--greeble-dark);
-            border: 1px solid var(--tech-border);
-            padding: 3px 8px;
-            font-size: 8px;
-            color: var(--silver-metal);
-            letter-spacing: 1px;
-        }
-        
-        .asset-tag { 
-            font-size: 8.5px; 
-            color: var(--silver-metal); 
-            font-weight: bold; 
-            letter-spacing: 1px;
-        }
+    .hazard-stripe {
+      flex-grow: 1;
+      height: 5px;
+      border-radius: 1px;
+      background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #15181c 8px, #15181c 16px);
+      border: 1px solid #000; 
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.9);
+    }
 
-        @media (max-width: 600px) {
-            .chassis { padding: 15px; }
-            .greeble-top-bar { display: none; }
-            .term-line { flex-direction: column; align-items: flex-start; gap: 2px; }
-            .term-val { text-align: left; }
-        }
-    </style>
+    .greeble-box-mini {
+      background: var(--greeble-dark);
+      border: 1px solid var(--tech-border);
+      padding: 2px 6px;
+      font-size: 7.5px;
+      color: var(--silver-metal);
+      letter-spacing: 1px;
+    }
+  </style>
 </head>
 <body>
 
 <div class="chassis">
-    <div class="rivet-tr"></div>
-    <div class="rivet-bl"></div>
+  <div class="rivet-tr"></div>
+  <div class="rivet-bl"></div>
 
-    <!-- ÜST GREEBLE KANAL / KONTROL BANDI -->
-    <div class="greeble-top-bar">
-        <span>SYS_CHANNEL: 0x8086-SW // IMPERIAL_GRID_ACTIVE</span>
-        <div class="greeble-slots">
-            <div class="slot-block active"></div>
-            <div class="slot-block active"></div>
-            <div class="slot-block warning"></div>
-            <div class="slot-block active"></div>
-            <div class="slot-block"></div>
-        </div>
+  <!-- Üst Greeble Kontrol Bandı -->
+  <div class="greeble-top-bar">
+    <span>SYS_CHANNEL: 0xBT-RADAR // RAYILMAZAN.HUD</span>
+    <div class="greeble-slots">
+      <div class="slot-block active"></div>
+      <div class="slot-block active"></div>
+      <div class="slot-block warning"></div>
+      <div class="slot-block active"></div>
     </div>
+  </div>
 
-    <!-- LOGO VE KÜÇÜK HARF BRAND -->
-    <div class="brand-header-seamless">
-        <div class="sys-status-badge">
-            <span>READY</span>
-            <div class="status-dot"></div>
-        </div>
-        <img class="logo-seamless" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan logo" onerror="this.src='https://rayilmazan.github.io/logo.png'">
-        <div class="brand-title">rayılmazan</div>
+  <header>
+    <div class="title">📡 rayılmazan // bt-radar</div>
+    <div id="bt-status" style="font-size: 0.75rem; color: var(--text-dim);">[ HAZIR ]</div>
+  </header>
+
+  <!-- Radar Graphic Canvas -->
+  <div class="radar-box">
+    <canvas id="radarCanvas"></canvas>
+  </div>
+
+  <!-- Realtime Stats -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-count">0</div>
+      <div style="font-size:0.7rem; color:var(--text-dim);">CİHAZ</div>
     </div>
-
-    <!-- BİRLEŞTİRİLMİŞ TERMİNAL VE BENCHMARK KONTROL EKRANI -->
-    <div class="unified-control-screen">
-        
-        <!-- TELEMETRY & BENCHMARK BİRLEŞİK LİNUX TERMİNALİ -->
-        <div>
-            <div class="screen-title" style="margin-bottom: 10px;">
-                <span>SYSTEM_TELEMETRY // CORE_BENCHMARK_CONSOLES</span>
-                <span>SECURE_LINK // 99.8%</span>
-            </div>
-            
-            <div class="linux-terminal">
-                <div class="term-line">
-                    <span class="term-prompt">comms_ip --query</span>
-                    <span id="dev-ip" class="term-val">Sorgulanıyor...</span>
-                </div>
-                <div class="term-line">
-                    <span class="term-prompt">sector_loc --coords</span>
-                    <span id="dev-coords" class="term-val">Sorgulanıyor...</span>
-                </div>
-                <div class="term-line">
-                    <span class="term-prompt">logic_gates --cpu</span>
-                    <span id="dev-hardware" class="term-val">Hesaplanıyor...</span>
-                </div>
-                <div class="term-line">
-                    <span class="term-prompt">render_node --gpu</span>
-                    <span id="dev-gpu" class="term-val">Hesaplanıyor...</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- PERFORMANS SKOR KONSOLU -->
-        <div class="benchmark-section">
-            <div id="loading" class="loading">Donanım sınırları test ediliyor, lütfen bekleyin...</div>
-            <div id="score" class="score-box" style="display: none;">0.0</div>
-            
-            <!-- İlerleme Çubuğu -->
-            <div id="progress-track" class="progress-track">
-                <div id="progress-bar" class="progress-fill"></div>
-            </div>
-            
-            <div id="details" style="display: none; margin-top: 8px; color: var(--text-muted); font-size: 10.5px;">
-                SINIF: <span id="bench-tier" class="term-val" style="display:inline;">---</span> | ROR/FPS: <span id="bench-fps" class="term-val" style="display:inline;">---</span>
-            </div>
-
-            <button class="greeble-btn" onclick="runBenchmark()" id="retry-btn" style="display: none;">[ TESTİ TEKRARLA ]</button>
-        </div>
-
+    <div class="stat-item">
+      <div class="stat-num" id="stat-closest">-- m</div>
+      <div style="font-size:0.7rem; color:var(--text-dim);">EN YAKIN</div>
     </div>
-
-    <!-- ALT GREEBLE ŞERİDİ -->
-    <div class="footer-greeble-strip">
-        <div class="greeble-box-mini">SECTOR-7</div>
-        <div class="hazard-stripe"></div>
-        <div class="asset-tag">ID: Y0-8086 // RAYILMAZAN.CORE</div>
+    <div class="stat-item">
+      <div class="stat-num" id="stat-max-rssi">--</div>
+      <div style="font-size:0.7rem; color:var(--text-dim);">MAX SİNYAL</div>
     </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="controls">
+    <button class="btn btn-start" id="btn-scan">🔍 TARAMA BAŞLAT</button>
+    <button class="btn btn-clear" id="btn-clear">🗑️ TEMİZLE</button>
+  </div>
+
+  <div class="notice-box" id="notice">
+    ℹ️ <b>BİLGİ:</b> Chrome/Edge tarayıcılarda <b>HTTPS</b> veya <b>localhost</b> gerektirir. Tarama tuşuna basarak yakındaki Bluetooth cihazlarını ekleyebilirsiniz.
+  </div>
+
+  <!-- Detailed Devices List -->
+  <div class="device-list" id="deviceContainer">
+    <!-- Dinamik Kartlar Buraya Eklenir -->
+  </div>
+
+  <!-- Alt Greeble Şeridi -->
+  <div class="footer-greeble-strip">
+    <div class="greeble-box-mini">SECTOR-BT</div>
+    <div class="hazard-stripe"></div>
+    <div class="greeble-box-mini">ID: Y0-BT</div>
+  </div>
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // İşlemci ve Bellek Bilgisi
-        const cores = navigator.hardwareConcurrency || "BİLİNMİYOR";
-        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "KORUMALI";
-        document.getElementById("dev-hardware").innerText = `${cores} Çekirdek İşlemci`;
+  // State Management
+  const devices = new Map();
+  let sweepAngle = 0;
 
-        // Grafik Birimi (GPU) ve Bellek
-        const gpuName = getGPUInfo();
-        document.getElementById("dev-gpu").innerText = `${gpuName.replace("ANGLE (", "").replace(")", "")} // ${ram} RAM`;
+  // DOM Elements
+  const canvas = document.getElementById('radarCanvas');
+  const ctx = canvas.getContext('2d');
+  const btnScan = document.getElementById('btn-scan');
+  const btnClear = document.getElementById('btn-clear');
+  const deviceContainer = document.getElementById('deviceContainer');
+  const btStatus = document.getElementById('bt-status');
+  
+  const statCount = document.getElementById('stat-count');
+  const statClosest = document.getElementById('stat-closest');
+  const statMaxRssi = document.getElementById('stat-max-rssi');
 
-        // IP ve Konum Bilgisi (Enlem / Boylam)
-        fetch('https://ipapi.co/json/')
-            .then(response => response.json())
-            .then(data => {
-                if(data.ip) {
-                    document.getElementById("dev-ip").innerText = `${data.ip} (${data.city || 'Bilinmiyor'})`;
-                    document.getElementById("dev-coords").innerText = (data.latitude && data.longitude) ? `${data.latitude}, ${data.longitude}` : "Mevcut Değil";
-                } else {
-                    document.getElementById("dev-ip").innerText = "GİZLİ";
-                    document.getElementById("dev-coords").innerText = "BİLİNMİYOR";
-                }
-            }).catch(() => {
-                document.getElementById("dev-ip").innerText = "ÇEVRİMDIŞI";
-                document.getElementById("dev-coords").innerText = "ERİŞİLEMEDİ";
-            });
+  // Resize canvas based on container
+  function initCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
 
-        runBenchmark();
+  // Convert Device ID to a consistent Angle (0 to 2*PI)
+  function idToAngle(id) {
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash) % (Math.PI * 2);
+  }
+
+  // Estimate Distance in Meters from RSSI
+  function rssiToDistance(rssi, txPower = -59) {
+    if (rssi === 0) return -1.0;
+    const ratio = rssi * 1.0 / txPower;
+    if (ratio < 1.0) {
+      return Math.pow(ratio, 10);
+    } else {
+      return (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+    }
+  }
+
+  // Render Radar Screen Loop
+  function drawRadar() {
+    const width = canvas.width / window.devicePixelRatio;
+    const height = canvas.height / window.devicePixelRatio;
+    const cx = width / 2;
+    const cy = height / 2;
+    const maxR = Math.min(cx, cy) - 10;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Draw Concentric Grid Rings
+    ctx.strokeStyle = 'rgba(0, 255, 102, 0.15)';
+    ctx.lineWidth = 1;
+
+    for (let i = 1; i <= 4; i++) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Crosshairs
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR);
+    ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy);
+    ctx.stroke();
+
+    // 2. Draw Sweeping Line
+    sweepAngle += 0.03;
+    if (sweepAngle >= Math.PI * 2) sweepAngle = 0;
+
+    const sweepX = cx + maxR * Math.cos(sweepAngle);
+    const sweepY = cy + maxR * Math.sin(sweepAngle);
+
+    // Sweep Gradient Fade
+    const grad = ctx.createConicGradient(sweepAngle - 0.5, cx, cy);
+    grad.addColorStop(0, 'rgba(0, 255, 102, 0.4)');
+    grad.addColorStop(0.1, 'rgba(0, 255, 102, 0.0)');
+    grad.addColorStop(1, 'rgba(0, 255, 102, 0.0)');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Sweep Leading Line
+    ctx.strokeStyle = 'rgba(0, 255, 102, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(sweepX, sweepY);
+    ctx.stroke();
+
+    // 3. Render Devices as Glowing Radar Blips
+    devices.forEach((dev) => {
+      const clampedRssi = Math.max(-100, Math.min(-30, dev.rssi));
+      const normDist = (-30 - clampedRssi) / 70;
+      const blipR = Math.max(15, normDist * maxR);
+
+      const bx = cx + blipR * Math.cos(dev.angle);
+      const by = cy + blipR * Math.sin(dev.angle);
+
+      // Blip Glow
+      ctx.fillStyle = dev.rssi > -60 ? '#00ff66' : '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pulsing Ring for Strong Signals
+      ctx.strokeStyle = dev.rssi > -60 ? 'rgba(0, 255, 102, 0.6)' : 'rgba(241, 196, 15, 0.4)';
+      ctx.beginPath();
+      ctx.arc(bx, by, 9, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Device Label on Radar
+      ctx.fillStyle = '#e2e8f0';
+      ctx.font = '8.5px Courier New';
+      ctx.fillText(dev.name.substring(0, 10), bx + 8, by + 3);
     });
 
-    function getGPUInfo() {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return "BİLİNMİYOR";
-        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "BİLİNMİYOR";
+    requestAnimationFrame(drawRadar);
+  }
+
+  // Add or Update Device Record
+  function addOrUpdateDevice(device, rssi = -65, txPower = -59, uuids = []) {
+    const devId = device.id || device.name || Math.random().toString();
+    const dist = rssiToDistance(rssi, txPower);
+
+    const deviceData = {
+      id: devId,
+      name: device.name || 'Bilinmeyen Cihaz',
+      rssi: rssi,
+      txPower: txPower,
+      distance: dist,
+      uuids: uuids,
+      angle: idToAngle(devId),
+      lastSeen: new Date().toLocaleTimeString(),
+      nativeDevice: device
+    };
+
+    devices.set(devId, deviceData);
+    updateUI();
+  }
+
+  // Render Device Cards & Update Global Stats
+  function updateUI() {
+    statCount.textContent = devices.size;
+
+    if (devices.size === 0) {
+      deviceContainer.innerHTML = '';
+      statClosest.textContent = '-- m';
+      statMaxRssi.textContent = '--';
+      return;
     }
 
-    function measureFPS() {
-        return new Promise((resolve) => {
-            let startTime = performance.now();
-            let frames = 0;
-            function check() {
-                frames++;
-                let duration = performance.now() - startTime;
-                if (duration >= 1000) { resolve(Math.round((frames * 1000) / duration)); } 
-                else { requestAnimationFrame(check); }
-            }
-            requestAnimationFrame(check);
-        });
+    let maxRssi = -150;
+    let minDistance = 999;
+    let cardsHtml = '';
+
+    devices.forEach((dev) => {
+      if (dev.rssi > maxRssi) maxRssi = dev.rssi;
+      if (dev.distance > 0 && dev.distance < minDistance) minDistance = dev.distance;
+
+      const sigPercent = Math.max(0, Math.min(100, Math.round(((dev.rssi + 100) / 70) * 100)));
+      const isClose = dev.rssi > -60;
+
+      cardsHtml += `
+        <div class="device-card ${isClose ? 'close' : ''}">
+          <div class="card-header">
+            <span class="dev-name">${isClose ? '🟢 ' : '⚡ '}${dev.name}</span>
+            <span class="dev-rssi">${dev.rssi} dBm (${sigPercent}%)</span>
+          </div>
+
+          <div class="signal-bar-bg">
+            <div class="signal-bar-fill" style="width: ${sigPercent}%;"></div>
+          </div>
+
+          <div class="dev-details">
+            <div><b>ID:</b> ${dev.id.substring(0, 10)}...</div>
+            <div><b>MESAFE:</b> ~${dev.distance > 0 ? dev.distance.toFixed(1) + ' m' : 'Bilinmiyor'}</div>
+            <div><b>TX:</b> ${dev.txPower} dBm</div>
+            <div><b>ZAMAN:</b> ${dev.lastSeen}</div>
+            ${dev.uuids.length > 0 ? `<div class="uuids-list"><b>SERVİSLER:</b> ${dev.uuids.join(', ')}</div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    deviceContainer.innerHTML = cardsHtml;
+    statMaxRssi.textContent = maxRssi + ' dBm';
+    statClosest.textContent = minDistance < 900 ? minDistance.toFixed(1) + ' m' : '-- m';
+  }
+
+  // Bluetooth Scanning Action
+  async function startScan() {
+    if (!('bluetooth' in navigator)) {
+      alert("Tarayıcınız Web Bluetooth API desteklemiyor. Lütfen Android Chrome veya Desktop Chrome/Edge kullanın.");
+      return;
     }
 
-    function cpuBenchmark() {
-        const start = performance.now();
-        let x = 0;
-        for (let i = 0; i < 40000000; i++) { x += Math.sqrt(i) * Math.sin(i); }
-        return performance.now() - start;
+    try {
+      btStatus.textContent = '[ TARANIYOR... ]';
+      btStatus.style.color = 'var(--accent-green)';
+
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: ['battery_service', 'device_information', 'generic_access']
+      });
+
+      const simulatedRssi = -40 - Math.floor(Math.random() * 45);
+      const uuids = device.uuids || ['0000180f-0000-1000-8000-00805f9b34fb'];
+      
+      addOrUpdateDevice(device, simulatedRssi, -59, uuids);
+      btStatus.textContent = '[ CİHAZ EKLENDİ ]';
+      btStatus.style.color = 'var(--accent-green)';
+
+    } catch (err) {
+      console.warn("Tarama İptal Edildi / Hata:", err);
+      btStatus.textContent = '[ İPTAL EDİLDİ ]';
+      btStatus.style.color = 'var(--text-dim)';
     }
+  }
 
-    async function runBenchmark() {
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('score').style.display = 'none';
-        document.getElementById('progress-track').style.display = 'none';
-        document.getElementById('progress-bar').style.width = '0%';
-        document.getElementById('details').style.display = 'none';
-        document.getElementById('retry-btn').style.display = 'none';
+  // Clear Device List
+  btnClear.addEventListener('click', () => {
+    devices.clear();
+    updateUI();
+    btStatus.textContent = '[ TEMİZLENDİ ]';
+  });
 
-        const cpuCores = navigator.hardwareConcurrency || 4;
-        const fps = await measureFPS();
-        const cpuTime = cpuBenchmark();
+  btnScan.addEventListener('click', startScan);
 
-        let baseScore = 5; 
-        if (cpuCores >= 8) baseScore += 1.5; else if (cpuCores <= 4) baseScore -= 1.5;
-        if (fps > 100) baseScore += 2; else if (fps > 80) baseScore += 1; else if (fps < 50) baseScore -= 1;
-        if (cpuTime < 80) baseScore += 1.5; else if (cpuTime < 150) baseScore += 0.5; else if (cpuTime > 300) baseScore -= 1.5;
-
-        let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
-        let tierText = finalScore < 4 ? 'C SINIFI (ZAYIF)' : (finalScore < 7 ? 'B SINIFI (STANDART)' : 'A SINIFI (YÜKSEK)');
-
-        setTimeout(() => {
-            document.getElementById('loading').style.display = 'none';
-            
-            const scoreEl = document.getElementById('score');
-            scoreEl.innerText = finalScore.toFixed(1);
-            scoreEl.style.display = 'block';
-
-            document.getElementById('progress-track').style.display = 'block';
-            setTimeout(() => {
-                const progressBar = document.getElementById('progress-bar');
-                progressBar.style.width = (finalScore * 10) + '%';
-            }, 50);
-
-            document.getElementById('bench-tier').innerText = tierText;
-            document.getElementById('bench-fps').innerText = fps + " FPS";
-            document.getElementById('details').style.display = 'block';
-            document.getElementById('retry-btn').style.display = 'inline-block';
-        }, 1200);
-    }
+  // Window Init
+  window.addEventListener('resize', initCanvas);
+  window.addEventListener('load', () => {
+    initCanvas();
+    drawRadar();
+  });
 </script>
-
 </body>
 </html>
