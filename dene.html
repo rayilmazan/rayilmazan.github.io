@@ -1,1 +1,199 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USED FUTURE // LOGO TERMINAL</title>
+    <style>
+        :root {
+            --amber-main: #ff9d00;
+            --amber-glow: #ff5500;
+            --amber-dim: #553300;
+            --bg-dark: #0a0804;
+            --crt-line: rgba(18, 12, 4, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--amber-main);
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* CRT Ekran Çerçevesi ve Kavis Doku */
+        .crt-container {
+            position: relative;
+            width: 90vw;
+            max-width: 650px;
+            aspect-ratio: 1 / 1;
+            background: radial-gradient(circle, #1a1208 0%, #050402 100%);
+            border: 3px solid var(--amber-dim);
+            border-radius: 24px;
+            box-shadow: 
+                0 0 30px rgba(255, 157, 0, 0.15),
+                inset 0 0 80px rgba(0, 0, 0, 0.9);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* Scanline Tarama Çizgileri */
+        .crt-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(var(--crt-line) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Ekran Titreme & Vignette */
+        .crt-container::after {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.8) 100%);
+            z-index: 11;
+            pointer-events: none;
+        }
+
+        /* Başlık ve Telemetri Bilgileri */
+        .hud-header, .hud-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px var(--amber-glow);
+            z-index: 5;
+            opacity: 0.85;
+        }
+
+        .status-tag {
+            background-color: var(--amber-main);
+            color: #000;
+            padding: 2px 6px;
+            font-weight: bold;
+        }
+
+        /* Logo Sahnesi */
+        .viewport {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Logo Işıması ve Efektler */
+        .used-future-logo {
+            width: 70%;
+            height: 70%;
+            filter: drop-shadow(0 0 12px var(--amber-glow)) 
+                    drop-shadow(0 0 25px var(--amber-main))
+                    url(#used-texture);
+            animation: subtle-flicker 0.15s infinite alternate;
+        }
+
+        /* Izgara Arka Planı */
+        .grid-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            stroke: var(--amber-dim);
+            stroke-width: 0.5;
+            opacity: 0.3;
+        }
+
+        @keyframes subtle-flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.94; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="crt-container">
+        <!-- Telemetri Üst Bilgi -->
+        <div class="hud-header">
+            <span>SYS_ID // UF-8086</span>
+            <span class="status-tag">OPERATIONAL</span>
+            <span>VOLTS: 240V PHOSPHOR</span>
+        </div>
+
+        <!-- Ana Logo Alanı -->
+        <div class="viewport">
+            <svg class="used-future-logo" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Eskitme / Noise Filtresi -->
+                    <filter id="used-texture" x="0%" y="0%" width="100%" height="100%">
+                        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+                    </filter>
+                </defs>
+
+                <!-- Arka Plan Hizalama Izgarası -->
+                <g class="grid-bg">
+                    <line x1="50" y1="0" x2="50" y2="500" />
+                    <line x1="250" y1="0" x2="250" y2="500" />
+                    <line x1="450" y1="0" x2="450" y2="500" />
+                    <line x1="0" y1="250" x2="500" y2="250" />
+                    <circle cx="250" cy="250" r="200" fill="none" stroke="var(--amber-dim)" stroke-width="0.5" stroke-dasharray="4 4" />
+                </g>
+
+                <!-- Vektörel "K / R" Logosu -->
+                <g fill="var(--amber-main)">
+                    <!-- Dikey Gövde ve Sağ Alt Bacak (Birleşik Geometri) -->
+                    <path d="M 150 100 
+                             H 190 
+                             V 220 
+                             L 310 350 
+                             H 240 
+                             L 190 290 
+                             V 350 
+                             H 150 
+                             Z" />
+
+                    <!-- Üst Yuvarlak Loop (Çember Çerçeve) -->
+                    <circle cx="250" cy="185" r="65" 
+                            fill="none" 
+                            stroke="var(--amber-main)" 
+                            stroke-width="8" />
+                </g>
+
+                <!-- Aşınma Çizgileri / Çizikler -->
+                <path d="M 140 120 L 320 120 M 170 340 L 290 340 M 230 140 L 280 200" 
+                      stroke="var(--bg-dark)" 
+                      stroke-width="2" 
+                      opacity="0.6" />
+            </svg>
+        </div>
+
+        <!-- Telemetri Alt Bilgi -->
+        <div class="hud-footer">
+            <span>MEM: 640KB OK</span>
+            <span>CORE_EST: RETRO_FUTURISM</span>
+            <span>REV. 2026</span>
+        </div>
+    </div>
+
+</body>
+</html>
