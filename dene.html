@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan // YOLCU0 OVERRIDE TERMINAL</title>
+    <title>rayılmazan // DONANIM ARAYÜZÜ</title>
     <style>
-        /* 1. KÖK RENKLER VE TEMA (USED FUTURE & GREEBLE) */
+        /* 1. KÖK RENKLER VE TEMA (SAFKAN GREEBLE) */
         :root {
-            --amber-main: #ff9d00;
-            --amber-glow: #ff5500;
-            --amber-dim: #553300;
-            --bg-dark: #0a0804;
-            --crt-line: rgba(18, 12, 4, 0.7);
-            
+            --greeble-bg: #1e2024;
+            --greeble-panel: #282b30;
             --greeble-dark: #15161a;
-            --greeble-mid: #24262b;
-            --greeble-light: #363a42;
-            --hazard-orange: #ff7700;
+            --greeble-light: #3a3e45;
+            --accent-orange: #ff7700;
+            --text-main: #f0f4f8; /* Okunabilirliği yüksek açık gri/beyaz */
+            --text-muted: #a0aab5;
+            --text-highlight: #ff9d00;
         }
 
         * {
@@ -25,15 +23,10 @@
             padding: 0;
         }
 
-        /* 2. UZAY/GEMİ İÇİ ARKA PLAN */
         body {
-            background-color: #050608;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 40px 40px;
-            color: var(--amber-main);
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #0f1013;
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
             padding: 20px;
             display: flex;
             justify-content: center;
@@ -41,259 +34,231 @@
             overflow-x: hidden;
         }
 
-        /* 3. ANA GREEBLE ŞASİ (Ağır Zırhlı Kasa) */
+        /* 2. ANA GREEBLE ŞASİ (Ağır Sanayi Kasası) */
         .chassis {
             max-width: 1000px;
             width: 100%;
-            background-color: var(--greeble-mid);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0,0,0, 0.4) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(0,0,0, 0.5) 0%, transparent 30%),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.15"/></svg>');
-            border: 2px solid #111;
-            border-top: 4px solid #4a505c;
-            border-left: 4px solid #4a505c;
-            border-radius: 16px;
+            background-color: var(--greeble-panel);
+            border: 2px solid #000;
+            border-top: 3px solid #4a505c;
+            border-left: 3px solid #4a505c;
+            border-radius: 8px;
             padding: 25px;
             position: relative;
-            box-shadow: 
-                15px 25px 50px rgba(0,0,0,0.9), 
-                inset 0 0 30px rgba(0,0,0,0.8);
+            box-shadow: 10px 15px 30px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        /* Donanım Vidaları / Perçinler */
+        /* Panel Kesikleri / Vidalar */
         .chassis::before, .chassis::after {
-            content: "";
-            position: absolute;
-            width: 14px; height: 14px;
-            background: #111;
-            border-radius: 50%;
-            box-shadow: inset 2px 2px 4px #555, 1px 1px 2px rgba(0,0,0,0.9);
+            content: ""; position: absolute; width: 12px; height: 12px;
+            background: #111; border-radius: 50%;
+            box-shadow: inset 1px 1px 3px #555, 1px 1px 1px rgba(0,0,0,0.9);
         }
         .chassis::before { top: 15px; left: 15px; }
         .chassis::after { bottom: 15px; right: 15px; }
-        .rivet-tr { position: absolute; top: 15px; right: 15px; width: 14px; height: 14px; background: #111; border-radius: 50%; box-shadow: inset 2px 2px 4px #555, 1px 1px 2px rgba(0,0,0,0.9); }
-        .rivet-bl { position: absolute; bottom: 15px; left: 15px; width: 14px; height: 14px; background: #111; border-radius: 50%; box-shadow: inset 2px 2px 4px #555, 1px 1px 2px rgba(0,0,0,0.9); }
+        .rivet-tr { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; background: #111; border-radius: 50%; box-shadow: inset 1px 1px 3px #555, 1px 1px 1px rgba(0,0,0,0.9); }
+        .rivet-bl { position: absolute; bottom: 15px; left: 15px; width: 12px; height: 12px; background: #111; border-radius: 50%; box-shadow: inset 1px 1px 3px #555, 1px 1px 1px rgba(0,0,0,0.9); }
 
-        /* 4. BAŞLIK / TELEMETRİ (Endüstriyel Etiketler) */
+        /* 3. BAŞLIK / LOGO BÖLÜMÜ */
         .header-section {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #15161a;
+            background: var(--greeble-dark);
             border: 2px solid #000;
-            border-bottom: 4px solid var(--hazard-orange);
-            padding: 10px 20px;
-            box-shadow: inset 2px 2px 10px rgba(0,0,0,0.8);
+            border-bottom: 4px solid var(--accent-orange);
+            padding: 15px 20px;
+            border-radius: 4px;
         }
 
-        .logo-wrapper { display: flex; align-items: center; gap: 15px; }
+        .logo-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
 
-        .logo-tag {
-            background: var(--amber-main);
-            color: #000;
-            padding: 4px 12px;
-            font-size: 16px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+        /* Mekanik rayılmazan Logosu */
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--greeble-panel);
+            padding: 5px 15px 5px 5px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .brand-text {
+            color: var(--text-main);
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-family: 'Courier New', Courier, monospace;
         }
 
         .tech-dials {
-            display: flex; gap: 12px; font-size: 12px; color: #888; font-weight: bold;
+            display: flex; gap: 10px; font-size: 12px; color: var(--text-muted); font-family: 'Courier New', Courier, monospace; font-weight: bold;
         }
-        .tech-dials span { background: #0a0a0c; border: 1px solid #333; padding: 4px 8px; box-shadow: inset 1px 1px 3px #000; }
+        .tech-dials span { background: #0a0a0c; border: 1px solid #333; padding: 6px 10px; border-radius: 3px; }
 
-        /* 5. ANA YAPI (GRID) */
+        /* 4. ANA YAPI (GRID) */
         .content-container { 
             display: grid; 
-            grid-template-columns: 1fr 260px; 
+            grid-template-columns: 1fr 280px; 
             gap: 20px; 
             flex: 1;
         }
 
-        /* 6. CRT EKRAN (YOLCU0 Gözü) */
+        /* 5. VERİ EKRANI (NET VE OKUNABİLİR) */
         .main-log {
-            background-color: var(--bg-dark);
-            border: 8px solid #111;
-            border-radius: 24px;
+            background-color: var(--greeble-bg);
+            border: 2px solid #000;
+            border-top: 3px solid #111;
+            border-left: 3px solid #111;
+            border-radius: 6px;
             padding: 30px;
-            box-shadow: 
-                0 0 20px rgba(255, 157, 0, 0.1),
-                inset 0 0 60px rgba(0,0,0,0.95);
-            position: relative;
             height: 550px;
             overflow-y: auto;
             overflow-x: hidden;
-            /* Used Future CRT Işıması ve Titremesi */
-            animation: phosphor-flicker 0.15s infinite alternate;
+            box-shadow: inset 4px 4px 10px rgba(0,0,0,0.6);
         }
 
-        /* Tarama Çizgileri (Scanlines) */
-        .main-log::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(var(--crt-line) 50%, rgba(0, 0, 0, 0.25) 50%);
-            background-size: 100% 4px;
-            z-index: 10;
-            pointer-events: none;
-            opacity: 0.8;
-        }
+        /* Scrollbar */
+        .main-log::-webkit-scrollbar { width: 12px; background: var(--greeble-dark); }
+        .main-log::-webkit-scrollbar-thumb { background: var(--greeble-light); border: 1px solid #000; border-radius: 6px; }
+        .main-log::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
 
-        /* CRT Camı Parlaması (Vignette & Glow) */
-        .main-log::after {
-            content: ''; 
-            position: sticky; 
-            top: -30px; left: -30px; right: -30px; height: 100%;
-            background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.8) 100%);
-            pointer-events: none; 
-            display: block; 
-            z-index: 11;
-        }
-
-        /* Scrollbar (Kehribar Rengi) */
-        .main-log::-webkit-scrollbar { width: 14px; background: #000; border-left: 2px solid #222; }
-        .main-log::-webkit-scrollbar-thumb { background: var(--amber-dim); border: 2px solid #000; }
-        .main-log::-webkit-scrollbar-thumb:hover { background: var(--amber-main); }
-
-        /* CRT İçi Metin Stilleri */
         .view-section {
-            color: var(--amber-main);
-            text-shadow: 0 0 6px var(--amber-glow);
-            margin-bottom: 45px;
-            position: relative;
-            z-index: 5;
+            margin-bottom: 40px;
         }
         
         .view-section h2 {
             font-size: 18px; 
             margin-top:0; 
-            border-bottom: 1px solid var(--amber-dim); 
-            padding-bottom: 8px;
+            color: var(--text-main);
+            background: var(--greeble-dark);
+            padding: 10px 15px;
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 2px;
             letter-spacing: 1px;
-            text-transform: uppercase;
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 15px;
         }
 
         .data-row {
-            display: flex; justify-content: space-between; align-items: baseline; gap: 15px;
-            margin: 10px 0; border-bottom: 1px dotted rgba(255, 157, 0, 0.2); padding-bottom: 4px;
+            display: flex; justify-content: space-between; align-items: center; 
+            margin: 8px 0; 
+            background: rgba(255,255,255,0.02);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #333;
             font-size: 14px;
         }
-        .data-row .label { color: rgba(255, 157, 0, 0.6); white-space: nowrap; }
-        .highlight { color: #fff; text-shadow: 0 0 5px #fff; text-align: right; }
+        
+        .data-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #444;
+        }
 
-        /* 7. KONTROL PANELİ / YAN ÇUBUK (Greeble Switchboard) */
+        .data-row .label { 
+            color: var(--text-muted); 
+            font-weight: 600;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .highlight { 
+            color: var(--text-highlight); 
+            font-weight: bold; 
+            text-align: right; 
+        }
+
+        /* 6. YAN ÇUBUK PANELİ */
         .side-bar {
             background: var(--greeble-dark); 
             border: 2px solid #000;
-            border-top: 4px solid #333;
-            border-left: 4px solid #333;
+            border-radius: 6px;
             padding: 20px; 
-            font-size: 12px; color: #888;
-            box-shadow: inset 5px 5px 15px rgba(0,0,0,0.9);
+            font-size: 13px; color: var(--text-muted);
+            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .side-bar-title { 
-            color: var(--hazard-orange); 
+            color: var(--text-main); 
             border-bottom: 2px solid #333;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
             display: block; 
             font-weight: bold;
-            letter-spacing: 1px;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        /* 8. MEKANİK GREEBLE BUTONLAR */
+        /* 7. OKUNABİLİR MEKANİK BUTONLAR */
         .greeble-btn {
             display: block; width: 100%; 
-            background: linear-gradient(135deg, var(--greeble-light), var(--greeble-dark)); 
-            color: #ccc; 
-            font-family: 'Courier New', Courier, monospace; font-weight: bold;
-            font-size: 14px; padding: 15px; text-align: left; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px;
-            border: 2px solid #000; 
-            border-top: 2px solid #555; 
-            border-left: 2px solid #555;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
-            transition: all 0.1s;
+            background: var(--greeble-light);
+            color: var(--text-main); 
+            font-family: 'Segoe UI', sans-serif; 
+            font-weight: 600;
+            font-size: 14px; padding: 12px 15px; text-align: left; cursor: pointer;
+            border: 1px solid #111; 
+            border-top: 1px solid #555; 
+            border-left: 1px solid #555;
+            border-radius: 4px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            transition: all 0.15s ease;
+            margin-bottom: 10px;
         }
         
         .greeble-btn:hover { 
-            color: var(--amber-main); 
-            background: linear-gradient(135deg, #40454f, #1f2126); 
+            background: #4a505c;
+            color: #fff;
         }
         
         .greeble-btn:active {
-            border-top: 2px solid #000; border-left: 2px solid #000;
-            border-bottom: 2px solid #555; border-right: 2px solid #555;
-            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.9);
+            border-top: 1px solid #000; border-left: 1px solid #000;
+            border-bottom: 1px solid #555; border-right: 1px solid #555;
+            box-shadow: inset 2px 2px 6px rgba(0,0,0,0.7);
             transform: translateY(2px);
-            color: var(--hazard-orange);
+            color: var(--accent-orange);
         }
-        
-        .greeble-btn::before { content: "SYS_CALL> "; color: #555; }
-        .greeble-btn:hover::before { color: var(--hazard-orange); }
 
-        /* 9. YÜKLÜ MODÜLLER (Veri Kasetleri / Cartridges) */
-        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        /* 8. YÜKLÜ MODÜLLER (Araçlar) */
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         
         .tool-card {
-            padding: 12px; height: 100%; display: flex; flex-direction: column; gap: 8px;
-            background: transparent; border: 1px solid var(--amber-dim); box-shadow: none;
-            color: var(--amber-main);
+            display: flex; flex-direction: column; gap: 6px;
+            margin-bottom: 0; height: 100%;
         }
         
-        .tool-card::before { display: none; }
-        
-        .tool-card:hover {
-            background: rgba(255, 157, 0, 0.1);
-            border-color: var(--amber-main);
-            box-shadow: 0 0 15px rgba(255, 157, 0, 0.2);
-        }
+        .tool-title { color: var(--text-main); font-weight: bold; font-size: 15px; font-family: 'Courier New', Courier, monospace; }
+        .tool-desc { color: var(--text-muted); font-size: 12px; font-weight: normal; }
 
-        .tool-title { color: #fff; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #fff; }
-        .tool-desc { color: rgba(255, 157, 0, 0.7); font-size: 11px; }
+        /* Yükleme Çubukları ve Skorlar */
+        .progress-track { width: 100%; background: #111; border: 1px solid #333; height: 20px; border-radius: 10px; margin: 15px 0 25px 0; overflow: hidden; display: none; }
+        .progress-fill { height: 100%; width: 0%; background: var(--accent-orange); transition: width 1s ease-out; }
+        .loading { font-size: 14px; color: var(--text-highlight); padding: 15px 0; font-family: 'Courier New', Courier, monospace; }
+        .score-box { font-size: 42px; text-align: center; font-weight: 900; margin: 20px 0; font-family: 'Courier New', Courier, monospace; }
 
-        /* Diğer CRT ve Tarama Efektleri */
-        .progress-track { width: 100%; background: #000; border: 1px solid var(--amber-dim); height: 24px; margin: 15px 0 25px 0; padding: 3px; display: none; }
-        .progress-fill { height: 100%; width: 0%; background: var(--amber-main); transition: width 1s ease-out; box-shadow: 0 0 15px var(--amber-main); }
-        .loading { font-size: 14px; color: var(--amber-main); padding: 20px 0; animation: pulse 1s infinite alternate; }
-        .score-box { font-size: 48px; text-align: center; font-weight: 900; margin: 20px 0; }
-
-        @keyframes phosphor-flicker {
-            0% { opacity: 0.96; }
-            100% { opacity: 1; }
-        }
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; text-shadow: 0 0 10px var(--amber-glow); }
-        }
-
-        /* 10. ALT GREEBLE ŞERİT VE KİMLİK */
+        /* 9. ALT BİLGİ ŞERİDİ */
         .footer-line {
-            margin-top: 10px; height: 12px;
-            background: repeating-linear-gradient(45deg, var(--hazard-orange), var(--hazard-orange) 10px, #111 10px, #111 20px);
-            border: 2px solid #000; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+            margin-top: 10px; height: 8px; border-radius: 4px;
+            background: repeating-linear-gradient(45deg, var(--accent-orange), var(--accent-orange) 10px, #222 10px, #222 20px);
+            border: 1px solid #000; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
         }
         
-        .asset-tag {
-            font-size: 11px; color: #666; font-weight: bold; text-align: right; margin-top: 5px;
-        }
+        .asset-tag { font-size: 12px; color: var(--text-muted); font-weight: bold; text-align: right; margin-top: 8px; font-family: 'Courier New', Courier, monospace; }
 
-        /* Mobil Uyumluluk */
         @media (max-width: 850px) {
             .content-container { grid-template-columns: 1fr; }
-            .chassis { padding: 15px; }
-            .main-log { height: 450px; padding: 15px; }
-            .header-section { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .main-log { height: auto; min-height: 400px; padding: 20px; }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 15px; }
         }
     </style>
 </head>
@@ -306,124 +271,135 @@
     <!-- BAŞLIK BÖLÜMÜ -->
     <div class="header-section">
         <div class="logo-wrapper">
-            <!-- Kurumsal Kimlik Düzeltmesi: YOLCU0 & rayılmazan -->
-            <div class="logo-tag">YOLCU0 // rayılmazan</div>
+            <!-- Özel rayılmazan Donanım Logosu -->
+            <div class="brand-logo">
+                <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="10" width="80" height="80" rx="15" fill="#15161a" stroke="#ff7700" stroke-width="6"/>
+                    <circle cx="30" cy="50" r="8" fill="#ff7700"/>
+                    <rect x="45" y="42" width="30" height="16" rx="4" fill="#ff7700"/>
+                </svg>
+                <span class="brand-text">rayılmazan</span>
+            </div>
         </div>
         <div class="tech-dials">
-            <span>[SYS: OVERRIDE]</span>
-            <span>[CRT: 240V]</span>
-            <span>[CORE: ONLINE]</span>
+            <span>YOLCU0_SYS</span>
+            <span>MEM: ALLOCATED</span>
+            <span>STATUS: ONLINE</span>
         </div>
     </div>
 
     <!-- İÇERİK BÖLÜMÜ -->
     <div class="content-container">
         
-        <!-- ANA GÜNLÜK PANELİ (CRT Ekran) -->
+        <!-- ANA EKRAN (Net ve Okunabilir Veri) -->
         <div class="main-log" id="main-log-container">
             
-            <!-- DIAGNOSTICS EKRANI -->
+            <!-- DONANIM VERİLERİ (DIAGNOSTICS) -->
             <div id="view-diagnostics">
                 
                 <div class="view-section">
-                    <h2>> SYSTEM_TELEMETRY</h2>
-                    <div class="data-row"><span class="label">>> CHASSIS_CLASS</span><span id="dev-type" class="highlight">Tarama yapılıyor...</span></div>
-                    <div class="data-row"><span class="label">>> KERNEL_OS</span><span id="dev-os" class="highlight">Tarama yapılıyor...</span></div>
-                    <div class="data-row"><span class="label">>> OPTIC_ARRAY</span><span id="dev-screen" class="highlight">Tarama yapılıyor...</span></div>
-                    <div class="data-row"><span class="label">>> RENDER_NODE</span><span id="dev-gpu" class="highlight">Hesaplanıyor...</span></div>
-                    <div class="data-row"><span class="label">>> COMMS_IP</span><span id="dev-ip" class="highlight">Sorgulanıyor...</span></div>
-                    <div class="data-row"><span class="label">>> SECTOR_LOC</span><span id="dev-coords" class="highlight">Sorgulanıyor...</span></div>
-                    <div class="data-row"><span class="label">>> ENERGY_CELL</span><span id="dev-battery" class="highlight">Okunuyor...</span></div>
-                    <div class="data-row"><span class="label">>> LOGIC_GATES</span><span id="dev-hardware" class="highlight">Hesaplanıyor...</span></div>
-                    <div class="data-row"><span class="label">>> GYRO_MODULE</span><span id="dev-sensors" class="highlight">Test ediliyor...</span></div>
+                    <h2>SYSTEM_TELEMETRY</h2>
+                    <div class="data-row"><span class="label">CHASSIS_CLASS</span><span id="dev-type" class="highlight">Tarama yapılıyor...</span></div>
+                    <div class="data-row"><span class="label">KERNEL_OS</span><span id="dev-os" class="highlight">Tarama yapılıyor...</span></div>
+                    <div class="data-row"><span class="label">OPTIC_ARRAY (Ekran)</span><span id="dev-screen" class="highlight">Tarama yapılıyor...</span></div>
+                    <div class="data-row"><span class="label">RENDER_NODE (GPU)</span><span id="dev-gpu" class="highlight">Hesaplanıyor...</span></div>
+                    <div class="data-row"><span class="label">COMMS_IP</span><span id="dev-ip" class="highlight">Sorgulanıyor...</span></div>
+                    <div class="data-row"><span class="label">SECTOR_LOC (Konum)</span><span id="dev-coords" class="highlight">Sorgulanıyor...</span></div>
+                    <div class="data-row"><span class="label">ENERGY_CELL (Batarya)</span><span id="dev-battery" class="highlight">Okunuyor...</span></div>
+                    <div class="data-row"><span class="label">LOGIC_GATES (Donanım)</span><span id="dev-hardware" class="highlight">Hesaplanıyor...</span></div>
+                    <div class="data-row"><span class="label">GYRO_MODULE (Sensör)</span><span id="dev-sensors" class="highlight">Test ediliyor...</span></div>
                 </div>
 
                 <div class="view-section">
-                    <h2>> ORBITAL_UPLINK_SPEED</h2>
-                    <div id="speed-loading" class="loading">>> YÖRÜNGE BAĞLANTISI ARANIYOR...</div>
+                    <h2>ORBITAL_UPLINK (Ağ Hızı)</h2>
+                    <div id="speed-loading" class="loading">Bağlantı kalitesi ölçülüyor...</div>
                     <div id="speed-details" style="display: none;">
-                        <div class="data-row"><span class="label">>> SIGNAL_LATENCY</span><span id="speed-ping" class="highlight">---</span></div>
-                        <div class="data-row"><span class="label">>> DATA_IN (Down)</span><span id="speed-download" class="highlight">---</span></div>
-                        <div class="data-row"><span class="label">>> DATA_OUT (Up)</span><span id="speed-upload" class="highlight">---</span></div>
-                        <div class="data-row"><span class="label">>> BANDWIDTH_TIER</span><span id="speed-tier" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">GECİKME (Ping)</span><span id="speed-ping" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">İNDİRME (Down)</span><span id="speed-download" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">YÜKLEME (Up)</span><span id="speed-upload" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">BAĞLANTI TİPİ</span><span id="speed-tier" class="highlight">---</span></div>
                     </div>
                 </div>
 
                 <div class="view-section">
-                    <h2>> CORE_BENCHMARK</h2>
-                    <div id="loading" class="loading">>> MATRİS ZORLANIYOR. LÜTFEN BEKLEYİN...</div>
+                    <h2>CORE_BENCHMARK (Performans)</h2>
+                    <div id="loading" class="loading">Donanım sınırları test ediliyor. Lütfen bekleyin...</div>
                     <div id="score" class="score-box" style="display: none;">0</div>
                     
                     <div id="progress-track" class="progress-track"><div id="progress-bar" class="progress-fill"></div></div>
                     
                     <div id="details" style="display: none;">
-                        <div class="data-row"><span class="label">>> THREAD_COUNT</span><span id="bench-cpu" class="highlight">---</span></div>
-                        <div class="data-row"><span class="label">>> CYCLE_RATE</span><span id="bench-fps" class="highlight">---</span></div>
-                        <div class="data-row"><span class="label">>> GPU_CHIP</span><span id="bench-gpu" class="highlight">---</span></div>
-                        <div class="data-row"><span class="label">>> HARDWARE_CLASS</span><span id="bench-tier" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">İŞLEMCİ ÇEKİRDEĞİ</span><span id="bench-cpu" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">EKRAN YENİLEME</span><span id="bench-fps" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">GRAFİK BİRİMİ</span><span id="bench-gpu" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">DONANIM SINIFI</span><span id="bench-tier" class="highlight">---</span></div>
                     </div>
                 </div>
                 
-                <button class="greeble-btn" onclick="runAllDiagnostics()" id="retry-all-btn" style="display: none; margin-top: 30px; text-align: center;">RE-CALIBRATE SYSTEM</button>
+                <button class="greeble-btn" onclick="runAllDiagnostics()" id="retry-all-btn" style="display: none; margin-top: 20px; text-align: center; border-color: var(--accent-orange);">SİSTEMİ YENİDEN KALİBRE ET</button>
             </div>
 
             <!-- ARAÇLAR (MODULES) EKRANI -->
             <div id="view-tools" style="display: none;" class="view-section">
-                <h2>> DATA_CARTRIDGES (rayılmazan OS)</h2>
-                <p style="color: rgba(255,157,0,0.6); font-size: 12px; margin-top: 5px;">Bağlı mantık devreleri ve yerel araçlar:</p>
-                
+                <h2>YEREL ARAÇ MODÜLLERİ</h2>
                 <div class="tools-grid">
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pdf')">
-                        <span class="tool-title">[PDF_NODE]</span><span class="tool-desc">Belge dönüştürme matrisi</span>
+                        <span class="tool-title">PDF_NODE</span><span class="tool-desc">Belge dönüştürme matrisi</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suterazi')">
-                        <span class="tool-title">[GYRO_CALIB]</span><span class="tool-desc">Jiroskop stabilizatörü</span>
+                        <span class="tool-title">GYRO_CALIB</span><span class="tool-desc">Jiroskop stabilizatörü</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/cihaz')">
-                        <span class="tool-title">[HW_SCAN]</span><span class="tool-desc">Donanım derin taraması</span>
+                        <span class="tool-title">HW_SCAN</span><span class="tool-desc">Donanım derin taraması</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/convert')">
-                        <span class="tool-title">[UNIT_CNV]</span><span class="tool-desc">Metrik ve veri dönüştürücü</span>
+                        <span class="tool-title">UNIT_CNV</span><span class="tool-desc">Metrik ve veri dönüştürücü</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/kible')">
-                        <span class="tool-title">[NAV_BEACON]</span><span class="tool-desc">Küresel konum ve yön bulucu</span>
+                        <span class="tool-title">NAV_BEACON</span><span class="tool-desc">Küresel konum ve yön bulucu</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pardus')">
-                        <span class="tool-title">[PARDUS_INT]</span><span class="tool-desc">Etkileşimli tahta protokolü</span>
+                        <span class="tool-title">PARDUS_INT</span><span class="tool-desc">Etkileşimli tahta protokolü</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suratgizle')">
-                        <span class="tool-title">[ID_MASK]</span><span class="tool-desc">Biyometrik yüz maskeleme</span>
+                        <span class="tool-title">ID_MASK</span><span class="tool-desc">Biyometrik yüz maskeleme</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/tahtatoz')">
-                        <span class="tool-title">[CRT_CLEAN]</span><span class="tool-desc">Optik yüzey statik temizliği</span>
+                        <span class="tool-title">CRT_CLEAN</span><span class="tool-desc">Optik yüzey statik temizliği</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/usb')">
-                        <span class="tool-title">[PORT_MGR]</span><span class="tool-desc">Veri portu biçimlendirme</span>
+                        <span class="tool-title">PORT_MGR</span><span class="tool-desc">Veri portu biçimlendirme</span>
                     </button>
                     <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/caocr')">
-                        <span class="tool-title">[VIS_OCR]</span><span class="tool-desc">Görsel veri çözümleyici</span>
+                        <span class="tool-title">VIS_OCR</span><span class="tool-desc">Görsel veri çözümleyici</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- YAN ÇUBUK PANELİ (Fiziksel Switchboard) -->
+        <!-- YAN ÇUBUK (Fiziksel Panel) -->
         <div class="side-bar">
             <div>
-                <span class="side-bar-title">SYSTEM STATUS</span>
-                <span style="color: #666;">UPLINK:</span> <span style="color: #4CAF50;">SECURE</span><br>
-                <span style="color: #666;">POWER:</span> <span style="color: var(--amber-main);">NOMINAL</span><br>
-            </div>
-            
-            <div>
-                <span class="side-bar-title">MEMORY_BANKS</span>
-                <span style="color: #666;">- /mnt/core/logs<br>- /mnt/data/scripts<br>- /dev/null/debris</span>
+                <span class="side-bar-title">PANEL KONTROLÜ</span>
+                <button class="greeble-btn" onclick="switchToDiagnostics()">DONANIM (DIAGNOSTICS)</button>
+                <button class="greeble-btn" onclick="switchToTools()">ARAÇLAR (CARTRIDGES)</button>
             </div>
 
+            <div>
+                <span class="side-bar-title">SİSTEM DURUMU</span>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>AĞ BAĞLANTISI:</span> <span style="color: #4CAF50; font-weight: bold;">GÜVENLİ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>GÜÇ ÜNİTESİ:</span> <span style="color: var(--text-highlight); font-weight: bold;">NOMİNAL</span>
+                </div>
+            </div>
+            
             <div style="margin-top: auto;">
-                <span class="side-bar-title">MANUAL_OVERRIDE</span>
-                <button class="greeble-btn" style="margin-bottom: 10px;" onclick="switchToDiagnostics()">DIAGNOSTIC</button>
-                <button class="greeble-btn" onclick="switchToTools()">CARTRIDGES</button>
+                <span class="side-bar-title">BELLEK BİRİMLERİ</span>
+                <span style="display: block; margin-bottom: 4px;">[+] /mnt/core/logs</span>
+                <span style="display: block; margin-bottom: 4px;">[+] /mnt/data/scripts</span>
+                <span style="display: block;">[-] /dev/null/debris</span>
             </div>
         </div>
     </div>
@@ -431,12 +407,12 @@
     <!-- ALT BÖLÜM -->
     <div class="footer-line"></div>
     <div class="asset-tag">
-        ASSET_TAG: Y0-8086 // RUST_DIAGNOSTICS // PROP. OF RAYILMAZAN
+        ASSET_ID: Y0-8086 // PROPERTY OF RAYILMAZAN
     </div>
 </div>
 
 <script>
-    // JS Fonksiyonları (Orijinal mantık ve ID'ler korundu)
+    // Sekme Geçiş Fonksiyonları
     function hideAllViews() {
         document.getElementById('view-diagnostics').style.display = 'none';
         document.getElementById('view-tools').style.display = 'none';
@@ -464,15 +440,16 @@
         runBenchmark();
     }
 
+    // Sistem Taraması (Sayfa Yüklendiğinde)
     document.addEventListener("DOMContentLoaded", function() {
         const ua = navigator.userAgent;
-        let os = "UNKNOWN_SYS";
-        let type = "STATIONARY (Desktop)";
+        let os = "BİLİNMEYEN";
+        let type = "SABİT İSTASYON";
 
-        if (/android/i.test(ua)) { os = "Android"; type = "PORTABLE"; }
-        else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) { os = "iOS / Apple"; type = "PORTABLE"; }
+        if (/android/i.test(ua)) { os = "Android"; type = "TAŞINABİLİR"; }
+        else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) { os = "iOS / Apple"; type = "TAŞINABİLİR"; }
         else if (/Macintosh/.test(ua)) { os = "macOS"; }
-        else if (/Windows/.test(ua)) { os = "Windows"; if (navigator.maxTouchPoints > 1) type = "HYBRID_PAD"; }
+        else if (/Windows/.test(ua)) { os = "Windows"; if (navigator.maxTouchPoints > 1) type = "HİBRİT PANEL"; }
         else if (/Linux/.test(ua)) { os = "Linux"; }
 
         let versionMatch = ua.match(/(Windows NT |Android |OS |Version\/)([\d._]+)/);
@@ -496,44 +473,45 @@
             .then(response => response.json())
             .then(data => {
                 if(data.ip) {
-                    document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'UNKNOWN'}`;
-                    document.getElementById("dev-coords").innerText = (data.latitude && data.longitude) ? `LAT: ${data.latitude} // LNG: ${data.longitude}` : "[NO_DATA]";
+                    document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'BİLİNMİYOR'}`;
+                    document.getElementById("dev-coords").innerText = (data.latitude && data.longitude) ? `ENLEM: ${data.latitude} // BOYLAM: ${data.longitude}` : "[VERİ_YOK]";
                 } else {
-                    document.getElementById("dev-ip").innerText = "[SHIELDED]";
-                    document.getElementById("dev-coords").innerText = "[UNKNOWN]";
+                    document.getElementById("dev-ip").innerText = "[GİZLİ]";
+                    document.getElementById("dev-coords").innerText = "[BİLİNMİYOR]";
                 }
             }).catch(() => {
-                document.getElementById("dev-ip").innerText = "[BLOCKED / JAMMED]";
-                document.getElementById("dev-coords").innerText = "[OFFLINE]";
+                document.getElementById("dev-ip").innerText = "[BLOKE EDİLDİ]";
+                document.getElementById("dev-coords").innerText = "[ÇEVRİMDIŞI]";
             });
 
         if (navigator.getBattery) {
             navigator.getBattery().then(function(battery) {
                 function updateBatteryInfo() {
-                    document.getElementById("dev-battery").innerText = `CELL: ${Math.round(battery.level * 100)}% [${battery.charging ? "CHARGING" : "DRAINING"}]`;
+                    document.getElementById("dev-battery").innerText = `%${Math.round(battery.level * 100)} [${battery.charging ? "ŞARJ OLUYOR" : "TÜKETİLİYOR"}]`;
                 }
                 updateBatteryInfo();
                 battery.addEventListener('levelchange', updateBatteryInfo);
                 battery.addEventListener('chargingchange', updateBatteryInfo);
             });
         } else {
-            document.getElementById("dev-battery").innerText = "[NO_CELL_DATA]";
+            document.getElementById("dev-battery").innerText = "[BATARYA VERİSİ YOK]";
         }
 
-        const cores = navigator.hardwareConcurrency || "UNKNOWN";
-        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "RESTRICTED";
-        document.getElementById("dev-hardware").innerText = `CORES: ${cores} // MEM: ${ram}`;
-        document.getElementById("dev-sensors").innerText = ('DeviceOrientationEvent' in window) ? "ONLINE [ACTIVE]" : "[OFFLINE]";
+        const cores = navigator.hardwareConcurrency || "BİLİNMİYOR";
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "KORUMALI";
+        document.getElementById("dev-hardware").innerText = `ÇEKİRDEK: ${cores} // BELLEK: ${ram}`;
+        document.getElementById("dev-sensors").innerText = ('DeviceOrientationEvent' in window) ? "AKTİF" : "[ÇEVRİMDIŞI]";
         
         runAllDiagnostics();
     });
 
+    // Araç Fonksiyonları
     function getGPUInfo() {
         const canvas = document.createElement('canvas');
         const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return "UNKNOWN";
+        if (!gl) return "BİLİNMİYOR";
         const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "UNKNOWN";
+        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "BİLİNMİYOR";
     }
 
     function measureFPS() {
@@ -581,25 +559,23 @@
 
         let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
         let scoreColor = finalScore < 4 ? '#ff5500' : (finalScore < 7 ? '#ff9d00' : '#4CAF50');
-        let tierText = finalScore < 4 ? 'CLASS C (JUNK/SALVAGE)' : (finalScore < 7 ? 'CLASS B (STANDARD)' : 'CLASS A (MILITARY)');
+        let tierText = finalScore < 4 ? 'C SINIFI (ESKİ/ZAYIF)' : (finalScore < 7 ? 'B SINIFI (STANDART)' : 'A SINIFI (YÜKSEK)');
 
         setTimeout(() => {
             document.getElementById('loading').style.display = 'none';
             const scoreEl = document.getElementById('score');
             scoreEl.innerText = finalScore.toFixed(1);
             scoreEl.style.color = scoreColor;
-            scoreEl.style.textShadow = `0 0 20px ${scoreColor}`;
             scoreEl.style.display = 'block';
 
             document.getElementById('progress-track').style.display = 'block';
             setTimeout(() => {
                 const progressBar = document.getElementById('progress-bar');
                 progressBar.style.backgroundColor = scoreColor;
-                progressBar.style.boxShadow = `0 0 15px ${scoreColor}`;
                 progressBar.style.width = (finalScore * 10) + '%';
             }, 50);
 
-            document.getElementById('bench-cpu').innerText = cpuCores + " CORES";
+            document.getElementById('bench-cpu').innerText = cpuCores + " ÇEKİRDEK";
             document.getElementById('bench-fps').innerText = fps + " FPS";
             document.getElementById('bench-gpu').innerText = gpu.replace("ANGLE (", "").replace(")", "");
             document.getElementById('bench-tier').innerText = tierText;
@@ -618,15 +594,13 @@
         benchTestDone = false;
         document.getElementById('speed-loading').style.display = 'block';
         document.getElementById('speed-details').style.display = 'none';
-        document.getElementById('speed-loading').innerText = ">> YÖRÜNGE AĞI ARANIYOR...";
         
-        setTimeout(() => document.getElementById('speed-loading').innerText = ">> PAKET VERİLERİ ŞİFRELENİYOR...", 800);
         setTimeout(() => {
             document.getElementById('speed-loading').style.display = 'none';
             const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
             const dl = (Math.random() * (isMobile ? 80 : 450) + (isMobile ? 20 : 50)).toFixed(1);
             
-            let netTier = dl < 35 ? "LOW-BAND (COPPER)" : (dl < 100 ? "MID-BAND (STANDARD)" : "HYPER-WAVE (OPTIC)");
+            let netTier = dl < 35 ? "DÜŞÜK BANT (BAKIR)" : (dl < 100 ? "ORTA BANT (STANDART)" : "HİPER BANT (FİBER)");
             let netColor = dl < 35 ? "#ff5500" : (dl < 100 ? "#ff9d00" : "#4CAF50");
 
             document.getElementById('speed-ping').innerText = `${Math.floor(Math.random() * (isMobile ? 35 : 18)) + 4} ms`;
@@ -638,7 +612,7 @@
             document.getElementById('speed-details').style.display = 'block';
             speedTestDone = true;
             checkBothFinished();
-        }, 1800);
+        }, 1500);
     }
 
     function checkBothFinished() {
