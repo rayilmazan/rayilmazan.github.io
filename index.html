@@ -3,28 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>rayılmazan // STAR WARS INDUSTRIAL BLUETOOTH RADAR</title>
+  <title>Bluetooth Radar & Cihaz Dedektörü</title>
   <style>
     :root {
-      --bg: #08090b;
-      --greeble-panel: #21252d;
-      --greeble-dark: #0c0e11;
-      --silver-metal: #8a96a8;
-      --silver-dark: #4e5766;
-      
-      /* Göz Alıcı Yeşil & Terminal Işıması */
-      --accent-green: #00ff66;
-      --accent-glow: rgba(0, 255, 102, 0.4);
-      
-      /* Star Wars / Endüstriyel Pas ve Uyarı Tonları */
-      --rust-accent: #b8622f;
-      --rust-dark: #6e3717;
-      --hazard-yellow: #f1c40f;
-      
-      --text: #e2e8f0;
-      --text-dim: #8c9cb8;
-      --tech-border: #3d4656;
-      --card-bg: #15181c;
+      --bg: #060913;
+      --card-bg: #0f172a;
+      --card-border: #1e293b;
+      --radar-green: #10b981;
+      --radar-cyan: #06b6d4;
+      --text: #f8fafc;
+      --text-dim: #64748b;
+      --accent: #22d3ee;
     }
 
     * {
@@ -38,114 +27,42 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Courier New', Courier, monospace;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
-      padding: 12px;
-      background-image: 
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 15px 15px;
-    }
-
-    /* Star Wars Zırh Plakası / Endüstriyel Şasi */
-    .chassis {
-      max-width: 500px;
-      width: 100%;
-      background: linear-gradient(135deg, #262b35 0%, #191d24 100%);
-      border: 3px solid #0c0e11;
-      border-top: 4px solid var(--silver-metal);
-      border-left: 4px solid var(--silver-metal);
-      border-right: 4px solid #363e4d;
-      border-bottom: 4px solid var(--rust-dark);
-      border-radius: 4px;
-      padding: 16px;
-      position: relative;
-      box-shadow: 0 30px 70px rgba(0,0,0,0.98), inset 0 0 40px rgba(0,0,0,0.7);
-      display: flex;
       flex-direction: column;
+      padding: 12px;
       gap: 12px;
-    }
-
-    /* Endüstriyel Vidalar */
-    .chassis::before, .chassis::after {
-      content: ""; position: absolute; width: 8px; height: 8px;
-      background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%);
-      border-radius: 50%;
-      box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9);
-    }
-    .chassis::before { top: 10px; left: 10px; }
-    .chassis::after { bottom: 10px; right: 10px; }
-    .rivet-tr { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
-    .rivet-bl { position: absolute; bottom: 10px; left: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
-
-    /* Üst Teknik Gösterge Kanalı */
-    .greeble-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--greeble-dark);
-      border: 1px solid var(--tech-border);
-      padding: 5px 10px;
-      font-size: 8.5px;
-      color: var(--text-dim);
-      letter-spacing: 1px;
-    }
-
-    .greeble-slots {
-      display: flex;
-      gap: 4px;
-    }
-
-    .slot-block {
-      width: 12px;
-      height: 5px;
-      background: var(--silver-dark);
-      border: 1px solid #000;
-    }
-    .slot-block.active {
-      background: var(--accent-green);
-      box-shadow: 0 0 5px var(--accent-green);
-    }
-    .slot-block.warning {
-      background: var(--hazard-yellow);
     }
 
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 8px;
-      background: var(--greeble-dark);
-      border: 1px solid var(--tech-border);
-      border-left: 3px solid var(--accent-green);
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--card-border);
     }
 
     .title {
-      font-size: 1rem;
-      font-weight: 900;
-      color: var(--accent-green);
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--accent);
       display: flex;
       align-items: center;
       gap: 6px;
-      text-shadow: 0 0 8px var(--accent-glow);
-      text-transform: lowercase;
-      letter-spacing: 1px;
     }
 
     /* Radar Viewport */
     .radar-box {
       width: 100%;
-      max-width: 380px;
+      max-width: 420px;
       aspect-ratio: 1 / 1;
       margin: 0 auto;
       position: relative;
-      background: radial-gradient(circle, #0c1829 0%, var(--greeble-dark) 100%);
+      background: radial-gradient(circle, #0c1829 0%, #060913 100%);
       border-radius: 50%;
-      border: 3px solid var(--tech-border);
-      border-top-color: var(--silver-metal);
-      box-shadow: 0 0 25px rgba(0, 255, 102, 0.15), inset 0 0 20px rgba(0,0,0,0.8);
+      border: 2px solid #1e3a5f;
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.15);
       overflow: hidden;
     }
 
@@ -159,12 +76,11 @@
     .stats-bar {
       display: flex;
       justify-content: space-around;
-      background: var(--greeble-panel);
+      background: var(--card-bg);
       padding: 10px;
-      border-radius: 3px;
-      border: 1px solid var(--tech-border);
-      border-top: 2px solid var(--rust-accent);
-      font-size: 0.8rem;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      font-size: 0.85rem;
     }
 
     .stat-item {
@@ -172,11 +88,10 @@
     }
 
     .stat-num {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      color: var(--accent-green);
+      color: var(--accent);
       font-family: monospace;
-      text-shadow: 0 0 5px rgba(0,255,102,0.3);
     }
 
     /* Controls */
@@ -187,75 +102,45 @@
 
     .btn {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 2px;
-      font-weight: bold;
-      font-size: 0.85rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
-      letter-spacing: 1px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.8);
-      transition: all 0.15s ease;
     }
 
-    .btn-start { 
-      background: linear-gradient(135deg, #252c38 0%, #15181c 100%);
-      color: var(--accent-green); 
-      border: 1px solid var(--tech-border);
-      border-top: 1px solid var(--accent-green);
-      text-shadow: 0 0 5px rgba(0,255,102,0.4);
-    }
-    .btn-clear { 
-      background: var(--greeble-dark); 
-      color: var(--silver-metal); 
-      border: 1px solid var(--tech-border);
-    }
-    .btn:active { transform: translateY(2px); }
-
-    /* Notice Box */
-    .notice-box {
-      background: var(--greeble-dark);
-      border: 1px solid var(--tech-border);
-      border-left: 3px solid var(--hazard-yellow);
-      padding: 8px 10px;
-      border-radius: 2px;
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      line-height: 1.4;
-    }
-
-    .notice-box b {
-      color: var(--hazard-yellow);
-    }
+    .btn-start { background: var(--radar-cyan); color: #000; }
+    .btn-clear { background: var(--card-border); color: var(--text); }
+    .btn:active { opacity: 0.8; }
 
     /* Device List */
     .device-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       overflow-y: auto;
-      max-height: 300px;
-      padding-right: 2px;
+      max-height: 380px;
     }
 
     .device-card {
-      background: var(--greeble-panel);
-      border: 1px solid var(--tech-border);
-      border-radius: 3px;
-      padding: 10px 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       position: relative;
     }
 
     .device-card.close {
-      border-color: var(--accent-green);
-      box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
+      border-color: var(--radar-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
     }
 
     .card-header {
@@ -265,106 +150,70 @@
     }
 
     .dev-name {
-      font-weight: bold;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: 0.95rem;
       color: #fff;
     }
 
     .dev-rssi {
       font-family: monospace;
       font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 2px;
-      background: var(--greeble-dark);
-      color: var(--accent-green);
-      font-size: 0.75rem;
-      border: 1px solid var(--tech-border);
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: #1e293b;
+      font-size: 0.8rem;
     }
 
     .dev-details {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
-      font-size: 0.7rem;
+      gap: 6px;
+      font-size: 0.75rem;
       color: var(--text-dim);
       font-family: monospace;
-      background: var(--greeble-dark);
-      padding: 6px;
-      border-radius: 2px;
-      border: 1px solid #1a202c;
+      background: #090d16;
+      padding: 8px;
+      border-radius: 6px;
     }
 
     .signal-bar-bg {
       width: 100%;
-      height: 3px;
-      background: var(--greeble-dark);
-      border-radius: 1px;
+      height: 4px;
+      background: #1e293b;
+      border-radius: 2px;
       overflow: hidden;
-      border: 1px solid #1a202c;
     }
 
     .signal-bar-fill {
       height: 100%;
-      background: var(--accent-green);
+      background: var(--radar-cyan);
       width: 0%;
       transition: width 0.3s;
-      box-shadow: 0 0 5px var(--accent-green);
     }
 
     .uuids-list {
       grid-column: span 2;
       word-break: break-all;
-      font-size: 0.65rem;
-      color: var(--silver-metal);
+      font-size: 0.7rem;
+      color: #94a3b8;
     }
 
-    /* Alt Greeble Şeridi */
-    .footer-greeble-strip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 2px;
-    }
-
-    .hazard-stripe {
-      flex-grow: 1;
-      height: 5px;
-      border-radius: 1px;
-      background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #15181c 8px, #15181c 16px);
-      border: 1px solid #000; 
-      box-shadow: inset 0 0 4px rgba(0,0,0,0.9);
-    }
-
-    .greeble-box-mini {
-      background: var(--greeble-dark);
-      border: 1px solid var(--tech-border);
-      padding: 2px 6px;
-      font-size: 7.5px;
-      color: var(--silver-metal);
-      letter-spacing: 1px;
+    .notice-box {
+      background: #1e1b4b;
+      border: 1px solid #3730a3;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #c7d2fe;
+      line-height: 1.4;
     }
   </style>
 </head>
 <body>
 
-<div class="chassis">
-  <div class="rivet-tr"></div>
-  <div class="rivet-bl"></div>
-
-  <!-- Üst Greeble Kontrol Bandı -->
-  <div class="greeble-top-bar">
-    <span>SYS_CHANNEL: 0xBT-RADAR // RAYILMAZAN.HUD</span>
-    <div class="greeble-slots">
-      <div class="slot-block active"></div>
-      <div class="slot-block active"></div>
-      <div class="slot-block warning"></div>
-      <div class="slot-block active"></div>
-    </div>
-  </div>
-
   <header>
-    <div class="title">📡 rayılmazan // bt-radar</div>
-    <div id="bt-status" style="font-size: 0.75rem; color: var(--text-dim);">[ HAZIR ]</div>
+    <div class="title">📡 Bluetooth Radar</div>
+    <div id="bt-status" style="font-size:0.8rem; color:var(--text-dim);">Hazır</div>
   </header>
 
   <!-- Radar Graphic Canvas -->
@@ -376,283 +225,275 @@
   <div class="stats-bar">
     <div class="stat-item">
       <div class="stat-num" id="stat-count">0</div>
-      <div style="font-size:0.7rem; color:var(--text-dim);">CİHAZ</div>
+      <div>Cihaz Sayısı</div>
     </div>
     <div class="stat-item">
       <div class="stat-num" id="stat-closest">-- m</div>
-      <div style="font-size:0.7rem; color:var(--text-dim);">EN YAKIN</div>
+      <div>En Yakın</div>
     </div>
     <div class="stat-item">
       <div class="stat-num" id="stat-max-rssi">--</div>
-      <div style="font-size:0.7rem; color:var(--text-dim);">MAX SİNYAL</div>
+      <div>Max Sinyal</div>
     </div>
   </div>
 
   <!-- Actions -->
   <div class="controls">
-    <button class="btn btn-start" id="btn-scan">🔍 TARAMA BAŞLAT</button>
-    <button class="btn btn-clear" id="btn-clear">🗑️ TEMİZLE</button>
+    <button class="btn btn-start" id="btn-scan">🔍 Tarama Başlat</button>
+    <button class="btn btn-clear" id="btn-clear">🗑️ Temizle</button>
   </div>
 
   <div class="notice-box" id="notice">
-    ℹ️ <b>BİLGİ:</b> Chrome/Edge tarayıcılarda <b>HTTPS</b> veya <b>localhost</b> gerektirir. Tarama tuşuna basarak yakındaki Bluetooth cihazlarını ekleyebilirsiniz.
+    ℹ️ <b>Bilgi:</b> Chrome/Edge üzerinde <b>HTTPS</b> veya <b>localhost</b> protokolü gerektirir. Tarama tuşuna bastığınızda yakındaki Bluetooth cihazlarını seçip radar ekleyebilirsiniz.
   </div>
 
   <!-- Detailed Devices List -->
   <div class="device-list" id="deviceContainer">
-    <!-- Dinamik Kartlar Buraya Eklenir -->
+    <!-- Dynamic Cards Inserted Here -->
   </div>
 
-  <!-- Alt Greeble Şeridi -->
-  <div class="footer-greeble-strip">
-    <div class="greeble-box-mini">SECTOR-BT</div>
-    <div class="hazard-stripe"></div>
-    <div class="greeble-box-mini">ID: Y0-BT</div>
-  </div>
-</div>
+  <script>
+    // State Management
+    const devices = new Map();
+    let sweepAngle = 0;
 
-<script>
-  // State Management
-  const devices = new Map();
-  let sweepAngle = 0;
+    // DOM Elements
+    const canvas = document.getElementById('radarCanvas');
+    const ctx = canvas.getContext('2d');
+    const btnScan = document.getElementById('btn-scan');
+    const btnClear = document.getElementById('btn-clear');
+    const deviceContainer = document.getElementById('deviceContainer');
+    const btStatus = document.getElementById('bt-status');
+    
+    const statCount = document.getElementById('stat-count');
+    const statClosest = document.getElementById('stat-closest');
+    const statMaxRssi = document.getElementById('stat-max-rssi');
 
-  // DOM Elements
-  const canvas = document.getElementById('radarCanvas');
-  const ctx = canvas.getContext('2d');
-  const btnScan = document.getElementById('btn-scan');
-  const btnClear = document.getElementById('btn-clear');
-  const deviceContainer = document.getElementById('deviceContainer');
-  const btStatus = document.getElementById('bt-status');
-  
-  const statCount = document.getElementById('stat-count');
-  const statClosest = document.getElementById('stat-closest');
-  const statMaxRssi = document.getElementById('stat-max-rssi');
-
-  // Resize canvas based on container
-  function initCanvas() {
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width * window.devicePixelRatio;
-    canvas.height = rect.height * window.devicePixelRatio;
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  }
-
-  // Convert Device ID to a consistent Angle (0 to 2*PI)
-  function idToAngle(id) {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    // Resize canvas based on container
+    function initCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     }
-    return Math.abs(hash) % (Math.PI * 2);
-  }
 
-  // Estimate Distance in Meters from RSSI
-  function rssiToDistance(rssi, txPower = -59) {
-    if (rssi === 0) return -1.0;
-    const ratio = rssi * 1.0 / txPower;
-    if (ratio < 1.0) {
-      return Math.pow(ratio, 10);
-    } else {
-      return (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+    // Convert Device ID to a consistent Angle (0 to 2*PI)
+    function idToAngle(id) {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      return Math.abs(hash) % (Math.PI * 2);
     }
-  }
 
-  // Render Radar Screen Loop
-  function drawRadar() {
-    const width = canvas.width / window.devicePixelRatio;
-    const height = canvas.height / window.devicePixelRatio;
-    const cx = width / 2;
-    const cy = height / 2;
-    const maxR = Math.min(cx, cy) - 10;
+    // Estimate Distance in Meters from RSSI
+    function rssiToDistance(rssi, txPower = -59) {
+      if (rssi === 0) return -1.0;
+      const ratio = rssi * 1.0 / txPower;
+      if (ratio < 1.0) {
+        return Math.pow(ratio, 10);
+      } else {
+        return (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+      }
+    }
 
-    ctx.clearRect(0, 0, width, height);
+    // Render Radar Screen Loop
+    function drawRadar() {
+      const width = canvas.width / window.devicePixelRatio;
+      const height = canvas.height / window.devicePixelRatio;
+      const cx = width / 2;
+      const cy = height / 2;
+      const maxR = Math.min(cx, cy) - 10;
 
-    // 1. Draw Concentric Grid Rings
-    ctx.strokeStyle = 'rgba(0, 255, 102, 0.15)';
-    ctx.lineWidth = 1;
+      ctx.clearRect(0, 0, width, height);
 
-    for (let i = 1; i <= 4; i++) {
+      // 1. Draw Concentric Grid Rings (-30dBm to -100dBm)
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
+      ctx.lineWidth = 1;
+
+      for (let i = 1; i <= 4; i++) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Crosshairs
       ctx.beginPath();
-      ctx.arc(cx, cy, (maxR / 4) * i, 0, Math.PI * 2);
+      ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR);
+      ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy);
       ctx.stroke();
-    }
 
-    // Crosshairs
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR);
-    ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy);
-    ctx.stroke();
+      // 2. Draw Sweeping Line
+      sweepAngle += 0.03;
+      if (sweepAngle >= Math.PI * 2) sweepAngle = 0;
 
-    // 2. Draw Sweeping Line
-    sweepAngle += 0.03;
-    if (sweepAngle >= Math.PI * 2) sweepAngle = 0;
+      const sweepX = cx + maxR * Math.cos(sweepAngle);
+      const sweepY = cy + maxR * Math.sin(sweepAngle);
 
-    const sweepX = cx + maxR * Math.cos(sweepAngle);
-    const sweepY = cy + maxR * Math.sin(sweepAngle);
+      // Sweep Gradient Fade
+      const grad = ctx.createConicGradient(sweepAngle - 0.5, cx, cy);
+      grad.addColorStop(0, 'rgba(6, 182, 212, 0.4)');
+      grad.addColorStop(0.1, 'rgba(6, 182, 212, 0.0)');
+      grad.addColorStop(1, 'rgba(6, 182, 212, 0.0)');
 
-    // Sweep Gradient Fade
-    const grad = ctx.createConicGradient(sweepAngle - 0.5, cx, cy);
-    grad.addColorStop(0, 'rgba(0, 255, 102, 0.4)');
-    grad.addColorStop(0.1, 'rgba(0, 255, 102, 0.0)');
-    grad.addColorStop(1, 'rgba(0, 255, 102, 0.0)');
-
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Sweep Leading Line
-    ctx.strokeStyle = 'rgba(0, 255, 102, 0.9)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(sweepX, sweepY);
-    ctx.stroke();
-
-    // 3. Render Devices as Glowing Radar Blips
-    devices.forEach((dev) => {
-      const clampedRssi = Math.max(-100, Math.min(-30, dev.rssi));
-      const normDist = (-30 - clampedRssi) / 70;
-      const blipR = Math.max(15, normDist * maxR);
-
-      const bx = cx + blipR * Math.cos(dev.angle);
-      const by = cy + blipR * Math.sin(dev.angle);
-
-      // Blip Glow
-      ctx.fillStyle = dev.rssi > -60 ? '#00ff66' : '#f1c40f';
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(bx, by, 4.5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
       ctx.fill();
 
-      // Pulsing Ring for Strong Signals
-      ctx.strokeStyle = dev.rssi > -60 ? 'rgba(0, 255, 102, 0.6)' : 'rgba(241, 196, 15, 0.4)';
+      // Sweep Leading Line
+      ctx.strokeStyle = 'rgba(34, 211, 238, 0.8)';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(bx, by, 9, 0, Math.PI * 2);
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(sweepX, sweepY);
       ctx.stroke();
 
-      // Device Label on Radar
-      ctx.fillStyle = '#e2e8f0';
-      ctx.font = '8.5px Courier New';
-      ctx.fillText(dev.name.substring(0, 10), bx + 8, by + 3);
-    });
+      // 3. Render Devices as Glowing Radar Blips
+      devices.forEach((dev) => {
+        const clampedRssi = Math.max(-100, Math.min(-30, dev.rssi));
+        const normDist = (-30 - clampedRssi) / 70;
+        const blipR = Math.max(15, normDist * maxR);
 
-    requestAnimationFrame(drawRadar);
-  }
+        const bx = cx + blipR * Math.cos(dev.angle);
+        const by = cy + blipR * Math.sin(dev.angle);
 
-  // Add or Update Device Record
-  function addOrUpdateDevice(device, rssi = -65, txPower = -59, uuids = []) {
-    const devId = device.id || device.name || Math.random().toString();
-    const dist = rssiToDistance(rssi, txPower);
+        // Blip Glow
+        ctx.fillStyle = dev.rssi > -60 ? '#10b981' : '#22d3ee';
+        ctx.beginPath();
+        ctx.arc(bx, by, 5, 0, Math.PI * 2);
+        ctx.fill();
 
-    const deviceData = {
-      id: devId,
-      name: device.name || 'Bilinmeyen Cihaz',
-      rssi: rssi,
-      txPower: txPower,
-      distance: dist,
-      uuids: uuids,
-      angle: idToAngle(devId),
-      lastSeen: new Date().toLocaleTimeString(),
-      nativeDevice: device
-    };
+        // Pulsing Ring for Strong Signals
+        ctx.strokeStyle = dev.rssi > -60 ? 'rgba(16, 185, 129, 0.5)' : 'rgba(34, 211, 238, 0.3)';
+        ctx.beginPath();
+        ctx.arc(bx, by, 10, 0, Math.PI * 2);
+        ctx.stroke();
 
-    devices.set(devId, deviceData);
-    updateUI();
-  }
-
-  // Render Device Cards & Update Global Stats
-  function updateUI() {
-    statCount.textContent = devices.size;
-
-    if (devices.size === 0) {
-      deviceContainer.innerHTML = '';
-      statClosest.textContent = '-- m';
-      statMaxRssi.textContent = '--';
-      return;
-    }
-
-    let maxRssi = -150;
-    let minDistance = 999;
-    let cardsHtml = '';
-
-    devices.forEach((dev) => {
-      if (dev.rssi > maxRssi) maxRssi = dev.rssi;
-      if (dev.distance > 0 && dev.distance < minDistance) minDistance = dev.distance;
-
-      const sigPercent = Math.max(0, Math.min(100, Math.round(((dev.rssi + 100) / 70) * 100)));
-      const isClose = dev.rssi > -60;
-
-      cardsHtml += `
-        <div class="device-card ${isClose ? 'close' : ''}">
-          <div class="card-header">
-            <span class="dev-name">${isClose ? '🟢 ' : '⚡ '}${dev.name}</span>
-            <span class="dev-rssi">${dev.rssi} dBm (${sigPercent}%)</span>
-          </div>
-
-          <div class="signal-bar-bg">
-            <div class="signal-bar-fill" style="width: ${sigPercent}%;"></div>
-          </div>
-
-          <div class="dev-details">
-            <div><b>ID:</b> ${dev.id.substring(0, 10)}...</div>
-            <div><b>MESAFE:</b> ~${dev.distance > 0 ? dev.distance.toFixed(1) + ' m' : 'Bilinmiyor'}</div>
-            <div><b>TX:</b> ${dev.txPower} dBm</div>
-            <div><b>ZAMAN:</b> ${dev.lastSeen}</div>
-            ${dev.uuids.length > 0 ? `<div class="uuids-list"><b>SERVİSLER:</b> ${dev.uuids.join(', ')}</div>` : ''}
-          </div>
-        </div>
-      `;
-    });
-
-    deviceContainer.innerHTML = cardsHtml;
-    statMaxRssi.textContent = maxRssi + ' dBm';
-    statClosest.textContent = minDistance < 900 ? minDistance.toFixed(1) + ' m' : '-- m';
-  }
-
-  // Bluetooth Scanning Action
-  async function startScan() {
-    if (!('bluetooth' in navigator)) {
-      alert("Tarayıcınız Web Bluetooth API desteklemiyor. Lütfen Android Chrome veya Desktop Chrome/Edge kullanın.");
-      return;
-    }
-
-    try {
-      btStatus.textContent = '[ TARANIYOR... ]';
-      btStatus.style.color = 'var(--accent-green)';
-
-      const device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: ['battery_service', 'device_information', 'generic_access']
+        // Device Label on Radar
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '9px monospace';
+        ctx.fillText(dev.name.substring(0, 10), bx + 8, by + 3);
       });
 
-      const simulatedRssi = -40 - Math.floor(Math.random() * 45);
-      const uuids = device.uuids || ['0000180f-0000-1000-8000-00805f9b34fb'];
-      
-      addOrUpdateDevice(device, simulatedRssi, -59, uuids);
-      btStatus.textContent = '[ CİHAZ EKLENDİ ]';
-      btStatus.style.color = 'var(--accent-green)';
-
-    } catch (err) {
-      console.warn("Tarama İptal Edildi / Hata:", err);
-      btStatus.textContent = '[ İPTAL EDİLDİ ]';
-      btStatus.style.color = 'var(--text-dim)';
+      requestAnimationFrame(drawRadar);
     }
-  }
 
-  // Clear Device List
-  btnClear.addEventListener('click', () => {
-    devices.clear();
-    updateUI();
-    btStatus.textContent = '[ TEMİZLENDİ ]';
-  });
+    // Add or Update Device Record
+    function addOrUpdateDevice(device, rssi = -65, txPower = -59, uuids = []) {
+      const devId = device.id || device.name || Math.random().toString();
+      const dist = rssiToDistance(rssi, txPower);
 
-  btnScan.addEventListener('click', startScan);
+      const deviceData = {
+        id: devId,
+        name: device.name || 'Bilinmeyen Cihaz',
+        rssi: rssi,
+        txPower: txPower,
+        distance: dist,
+        uuids: uuids,
+        angle: idToAngle(devId),
+        lastSeen: new Date().toLocaleTimeString(),
+        nativeDevice: device
+      };
 
-  // Window Init
-  window.addEventListener('resize', initCanvas);
-  window.addEventListener('load', () => {
-    initCanvas();
-    drawRadar();
-  });
-</script>
+      devices.set(devId, deviceData);
+      updateUI();
+    }
+
+    // Render Device Cards & Update Global Stats
+    function updateUI() {
+      statCount.textContent = devices.size;
+
+      if (devices.size === 0) {
+        deviceContainer.innerHTML = '';
+        statClosest.textContent = '-- m';
+        statMaxRssi.textContent = '--';
+        return;
+      }
+
+      let maxRssi = -150;
+      let minDistance = 999;
+      let cardsHtml = '';
+
+      devices.forEach((dev) => {
+        if (dev.rssi > maxRssi) maxRssi = dev.rssi;
+        if (dev.distance > 0 && dev.distance < minDistance) minDistance = dev.distance;
+
+        const sigPercent = Math.max(0, Math.min(100, Math.round(((dev.rssi + 100) / 70) * 100)));
+        const isClose = dev.rssi > -60;
+
+        cardsHtml += `
+          <div class="device-card ${isClose ? 'close' : ''}">
+            <div class="card-header">
+              <span class="dev-name">${isClose ? '🟢 ' : '🔵 '}${dev.name}</span>
+              <span class="dev-rssi">${dev.rssi} dBm (${sigPercent}%)</span>
+            </div>
+
+            <div class="signal-bar-bg">
+              <div class="signal-bar-fill" style="width: ${sigPercent}%;"></div>
+            </div>
+
+            <div class="dev-details">
+              <div><b>ID:</b> ${dev.id.substring(0, 12)}...</div>
+              <div><b>Mesafe:</b> ~${dev.distance > 0 ? dev.distance.toFixed(1) + ' m' : 'Bilinmiyor'}</div>
+              <div><b>Tx Gücü:</b> ${dev.txPower} dBm</div>
+              <div><b>Son Görülme:</b> ${dev.lastSeen}</div>
+              ${dev.uuids.length > 0 ? `<div class="uuids-list"><b>Servisler:</b> ${dev.uuids.join(', ')}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      deviceContainer.innerHTML = cardsHtml;
+      statMaxRssi.textContent = maxRssi + ' dBm';
+      statClosest.textContent = minDistance < 900 ? minDistance.toFixed(1) + ' m' : '-- m';
+    }
+
+    // Bluetooth Scanning Action
+    async function startScan() {
+      if (!('bluetooth' in navigator)) {
+        alert("Tarayıcınız Web Bluetooth API desteklemiyor. Lütfen Android Chrome veya Desktop Chrome/Edge kullanın.");
+        return;
+      }
+
+      try {
+        btStatus.textContent = 'Cihaz Taranıyor...';
+        btStatus.style.color = 'var(--accent)';
+
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['battery_service', 'device_information', 'generic_access']
+        });
+
+        const simulatedRssi = -40 - Math.floor(Math.random() * 45);
+        const uuids = device.uuids || ['0000180f-0000-1000-8000-00805f9b34fb'];
+        
+        addOrUpdateDevice(device, simulatedRssi, -59, uuids);
+        btStatus.textContent = 'Cihaz Eklendi';
+        btStatus.style.color = 'var(--radar-green)';
+
+      } catch (err) {
+        console.warn("Tarama İptal Edildi / Hata:", err);
+        btStatus.textContent = 'İptal Edildi';
+        btStatus.style.color = 'var(--text-dim)';
+      }
+    }
+
+    // Clear Device List
+    btnClear.addEventListener('click', () => {
+      devices.clear();
+      updateUI();
+      btStatus.textContent = 'Temizlendi';
+    });
+
+    btnScan.addEventListener('click', startScan);
+
+    // Window Init
+    window.addEventListener('resize', initCanvas);
+    window.addEventListener('load', () => {
+      initCanvas();
+      drawRadar();
+    });
+  </script>
 </body>
 </html>
