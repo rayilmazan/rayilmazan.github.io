@@ -3,29 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan // RUSTED SILVER GREEBLE HUD v6.0</title>
+    <title>rayılmazan // STAR WARS INDUSTRIAL GREEBLE HUD v7.0</title>
     <style>
         :root {
-            /* Gri, Gümüş ve Paslanmış Metal Renk Paleti */
-            --greeble-bg: #1c1e22;
-            --greeble-panel: #282c33;
-            --greeble-dark: #141619;
-            --greeble-light: #434a56;
-            --silver-metal: #8c96a8;
-            --silver-dark: #555e6e;
+            --greeble-bg: #15181c;
+            --greeble-panel: #21252d;
+            --greeble-dark: #0c0e11;
+            --greeble-light: #38404f;
+            --silver-metal: #8a96a8;
+            --silver-dark: #4e5766;
             
-            /* Yeşil Yazı ve Vurgular */
+            /* Göz Alıcı Yeşil & Terminal Işıması */
             --accent-green: #00ff66;
-            --accent-glow: rgba(0, 255, 102, 0.35);
+            --accent-glow: rgba(0, 255, 102, 0.4);
             
-            /* Paslanmış Detay Tonları */
-            --rust-accent: #a65e31;
-            --rust-dark: #6e3d1e;
+            /* Star Wars / Endüstriyel Pas ve Uyarı Tonları */
+            --rust-accent: #b8622f;
+            --rust-dark: #6e3717;
+            --hazard-yellow: #f1c40f;
             
             --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
+            --text-muted: #8c9cb8;
             --text-highlight: #00ff66;
-            --tech-border: #4a5263;
+            --tech-border: #3d4656;
         }
 
         * {
@@ -35,90 +35,123 @@
         }
 
         body {
-            background-color: #0e0f12;
+            background-color: #08090b;
             color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             padding: 20px;
             display: flex;
             justify-content: center;
             min-height: 100vh;
             background-image: 
-                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-            background-size: 20px 20px;
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 15px 15px;
         }
 
-        /* Gümüş & Paslanmış Endüstriyel Şasi */
+        /* Star Wars Zırh Plakası / Gelişmiş Greeble Şasi */
         .chassis {
-            max-width: 900px;
+            max-width: 950px;
             width: 100%;
-            background: linear-gradient(135deg, #2b303b 0%, #1f232b 100%);
-            border: 3px solid #141619;
+            background: linear-gradient(135deg, #262b35 0%, #191d24 100%);
+            border: 3px solid #0c0e11;
             border-top: 4px solid var(--silver-metal);
             border-left: 4px solid var(--silver-metal);
-            border-right: 4px solid #3d4452;
+            border-right: 4px solid #363e4d;
             border-bottom: 4px solid var(--rust-dark);
-            border-radius: 6px;
-            padding: 25px;
+            border-radius: 4px;
+            padding: 22px;
             position: relative;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.95), inset 0 0 35px rgba(0,0,0,0.6);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.98), inset 0 0 40px rgba(0,0,0,0.7);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
-        /* Paslanmış / Eskitilmiş Metal Vidalar */
+        /* Endüstriyel Eskitilmiş Vidalar */
         .chassis::before, .chassis::after {
-            content: ""; position: absolute; width: 9px; height: 9px;
-            background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 70%, #0d0e11 100%);
+            content: ""; position: absolute; width: 8px; height: 8px;
+            background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%);
             border-radius: 50%;
-            box-shadow: inset 1px 1px 2px #ff9e6b, 1px 1px 3px rgba(0,0,0,0.9);
+            box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9);
         }
-        .chassis::before { top: 12px; left: 12px; }
-        .chassis::after { bottom: 12px; right: 12px; }
-        .rivet-tr { position: absolute; top: 12px; right: 12px; width: 9px; height: 9px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 70%, #0d0e11 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ff9e6b, 1px 1px 3px rgba(0,0,0,0.9); }
-        .rivet-bl { position: absolute; bottom: 12px; left: 12px; width: 9px; height: 9px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 70%, #0d0e11 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ff9e6b, 1px 1px 3px rgba(0,0,0,0.9); }
+        .chassis::before { top: 10px; left: 10px; }
+        .chassis::after { bottom: 10px; right: 10px; }
+        .rivet-tr { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
+        .rivet-bl { position: absolute; bottom: 10px; left: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #ffb088, 1px 1px 3px rgba(0,0,0,0.9); }
 
-        /* LOGO VE KÜÇÜK HARF BRAND (Çerçevesiz, Sayfayla Bütünleşen Yapı) */
+        /* GREEBLE DETAY ŞERİDİ 1: ÜST TEKNİK GÖSTERGELER (Star Wars Gantry Tarzı) */
+        .greeble-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--greeble-dark);
+            border: 1px solid var(--tech-border);
+            padding: 6px 12px;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .greeble-slots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .slot-block {
+            width: 15px;
+            height: 6px;
+            background: var(--silver-dark);
+            border: 1px solid #000;
+        }
+        .slot-block.active {
+            background: var(--accent-green);
+            box-shadow: 0 0 5px var(--accent-green);
+        }
+        .slot-block.warning {
+            background: var(--hazard-yellow);
+        }
+
+        /* LOGO VE KÜÇÜK HARF BRAND (Bütünleşen Yapı) */
         .brand-header-seamless {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px 0 5px 0;
+            padding: 5px 0;
             position: relative;
+            background: rgba(12, 14, 17, 0.4);
+            border: 1px dashed var(--tech-border);
+            border-radius: 3px;
         }
 
         .logo-seamless {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             object-fit: contain;
             filter: drop-shadow(0 0 10px var(--accent-glow));
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .brand-title {
             color: var(--accent-green);
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 900;
-            letter-spacing: 4px;
-            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 5px;
             text-shadow: 0 0 10px var(--accent-glow);
             text-transform: lowercase;
         }
 
         .sys-status-badge {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 6px;
+            right: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 9px;
+            font-size: 8px;
             color: var(--accent-green);
-            background: rgba(0,0,0,0.4);
-            padding: 3px 8px;
+            background: rgba(0,0,0,0.6);
+            padding: 3px 6px;
             border-radius: 2px;
             border: 1px solid var(--tech-border);
         }
@@ -129,33 +162,42 @@
             background-color: var(--accent-green);
             border-radius: 50%;
             box-shadow: 0 0 6px var(--accent-green);
-            animation: pulse 1.5s infinite;
+            animation: pulse 1.2s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 0.3; }
+            0% { opacity: 0.2; }
             50% { opacity: 1; }
-            100% { opacity: 0.3; }
+            100% { opacity: 0.2; }
         }
 
-        /* TEK EKRAN BİRLEŞTİRİLMİŞ SİSTEM & BENCHMARK PANELİ (Gümüş / Paslanmış Stil) */
+        /* GREEBLE ORTAMI: GÖVDE VE KANALLAR (Greeble Yoğunluğu Arttırıldı) */
         .unified-control-screen {
             background-color: var(--greeble-bg);
-            border: 2px solid #141619;
+            border: 2px solid #0c0e11;
             border-left: 4px solid var(--accent-green);
-            border-right: 2px solid #3d4452;
-            border-bottom: 2px solid #3d4452;
+            border-right: 2px solid #3d4656;
+            border-bottom: 2px solid #3d4656;
             border-radius: 4px;
-            padding: 20px;
-            box-shadow: inset 3px 3px 12px rgba(0,0,0,0.85);
+            padding: 18px;
+            box-shadow: inset 3px 3px 15px rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            position: relative;
+        }
+
+        /* Arka Plan Teknik Çizgiler ve Greeble Efektleri */
+        .unified-control-screen::before {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; width: 120px; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,255,255,0.012) 4px, rgba(255,255,255,0.012) 8px);
+            pointer-events: none;
         }
 
         .screen-title {
-            font-size: 11px;
-            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
             color: var(--silver-metal);
             text-transform: uppercase;
             letter-spacing: 1.5px;
@@ -168,7 +210,7 @@
 
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 
@@ -178,116 +220,124 @@
             border-top: 2px solid var(--silver-dark);
             padding: 10px 12px;
             border-radius: 3px;
-            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.6);
+            box-shadow: inset 1px 1px 5px rgba(0,0,0,0.7);
+            position: relative;
+        }
+
+        /* Greeble Köşe Çentikleri */
+        .info-card::after {
+            content: "";
+            position: absolute;
+            bottom: 2px; right: 2px;
+            width: 4px; height: 4px;
+            background: var(--accent-green);
+            box-shadow: 0 0 3px var(--accent-green);
         }
 
         .info-card .label {
             color: var(--text-muted);
-            font-size: 9px;
-            font-family: 'Courier New', Courier, monospace;
+            font-size: 8.5px;
             display: block;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .info-card .val {
             color: var(--text-highlight);
             font-weight: bold;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
+            font-size: 11.5px;
             word-break: break-all;
-            text-shadow: 0 0 6px rgba(0,255,102,0.2);
+            text-shadow: 0 0 6px rgba(0,255,102,0.25);
         }
 
-        /* BENCHMARK BÖLÜMÜ (AYNI EKRAN İÇİNDE) */
+        /* BENCHMARK BÖLÜMÜ (STAR WARS KONTROL PANELİ STİLİ) */
         .benchmark-section {
             background: var(--greeble-dark);
             border: 1px solid var(--tech-border);
             border-top: 2px solid var(--rust-accent);
             border-radius: 4px;
-            padding: 20px;
+            padding: 18px;
             text-align: center;
-            box-shadow: inset 2px 2px 8px rgba(0,0,0,0.7);
+            box-shadow: inset 2px 2px 10px rgba(0,0,0,0.8);
+            position: relative;
         }
 
         .benchmark-header {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-main);
             background: var(--greeble-panel);
-            padding: 8px 12px;
+            padding: 7px 10px;
             border-left: 3px solid var(--accent-green);
             border-radius: 2px;
             letter-spacing: 1px;
-            font-family: 'Courier New', Courier, monospace;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: left;
         }
 
         .loading { 
-            font-size: 12px; 
+            font-size: 11px; 
             color: var(--text-highlight); 
             padding: 10px 0; 
-            font-family: 'Courier New', Courier, monospace; 
         }
 
         .score-box { 
-            font-size: 44px; 
+            font-size: 42px; 
             font-weight: 900; 
-            margin: 5px 0; 
-            font-family: 'Courier New', Courier, monospace; 
+            margin: 4px 0; 
             color: var(--accent-green); 
             text-shadow: 0 0 15px var(--accent-glow); 
         }
 
-        /* İlerleme Çubuğu (Yeşil) */
+        /* İlerleme Çubuğu (Greeble Çizgili) */
         .progress-track { 
             width: 100%; 
-            background: #0e0f12; 
+            background: #08090b; 
             border: 1px solid var(--tech-border); 
-            height: 16px; 
+            height: 14px; 
             border-radius: 2px; 
-            margin: 15px 0; 
+            margin: 12px 0; 
             overflow: hidden; 
             display: none; 
             box-shadow: inset 2px 2px 6px rgba(0,0,0,0.9);
+            position: relative;
         }
 
         .progress-fill { 
             height: 100%; 
             width: 0%; 
-            background: var(--accent-green); 
+            background: linear-gradient(90deg, #00b347, var(--accent-green)); 
             transition: width 1s ease-out; 
             box-shadow: 0 0 10px var(--accent-green);
         }
 
         .greeble-btn {
             display: inline-block;
-            background: linear-gradient(135deg, #434a56 0%, #2f353f 100%);
+            background: linear-gradient(135deg, #3d4656 0%, #252c38 100%);
             color: var(--accent-green); 
-            font-family: 'Courier New', Courier, monospace; 
             font-weight: bold;
-            font-size: 12px; 
-            padding: 10px 22px; 
+            font-size: 11px; 
+            padding: 9px 20px; 
             cursor: pointer;
-            border: 1px solid #141619; 
+            border: 1px solid #0c0e11; 
             border-top: 1px solid var(--silver-metal); 
             border-left: 1px solid var(--silver-metal);
-            border-radius: 3px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+            border-radius: 2px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.8);
             transition: all 0.15s ease;
-            margin-top: 10px;
+            margin-top: 8px;
             letter-spacing: 1px;
             text-shadow: 0 0 5px rgba(0,255,102,0.4);
         }
         
-        .greeble-btn:hover { background: #555e6e; color: #fff; border-color: var(--accent-green); }
+        .greeble-btn:hover { background: #4e5766; color: #fff; border-color: var(--accent-green); }
         .greeble-btn:active { transform: translateY(2px); color: var(--accent-green); }
 
-        /* ALT GREEBLE ŞERİDİ (Paslanmış / İhtar Çizgileri) */
-        .footer-strip {
+        /* ALT GREEBLE DETAY ŞERİDİ (Star Wars Hazard Şeritleri ve Greeble Parçaları) */
+        .footer-greeble-strip {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 10px;
             margin-top: 2px;
         }
 
@@ -295,23 +345,31 @@
             flex-grow: 1;
             height: 6px;
             border-radius: 2px;
-            background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #1c1e22 8px, #1c1e22 16px);
+            background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #15181c 8px, #15181c 16px);
             border: 1px solid #000; 
-            box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
-            margin-right: 15px;
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.9);
+        }
+
+        .greeble-box-mini {
+            background: var(--greeble-dark);
+            border: 1px solid var(--tech-border);
+            padding: 3px 8px;
+            font-size: 8px;
+            color: var(--silver-metal);
+            letter-spacing: 1px;
         }
         
         .asset-tag { 
-            font-size: 9px; 
+            font-size: 8.5px; 
             color: var(--silver-metal); 
             font-weight: bold; 
-            font-family: 'Courier New', Courier, monospace; 
             letter-spacing: 1px;
         }
 
         @media (max-width: 600px) {
             .chassis { padding: 15px; }
             .info-grid { grid-template-columns: 1fr; }
+            .greeble-top-bar { display: none; }
         }
     </style>
 </head>
@@ -321,26 +379,38 @@
     <div class="rivet-tr"></div>
     <div class="rivet-bl"></div>
 
-    <!-- LOGO VE KÜÇÜK HARF BRAND (Çerçevesiz, Sayfayla Bütünleşen Yapı) -->
+    <!-- ÜST GREEBLE KANAL / KONTROL BANDI -->
+    <div class="greeble-top-bar">
+        <span>SYS_CHANNEL: 0x8086-SW // IMPERIAL_GRID_ACTIVE</span>
+        <div class="greeble-slots">
+            <div class="slot-block active"></div>
+            <div class="slot-block active"></div>
+            <div class="slot-block warning"></div>
+            <div class="slot-block active"></div>
+            <div class="slot-block"></div>
+        </div>
+    </div>
+
+    <!-- LOGO VE KÜÇÜK HARF BRAND (Sayfayla Bütünleşen Tasarım) -->
     <div class="brand-header-seamless">
         <div class="sys-status-badge">
-            <span>ONLINE</span>
+            <span>READY</span>
             <div class="status-dot"></div>
         </div>
         <img class="logo-seamless" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan logo" onerror="this.src='https://rayilmazan.github.io/logo.png'">
         <div class="brand-title">rayılmazan</div>
     </div>
 
-    <!-- TEK EKRAN BİRLEŞTİRİLMİŞ SİSTEM & BENCHMARK PANELİ -->
+    <!-- TEK EKRAN BİRLEŞTİRİLMİŞ SİSTEM & BENCHMARK PANELİ (Yoğun Greeble Katmanları) -->
     <div class="unified-control-screen">
         
         <!-- TELEMETRY BÖLÜMÜ -->
         <div>
             <div class="screen-title">
                 <span>TELEMETRY_HUB // SİSTEM VE AĞ VERİLERİ</span>
-                <span>SECURE_LINK</span>
+                <span>SECURE_LINK // 99.8%</span>
             </div>
-            <div class="info-grid" style="margin-top: 12px;">
+            <div class="info-grid" style="margin-top: 10px;">
                 <div class="info-card">
                     <span class="label">COMMS_IP (Ağ Adresi)</span>
                     <span id="dev-ip" class="val">Sorgulanıyor...</span>
@@ -360,7 +430,7 @@
             </div>
         </div>
 
-        <!-- CORE_BENCHMARK BÖLÜMÜ (AYNI EKRAN İÇİNDE) -->
+        <!-- CORE_BENCHMARK BÖLÜMÜ -->
         <div class="benchmark-section">
             <div class="benchmark-header">
                 CORE_BENCHMARK // SİSTEM PERFORMANS TESTİ
@@ -374,7 +444,7 @@
                 <div id="progress-bar" class="progress-fill"></div>
             </div>
             
-            <div id="details" style="display: none; margin-top: 10px; font-family: 'Courier New', Courier, monospace; color: var(--text-muted); font-size: 11px;">
+            <div id="details" style="display: none; margin-top: 8px; color: var(--text-muted); font-size: 10.5px;">
                 SINIF: <span id="bench-tier" class="val">---</span> | ROR/FPS: <span id="bench-fps" class="val">---</span>
             </div>
 
@@ -383,10 +453,11 @@
 
     </div>
 
-    <!-- ALT GREEBLE ŞERİDİ -->
-    <div class="footer-strip">
+    <!-- ALT GREEBLE ŞERİDİ VE ENDÜSTRİYEL PARÇALAR -->
+    <div class="footer-greeble-strip">
+        <div class="greeble-box-mini">SECTOR-7</div>
         <div class="hazard-stripe"></div>
-        <div class="asset-tag">ASSET_ID: Y0-8086 // RAYILMAZAN.CORE</div>
+        <div class="asset-tag">ID: Y0-8086 // RAYILMAZAN.CORE</div>
     </div>
 </div>
 
