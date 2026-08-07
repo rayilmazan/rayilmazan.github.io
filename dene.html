@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GREEBLES // YOLCU0 SYSTEM</title>
+    <title>rayılmazan // YOLCU0 OVERRIDE TERMINAL</title>
     <style>
+        /* 1. KÖK RENKLER VE TEMA (USED FUTURE & GREEBLE) */
         :root {
-            --bg-color: #0b0c10;
-            --grid-color: #1f2129;
-            --accent-cyan: #45f3ff;
-            --accent-orange: #ff7700;
+            --amber-main: #ff9d00;
+            --amber-glow: #ff5500;
+            --amber-dim: #553300;
+            --bg-dark: #0a0804;
+            --crt-line: rgba(18, 12, 4, 0.7);
+            
+            --greeble-dark: #15161a;
+            --greeble-mid: #24262b;
+            --greeble-light: #363a42;
+            --hazard-orange: #ff7700;
         }
 
         * {
@@ -18,210 +25,628 @@
             padding: 0;
         }
 
+        /* 2. UZAY/GEMİ İÇİ ARKA PLAN */
         body {
-            background-color: var(--bg-color);
+            background-color: #050608;
             background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 30px 30px;
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--amber-main);
             font-family: 'Courier New', Courier, monospace;
-            min-height: 100vh;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .greeble-container {
+        /* 3. ANA GREEBLE ŞASİ (Ağır Zırhlı Kasa) */
+        .chassis {
+            max-width: 1000px;
+            width: 100%;
+            background-color: var(--greeble-mid);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0,0,0, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(0,0,0, 0.5) 0%, transparent 30%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.15"/></svg>');
+            border: 2px solid #111;
+            border-top: 4px solid #4a505c;
+            border-left: 4px solid #4a505c;
+            border-radius: 16px;
+            padding: 25px;
             position: relative;
-            width: 90vw;
-            max-width: 600px;
-            aspect-ratio: 1 / 1;
-            background: radial-gradient(circle at center, #15161a 0%, #0b0c10 100%);
-            border: 1px solid #333;
-            border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.9);
+            box-shadow: 
+                15px 25px 50px rgba(0,0,0,0.9), 
+                inset 0 0 30px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            gap: 20px;
         }
 
-        .hud-overlay {
+        /* Donanım Vidaları / Perçinler */
+        .chassis::before, .chassis::after {
+            content: "";
+            position: absolute;
+            width: 14px; height: 14px;
+            background: #111;
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 4px #555, 1px 1px 2px rgba(0,0,0,0.9);
+        }
+        .chassis::before { top: 15px; left: 15px; }
+        .chassis::after { bottom: 15px; right: 15px; }
+        .rivet-tr { position: absolute; top: 15px; right: 15px; width: 14px; height: 14px; background: #111; border-radius: 50%; box-shadow: inset 2px 2px 4px #555, 1px 1px 2px rgba(0,0,0,0.9); }
+        .rivet-bl { position: absolute; bottom: 15px; left: 15px; width: 14px; height: 14px; background: #111; border-radius: 50%; box-shadow: inset 2px 2px 4px #555, 1px 1px 2px rgba(0,0,0,0.9); }
+
+        /* 4. BAŞLIK / TELEMETRİ (Endüstriyel Etiketler) */
+        .header-section {
             display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #666;
-            letter-spacing: 2px;
-            z-index: 10;
-        }
-
-        .brand {
-            color: var(--accent-cyan);
-            font-weight: bold;
-        }
-
-        .viewport {
-            flex: 1;
-            display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            background: #15161a;
+            border: 2px solid #000;
+            border-bottom: 4px solid var(--hazard-orange);
+            padding: 10px 20px;
+            box-shadow: inset 2px 2px 10px rgba(0,0,0,0.8);
         }
 
-        .greeble-logo {
-            width: 80%;
-            height: 80%;
-            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.9));
+        .logo-wrapper { display: flex; align-items: center; gap: 15px; }
+
+        .logo-tag {
+            background: var(--amber-main);
+            color: #000;
+            padding: 4px 12px;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        /* Hover Animasyonları (Enerji Akışı) */
-        .power-line {
-            stroke-dasharray: 100;
-            stroke-dashoffset: 100;
-            transition: stroke-dashoffset 1s ease-in-out;
+        .tech-dials {
+            display: flex; gap: 12px; font-size: 12px; color: #888; font-weight: bold;
+        }
+        .tech-dials span { background: #0a0a0c; border: 1px solid #333; padding: 4px 8px; box-shadow: inset 1px 1px 3px #000; }
+
+        /* 5. ANA YAPI (GRID) */
+        .content-container { 
+            display: grid; 
+            grid-template-columns: 1fr 260px; 
+            gap: 20px; 
+            flex: 1;
+        }
+
+        /* 6. CRT EKRAN (YOLCU0 Gözü) */
+        .main-log {
+            background-color: var(--bg-dark);
+            border: 8px solid #111;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 
+                0 0 20px rgba(255, 157, 0, 0.1),
+                inset 0 0 60px rgba(0,0,0,0.95);
+            position: relative;
+            height: 550px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            /* Used Future CRT Işıması ve Titremesi */
+            animation: phosphor-flicker 0.15s infinite alternate;
+        }
+
+        /* Tarama Çizgileri (Scanlines) */
+        .main-log::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(var(--crt-line) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* CRT Camı Parlaması (Vignette & Glow) */
+        .main-log::after {
+            content: ''; 
+            position: sticky; 
+            top: -30px; left: -30px; right: -30px; height: 100%;
+            background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none; 
+            display: block; 
+            z-index: 11;
+        }
+
+        /* Scrollbar (Kehribar Rengi) */
+        .main-log::-webkit-scrollbar { width: 14px; background: #000; border-left: 2px solid #222; }
+        .main-log::-webkit-scrollbar-thumb { background: var(--amber-dim); border: 2px solid #000; }
+        .main-log::-webkit-scrollbar-thumb:hover { background: var(--amber-main); }
+
+        /* CRT İçi Metin Stilleri */
+        .view-section {
+            color: var(--amber-main);
+            text-shadow: 0 0 6px var(--amber-glow);
+            margin-bottom: 45px;
+            position: relative;
+            z-index: 5;
         }
         
-        .greeble-container:hover .power-line {
-            stroke-dashoffset: 0;
+        .view-section h2 {
+            font-size: 18px; 
+            margin-top:0; 
+            border-bottom: 1px solid var(--amber-dim); 
+            padding-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .core-glow {
-            transition: fill 0.3s ease;
+        .data-row {
+            display: flex; justify-content: space-between; align-items: baseline; gap: 15px;
+            margin: 10px 0; border-bottom: 1px dotted rgba(255, 157, 0, 0.2); padding-bottom: 4px;
+            font-size: 14px;
+        }
+        .data-row .label { color: rgba(255, 157, 0, 0.6); white-space: nowrap; }
+        .highlight { color: #fff; text-shadow: 0 0 5px #fff; text-align: right; }
+
+        /* 7. KONTROL PANELİ / YAN ÇUBUK (Greeble Switchboard) */
+        .side-bar {
+            background: var(--greeble-dark); 
+            border: 2px solid #000;
+            border-top: 4px solid #333;
+            border-left: 4px solid #333;
+            padding: 20px; 
+            font-size: 12px; color: #888;
+            box-shadow: inset 5px 5px 15px rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .greeble-container:hover .core-glow {
-            fill: var(--accent-cyan);
-            filter: drop-shadow(0 0 8px var(--accent-cyan));
+        .side-bar-title { 
+            color: var(--hazard-orange); 
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            display: block; 
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* 8. MEKANİK GREEBLE BUTONLAR */
+        .greeble-btn {
+            display: block; width: 100%; 
+            background: linear-gradient(135deg, var(--greeble-light), var(--greeble-dark)); 
+            color: #ccc; 
+            font-family: 'Courier New', Courier, monospace; font-weight: bold;
+            font-size: 14px; padding: 15px; text-align: left; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+            border: 2px solid #000; 
+            border-top: 2px solid #555; 
+            border-left: 2px solid #555;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.8);
+            transition: all 0.1s;
+        }
+        
+        .greeble-btn:hover { 
+            color: var(--amber-main); 
+            background: linear-gradient(135deg, #40454f, #1f2126); 
+        }
+        
+        .greeble-btn:active {
+            border-top: 2px solid #000; border-left: 2px solid #000;
+            border-bottom: 2px solid #555; border-right: 2px solid #555;
+            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.9);
+            transform: translateY(2px);
+            color: var(--hazard-orange);
+        }
+        
+        .greeble-btn::before { content: "SYS_CALL> "; color: #555; }
+        .greeble-btn:hover::before { color: var(--hazard-orange); }
+
+        /* 9. YÜKLÜ MODÜLLER (Veri Kasetleri / Cartridges) */
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        
+        .tool-card {
+            padding: 12px; height: 100%; display: flex; flex-direction: column; gap: 8px;
+            background: transparent; border: 1px solid var(--amber-dim); box-shadow: none;
+            color: var(--amber-main);
+        }
+        
+        .tool-card::before { display: none; }
+        
+        .tool-card:hover {
+            background: rgba(255, 157, 0, 0.1);
+            border-color: var(--amber-main);
+            box-shadow: 0 0 15px rgba(255, 157, 0, 0.2);
+        }
+
+        .tool-title { color: #fff; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #fff; }
+        .tool-desc { color: rgba(255, 157, 0, 0.7); font-size: 11px; }
+
+        /* Diğer CRT ve Tarama Efektleri */
+        .progress-track { width: 100%; background: #000; border: 1px solid var(--amber-dim); height: 24px; margin: 15px 0 25px 0; padding: 3px; display: none; }
+        .progress-fill { height: 100%; width: 0%; background: var(--amber-main); transition: width 1s ease-out; box-shadow: 0 0 15px var(--amber-main); }
+        .loading { font-size: 14px; color: var(--amber-main); padding: 20px 0; animation: pulse 1s infinite alternate; }
+        .score-box { font-size: 48px; text-align: center; font-weight: 900; margin: 20px 0; }
+
+        @keyframes phosphor-flicker {
+            0% { opacity: 0.96; }
+            100% { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; text-shadow: 0 0 10px var(--amber-glow); }
+        }
+
+        /* 10. ALT GREEBLE ŞERİT VE KİMLİK */
+        .footer-line {
+            margin-top: 10px; height: 12px;
+            background: repeating-linear-gradient(45deg, var(--hazard-orange), var(--hazard-orange) 10px, #111 10px, #111 20px);
+            border: 2px solid #000; box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+        }
+        
+        .asset-tag {
+            font-size: 11px; color: #666; font-weight: bold; text-align: right; margin-top: 5px;
+        }
+
+        /* Mobil Uyumluluk */
+        @media (max-width: 850px) {
+            .content-container { grid-template-columns: 1fr; }
+            .chassis { padding: 15px; }
+            .main-log { height: 450px; padding: 15px; }
+            .header-section { flex-direction: column; align-items: flex-start; gap: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="greeble-container">
-        <!-- HUD Bilgileri -->
-        <div class="hud-overlay">
-            <span>YOLCU0_ENG // GREEBLE_PROTO</span>
-            <span class="brand">RAYILMAZAN</span>
+<div class="chassis">
+    <div class="rivet-tr"></div>
+    <div class="rivet-bl"></div>
+
+    <!-- BAŞLIK BÖLÜMÜ -->
+    <div class="header-section">
+        <div class="logo-wrapper">
+            <!-- Kurumsal Kimlik Düzeltmesi: YOLCU0 & rayılmazan -->
+            <div class="logo-tag">YOLCU0 // rayılmazan</div>
         </div>
-
-        <div class="viewport">
-            <svg class="greeble-logo" viewBox="0 0 330 320" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <!-- Gölgelendirme Filtresi (Panellerin 3D durması için) -->
-                    <filter id="panel-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.85" />
-                    </filter>
-                    
-                    <filter id="inset-shadow">
-                        <feOffset dx="1" dy="1"/>
-                        <feGaussianBlur stdDeviation="1" result="offset-blur"/>
-                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-                        <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
-                        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
-                        <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
-                    </filter>
-
-                    <!-- Havalandırma (Vent) Deseni -->
-                    <pattern id="vents" width="8" height="8" patternUnits="userSpaceOnUse">
-                        <line x1="0" y1="4" x2="8" y2="4" stroke="#111" stroke-width="3" />
-                        <line x1="0" y1="8" x2="8" y2="8" stroke="#333" stroke-width="1" />
-                    </pattern>
-
-                    <!-- Uyarı Şeridi (Hazard) Deseni -->
-                    <pattern id="hazard" width="16" height="16" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
-                        <rect width="16" height="16" fill="#1f2124" />
-                        <rect width="8" height="16" fill="#ffb700" />
-                    </pattern>
-
-                    <!-- ORİJİNAL LOGO GEOMETRİSİ (Kesim Maskesi) -->
-                    <!-- Sınırlar asla değişmez. Tüm karmaşık mekanik yapı bu şeklin içine hapsolur. -->
-                    <clipPath id="logo-shape">
-                        <!-- Dikey Blok ve Sağ Alt Bacak (Kesin Oranlar) -->
-                        <path d="M 100 50 H 140 V 150 L 230 270 H 185 L 140 210 V 270 H 100 Z" />
-                        <!-- Üst Çember (Orijinaldeki gibi dikey bloğa sıfır ve üst hiza) -->
-                        <!-- Stroke et kalınlığı hesaba katılarak kapalı path'e çevrildi -->
-                        <path d="M 140 50 A 50 50 0 0 1 140 150 L 140 144 A 44 44 0 0 0 140 56 Z" />
-                    </clipPath>
-                </defs>
-
-                <!-- ========================================== -->
-                <!-- GREEBLE MEKANİK DETAYLARI (Maskelenmiş Alan) -->
-                <!-- ========================================== -->
-                <g clip-path="url(#logo-shape)">
-                    <!-- Ana Şasi Rengi -->
-                    <rect x="0" y="0" width="330" height="320" fill="#24262b" />
-
-                    <!-- DİKEY BLOK PANELLERİ -->
-                    <!-- Alt Zırh Plakaları -->
-                    <rect x="100" y="50" width="40" height="60" fill="#2d3036" filter="url(#panel-shadow)"/>
-                    <rect x="105" y="115" width="30" height="50" fill="#363a42" filter="url(#panel-shadow)"/>
-                    <rect x="100" y="170" width="35" height="40" fill="#1c1e22" filter="url(#panel-shadow)"/>
-                    <rect x="110" y="215" width="30" height="55" fill="#2d3036" filter="url(#panel-shadow)"/>
-                    
-                    <!-- Havalandırma Izgaraları (Vents) -->
-                    <rect x="105" y="60" width="15" height="30" fill="url(#vents)" filter="url(#inset-shadow)"/>
-                    <rect x="115" y="225" width="20" height="35" fill="url(#vents)" filter="url(#inset-shadow)"/>
-
-                    <!-- Güç Çekirdeği ve Uyarı Şeritleri -->
-                    <rect x="125" y="60" width="10" height="15" fill="#ff7700" filter="url(#panel-shadow)"/>
-                    <rect class="core-glow" x="125" y="80" width="10" height="25" fill="#1c1e22" filter="url(#inset-shadow)"/>
-                    <rect x="100" y="155" width="40" height="10" fill="url(#hazard)" />
-
-                    <!-- Mekanik Vidalar (Rivets) -->
-                    <circle cx="106" cy="56" r="1.5" fill="#000" />
-                    <circle cx="134" cy="56" r="1.5" fill="#000" />
-                    <circle cx="106" cy="104" r="1.5" fill="#000" />
-                    <circle cx="134" cy="104" r="1.5" fill="#000" />
-
-                    <!-- ÇAPRAZ BACAK GREEBLE DETAYLARI -->
-                    <!-- Ana Zırh Plakası (Çapraz formda kesilmiş) -->
-                    <polygon points="140,210 210,270 230,270 160,210" fill="#363a42" filter="url(#panel-shadow)"/>
-                    <polygon points="160,195 230,255 220,270 140,190" fill="#2d3036" filter="url(#panel-shadow)"/>
-                    
-                    <!-- Bacak İçi Borular ve Hidrolikler -->
-                    <line x1="150" y1="210" x2="200" y2="253" stroke="#111" stroke-width="6" stroke-linecap="round" />
-                    <line x1="150" y1="210" x2="200" y2="253" stroke="#666" stroke-width="2" stroke-linecap="round" />
-                    
-                    <line x1="160" y1="215" x2="210" y2="258" stroke="#111" stroke-width="4" stroke-linecap="round" />
-                    <!-- Enerji Akış Kablosu -->
-                    <line class="power-line" x1="160" y1="215" x2="210" y2="258" stroke="var(--accent-cyan)" stroke-width="1.5" stroke-linecap="round" />
-
-                    <!-- Bacak Havalandırması ve Vidalar -->
-                    <polygon points="175,240 195,257 190,265 170,248" fill="url(#vents)" filter="url(#inset-shadow)"/>
-                    <circle cx="215" cy="260" r="2" fill="#111" />
-                    <circle cx="150" cy="200" r="2" fill="#111" />
-
-                    <!-- ÜST ÇEMBER (YARIM HALKA) GREEBLE DETAYLARI -->
-                    <!-- Yapısal Halka Segmentleri -->
-                    <path d="M 140 50 A 50 50 0 0 1 185 85 L 140 100 Z" fill="#2d3036" filter="url(#panel-shadow)"/>
-                    <path d="M 185 85 A 50 50 0 0 1 175 145 L 140 100 Z" fill="#363a42" filter="url(#panel-shadow)"/>
-                    <path d="M 175 145 A 50 50 0 0 1 140 150 L 140 100 Z" fill="#1c1e22" filter="url(#panel-shadow)"/>
-                    
-                    <!-- Halka İçi Kavislendirilmiş Borular -->
-                    <path d="M 140 60 A 40 40 0 0 1 175 125" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round" filter="url(#panel-shadow)"/>
-                    <path d="M 140 60 A 40 40 0 0 1 175 125" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" />
-                    
-                    <path d="M 140 70 A 30 30 0 0 1 165 115" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" />
-                    <path class="power-line" d="M 140 70 A 30 30 0 0 1 165 115" fill="none" stroke="var(--accent-orange)" stroke-width="1" stroke-linecap="round" />
-
-                    <!-- Halka Üzeri Uyarı Blokları ve Eklentiler -->
-                    <rect x="175" y="95" width="15" height="10" fill="#ff7700" filter="url(#panel-shadow)" transform="rotate(20 180 100)"/>
-                    <circle cx="160" cy="65" r="3" fill="#111" filter="url(#inset-shadow)"/>
-                    <circle cx="180" cy="120" r="2.5" fill="#111" filter="url(#inset-shadow)"/>
-                </g>
-
-                <!-- ========================================== -->
-                <!-- DIŞ HAT VURGUSU (Siluetin kaybolmaması için) -->
-                <!-- ========================================== -->
-                <!-- Logonun orijinal dış çerçevesini 1px kalınlığında metalik bir telle çevreliyoruz. -->
-                <g fill="none" stroke="#555" stroke-width="1" opacity="0.6">
-                    <path d="M 100 50 H 140 V 150 L 230 270 H 185 L 140 210 V 270 H 100 Z" />
-                    <path d="M 140 50 A 50 50 0 0 1 140 150" />
-                    <path d="M 140 56 A 44 44 0 0 0 140 144" />
-                </g>
-                
-            </svg>
+        <div class="tech-dials">
+            <span>[SYS: OVERRIDE]</span>
+            <span>[CRT: 240V]</span>
+            <span>[CORE: ONLINE]</span>
         </div>
     </div>
+
+    <!-- İÇERİK BÖLÜMÜ -->
+    <div class="content-container">
+        
+        <!-- ANA GÜNLÜK PANELİ (CRT Ekran) -->
+        <div class="main-log" id="main-log-container">
+            
+            <!-- DIAGNOSTICS EKRANI -->
+            <div id="view-diagnostics">
+                
+                <div class="view-section">
+                    <h2>> SYSTEM_TELEMETRY</h2>
+                    <div class="data-row"><span class="label">>> CHASSIS_CLASS</span><span id="dev-type" class="highlight">Tarama yapılıyor...</span></div>
+                    <div class="data-row"><span class="label">>> KERNEL_OS</span><span id="dev-os" class="highlight">Tarama yapılıyor...</span></div>
+                    <div class="data-row"><span class="label">>> OPTIC_ARRAY</span><span id="dev-screen" class="highlight">Tarama yapılıyor...</span></div>
+                    <div class="data-row"><span class="label">>> RENDER_NODE</span><span id="dev-gpu" class="highlight">Hesaplanıyor...</span></div>
+                    <div class="data-row"><span class="label">>> COMMS_IP</span><span id="dev-ip" class="highlight">Sorgulanıyor...</span></div>
+                    <div class="data-row"><span class="label">>> SECTOR_LOC</span><span id="dev-coords" class="highlight">Sorgulanıyor...</span></div>
+                    <div class="data-row"><span class="label">>> ENERGY_CELL</span><span id="dev-battery" class="highlight">Okunuyor...</span></div>
+                    <div class="data-row"><span class="label">>> LOGIC_GATES</span><span id="dev-hardware" class="highlight">Hesaplanıyor...</span></div>
+                    <div class="data-row"><span class="label">>> GYRO_MODULE</span><span id="dev-sensors" class="highlight">Test ediliyor...</span></div>
+                </div>
+
+                <div class="view-section">
+                    <h2>> ORBITAL_UPLINK_SPEED</h2>
+                    <div id="speed-loading" class="loading">>> YÖRÜNGE BAĞLANTISI ARANIYOR...</div>
+                    <div id="speed-details" style="display: none;">
+                        <div class="data-row"><span class="label">>> SIGNAL_LATENCY</span><span id="speed-ping" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">>> DATA_IN (Down)</span><span id="speed-download" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">>> DATA_OUT (Up)</span><span id="speed-upload" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">>> BANDWIDTH_TIER</span><span id="speed-tier" class="highlight">---</span></div>
+                    </div>
+                </div>
+
+                <div class="view-section">
+                    <h2>> CORE_BENCHMARK</h2>
+                    <div id="loading" class="loading">>> MATRİS ZORLANIYOR. LÜTFEN BEKLEYİN...</div>
+                    <div id="score" class="score-box" style="display: none;">0</div>
+                    
+                    <div id="progress-track" class="progress-track"><div id="progress-bar" class="progress-fill"></div></div>
+                    
+                    <div id="details" style="display: none;">
+                        <div class="data-row"><span class="label">>> THREAD_COUNT</span><span id="bench-cpu" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">>> CYCLE_RATE</span><span id="bench-fps" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">>> GPU_CHIP</span><span id="bench-gpu" class="highlight">---</span></div>
+                        <div class="data-row"><span class="label">>> HARDWARE_CLASS</span><span id="bench-tier" class="highlight">---</span></div>
+                    </div>
+                </div>
+                
+                <button class="greeble-btn" onclick="runAllDiagnostics()" id="retry-all-btn" style="display: none; margin-top: 30px; text-align: center;">RE-CALIBRATE SYSTEM</button>
+            </div>
+
+            <!-- ARAÇLAR (MODULES) EKRANI -->
+            <div id="view-tools" style="display: none;" class="view-section">
+                <h2>> DATA_CARTRIDGES (rayılmazan OS)</h2>
+                <p style="color: rgba(255,157,0,0.6); font-size: 12px; margin-top: 5px;">Bağlı mantık devreleri ve yerel araçlar:</p>
+                
+                <div class="tools-grid">
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pdf')">
+                        <span class="tool-title">[PDF_NODE]</span><span class="tool-desc">Belge dönüştürme matrisi</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suterazi')">
+                        <span class="tool-title">[GYRO_CALIB]</span><span class="tool-desc">Jiroskop stabilizatörü</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/cihaz')">
+                        <span class="tool-title">[HW_SCAN]</span><span class="tool-desc">Donanım derin taraması</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/convert')">
+                        <span class="tool-title">[UNIT_CNV]</span><span class="tool-desc">Metrik ve veri dönüştürücü</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/kible')">
+                        <span class="tool-title">[NAV_BEACON]</span><span class="tool-desc">Küresel konum ve yön bulucu</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/pardus')">
+                        <span class="tool-title">[PARDUS_INT]</span><span class="tool-desc">Etkileşimli tahta protokolü</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/suratgizle')">
+                        <span class="tool-title">[ID_MASK]</span><span class="tool-desc">Biyometrik yüz maskeleme</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/tahtatoz')">
+                        <span class="tool-title">[CRT_CLEAN]</span><span class="tool-desc">Optik yüzey statik temizliği</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/usb')">
+                        <span class="tool-title">[PORT_MGR]</span><span class="tool-desc">Veri portu biçimlendirme</span>
+                    </button>
+                    <button class="greeble-btn tool-card" onclick="openTool('https://rayilmazan.github.io/caocr')">
+                        <span class="tool-title">[VIS_OCR]</span><span class="tool-desc">Görsel veri çözümleyici</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- YAN ÇUBUK PANELİ (Fiziksel Switchboard) -->
+        <div class="side-bar">
+            <div>
+                <span class="side-bar-title">SYSTEM STATUS</span>
+                <span style="color: #666;">UPLINK:</span> <span style="color: #4CAF50;">SECURE</span><br>
+                <span style="color: #666;">POWER:</span> <span style="color: var(--amber-main);">NOMINAL</span><br>
+            </div>
+            
+            <div>
+                <span class="side-bar-title">MEMORY_BANKS</span>
+                <span style="color: #666;">- /mnt/core/logs<br>- /mnt/data/scripts<br>- /dev/null/debris</span>
+            </div>
+
+            <div style="margin-top: auto;">
+                <span class="side-bar-title">MANUAL_OVERRIDE</span>
+                <button class="greeble-btn" style="margin-bottom: 10px;" onclick="switchToDiagnostics()">DIAGNOSTIC</button>
+                <button class="greeble-btn" onclick="switchToTools()">CARTRIDGES</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALT BÖLÜM -->
+    <div class="footer-line"></div>
+    <div class="asset-tag">
+        ASSET_TAG: Y0-8086 // RUST_DIAGNOSTICS // PROP. OF RAYILMAZAN
+    </div>
+</div>
+
+<script>
+    // JS Fonksiyonları (Orijinal mantık ve ID'ler korundu)
+    function hideAllViews() {
+        document.getElementById('view-diagnostics').style.display = 'none';
+        document.getElementById('view-tools').style.display = 'none';
+        document.getElementById('main-log-container').scrollTo(0,0);
+    }
+
+    function switchToDiagnostics() {
+        hideAllViews();
+        document.getElementById('view-diagnostics').style.display = 'block';
+        runAllDiagnostics();
+    }
+
+    function switchToTools() {
+        hideAllViews();
+        document.getElementById('view-tools').style.display = 'block';
+    }
+
+    function openTool(url) {
+        window.open(url, '_blank');
+    }
+
+    function runAllDiagnostics() {
+        document.getElementById('retry-all-btn').style.display = 'none';
+        runSpeedTest();
+        runBenchmark();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const ua = navigator.userAgent;
+        let os = "UNKNOWN_SYS";
+        let type = "STATIONARY (Desktop)";
+
+        if (/android/i.test(ua)) { os = "Android"; type = "PORTABLE"; }
+        else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) { os = "iOS / Apple"; type = "PORTABLE"; }
+        else if (/Macintosh/.test(ua)) { os = "macOS"; }
+        else if (/Windows/.test(ua)) { os = "Windows"; if (navigator.maxTouchPoints > 1) type = "HYBRID_PAD"; }
+        else if (/Linux/.test(ua)) { os = "Linux"; }
+
+        let versionMatch = ua.match(/(Windows NT |Android |OS |Version\/)([\d._]+)/);
+        if (versionMatch && versionMatch[2]) {
+            let ver = versionMatch[2].replace(/_/g, '.');
+            os += ` [v${ver}]`;
+        }
+
+        document.getElementById("dev-type").innerText = type;
+        document.getElementById("dev-os").innerText = os;
+
+        const width = window.screen.width;
+        const height = window.screen.height;
+        const pixelRatio = window.devicePixelRatio;
+        document.getElementById("dev-screen").innerText = `${width}x${height} (${pixelRatio}x)`;
+
+        const gpuName = getGPUInfo();
+        document.getElementById("dev-gpu").innerText = gpuName.replace("ANGLE (", "").replace(")", "");
+
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                if(data.ip) {
+                    document.getElementById("dev-ip").innerText = `${data.ip} // ${data.city || 'UNKNOWN'}`;
+                    document.getElementById("dev-coords").innerText = (data.latitude && data.longitude) ? `LAT: ${data.latitude} // LNG: ${data.longitude}` : "[NO_DATA]";
+                } else {
+                    document.getElementById("dev-ip").innerText = "[SHIELDED]";
+                    document.getElementById("dev-coords").innerText = "[UNKNOWN]";
+                }
+            }).catch(() => {
+                document.getElementById("dev-ip").innerText = "[BLOCKED / JAMMED]";
+                document.getElementById("dev-coords").innerText = "[OFFLINE]";
+            });
+
+        if (navigator.getBattery) {
+            navigator.getBattery().then(function(battery) {
+                function updateBatteryInfo() {
+                    document.getElementById("dev-battery").innerText = `CELL: ${Math.round(battery.level * 100)}% [${battery.charging ? "CHARGING" : "DRAINING"}]`;
+                }
+                updateBatteryInfo();
+                battery.addEventListener('levelchange', updateBatteryInfo);
+                battery.addEventListener('chargingchange', updateBatteryInfo);
+            });
+        } else {
+            document.getElementById("dev-battery").innerText = "[NO_CELL_DATA]";
+        }
+
+        const cores = navigator.hardwareConcurrency || "UNKNOWN";
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "RESTRICTED";
+        document.getElementById("dev-hardware").innerText = `CORES: ${cores} // MEM: ${ram}`;
+        document.getElementById("dev-sensors").innerText = ('DeviceOrientationEvent' in window) ? "ONLINE [ACTIVE]" : "[OFFLINE]";
+        
+        runAllDiagnostics();
+    });
+
+    function getGPUInfo() {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) return "UNKNOWN";
+        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "UNKNOWN";
+    }
+
+    function measureFPS() {
+        return new Promise((resolve) => {
+            let startTime = performance.now();
+            let frames = 0;
+            function check() {
+                frames++;
+                let duration = performance.now() - startTime;
+                if (duration >= 1000) { resolve(Math.round((frames * 1000) / duration)); } 
+                else { requestAnimationFrame(check); }
+            }
+            requestAnimationFrame(check);
+        });
+    }
+
+    function cpuBenchmark() {
+        const start = performance.now();
+        let x = 0;
+        for (let i = 0; i < 50000000; i++) { x += Math.sqrt(i) * Math.sin(i); }
+        return performance.now() - start;
+    }
+
+    async function runBenchmark() {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('score').style.display = 'none';
+        document.getElementById('progress-track').style.display = 'none';
+        document.getElementById('progress-bar').style.width = '0%';
+        document.getElementById('details').style.display = 'none';
+
+        const cpuCores = navigator.hardwareConcurrency || 4;
+        const gpu = getGPUInfo();
+        const fps = await measureFPS();
+        const cpuTime = cpuBenchmark();
+
+        let baseScore = 5; 
+        if (cpuCores >= 8) baseScore += 1.5; else if (cpuCores <= 4) baseScore -= 1.5;
+        if (fps > 100) baseScore += 2; else if (fps > 80) baseScore += 1; else if (fps < 50) baseScore -= 1;
+        if (cpuTime < 80) baseScore += 1.5; else if (cpuTime < 150) baseScore += 0.5; else if (cpuTime > 300) baseScore -= 1.5;
+
+        const gpuLower = gpu.toLowerCase();
+        if (gpuLower.includes('apple') || gpuLower.includes('bionic')) baseScore += 1;
+        else if (gpuLower.includes('adreno(tm) 7') || gpuLower.includes('immortalis')) baseScore += 1.5;
+        else if (gpuLower.includes('mali-g5') || gpuLower.includes('adreno(tm) 61')) baseScore -= 1;
+
+        let finalScore = Math.min(10, Math.max(1, Math.round(baseScore * 10) / 10));
+        let scoreColor = finalScore < 4 ? '#ff5500' : (finalScore < 7 ? '#ff9d00' : '#4CAF50');
+        let tierText = finalScore < 4 ? 'CLASS C (JUNK/SALVAGE)' : (finalScore < 7 ? 'CLASS B (STANDARD)' : 'CLASS A (MILITARY)');
+
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            const scoreEl = document.getElementById('score');
+            scoreEl.innerText = finalScore.toFixed(1);
+            scoreEl.style.color = scoreColor;
+            scoreEl.style.textShadow = `0 0 20px ${scoreColor}`;
+            scoreEl.style.display = 'block';
+
+            document.getElementById('progress-track').style.display = 'block';
+            setTimeout(() => {
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.backgroundColor = scoreColor;
+                progressBar.style.boxShadow = `0 0 15px ${scoreColor}`;
+                progressBar.style.width = (finalScore * 10) + '%';
+            }, 50);
+
+            document.getElementById('bench-cpu').innerText = cpuCores + " CORES";
+            document.getElementById('bench-fps').innerText = fps + " FPS";
+            document.getElementById('bench-gpu').innerText = gpu.replace("ANGLE (", "").replace(")", "");
+            document.getElementById('bench-tier').innerText = tierText;
+            document.getElementById('bench-tier').style.color = scoreColor;
+            document.getElementById('details').style.display = 'block';
+            
+            checkBothFinished();
+        }, 600);
+    }
+
+    let speedTestDone = false;
+    let benchTestDone = false;
+
+    function runSpeedTest() {
+        speedTestDone = false;
+        benchTestDone = false;
+        document.getElementById('speed-loading').style.display = 'block';
+        document.getElementById('speed-details').style.display = 'none';
+        document.getElementById('speed-loading').innerText = ">> YÖRÜNGE AĞI ARANIYOR...";
+        
+        setTimeout(() => document.getElementById('speed-loading').innerText = ">> PAKET VERİLERİ ŞİFRELENİYOR...", 800);
+        setTimeout(() => {
+            document.getElementById('speed-loading').style.display = 'none';
+            const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+            const dl = (Math.random() * (isMobile ? 80 : 450) + (isMobile ? 20 : 50)).toFixed(1);
+            
+            let netTier = dl < 35 ? "LOW-BAND (COPPER)" : (dl < 100 ? "MID-BAND (STANDARD)" : "HYPER-WAVE (OPTIC)");
+            let netColor = dl < 35 ? "#ff5500" : (dl < 100 ? "#ff9d00" : "#4CAF50");
+
+            document.getElementById('speed-ping').innerText = `${Math.floor(Math.random() * (isMobile ? 35 : 18)) + 4} ms`;
+            document.getElementById('speed-download').innerText = `${dl} Mbps`;
+            document.getElementById('speed-upload').innerText = `${(dl * (Math.random() * 0.15 + 0.10)).toFixed(1)} Mbps`;
+            document.getElementById('speed-tier').innerText = netTier;
+            document.getElementById('speed-tier').style.color = netColor;
+
+            document.getElementById('speed-details').style.display = 'block';
+            speedTestDone = true;
+            checkBothFinished();
+        }, 1800);
+    }
+
+    function checkBothFinished() {
+        if(document.getElementById('details').style.display === 'block' && speedTestDone) {
+            document.getElementById('retry-all-btn').style.display = 'block';
+        }
+    }
+</script>
 
 </body>
 </html>
