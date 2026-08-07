@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rayılmazan // DONANIM KONTROL MERKEZİ</title>
+    <title>rayılmazan // "R" GREEBLE HUD KONTROL MERKEZİ</title>
     <style>
         :root {
             --greeble-bg: #15161a;
@@ -58,8 +58,8 @@
         .rivet-tr { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; background: #111; border-radius: 50%; box-shadow: inset 1px 1px 3px #555, 1px 1px 1px rgba(0,0,0,0.9); }
         .rivet-bl { position: absolute; bottom: 15px; left: 15px; width: 12px; height: 12px; background: #111; border-radius: 50%; box-shadow: inset 1px 1px 3px #555, 1px 1px 1px rgba(0,0,0,0.9); }
 
-        /* "R" HARFİ TASLAĞINA GÖRE GREEBLE DÜZENİ (GÖNDERDİĞİNİZ ÇİZİM GEOMETRİSİ) */
-        .r-layout-container {
+        /* "R" HARFİ GEOMETRİK TASLAĞINA VE X NOKTALARINA GÖRE GREEBLE DÜZENİ */
+        .r-matrix-layout {
             display: grid;
             grid-template-columns: 140px 1fr;
             gap: 20px;
@@ -68,11 +68,11 @@
             border-bottom: 4px solid var(--accent-orange);
             padding: 25px;
             border-radius: 6px;
-            align-items: center;
+            align-items: stretch;
         }
 
-        /* 1. DİKEY ÇUBUK (Sol Sütun - Logo) */
-        .r-vertical-bar {
+        /* 1. DİKEY ÇUBUK (R Harfinin Sol Gövdesi - Logo) */
+        .r-stem {
             background: var(--greeble-panel);
             border: 2px solid #333;
             border-top: 3px solid var(--accent-orange);
@@ -82,11 +82,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 220px;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
         }
 
-        .r-vertical-bar img {
+        .r-stem img {
             width: 75px;
             height: 75px;
             object-fit: contain;
@@ -96,50 +95,54 @@
 
         .brand-title {
             color: var(--text-main);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 2px;
             font-family: 'Courier New', Courier, monospace;
             text-align: center;
         }
 
-        /* 2. SAĞ KISIM (Kuyruk, Gövde ve Ayaklardaki X Noktaları) */
-        .r-right-grid {
+        /* 2. R HARFİNİN ÜST KAVİS VE BACAK ALANLARI (X İŞARETLERİNİN KONUMLARI) */
+        .r-nodes-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto;
-            gap: 15px;
-            position: relative;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto auto auto;
+            gap: 12px;
         }
 
-        .r-card {
+        .r-node-card {
             background: var(--greeble-panel);
             border: 1px solid #333;
             border-left: 3px solid var(--accent-orange);
-            padding: 12px 15px;
+            padding: 10px 14px;
             border-radius: 4px;
             font-size: 13px;
             box-shadow: inset 2px 2px 5px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .r-card.full-width {
+        /* Üst Kavis (İlk X işareti) */
+        .node-top-loop {
             grid-column: span 2;
+            border-left-color: var(--text-highlight);
         }
 
-        .r-card .label {
+        .r-node-card .label {
             color: var(--text-muted);
-            font-size: 11px;
+            font-size: 10px;
             font-family: 'Courier New', Courier, monospace;
             display: block;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             text-transform: uppercase;
         }
 
-        .r-card .val {
+        .r-node-card .val {
             color: var(--text-highlight);
             font-weight: bold;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
+            font-size: 12px;
             word-break: break-all;
         }
 
@@ -154,7 +157,7 @@
         }
 
         .view-section h2 {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--text-main);
             background: var(--greeble-dark);
             padding: 10px 15px;
@@ -217,9 +220,9 @@
         .asset-tag { font-size: 12px; color: var(--text-muted); font-weight: bold; text-align: right; font-family: 'Courier New', Courier, monospace; }
 
         @media (max-width: 768px) {
-            .r-layout-container { grid-template-columns: 1fr; }
-            .r-right-grid { grid-template-columns: 1fr; }
-            .r-card.full-width { grid-column: span 1; }
+            .r-matrix-layout { grid-template-columns: 1fr; }
+            .r-nodes-grid { grid-template-columns: 1fr; }
+            .node-top-loop { grid-column: span 1; }
             .chassis { padding: 15px; }
         }
     </style>
@@ -230,40 +233,45 @@
     <div class="rivet-tr"></div>
     <div class="rivet-bl"></div>
 
-    <!-- "R" HARFİ GEOMETRİK TASLAĞINA GÖRE DÜZENLENMİŞ BÖLÜM -->
-    <div class="r-layout-container">
+    <!-- "R" HARFİ TASLAĞI VE X İŞARETLERİNE GÖRE YERLEŞTİRİLMİŞ GREEBLE HATLARI -->
+    <div class="r-matrix-layout">
         
-        <!-- 1. Dikey Çubuk: Logo ve Marka -->
-        <div class="r-vertical-bar">
+        <!-- Sol Dikey Çubuk (Logo ve Marka) -->
+        <div class="r-stem">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan logo" onerror="this.src='https://rayilmazan.github.io/logo.png'">
             <div class="brand-title">rayılmazan</div>
         </div>
 
-        <!-- 2. R Harfinin Üst Kavis, Çapraz Kol ve Alt Ayaklarındaki "X" Noktaları -->
-        <div class="r-right-grid">
+        <!-- Sağ Taraf: R Taslağındaki X İşaretlerinin Konumlarına Karşılık Gelen Bilgi Modülleri -->
+        <div class="r-nodes-grid">
             
-            <!-- Üst Kavis Alanı (X 1) -->
-            <div class="r-card">
-                <span class="label">COMMS_IP // AĞ BAĞLANTISI</span>
+            <!-- X 1: Üst Kavis Bölgesi (IP Bilgisi) -->
+            <div class="r-node-card node-top-loop">
+                <span class="label">COMMS_IP // AĞ BAĞLANTI ADRESİ</span>
                 <span id="dev-ip" class="val">Sorgulanıyor...</span>
             </div>
 
-            <!-- Çapraz Kol Alanı - 1 (X 2) -->
-            <div class="r-card">
+            <!-- X 2: Çapraz Kol Üst Bölge (Enlem & Boylam) -->
+            <div class="r-node-card">
                 <span class="label">SECTOR_LOC // ENLEM & BOYLAM</span>
                 <span id="dev-coords" class="val">Sorgulanıyor...</span>
             </div>
 
-            <!-- Çapraz Kol Alanı - 2 (X 3) -->
-            <div class="r-card">
+            <!-- X 3: Çapraz Kol Alt Bölge (İşlemci / Donanım) -->
+            <div class="r-node-card">
                 <span class="label">LOGIC_GATES // İŞLEMCİ & ÇEKİRDEK</span>
                 <span id="dev-hardware" class="val">Hesaplanıyor...</span>
             </div>
 
-            <!-- Alt Ayak Alanı (X 4 & X 5) -->
-            <div class="r-card">
-                <span class="label">RENDER_NODE // GRAFİK BİRİMİ</span>
+            <!-- X 4 & 5: Alt Ayak Bölgeleri (Grafik Birimi & Bellek) -->
+            <div class="r-node-card">
+                <span class="label">RENDER_NODE // GRAFİK BİRİMİ (GPU)</span>
                 <span id="dev-gpu" class="val">Hesaplanıyor...</span>
+            </div>
+
+            <div class="r-node-card">
+                <span class="label">MEMORY_BUS // SİSTEM BELLEĞİ</span>
+                <span id="dev-memory" class="val">Hesaplanıyor...</span>
             </div>
 
         </div>
@@ -303,7 +311,8 @@
         // Donanım İşlemci ve Bellek Bilgisi
         const cores = navigator.hardwareConcurrency || "BİLİNMİYOR";
         const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "KORUMALI";
-        document.getElementById("dev-hardware").innerText = `${cores} Çekirdek // ${ram} RAM`;
+        document.getElementById("dev-hardware").innerText = `${cores} Çekirdek İşlemci`;
+        document.getElementById("dev-memory").innerText = `${ram} Sistem Belleği`;
 
         // Grafik Birimi (GPU) Bilgisi
         const gpuName = getGPUInfo();
@@ -314,7 +323,7 @@
             .then(response => response.json())
             .then(data => {
                 if(data.ip) {
-                    document.getElementById("dev-ip").innerText = `${data.ip} (${data.city || 'Bilinmiyor'})`;
+                    document.getElementById("dev-ip").innerText = `${data.ip} (${data.city || 'Bilinmiyor'} / ${data.country_name || ''})`;
                     document.getElementById("dev-coords").innerText = (data.latitude && data.longitude) ? `${data.latitude}, ${data.longitude}` : "Mevcut Değil";
                 } else {
                     document.getElementById("dev-ip").innerText = "GİZLİ";
