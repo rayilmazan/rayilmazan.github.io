@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USED FUTURE // YOLCU0 TERMINAL</title>
+    <title>GREEBLES // YOLCU0 SYSTEM</title>
     <style>
         :root {
-            --amber-main: #ff9d00;
-            --amber-glow: #ff5500;
-            --amber-dim: #553300;
-            --bg-dark: #070502;
-            --crt-line: rgba(20, 15, 5, 0.75);
+            --bg-color: #0b0c10;
+            --grid-color: #1f2129;
+            --accent-cyan: #45f3ff;
+            --accent-orange: #ff7700;
         }
 
         * {
@@ -20,193 +19,207 @@
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--amber-main);
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 30px 30px;
             font-family: 'Courier New', Courier, monospace;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            margin: 0;
+            color: #fff;
         }
 
-        /* Ağır Sanayi CRT Ekran Gövdesi */
-        .crt-container {
+        .greeble-container {
             position: relative;
             width: 90vw;
-            max-width: 650px;
+            max-width: 600px;
             aspect-ratio: 1 / 1;
-            background: radial-gradient(circle at center, #150f05 0%, #030201 100%);
-            border: 4px solid var(--amber-dim);
-            border-radius: 18px;
-            box-shadow: 
-                0 0 40px rgba(255, 157, 0, 0.1),
-                inset 0 0 90px rgba(0, 0, 0, 0.95);
-            padding: 24px;
+            background: radial-gradient(circle at center, #15161a 0%, #0b0c10 100%);
+            border: 1px solid #333;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,0,0,0.9);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
+            padding: 20px;
         }
 
-        /* Katot Işınlı Tarama Çizgileri */
-        .crt-container::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(var(--crt-line) 50%, rgba(0, 0, 0, 0.3) 50%);
-            background-size: 100% 4px;
-            z-index: 10;
-            pointer-events: none;
-            opacity: 0.85;
-        }
-
-        /* Ekran Kararması (Vignette) */
-        .crt-container::after {
-            content: " ";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, transparent 55%, rgba(0,0,0,0.9) 100%);
-            z-index: 11;
-            pointer-events: none;
-        }
-
-        /* Arayüz Telemetri Yazıları */
-        .hud-header, .hud-footer {
+        .hud-overlay {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            color: #666;
             letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 6px var(--amber-glow);
-            z-index: 5;
-            opacity: 0.9;
+            z-index: 10;
         }
 
-        .status-tag {
-            background-color: var(--amber-main);
-            color: #000;
-            padding: 2px 8px;
-            font-weight: 900;
-            text-shadow: none;
+        .brand {
+            color: var(--accent-cyan);
+            font-weight: bold;
         }
 
-        /* Logo Sahnesi */
         .viewport {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            z-index: 5;
         }
 
-        /* Fosfor Işıması ve Titreme */
-        .used-future-logo {
-            width: 75%;
-            height: 75%;
-            filter: drop-shadow(0 0 8px var(--amber-glow)) 
-                    drop-shadow(0 0 15px rgba(255, 157, 0, 0.6))
-                    url(#crt-noise);
-            animation: phosphor-flicker 0.12s infinite alternate;
+        .greeble-logo {
+            width: 80%;
+            height: 80%;
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.9));
         }
 
-        /* Teknik Hizalama Izgarası */
-        .grid-bg {
-            stroke: var(--amber-dim);
-            stroke-width: 0.5;
-            opacity: 0.3;
+        /* Hover Animasyonları (Enerji Akışı) */
+        .power-line {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+        
+        .greeble-container:hover .power-line {
+            stroke-dashoffset: 0;
         }
 
-        @keyframes phosphor-flicker {
-            0% { opacity: 0.95; }
-            50% { opacity: 1; }
-            100% { opacity: 0.92; }
+        .core-glow {
+            transition: fill 0.3s ease;
+        }
+
+        .greeble-container:hover .core-glow {
+            fill: var(--accent-cyan);
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
         }
     </style>
 </head>
 <body>
 
-    <div class="crt-container">
-        <!-- Telemetri Üst Bilgi -->
-        <div class="hud-header">
-            <span>SYS_ID // YOLCU0</span>
-            <span class="status-tag">RAYILMAZAN</span>
-            <span>240V CRT</span>
+    <div class="greeble-container">
+        <!-- HUD Bilgileri -->
+        <div class="hud-overlay">
+            <span>YOLCU0_ENG // GREEBLE_PROTO</span>
+            <span class="brand">RAYILMAZAN</span>
         </div>
 
-        <!-- Ana Vektör Alanı -->
         <div class="viewport">
-            <svg class="used-future-logo" viewBox="0 0 330 320" xmlns="http://www.w3.org/2000/svg">
+            <svg class="greeble-logo" viewBox="0 0 330 320" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <!-- Analog Gürültü ve Aşınma Filtresi -->
-                    <filter id="crt-noise" x="0%" y="0%" width="100%" height="100%">
-                        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" result="noise" />
-                        <!-- Deformasyonu minimumda tutarak orijinal şekli korur (scale="1.5") -->
-                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G" />
+                    <!-- Gölgelendirme Filtresi (Panellerin 3D durması için) -->
+                    <filter id="panel-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="2" dy="3" stdDeviation="2" flood-color="#000" flood-opacity="0.85" />
                     </filter>
+                    
+                    <filter id="inset-shadow">
+                        <feOffset dx="1" dy="1"/>
+                        <feGaussianBlur stdDeviation="1" result="offset-blur"/>
+                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+                        <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
+                        <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+                        <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+                    </filter>
+
+                    <!-- Havalandırma (Vent) Deseni -->
+                    <pattern id="vents" width="8" height="8" patternUnits="userSpaceOnUse">
+                        <line x1="0" y1="4" x2="8" y2="4" stroke="#111" stroke-width="3" />
+                        <line x1="0" y1="8" x2="8" y2="8" stroke="#333" stroke-width="1" />
+                    </pattern>
+
+                    <!-- Uyarı Şeridi (Hazard) Deseni -->
+                    <pattern id="hazard" width="16" height="16" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                        <rect width="16" height="16" fill="#1f2124" />
+                        <rect width="8" height="16" fill="#ffb700" />
+                    </pattern>
+
+                    <!-- ORİJİNAL LOGO GEOMETRİSİ (Kesim Maskesi) -->
+                    <!-- Sınırlar asla değişmez. Tüm karmaşık mekanik yapı bu şeklin içine hapsolur. -->
+                    <clipPath id="logo-shape">
+                        <!-- Dikey Blok ve Sağ Alt Bacak (Kesin Oranlar) -->
+                        <path d="M 100 50 H 140 V 150 L 230 270 H 185 L 140 210 V 270 H 100 Z" />
+                        <!-- Üst Çember (Orijinaldeki gibi dikey bloğa sıfır ve üst hiza) -->
+                        <!-- Stroke et kalınlığı hesaba katılarak kapalı path'e çevrildi -->
+                        <path d="M 140 50 A 50 50 0 0 1 140 150 L 140 144 A 44 44 0 0 0 140 56 Z" />
+                    </clipPath>
                 </defs>
 
-                <!-- Arka Plan Koordinat Izgarası -->
-                <g class="grid-bg">
-                    <line x1="100" y1="0" x2="100" y2="320" />
-                    <line x1="140" y1="0" x2="140" y2="320" />
-                    <line x1="230" y1="0" x2="230" y2="320" />
-                    <line x1="0" y1="50" x2="330" y2="50" />
-                    <line x1="0" y1="150" x2="330" y2="150" />
-                    <line x1="0" y1="270" x2="330" y2="270" />
-                </g>
+                <!-- ========================================== -->
+                <!-- GREEBLE MEKANİK DETAYLARI (Maskelenmiş Alan) -->
+                <!-- ========================================== -->
+                <g clip-path="url(#logo-shape)">
+                    <!-- Ana Şasi Rengi -->
+                    <rect x="0" y="0" width="330" height="320" fill="#24262b" />
 
-                <!-- 
-                  ORİJİNAL LOGO GEOMETRİSİ 
-                  Matematiksel Hizalama:
-                  - Dikey Blok Genişliği: 40 birim.
-                  - Çapraz Bacak Yatay Genişliği: 45 birim (Optik denge için).
-                  - Üst Çember dış teğeti Y=50'de başlar, Y=150'de biter.
-                -->
-                <g fill="var(--amber-main)">
+                    <!-- DİKEY BLOK PANELLERİ -->
+                    <!-- Alt Zırh Plakaları -->
+                    <rect x="100" y="50" width="40" height="60" fill="#2d3036" filter="url(#panel-shadow)"/>
+                    <rect x="105" y="115" width="30" height="50" fill="#363a42" filter="url(#panel-shadow)"/>
+                    <rect x="100" y="170" width="35" height="40" fill="#1c1e22" filter="url(#panel-shadow)"/>
+                    <rect x="110" y="215" width="30" height="55" fill="#2d3036" filter="url(#panel-shadow)"/>
                     
-                    <!-- Dikey Blok ve Sağ Alt Bacak (Eksiz, Kaynaksız Tek Parça Poligon) -->
-                    <path d="
-                        M 100 50
-                        H 140
-                        V 150
-                        L 230 270
-                        H 185
-                        L 140 210
-                        V 270
-                        H 100
-                        Z
-                    " />
+                    <!-- Havalandırma Izgaraları (Vents) -->
+                    <rect x="105" y="60" width="15" height="30" fill="url(#vents)" filter="url(#inset-shadow)"/>
+                    <rect x="115" y="225" width="20" height="35" fill="url(#vents)" filter="url(#inset-shadow)"/>
 
-                    <!-- 
-                      Sağ Üst İnce Yarım Çember
-                      Dikey bloğun dış kenarından (X=140) başlar.
-                      Stroke payı (6px/yarısı 3px) hesaplanarak Y=53 ve Y=147 arası çizilmiştir.
-                      Bu sayede dış hat tam olarak Y=50 (tepe noktası) ve Y=150 (bacak başlangıcı) ile sıfırlanır.
-                    -->
-                    <path d="M 140 53 A 47 47 0 0 1 140 147"
-                          fill="none"
-                          stroke="var(--amber-main)"
-                          stroke-width="6" 
-                          stroke-linecap="square"/>
+                    <!-- Güç Çekirdeği ve Uyarı Şeritleri -->
+                    <rect x="125" y="60" width="10" height="15" fill="#ff7700" filter="url(#panel-shadow)"/>
+                    <rect class="core-glow" x="125" y="80" width="10" height="25" fill="#1c1e22" filter="url(#inset-shadow)"/>
+                    <rect x="100" y="155" width="40" height="10" fill="url(#hazard)" />
+
+                    <!-- Mekanik Vidalar (Rivets) -->
+                    <circle cx="106" cy="56" r="1.5" fill="#000" />
+                    <circle cx="134" cy="56" r="1.5" fill="#000" />
+                    <circle cx="106" cy="104" r="1.5" fill="#000" />
+                    <circle cx="134" cy="104" r="1.5" fill="#000" />
+
+                    <!-- ÇAPRAZ BACAK GREEBLE DETAYLARI -->
+                    <!-- Ana Zırh Plakası (Çapraz formda kesilmiş) -->
+                    <polygon points="140,210 210,270 230,270 160,210" fill="#363a42" filter="url(#panel-shadow)"/>
+                    <polygon points="160,195 230,255 220,270 140,190" fill="#2d3036" filter="url(#panel-shadow)"/>
+                    
+                    <!-- Bacak İçi Borular ve Hidrolikler -->
+                    <line x1="150" y1="210" x2="200" y2="253" stroke="#111" stroke-width="6" stroke-linecap="round" />
+                    <line x1="150" y1="210" x2="200" y2="253" stroke="#666" stroke-width="2" stroke-linecap="round" />
+                    
+                    <line x1="160" y1="215" x2="210" y2="258" stroke="#111" stroke-width="4" stroke-linecap="round" />
+                    <!-- Enerji Akış Kablosu -->
+                    <line class="power-line" x1="160" y1="215" x2="210" y2="258" stroke="var(--accent-cyan)" stroke-width="1.5" stroke-linecap="round" />
+
+                    <!-- Bacak Havalandırması ve Vidalar -->
+                    <polygon points="175,240 195,257 190,265 170,248" fill="url(#vents)" filter="url(#inset-shadow)"/>
+                    <circle cx="215" cy="260" r="2" fill="#111" />
+                    <circle cx="150" cy="200" r="2" fill="#111" />
+
+                    <!-- ÜST ÇEMBER (YARIM HALKA) GREEBLE DETAYLARI -->
+                    <!-- Yapısal Halka Segmentleri -->
+                    <path d="M 140 50 A 50 50 0 0 1 185 85 L 140 100 Z" fill="#2d3036" filter="url(#panel-shadow)"/>
+                    <path d="M 185 85 A 50 50 0 0 1 175 145 L 140 100 Z" fill="#363a42" filter="url(#panel-shadow)"/>
+                    <path d="M 175 145 A 50 50 0 0 1 140 150 L 140 100 Z" fill="#1c1e22" filter="url(#panel-shadow)"/>
+                    
+                    <!-- Halka İçi Kavislendirilmiş Borular -->
+                    <path d="M 140 60 A 40 40 0 0 1 175 125" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round" filter="url(#panel-shadow)"/>
+                    <path d="M 140 60 A 40 40 0 0 1 175 125" fill="none" stroke="#555" stroke-width="1.5" stroke-linecap="round" />
+                    
+                    <path d="M 140 70 A 30 30 0 0 1 165 115" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" />
+                    <path class="power-line" d="M 140 70 A 30 30 0 0 1 165 115" fill="none" stroke="var(--accent-orange)" stroke-width="1" stroke-linecap="round" />
+
+                    <!-- Halka Üzeri Uyarı Blokları ve Eklentiler -->
+                    <rect x="175" y="95" width="15" height="10" fill="#ff7700" filter="url(#panel-shadow)" transform="rotate(20 180 100)"/>
+                    <circle cx="160" cy="65" r="3" fill="#111" filter="url(#inset-shadow)"/>
+                    <circle cx="180" cy="120" r="2.5" fill="#111" filter="url(#inset-shadow)"/>
                 </g>
 
-                <!-- Terminal Yüzeyindeki Optik Kırılmalar / Çizikler -->
-                <path d="M 90 70 L 120 70 M 115 250 L 175 250 M 145 190 L 180 236" 
-                      stroke="var(--bg-dark)" 
-                      stroke-width="2" 
-                      opacity="0.8" />
+                <!-- ========================================== -->
+                <!-- DIŞ HAT VURGUSU (Siluetin kaybolmaması için) -->
+                <!-- ========================================== -->
+                <!-- Logonun orijinal dış çerçevesini 1px kalınlığında metalik bir telle çevreliyoruz. -->
+                <g fill="none" stroke="#555" stroke-width="1" opacity="0.6">
+                    <path d="M 100 50 H 140 V 150 L 230 270 H 185 L 140 210 V 270 H 100 Z" />
+                    <path d="M 140 50 A 50 50 0 0 1 140 150" />
+                    <path d="M 140 56 A 44 44 0 0 0 140 144" />
+                </g>
+                
             </svg>
-        </div>
-
-        <!-- Telemetri Alt Bilgi -->
-        <div class="hud-footer">
-            <span>MEM: 640KB OK</span>
-            <span>CORE: GEOMETRIC_SYNC</span>
-            <span>REV. 2026</span>
         </div>
     </div>
 
