@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milli İrade Anadolu Lisesi - Öğretmen Takip Sistemi</title>
+    <title>Öğretmen Takip Sistemi</title>
     <style>
         :root {
             --bg-color: #121413;
@@ -14,15 +14,9 @@
             --accent-amber: #ffb000;
             --text-main: #c0d1c7;
             --text-bright: #ffffff;
-            --danger-red: #ff3333;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Courier New', Courier, monospace;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
 
         body {
             background-color: var(--bg-color);
@@ -32,9 +26,7 @@
             flex-direction: column;
             align-items: center;
             padding: 15px;
-            background-image: 
-                linear-gradient(rgba(18, 20, 19, 0.9), rgba(18, 20, 19, 0.9)),
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.3) 2px, rgba(0, 0, 0, 0.3) 4px);
         }
 
         .container {
@@ -42,187 +34,57 @@
             max-width: 600px;
             background: var(--panel-bg);
             border: 2px solid var(--border-metal);
-            box-shadow: 0 0 15px rgba(0, 255, 102, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
             border-radius: 4px;
             padding: 20px;
-            position: relative;
         }
 
-        /* Endüstriyel Panel Başlığı */
-        .header {
-            border-bottom: 2px dashed var(--border-metal);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        .header { border-bottom: 2px dashed var(--border-metal); padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
+        .header h2 { font-size: 1.3rem; color: var(--text-bright); font-weight: bold; }
+        .clock-box { font-size: 0.9rem; color: var(--accent-amber); margin-top: 5px; }
 
-        .header h1 {
-            font-size: 1.1rem;
-            color: var(--accent-green);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
+        .nav-panel { display: flex; justify-content: space-between; align-items: center; background: #151917; border: 1px solid var(--border-metal); padding: 10px; margin-bottom: 20px; }
+        .nav-btn { background: #222b26; color: var(--accent-green); border: 1px solid var(--accent-green); padding: 8px 15px; cursor: pointer; font-weight: bold; }
+        .nav-btn:hover { background: var(--accent-green); color: var(--bg-color); }
 
-        .header h2 {
-            font-size: 1.3rem;
-            color: var(--text-bright);
-            font-weight: bold;
-        }
+        #current-day-title { font-size: 1.2rem; color: var(--text-bright); font-weight: bold; }
 
-        .clock-box {
-            font-size: 0.9rem;
-            color: var(--accent-amber);
-            margin-top: 5px;
-        }
+        .timeline { display: flex; flex-direction: column; gap: 10px; }
+        .slot-card { display: flex; justify-content: space-between; align-items: center; background: #161b18; border: 1px solid #2a3630; padding: 12px 15px; border-radius: 3px; }
+        .slot-time { font-size: 0.85rem; color: #8fa398; min-width: 95px; }
+        .slot-info { flex-grow: 1; text-align: left; padding-left: 15px; }
+        .slot-class { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
+        .slot-desc { font-size: 0.8rem; color: #6c8275; text-transform: uppercase; }
 
-        /* Gün Navigasyon Paneli */
-        .nav-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #151917;
-            border: 1px solid var(--border-metal);
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 3px;
-        }
+        /* Aktif Ders */
+        .active-lesson { background: var(--accent-dim); border-color: var(--accent-green); box-shadow: 0 0 10px rgba(0, 255, 102, 0.2); }
+        .active-lesson .slot-class { color: var(--accent-green); }
+        
+        /* Tenefüs */
+        .break-time { background: #262012; border-color: var(--accent-amber); }
+        .break-time .slot-class { color: var(--accent-amber); }
 
-        .nav-btn {
-            background: #222b26;
-            color: var(--accent-green);
-            border: 1px solid var(--accent-green);
-            padding: 8px 15px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            transition: all 0.2s;
-            border-radius: 2px;
-        }
-
-        .nav-btn:hover {
-            background: var(--accent-green);
-            color: var(--bg-color);
-            box-shadow: 0 0 8px var(--accent-green);
-        }
-
-        #current-day-title {
-            font-size: 1.2rem;
-            color: var(--text-bright);
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        /* Slot Listesi */
-        .timeline {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .slot-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #161b18;
-            border: 1px solid #2a3630;
-            padding: 12px 15px;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .slot-time {
-            font-size: 0.85rem;
-            color: #8fa398;
-            min-width: 95px;
-        }
-
-        .slot-info {
-            flex-grow: 1;
-            text-align: left;
-            padding-left: 15px;
-        }
-
-        .slot-class {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .slot-desc {
-            font-size: 0.8rem;
-            color: #6c8275;
-            text-transform: uppercase;
-        }
-
-        /* Aktif Ders Durumu */
-        .slot-card.active-lesson {
-            background: var(--accent-dim);
-            border-color: var(--accent-green);
-            box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-        }
-
-        .slot-card.active-lesson .slot-class {
-            color: var(--accent-green);
-            text-shadow: 0 0 5px rgba(0, 255, 102, 0.4);
-        }
-
-        .slot-card.active-lesson .slot-time,
-        .slot-card.active-lesson .slot-desc {
-            color: var(--text-bright);
-        }
-
-        /* Tenefüs Durumu */
-        .slot-card.break-time {
-            background: #262012;
-            border-color: var(--accent-amber);
-            box-shadow: 0 0 10px rgba(255, 176, 0, 0.15);
-        }
-
-        .slot-card.break-time .slot-class {
-            color: var(--accent-amber);
-        }
-
-        .free-slot {
-            opacity: 0.4;
-        }
-
-        /* Responsive Düzenlemeler */
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-            .slot-card {
-                padding: 10px;
-            }
-            .slot-class {
-                font-size: 1rem;
-            }
-        }
+        .weekend-msg { text-align: center; padding: 40px; color: var(--accent-green); font-size: 1.5rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
-            <h1>Milli İrade Anadolu Lisesi</h1>
             <h2>RAMAZAN YILMAZ</h2>
-            <div class="clock-box" id="live-clock">Sistem Yükleniyor...</div>
+            <div class="clock-box" id="live-clock">Sistem Hazırlanıyor...</div>
         </div>
 
         <div class="nav-panel">
             <button class="nav-btn" onclick="changeDay(-1)">◄</button>
-            <span id="current-day-title">PAZARTESİ</span>
+            <span id="current-day-title">YÜKLENİYOR</span>
             <button class="nav-btn" onclick="changeDay(1)">►</button>
         </div>
 
-        <div class="timeline" id="timeline-container">
-            <!-- JavaScript ile dinamik doldurulacak -->
-        </div>
+        <div class="timeline" id="timeline-container"></div>
     </div>
 
     <script>
-        // PDF Verilerinden Çıkartılan Ders Programı Veri Yapısı
         const schedule = {
             "Pazartesi": [
                 { period: 1, start: "12:50", end: "13:20", class: "11-C", subject: "GÖRSEL SANATLAR (GRS1)" },
@@ -276,123 +138,94 @@
             ]
         };
 
-        const daysKeys = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"];
+        const daysKeys = Object.keys(schedule);
         let currentDayIndex = 0;
+        let isWeekend = false;
 
-        // Bugünün gününü otomatik seç
-        function setInitialDay() {
-            const jsDay = new Date().getDay(); // 0: Pazar, 1: Pazartesi ... 5: Cuma
-            if (jsDay >= 1 && jsDay <= 5) {
-                currentDayIndex = jsDay - 1;
+        function initSystem() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0: Pazar, 1: Pzt, ..., 6: Cmt
+
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                isWeekend = true;
             } else {
-                currentDayIndex = 0; // Haftasonu ise Pazartesi'den başla
+                currentDayIndex = dayOfWeek - 1; // Pzt: 1 -> 0
+                isWeekend = false;
             }
+            renderSchedule();
         }
 
         function changeDay(direction) {
+            isWeekend = false; // Manuel geçişte hafta sonu modundan çık
             currentDayIndex += direction;
             if (currentDayIndex < 0) currentDayIndex = daysKeys.length - 1;
             if (currentDayIndex >= daysKeys.length) currentDayIndex = 0;
             renderSchedule();
         }
 
-        function timeToMinutes(timeStr) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            return hours * 60 + minutes;
-        }
-
         function renderSchedule() {
-            const dayName = daysKeys[currentDayIndex];
-            document.getElementById('current-day-title').innerText = dayName;
-            
             const container = document.getElementById('timeline-container');
             container.innerHTML = '';
-
-            const dayLessons = schedule[dayName];
-            const now = new Date();
-            const currentDayNumber = now.getDay(); // 1-5 arası
-            const isToday = (currentDayNumber >= 1 && currentDayNumber <= 5 && daysKeys[currentDayNumber - 1] === dayName);
             
-            const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+            if (isWeekend) {
+                document.getElementById('current-day-title').innerText = "HAFTA SONU";
+                container.innerHTML = `<div class="weekend-msg">OKUL YOK / HAFTA SONU</div>`;
+                return;
+            }
 
-            for (let i = 0; i < dayLessons.length; i++) {
-                const lesson = dayLessons[i];
+            const dayName = daysKeys[currentDayIndex];
+            document.getElementById('current-day-title').innerText = dayName.toUpperCase();
+            
+            const now = new Date();
+            const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+            const isToday = (now.getDay() === (currentDayIndex + 1));
+
+            schedule[dayName].forEach((lesson, i) => {
                 const card = document.createElement('div');
                 card.className = 'slot-card';
+                
+                const startMin = lesson.start.split(':').map(Number);
+                const startMinutes = startMin[0] * 60 + startMin[1];
+                const endMin = lesson.end.split(':').map(Number);
+                const endMinutes = endMin[0] * 60 + endMin[1];
 
-                let isActive = false;
-                let isBreak = false;
-
-                const startMin = timeToMinutes(lesson.start);
-                const endMin = timeToMinutes(lesson.end);
-
-                // Aktif Ders Kontrolü
-                if (isToday && currentTimeMinutes >= startMin && currentTimeMinutes <= endMin) {
-                    isActive = true;
+                if (isToday && currentTimeMinutes >= startMinutes && currentTimeMinutes <= endMinutes) {
                     card.classList.add('active-lesson');
-                } else if (lesson.class === "BOŞ") {
-                    card.classList.add('free-slot');
                 }
 
-                card.innerHTML = `
-                    <div class="slot-time">${lesson.start} - ${lesson.end}</div>
-                    <div class="slot-info">
-                        <div class="slot-class">${lesson.class}</div>
-                        <div class="slot-desc">${lesson.subject}</div>
-                    </div>
-                `;
+                card.innerHTML = `<div class="slot-time">${lesson.start} - ${lesson.end}</div>
+                                  <div class="slot-info"><div class="slot-class">${lesson.class}</div>
+                                  <div class="slot-desc">${lesson.subject}</div></div>`;
                 container.appendChild(card);
 
-                // Dersler arası tenefüs kontrolü ve eklenmesi
-                if (i < dayLessons.length - 1) {
-                    const nextLesson = dayLessons[i + 1];
-                    const nextStartMin = timeToMinutes(nextLesson.start);
+                // Tenefüs
+                if (i < schedule[dayName].length - 1) {
+                    const nextLesson = schedule[dayName][i + 1];
+                    const nextStartMin = nextLesson.start.split(':').map(Number);
+                    const nextStartMinutes = nextStartMin[0] * 60 + nextStartMin[1];
 
-                    // Eğer iki ders arasında boşluk varsa (örn: 13:20 - 13:30 arası) tenefüs kartı ekle
-                    if (endMin < nextStartMin) {
+                    if (endMinutes < nextStartMinutes) {
                         const breakCard = document.createElement('div');
-                        breakCard.className = 'slot-card';
-
-                        let isBreakActive = false;
-                        if (isToday && currentTimeMinutes > endMin && currentTimeMinutes < nextStartMin) {
-                            isBreakActive = true;
-                            breakCard.classList.add('break-time');
-                        } else {
-                            breakCard.style.opacity = '0.6';
+                        breakCard.className = 'slot-card break-time';
+                        if (isToday && currentTimeMinutes > endMinutes && currentTimeMinutes < nextStartMinutes) {
+                             breakCard.style.border = "2px solid var(--accent-amber)";
                         }
-
-                        breakCard.innerHTML = `
-                            <div class="slot-time">${lesson.end} - ${nextLesson.start}</div>
-                            <div class="slot-info">
-                                <div class="slot-class" style="color: ${isBreakActive ? 'var(--accent-amber)' : '#998844'};">TENEFÜS</div>
-                                <div class="slot-desc">Dinlenme Arası</div>
-                            </div>
-                        `;
+                        breakCard.innerHTML = `<div class="slot-time">${lesson.end} - ${nextLesson.start}</div>
+                                               <div class="slot-info"><div class="slot-class">TENEFÜS</div></div>`;
                         container.appendChild(breakCard);
                     }
                 }
-            }
+            });
         }
 
-        function updateClockAndStatus() {
+        function updateClock() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = now.toLocaleDateString('tr-TR', options);
-            
-            document.getElementById('live-clock').innerText = `${dateStr} - ${hours}:${minutes}:${seconds}`;
-            
-            // Her saniye güncel saati yakalayarak aktif ders renklendirmesini günceller (sayfayı yenilemeden)
-            renderSchedule();
+            document.getElementById('live-clock').innerText = now.toLocaleDateString('tr-TR') + ' ' + now.toLocaleTimeString('tr-TR');
         }
 
-        // Başlangıç
-        setInitialDay();
-        renderSchedule();
-        setInterval(updateClockAndStatus, 1000);
+        initSystem();
+        setInterval(updateClock, 1000);
+        setInterval(renderSchedule, 60000); // 1 dakikada bir günceller
     </script>
 </body>
 </html>
