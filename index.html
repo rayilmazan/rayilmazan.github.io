@@ -6,26 +6,29 @@
    <title>rayılmazan // STAR WARS INDUSTRIAL GREEBLE HUD v8.0</title>
    <style>
        :root {
-           --greeble-bg: #060913;
-           --greeble-panel: #0f172a;
-           --greeble-dark: #04060c;
-           --greeble-light: #1e293b;
-           --silver-metal: #64748b;
-           --silver-dark: #334155;
+           /* Paslı / Yıpranmış Gümüş ve Gri Tonları */
+           --greeble-bg: #8c96a3; /* Dış şasi / Zemin grisi */
+           --greeble-panel: #d1d5db; /* Ana zırh plakası - Gümüş */
+           --greeble-dark: #090e17; /* İç ekranlar (Derin siyah/lacivert) */
+           --greeble-light: #f8fafc; /* Işık alan bölgeler */
            
-           /* Cihaztara Cyan & Accent Tonları[span_0](start_span)[span_0](end_span) */
-           --accent-green: #22d3ee;
-           --accent-glow: rgba(34, 211, 238, 0.4);
+           --silver-metal: #aeb6c1; /* Parçalar için orta gri */
+           --silver-dark: #475569; /* Panel çizgileri, gölgeler ve oyuklar */
            
-           /* Endüstriyel Mavi-Cyan Uyumlu Tonlar */
-           --rust-accent: #06b6d4;
-           --rust-dark: #0e7490;
-           --hazard-yellow: #f59e0b;
+           /* Star Wars Taktiksel HUD Renkleri */
+           --accent-blue: #38bdf8; /* Ekran yazıları için Aurebesh Mavisi */
+           --accent-glow: rgba(56, 189, 248, 0.4);
            
-           --text-main: #f8fafc;
-           --text-muted: #64748b;
-           --text-highlight: #22d3ee;
-           --tech-border: #1e293b;
+           /* Pas, Kir ve Uyarı (Hazard) Renkleri */
+           --rust-accent: #c2410c; /* Yıpranmış pas turuncusu */
+           --rust-dark: #7c2d12; /* Derin pas */
+           --hazard-yellow: #facc15; /* Klasik endüstriyel uyarı sarısı */
+           
+           /* Metin Tonları */
+           --text-main: #0f172a; /* Metal üzerindeki koyu yazılar */
+           --text-screen: #38bdf8; /* Siyah ekran üzerindeki aydınlık yazılar */
+           --text-muted: #334155;
+           --tech-border: #64748b;
        }
 
        * {
@@ -42,54 +45,60 @@
            display: flex;
            justify-content: center;
            min-height: 100vh;
+           /* Metal yüzeyindeki ince çizik/kirlilik dokusu */
            background-image: 
-               linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-               linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-           background-size: 15px 15px;
+               linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
+               linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
+           background-size: 20px 20px;
        }
 
-       /* Star Wars Zırh Plakası / Gelişmiş Greeble Şasi */
+       /* Star Wars Gümüş Zırh Plakası (Greeble Şasi) */
        .chassis {
            max-width: 950px;
            width: 100%;
-           background: linear-gradient(135deg, #0f172a 0%, #060913 100%);
-           border: 3px solid #04060c;
-           border-top: 4px solid var(--silver-metal);
-           border-left: 4px solid var(--silver-metal);
-           border-right: 4px solid #1e293b;
-           border-bottom: 4px solid #0e7490;
+           background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+           border: 2px solid #1e293b;
+           /* 3B Yükseltilmiş Metal Hissi (Bevel) */
+           border-top: 4px solid #ffffff;
+           border-left: 4px solid #ffffff;
+           border-right: 4px solid #475569;
+           border-bottom: 4px solid #475569;
            border-radius: 4px;
            padding: 22px;
            position: relative;
-           box-shadow: 0 30px 70px rgba(0,0,0,0.98), inset 0 0 40px rgba(0,0,0,0.7);
+           box-shadow: 10px 25px 45px rgba(0,0,0,0.4), inset 0 0 40px rgba(0,0,0,0.05);
            display: flex;
            flex-direction: column;
            gap: 15px;
        }
 
-       /* Endüstriyel Eskitilmiş Vidalar */
-       .chassis::before, .chassis::after {
-           content: ""; position: absolute; width: 8px; height: 8px;
-           background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%);
+       /* Endüstriyel Paslı Vidalar / Perçinler */
+       .chassis::before, .chassis::after, .rivet-tr, .rivet-bl {
+           content: ""; position: absolute; width: 10px; height: 10px;
+           background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 60%, #111 100%);
            border-radius: 50%;
-           box-shadow: inset 1px 1px 2px #a5f3fc, 1px 1px 3px rgba(0,0,0,0.9);
+           box-shadow: inset 1px 1px 2px #facc15, 1px 1px 5px rgba(0,0,0,0.7);
        }
-       .chassis::before { top: 10px; left: 10px; }
-       .chassis::after { bottom: 10px; right: 10px; }
-       .rivet-tr { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #a5f3fc, 1px 1px 3px rgba(0,0,0,0.9); }
-       .rivet-bl { position: absolute; bottom: 10px; left: 10px; width: 8px; height: 8px; background: radial-gradient(circle, var(--rust-accent) 0%, var(--rust-dark) 80%, #000 100%); border-radius: 50%; box-shadow: inset 1px 1px 2px #a5f3fc, 1px 1px 3px rgba(0,0,0,0.9); }
+       .chassis::before { top: 12px; left: 12px; }
+       .chassis::after { bottom: 12px; right: 12px; }
+       .rivet-tr { position: absolute; top: 12px; right: 12px; }
+       .rivet-bl { position: absolute; bottom: 12px; left: 12px; }
 
-       /* GREEBLE DETAY ŞERİDİ 1: ÜST TEKNİK GÖSTERGELER */
+       /* GREEBLE DETAY ŞERİDİ 1: ÜST TEKNİK GÖSTERGELER (Metalik Yuva) */
        .greeble-top-bar {
            display: flex;
            justify-content: space-between;
            align-items: center;
-           background: var(--greeble-dark);
+           background: var(--silver-metal);
            border: 1px solid var(--tech-border);
-           padding: 6px 12px;
-           font-size: 9px;
-           color: var(--text-muted);
+           border-top: 2px solid var(--silver-dark);
+           border-bottom: 1px solid #fff;
+           padding: 8px 12px;
+           font-size: 10px;
+           color: #0f172a;
+           font-weight: bold;
            letter-spacing: 1px;
+           box-shadow: inset 2px 2px 8px rgba(0,0,0,0.15);
        }
 
        .greeble-slots {
@@ -98,136 +107,138 @@
        }
 
        .slot-block {
-           width: 15px;
-           height: 6px;
+           width: 16px;
+           height: 8px;
            background: var(--silver-dark);
-           border: 1px solid #000;
+           border: 1px solid #1e293b;
+           box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8);
        }
        .slot-block.active {
-           background: var(--accent-green);
-           box-shadow: 0 0 5px var(--accent-green);
+           background: var(--accent-blue);
+           box-shadow: 0 0 6px var(--accent-blue), inset 1px 1px 2px #fff;
        }
        .slot-block.warning {
            background: var(--hazard-yellow);
+           box-shadow: inset 1px 1px 2px #fff;
        }
 
-       /* LOGO VE KÜÇÜK HARF BRAND */
+       /* YENİ LOGO VE MARKA ALANI */
        .brand-header-seamless {
            display: flex;
            flex-direction: column;
            align-items: center;
            justify-content: center;
-           padding: 5px 0;
+           padding: 10px 0;
            position: relative;
-           background: rgba(6, 9, 19, 0.6);
-           border: 1px dashed var(--tech-border);
+           background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
+           border: 1px dashed var(--silver-dark);
            border-radius: 3px;
+           box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
        }
 
        .logo-seamless {
-           width: 75px;
-           height: 75px;
+           width: 90px;
+           height: 90px;
            object-fit: contain;
-           filter: drop-shadow(0 0 10px var(--accent-glow));
-           margin-bottom: 6px;
+           /* Logonun gümüş panele gömülü durmasını sağlayan koyu gölge */
+           filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.45));
+           margin-bottom: 8px;
        }
 
        .brand-title {
-           color: var(--accent-green);
-           font-size: 15px;
+           color: #0f172a;
+           font-size: 16px;
            font-weight: 900;
-           letter-spacing: 5px;
-           text-shadow: 0 0 10px var(--accent-glow);
+           letter-spacing: 6px;
            text-transform: lowercase;
+           /* Yazıya kazınmış/emboss metalik efekt */
+           text-shadow: 1px 1px 0px #f8fafc, -1px -1px 0px #64748b;
        }
 
        .sys-status-badge {
            position: absolute;
-           top: 6px;
-           right: 8px;
+           top: 8px;
+           right: 10px;
            display: flex;
            align-items: center;
            gap: 6px;
-           font-size: 8px;
-           color: var(--accent-green);
-           background: rgba(0,0,0,0.6);
-           padding: 3px 6px;
+           font-size: 9px;
+           font-weight: bold;
+           color: #0f172a;
+           background: rgba(255,255,255,0.4);
+           padding: 4px 8px;
            border-radius: 2px;
            border: 1px solid var(--tech-border);
+           box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
        }
 
        .status-dot {
-           width: 5px;
-           height: 5px;
-           background-color: var(--accent-green);
+           width: 6px;
+           height: 6px;
+           background-color: #ef4444; /* Imperial Kırmızı Uyarı Işığı */
            border-radius: 50%;
-           box-shadow: 0 0 6px var(--accent-green);
-           animation: pulse 1.2s infinite;
+           box-shadow: 0 0 8px #ef4444;
+           animation: pulse 1.5s infinite;
        }
 
        @keyframes pulse {
-           0% { opacity: 0.2; }
+           0% { opacity: 0.3; }
            50% { opacity: 1; }
-           100% { opacity: 0.2; }
+           100% { opacity: 0.3; }
        }
 
-       /* BİRLEŞTİRİLMİŞ LINUX / STAR WARS TERMİNAL EKRANI */
+       /* KONTROL EKRANI ÇERÇEVESİ - Metalik Yuva */
        .unified-control-screen {
-           background-color: var(--greeble-bg);
-           border: 2px solid #04060c;
-           border-left: 4px solid var(--accent-green);
-           border-right: 2px solid var(--tech-border);
-           border-bottom: 2px solid var(--tech-border);
+           background-color: #cbd5e1;
+           border: 2px solid #334155;
+           border-top: 3px solid #1e293b;
+           border-left: 3px solid #1e293b;
+           border-bottom: 2px solid #f8fafc;
+           border-right: 2px solid #f8fafc;
            border-radius: 4px;
            padding: 18px;
-           box-shadow: inset 3px 3px 15px rgba(0,0,0,0.9);
+           box-shadow: inset 4px 4px 15px rgba(0,0,0,0.3);
            display: flex;
            flex-direction: column;
            gap: 15px;
            position: relative;
        }
 
-       .unified-control-screen::before {
-           content: "";
-           position: absolute;
-           top: 0; right: 0; width: 120px; height: 100%;
-           background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,255,255,0.012) 4px, rgba(255,255,255,0.012) 8px);
-           pointer-events: none;
-       }
-
        .screen-title {
-           font-size: 10px;
-           color: var(--silver-metal);
+           font-size: 11px;
+           color: #0f172a;
+           font-weight: bold;
            text-transform: uppercase;
            letter-spacing: 1.5px;
-           border-bottom: 1px dashed var(--tech-border);
-           padding-bottom: 6px;
+           border-bottom: 2px solid var(--silver-dark);
+           padding-bottom: 8px;
            display: flex;
            justify-content: space-between;
            align-items: center;
        }
 
-       /* Linux Terminal Konsol Stili - Alt Alta Satırlar */
+       /* STAR WARS CRT EKRAN (Gömülü Karanlık Terminal) */
        .linux-terminal {
            background: var(--greeble-dark);
-           border: 1px solid var(--tech-border);
-           border-left: 2px solid var(--accent-green);
-           padding: 12px 15px;
+           border: 2px solid #0f172a;
+           border-top: 4px solid var(--rust-accent); /* Paslı üst şerit */
+           border-bottom: 1px solid var(--silver-dark);
+           padding: 14px 18px;
            border-radius: 3px;
            font-family: 'Courier New', Courier, monospace;
-           font-size: 11px;
+           font-size: 12px;
            display: flex;
            flex-direction: column;
-           gap: 8px;
-           box-shadow: inset 2px 2px 8px rgba(0,0,0,0.8);
+           gap: 10px;
+           box-shadow: inset 0px 0px 20px rgba(0,0,0,0.9);
        }
 
        .term-line {
            display: flex;
            justify-content: space-between;
            align-items: center;
-           border-bottom: 1px dotted rgba(30, 41, 59, 0.6);
-           padding-bottom: 4px;
+           border-bottom: 1px dotted rgba(71, 85, 105, 0.6);
+           padding-bottom: 5px;
        }
 
        .term-line:last-child {
@@ -236,132 +247,137 @@
        }
 
        .term-prompt {
-           color: var(--text-muted);
+           color: #94a3b8;
            text-transform: uppercase;
            letter-spacing: 0.5px;
        }
 
        .term-prompt::before {
-           content: "$ ";
-           color: var(--accent-green);
+           content: "> ";
+           color: var(--hazard-yellow);
            font-weight: bold;
        }
 
        .term-val {
-           color: var(--text-highlight);
+           color: var(--text-screen);
            font-weight: bold;
-           text-shadow: 0 0 5px rgba(34,211,238,0.3);
+           text-shadow: 0 0 6px var(--accent-glow);
            word-break: break-all;
            text-align: right;
        }
 
-       /* BENCHMARK BÖLÜMÜ */
+       /* BENCHMARK EKRANI */
        .benchmark-section {
            background: var(--greeble-dark);
-           border: 1px solid var(--tech-border);
-           border-top: 2px solid var(--rust-accent);
-           border-radius: 4px;
-           padding: 18px;
+           border: 2px solid #0f172a;
+           border-top: 4px solid var(--rust-accent);
+           border-radius: 3px;
+           padding: 20px;
            text-align: center;
-           box-shadow: inset 2px 2px 10px rgba(0,0,0,0.8);
+           box-shadow: inset 0px 0px 20px rgba(0,0,0,0.9);
            position: relative;
        }
 
        .loading { 
-           font-size: 11px; 
-           color: var(--text-highlight); 
+           font-size: 12px; 
+           color: var(--hazard-yellow); 
            padding: 8px 0; 
        }
 
        .score-box { 
-           font-size: 42px; 
+           font-size: 46px; 
            font-weight: 900; 
            margin: 4px 0; 
-           color: var(--accent-green); 
+           color: var(--accent-blue); 
            text-shadow: 0 0 15px var(--accent-glow); 
        }
 
        /* İlerleme Çubuğu */
        .progress-track { 
            width: 100%; 
-           background: var(--greeble-bg); 
-           border: 1px solid var(--tech-border); 
-           height: 14px; 
+           background: #0f172a; 
+           border: 1px solid #334155; 
+           height: 16px; 
            border-radius: 2px; 
-           margin: 12px 0; 
+           margin: 15px 0; 
            overflow: hidden; 
            display: none; 
-           box-shadow: inset 2px 2px 6px rgba(0,0,0,0.9);
-           position: relative;
+           box-shadow: inset 2px 2px 8px rgba(0,0,0,0.9);
        }
 
        .progress-fill { 
            height: 100%; 
            width: 0%; 
-           background: linear-gradient(90deg, #06b6d4, var(--accent-green)); 
+           background: linear-gradient(90deg, #0284c7, var(--accent-blue)); 
            transition: width 1s ease-out; 
-           box-shadow: 0 0 10px var(--accent-green);
+           box-shadow: 0 0 12px var(--accent-blue);
        }
 
+       /* FİZİKSEL METAL BUTON HİSSİ */
        .greeble-btn {
            display: inline-block;
-           background: linear-gradient(135deg, var(--tech-border) 0%, var(--greeble-panel) 100%);
-           color: var(--accent-green); 
-           font-weight: bold;
-           font-size: 11px; 
-           padding: 9px 20px; 
+           background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+           color: #0f172a; 
+           font-weight: 900;
+           font-size: 12px; 
+           padding: 10px 24px; 
            cursor: pointer;
-           border: 1px solid #04060c; 
-           border-top: 1px solid var(--silver-metal); 
-           border-left: 1px solid var(--silver-metal);
-           border-radius: 2px;
-           box-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+           border: 2px solid #475569; 
+           border-top: 2px solid #ffffff; 
+           border-left: 2px solid #ffffff;
+           border-radius: 3px;
+           box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
            transition: all 0.15s ease;
-           margin-top: 8px;
-           letter-spacing: 1px;
-           text-shadow: 0 0 5px rgba(34,211,238,0.4);
+           margin-top: 12px;
+           letter-spacing: 1.5px;
        }
        
-       .greeble-btn:hover { background: var(--silver-dark); color: #fff; border-color: var(--accent-green); }
-       .greeble-btn:active { transform: translateY(2px); color: var(--accent-green); }
+       .greeble-btn:hover { 
+           background: #94a3b8; 
+           color: #fff;
+           border-color: #1e293b; 
+           border-top: 2px solid #cbd5e1; 
+           border-left: 2px solid #cbd5e1; 
+       }
+       
+       .greeble-btn:active { 
+           transform: translateY(2px); 
+           box-shadow: 1px 1px 3px rgba(0,0,0,0.5); 
+       }
 
-       /* ALT GREEBLE ŞERİDİ */
+       /* ALT GREEBLE ŞERİDİ VE UYARI BANTI (Hazard Stripes) */
        .footer-greeble-strip {
            display: flex;
            align-items: center;
-           gap: 10px;
-           margin-top: 2px;
+           gap: 12px;
+           margin-top: 5px;
        }
 
+       /* Siyah-Sarı Uyarı Bandı */
        .hazard-stripe {
            flex-grow: 1;
-           height: 6px;
+           height: 12px;
            border-radius: 2px;
-           background: repeating-linear-gradient(45deg, var(--rust-accent), var(--rust-accent) 8px, #060913 8px, #060913 16px);
-           border: 1px solid #000; 
-           box-shadow: inset 0 0 4px rgba(0,0,0,0.9);
+           background: repeating-linear-gradient(45deg, var(--hazard-yellow), var(--hazard-yellow) 12px, #0f172a 12px, #0f172a 24px);
+           border: 2px solid #334155; 
+           box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
        }
 
-       .greeble-box-mini {
-           background: var(--greeble-dark);
-           border: 1px solid var(--tech-border);
-           padding: 3px 8px;
-           font-size: 8px;
-           color: var(--silver-metal);
-           letter-spacing: 1px;
-       }
-       
-       .asset-tag { 
-           font-size: 8.5px; 
-           color: var(--silver-metal); 
-           font-weight: bold; 
-           letter-spacing: 1px;
+       .greeble-box-mini, .asset-tag {
+           background: #cbd5e1;
+           border: 1px solid var(--silver-dark);
+           padding: 4px 10px;
+           font-size: 10px;
+           color: #0f172a;
+           font-weight: 900;
+           letter-spacing: 1.5px;
+           box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7), 2px 2px 5px rgba(0,0,0,0.2);
        }
 
        @media (max-width: 600px) {
            .chassis { padding: 15px; }
            .greeble-top-bar { display: none; }
-           .term-line { flex-direction: column; align-items: flex-start; gap: 2px; }
+           .term-line { flex-direction: column; align-items: flex-start; gap: 4px; }
            .term-val { text-align: left; }
        }
    </style>
@@ -384,13 +400,14 @@
        </div>
    </div>
 
-   <!-- LOGO VE KÜÇÜK HARF BRAND -->
+   <!-- YENİ LOGO VE MARKA ALANI -->
    <div class="brand-header-seamless">
        <div class="sys-status-badge">
-           <span>READY</span>
+           <span>ONLINE</span>
            <div class="status-dot"></div>
        </div>
-       <img class="logo-seamless" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan logo" onerror="this.src='https://rayilmazan.github.io/logo.png'">
+       <!-- Logonu tam buraya ekledim -->
+       <img class="logo-seamless" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="rayılmazan logo">
        <div class="brand-title">rayılmazan</div>
    </div>
 
@@ -399,8 +416,8 @@
        
        <!-- TELEMETRY & BENCHMARK BİRLEŞİK LİNUX TERMİNALİ -->
        <div>
-           <div class="screen-title" style="margin-bottom: 10px;">
-               <span>SYSTEM_TELEMETRY // CORE_BENCHMARK_CONSOLES</span>
+           <div class="screen-title" style="margin-bottom: 12px;">
+               <span>SYSTEM_TELEMETRY // CORE_CONSOLES</span>
                <span>SECURE_LINK // 99.8%</span>
            </div>
            
@@ -434,7 +451,7 @@
                <div id="progress-bar" class="progress-fill"></div>
            </div>
            
-           <div id="details" style="display: none; margin-top: 8px; color: var(--text-muted); font-size: 10.5px;">
+           <div id="details" style="display: none; margin-top: 10px; color: #64748b; font-size: 11px;">
                SINIF: <span id="bench-tier" class="term-val" style="display:inline;">---</span> | ROR/FPS: <span id="bench-fps" class="term-val" style="display:inline;">---</span>
            </div>
 
@@ -443,11 +460,12 @@
 
    </div>
 
-   <!-- ALT GREEBLE ŞERİDİ -->
+   <!-- ALT GREEBLE ŞERİDİ (Uyarı Bantlı) -->
    <div class="footer-greeble-strip">
        <div class="greeble-box-mini">SECTOR-7</div>
+       <!-- Siyah ve Sarı Taktiksel Bant -->
        <div class="hazard-stripe"></div>
-       <div class="asset-tag">ID: Y0-8086 // RAYILMAZAN.CORE</div>
+       <div class="asset-tag">ID: Y0-8086 // CORE</div>
    </div>
 </div>
 
