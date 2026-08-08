@@ -124,35 +124,92 @@
 
         @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
 
+        /* HEADER: LOGO VE YAZI SOLDA, SAĞDA USED FUTURE GREEBLE PANELİ */
         .brand-header-seamless {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            padding: 25px 0;
-            background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
+            padding: 20px;
+            background: linear-gradient(to right, #cbd5e1, #94a3b8);
             border: 2px dashed var(--silver-dark);
             border-radius: 3px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.15);
+            gap: 20px;
+        }
+
+        .brand-left-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
         }
 
         .logo-seamless {
-            max-width: 96px; /* %70 oranında küçültüldü */
+            max-width: 96px; /* %70 küçültülmüş logo */
             width: 100%;
             height: auto;
             object-fit: contain;
             filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.45));
-            margin-bottom: 12px;
             transition: filter 0.3s ease;
         }
 
         .brand-title {
             color: #0f172a;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 900;
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             text-transform: lowercase;
             text-shadow: 1px 1px 0px #f8fafc, -1px -1px 0px #64748b;
+        }
+
+        /* SAĞ TARAFTAKİ USED FUTURE / GREEBLE DIAGNOSTIC PANELİ */
+        .used-future-panel {
+            background: var(--greeble-dark);
+            border: 1px solid var(--tech-border);
+            border-left: 3px solid var(--accent-green);
+            padding: 12px 16px;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: inset 2px 2px 10px rgba(0,0,0,0.9);
+            min-width: 240px;
+        }
+
+        .uf-line {
+            font-size: 9.5px;
+            color: var(--text-screen);
+            text-shadow: 0 0 5px var(--accent-glow);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .uf-grid-blocks {
+            display: flex;
+            gap: 4px;
+            margin: 3px 0;
+        }
+
+        .uf-block {
+            width: 14px;
+            height: 6px;
+            background: var(--silver-dark);
+            border: 1px solid #000;
+        }
+
+        .uf-block.active {
+            background: var(--accent-green);
+            box-shadow: 0 0 5px var(--accent-green);
+        }
+
+        .uf-block.warning {
+            background: #eab308;
+        }
+
+        .uf-sub {
+            font-size: 8.5px;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
         }
 
         .info-screen {
@@ -219,9 +276,11 @@
             box-shadow: inset 1px 1px 3px rgba(255,255,255,0.7), 2px 2px 5px rgba(0,0,0,0.2);
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 650px) {
             .chassis { padding: 15px; gap: 15px; }
-            .logo-seamless { max-width: 65px; }
+            .brand-header-seamless { flex-direction: column; align-items: flex-start; }
+            .used-future-panel { width: 100%; min-width: auto; }
+            .logo-seamless { max-width: 70px; }
             .info-screen { padding: 15px; }
             .section-content { font-size: 13px; padding-left: 15px; }
             .greeble-top-bar span:first-child { display: none; }
@@ -242,9 +301,25 @@
         </div>
     </header>
 
+    <!-- LOGO, YAZI VE SAĞ TARAF İÇİN USED FUTURE GREEBLE PANELİ -->
     <section class="brand-header-seamless">
-        <img class="logo-seamless" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="rayılmazan logo">
-        <h1 class="brand-title">rayılmazan</h1>
+        <div class="brand-left-group">
+            <img class="logo-seamless" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="rayılmazan logo">
+            <h1 class="brand-title">rayılmazan</h1>
+        </div>
+        
+        <!-- Used Future Tarzı Sağ Panel / Greeble Blok -->
+        <div class="used-future-panel">
+            <div class="uf-line">SYS_CHASSIS: ACTIVE</div>
+            <div class="uf-grid-blocks">
+                <div class="uf-block active"></div>
+                <div class="uf-block active"></div>
+                <div class="uf-block warning"></div>
+                <div class="uf-block active"></div>
+            </div>
+            <div class="uf-line">NODE: SECTOR_07</div>
+            <div class="uf-sub">STATUS: SECURE // 99.8%</div>
+        </div>
     </section>
 
     <article class="info-screen">
