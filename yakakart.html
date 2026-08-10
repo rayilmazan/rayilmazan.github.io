@@ -709,10 +709,10 @@
       const startX = (297 - (cols * cardW + (cols - 1) * gapX)) / 2;
       const startY = (210 - (rows * cardH + (rows - 1) * gapY)) / 2;
 
-      // Sayfa çizdirme fonksiyonu
-      const drawPageWithTemplate = (templateKey) => {
+      // Sayfa çizdirme fonksiyonu - isBackPage parametresi eklendi[span_0](start_span)[span_0](end_span)
+      const drawPageWithTemplate = (templateKey, isBackPage = false) => {
         const tempActive = activeTemplate;
-        activeTemplate = templateKey; // Şablonu geçici olarak ayarla
+        activeTemplate = templateKey; // Şablonu geçici olarak ayarla[span_1](start_span)[span_1](end_span)
 
         for (let i = 0; i < 8; i++) {
           const r = Math.floor(i / 4);
@@ -720,8 +720,15 @@
           const x = startX + c * (cardW + gapX);
           const y = startY + r * (cardH + gapY);
 
+          // Arkalı önlü baskıda hizalama için arka sayfada sütunları aynalıyoruz[span_2](start_span)[span_2](end_span)
+          let personIndex = i;
+          if (isBackPage) {
+            const mirroredC = 3 - c; // Sütunları ters çevir (0->3, 1->2, 2->1, 3->0)[span_3](start_span)[span_3](end_span)
+            personIndex = r * 4 + mirroredC;
+          }
+
           // Kişi verilerini geçici olarak DOM'a bas ve çiz
-          const p = persons[i];
+          const p = persons[personIndex];
           inputName.value = p.name || "";
           inputSub.value = p.sub || "";
           photoScale.value = p.scale;
@@ -748,22 +755,22 @@
           pdf.line(x + cardW, y + cardH, x + cardW, y + cardH + markLen);
         }
 
-        activeTemplate = tempActive; // Orjinal şablona geri dön
+        activeTemplate = tempActive; // Orjinal şablona geri dön[span_4](start_span)[span_4](end_span)
       };
 
-      // Öğretmen / Nöbetçi Öğretmen şablonlarındaysak 2 sayfa yazdır
+      // Öğretmen / Nöbetçi Öğretmen şablonlarındaysak 2 sayfa yazdır[span_5](start_span)[span_5](end_span)
       if (activeTemplate === 'ogretmen' || activeTemplate === 'nobetci_ogretmen') {
-        // 1. Sayfa: Öğretmenler
-        drawPageWithTemplate('ogretmen');
-        // 2. Sayfa: Nöbetçi Öğretmenler
+        // 1. Sayfa: Öğretmenler (Ön Yüz - Normal Sıralama)[span_6](start_span)[span_6](end_span)
+        drawPageWithTemplate('ogretmen', false);
+        // 2. Sayfa: Nöbetçi Öğretmenler (Arka Yüz - Aynalanmış Sıralama)[span_7](start_span)[span_7](end_span)
         pdf.addPage();
-        drawPageWithTemplate('nobetci_ogretmen');
+        drawPageWithTemplate('nobetci_ogretmen', true);
       } else {
-        // Diğer şablonlar (öğrenci/ziyaretçi) için tek sayfa
-        drawPageWithTemplate(activeTemplate);
+        // Diğer şablonlar (öğrenci/ziyaretçi) için tek sayfa[span_8](start_span)[span_8](end_span)
+        drawPageWithTemplate(activeTemplate, false);
       }
 
-      // PDF çizimi bittikten sonra arayüzü tekrar aktif kişinin verilerine döndür
+      // PDF çizimi bittikten sonra arayüzü tekrar aktif kişinin verilerine döndür[span_9](start_span)[span_9](end_span)
       const cp = persons[activePersonIndex];
       inputName.value = cp.name;
       inputSub.value = cp.sub;
@@ -781,4 +788,3 @@
   </script>
 </body>
 </html>
-
