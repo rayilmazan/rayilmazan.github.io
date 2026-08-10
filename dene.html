@@ -5,181 +5,336 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>rayılmazan</title>
 <style>
-  /* Used Future & Greebles Tema */
+  /* --- GREEBLES & USED FUTURE TEMA --- */
   body {
-    background-color: #3b3b3b;
-    color: #c0c0c0;
+    background-color: #5c5c5c; /* Eskimiş metalik gri */
+    color: #b0b0b0;
     font-family: 'Courier New', Courier, monospace;
     margin: 0; 
     padding: 20px;
-    /* Mekanik, paslı ve çizik yüzey dokusu */
     background-image: 
-      repeating-linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%, #333), 
-      repeating-linear-gradient(45deg, #333 25%, #3b3b3b 25%, #3b3b3b 75%, #333 75%, #333);
-    background-position: 0 0, 10px 10px;
-    background-size: 20px 20px;
+      /* Pas ve metalik yüzey çizikleri hissi */
+      linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2)), 
+      linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2));
+    background-size: 4px 4px;
   }
 
-  /* Sol hizalı, %70 küçültülmüş logo alanı */
+  /* Başlık ve Logo: Sola hizalı, %70 küçültülmüş logo */
   .header-container {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* Sola dayalı düzen */
-    background: #222;
-    border: 3px solid #5a5a5a;
-    border-radius: 2px;
-    padding: 10px 20px;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 2px 2px 5px rgba(0,0,0,0.5);
+    justify-content: flex-start;
+    background: linear-gradient(180deg, #4a4a4a 0%, #2b2b2b 100%);
+    border: 2px solid #736b5e; /* Paslanmış kenarlık tonu */
+    border-radius: 3px;
+    padding: 8px 15px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.9), 3px 3px 6px rgba(0,0,0,0.6);
     margin-bottom: 20px;
     max-width: 800px;
   }
 
   .logo {
-    width: 30%; /* Orjinalin %30'u boyutunda (%70 küçültme) */
-    max-width: 80px; 
-    margin-right: 20px;
-    filter: grayscale(100%) contrast(150%) drop-shadow(2px 2px 2px #000);
+    width: 24px; /* Orijinalden %70 daha küçük */
+    height: 24px;
+    margin-right: 15px;
+    filter: drop-shadow(1px 1px 1px #000);
   }
 
   .title {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
-    color: #8c8c8c;
-    text-shadow: -1px -1px 0 #555, 2px 2px 0 #000;
-    letter-spacing: 2px;
+    color: #d1d1d1;
+    text-shadow: -1px -1px 0px #222, 1px 1px 0px #000;
+    letter-spacing: 1px;
   }
 
-  /* Mekanik Panel Görünümü */
+  /* Mekanik Kontrol Paneli */
   .control-panel {
-    background: #2a2a2a;
-    border: 4px solid #4d4d4d;
-    border-top-color: #7a7a7a; 
-    border-left-color: #7a7a7a;
-    padding: 20px;
+    background: #363636;
+    border: 3px solid #1f1f1f;
+    border-top-color: #8c8c8c; 
+    border-left-color: #8c8c8c;
+    padding: 15px;
     max-width: 800px;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
     position: relative;
-    box-shadow: 5px 5px 15px rgba(0,0,0,0.6);
   }
+
+  .panel-screws {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: #111;
+    border-radius: 50%;
+    box-shadow: inset 1px 1px 2px #555;
+  }
+  .screw-tl { top: 5px; left: 5px; }
+  .screw-tr { top: 5px; right: 5px; }
+  .screw-bl { bottom: 5px; left: 5px; }
+  .screw-br { bottom: 5px; right: 5px; }
 
   .btn {
-    background: #444;
-    color: #ccc;
-    border: 2px solid #222;
-    border-top-color: #888;
-    border-left-color: #888;
-    padding: 10px 15px;
+    background: linear-gradient(to bottom, #555, #333);
+    color: #e0e0e0;
+    border: 2px solid #111;
+    border-top-color: #777;
+    border-left-color: #777;
+    padding: 8px 12px;
     font-family: inherit;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     margin-right: 10px;
-    text-transform: uppercase;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 0 #000;
   }
   .btn:active {
-    border: 2px solid #888;
-    border-top-color: #222;
-    border-left-color: #222;
+    border-top-color: #111;
+    border-left-color: #111;
+    background: #2a2a2a;
   }
 
-  /* Performans Çubuğu */
+  /* Yalnızca Tarayıcı İçinde Çalışacak Tuval */
+  #screenCanvas {
+    background: #0a0a0a;
+    border: 2px dashed #736b5e;
+    margin-top: 15px;
+    cursor: crosshair;
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    display: block;
+    box-shadow: inset 0 0 20px #000;
+  }
+
+  /* QR ve Kamera Alanları */
+  .qr-section {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  #qr-container {
+    background: #fff;
+    padding: 10px;
+    border: 2px solid #222;
+    display: none; /* Sadece QR üretilince görünür */
+  }
+  #camera-preview {
+    width: 300px;
+    height: 300px;
+    border: 2px solid #444;
+    display: none;
+    background: #000;
+  }
+
+  /* Performans / Sinyal Çubuğu */
   .perf-monitor {
-    width: 100%; height: 15px; 
-    background: #111; 
+    width: 100%; height: 12px; 
+    background: #1a1a1a; 
     border: 1px solid #444;
+    border-top-color: #000;
     margin-top: 15px;
     position: relative;
   }
   .perf-bar {
     width: 0%; height: 100%; 
-    background: #556b2f; /* Eski tip fosforlu yeşilimsi renk */
-    transition: width 0.3s;
-  }
-
-  /* Tuval (Canvas) Etkileşim Alanı */
-  #screenCanvas {
-    background: #000;
-    border: 3px dashed #5a5a5a;
-    margin-top: 20px;
-    cursor: crosshair;
-    width: 100%;
-    max-width: 800px;
-    height: auto;
+    background: #7a8b3e; /* Yıpranmış askeri yeşil */
+    transition: width 0.2s;
   }
 </style>
 </head>
 <body>
 
 <div class="header-container">
+  <!-- Sola hizalı, küçültülmüş logo -->
   <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <!-- Endüstriyel Çark/Makine Temalı Logo Yer Tutucu -->
-    <circle cx="50" cy="50" r="45" fill="#2a2a2a" stroke="#666" stroke-width="6" stroke-dasharray="10 5"/>
-    <circle cx="50" cy="50" r="20" fill="#444" stroke="#777" stroke-width="3"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="#736b5e" stroke-width="8" stroke-dasharray="15 10"/>
+    <circle cx="50" cy="50" r="15" fill="#8c8c8c" stroke="#2b2b2b" stroke-width="4"/>
   </svg>
   <div class="title">rayılmazan</div>
 </div>
 
 <div class="control-panel">
-  <button class="btn" onclick="generateQR()">Cihazı Bekle (QR Üret)</button>
-  <button class="btn" onclick="scanQR()">QR Tara & Eşleş</button>
+  <div class="panel-screws screw-tl"></div>
+  <div class="panel-screws screw-tr"></div>
+  <div class="panel-screws screw-bl"></div>
+  <div class="panel-screws screw-br"></div>
+
+  <button class="btn" onclick="hostSession()">1. OTURUM BAŞLAT (QR ÜRET)</button>
+  <button class="btn" onclick="startScanner()">2. BAĞLAN (QR TARA)</button>
   
-  <div id="qr-display" style="margin-top:15px; color:#a3a3a3;"></div>
+  <div class="qr-section">
+    <div id="qr-container"></div>
+    <video id="camera-preview" autoplay playsinline></video>
+  </div>
   
-  <!-- Sadece Tarayıcı Üzerinde Çalışacak Etkileşim Ekranı -->
-  <canvas id="screenCanvas" width="800" height="450"></canvas>
+  <canvas id="screenCanvas" width="800" height="400"></canvas>
   
   <div class="perf-monitor">
-    <div class="perf-bar" id="signalBar" style="width: 85%;"></div>
+    <div class="perf-bar" id="signalBar" style="width: 10%;"></div>
   </div>
 </div>
 
 <script>
-  // NOT: Gerçek sürümde QR kod üretme (örneğin qrcode.js) ve okuma (jsQR) 
-  // kütüphanelerinin sıkıştırılmış halleri CDN olmadan doğrudan bu alana yapıştırılacaktır.
+  /* =========================================================
+     BÖLÜM 1: HARİCİ KÜTÜPHANELER (CDN KULLANILMADAN EKLENECEK)
+     ========================================================= */
+  
+  // ---> KAREKOD ÜRETİCİ (qrcode.js veya benzeri minified kodu buraya yapıştırılacak)
+  // window.QRCode = ... 
+  
+  // ---> KAREKOD OKUYUCU (jsQR.js minified kodu buraya yapıştırılacak)
+  // window.jsQR = ...
+
+  /* =========================================================
+     BÖLÜM 2: WEBRTC & SİNYALİZASYON MANTIĞI
+     ========================================================= */
 
   const canvas = document.getElementById('screenCanvas');
   const ctx = canvas.getContext('2d');
+  const signalBar = document.getElementById('signalBar');
+  
   let peerConnection;
   let dataChannel;
+  const config = { iceServers: [] }; // Yerel ağ p2p, STUN/TURN yok.
 
-  function generateQR() {
-      // 1. WebRTC bağlantı teklifi oluşturulur.
-      // 2. SDP verisi gömülü kütüphane ile QR koda dönüştürülüp #qr-display içine basılır.
-      document.getElementById('qr-display').innerText = "[ Sistem QR Kodu Oluşturuyor... ]";
-  }
-
-  function scanQR() {
-      // 1. Cihaz kamerası açılır.
-      // 2. Karşı cihazdaki QR taranıp içindeki bağlantı yanıtı (Answer) WebRTC'ye işlenir.
-      document.getElementById('qr-display').innerText = "[ Kamera Bekleniyor... ]";
-  }
-
-  // Tarayıcı Sınırları İçerisinde Fare (Sanal İmleç) Simülasyonu
-  canvas.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      // Yalnızca canvas içindeki X ve Y koordinatları hesaplanır
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
-      
-      // Çizim işlemi (simülasyon amaçlı)
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#666';
-      ctx.fillRect(x - 5, y - 5, 10, 10);
-
-      // Veri kanalı açıksa Android'e gönder
-      if (dataChannel && dataChannel.readyState === 'open') {
-          dataChannel.send(JSON.stringify({ type: 'move', x: x, y: y }));
+  // 1. CİHAZ (OTURUM SAHİBİ) - QR ÜRETİR
+  async function hostSession() {
+    peerConnection = new RTCPeerConnection(config);
+    dataChannel = peerConnection.createDataChannel("rayilmazan_channel");
+    
+    setupChannelListeners(dataChannel);
+    
+    peerConnection.onicecandidate = e => {
+      // ICE gathering tamamlandığında (Tüm yerel IP'ler bulunduğunda)
+      if (!e.candidate) {
+        const sdpStr = JSON.stringify(peerConnection.localDescription);
+        generateQR(sdpStr);
       }
+    };
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+  }
+
+  // 2. CİHAZ (İSTEMCİ) - QR TARAR VE CEVAP ÜRETİR VEYA CEVABI OKUR
+  async function startScanner() {
+    const video = document.getElementById('camera-preview');
+    video.style.display = "block";
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      video.srcObject = stream;
+      
+      // Her karede QR tara (jsQR kütüphanesi buraya entegre)
+      const scanInterval = setInterval(() => {
+        // Not: Gerçek jsQR entegrasyonunda canvas'tan görüntü verisi okunur.
+        // let qrData = scanCanvas(video);
+        // if(qrData) { clearInterval(scanInterval); handleScannedData(qrData); }
+      }, 500);
+
+    } catch (err) {
+      alert("Kamera erişimi reddedildi veya bulunamadı.");
+    }
+  }
+
+  async function handleScannedData(scannedJSON) {
+    const data = JSON.parse(scannedJSON);
+    
+    if (!peerConnection) {
+      // İstemciyiz, teklifi okuduk, cevap oluşturacağız
+      peerConnection = new RTCPeerConnection(config);
+      
+      peerConnection.ondatachannel = e => {
+        setupChannelListeners(e.channel);
+      };
+
+      peerConnection.onicecandidate = e => {
+        if (!e.candidate) {
+          const answerSdp = JSON.stringify(peerConnection.localDescription);
+          generateQR(answerSdp); // Cevabı QR olarak ekrana bas
+        }
+      };
+
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+    } else {
+      // Ev sahibiyiz, cevabı okuduk, bağlantıyı kur
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(data));
+      document.getElementById('camera-preview').style.display = "none";
+    }
+  }
+
+  function setupChannelListeners(channel) {
+    channel.onopen = () => {
+      signalBar.style.width = "100%";
+      signalBar.style.background = "#556b2f"; // Yeşil
+      document.getElementById('qr-container').style.display = "none";
+    };
+    channel.onclose = () => {
+      signalBar.style.width = "10%";
+      signalBar.style.background = "#8b3e3e"; // Kırmızı
+    };
+    channel.onmessage = (e) => {
+      // Karşıdan gelen fare verisini Canvas üzerinde işle
+      const data = JSON.parse(e.data);
+      if (data.type === 'move') {
+        drawSimulatedCursor(data.x, data.y);
+      }
+    };
+  }
+
+  function generateQR(text) {
+    const qrContainer = document.getElementById('qr-container');
+    qrContainer.style.display = "block";
+    qrContainer.innerHTML = ""; 
+    
+    // Not: Burası window.QRCode kütüphanesini çağıracak alandır.
+    // Örnek: new QRCode(qrContainer, { text: text, width: 250, height: 250 });
+    
+    qrContainer.innerHTML = "<small style='color:#000'>Kütüphane eklendiğinde burada QR kod oluşacaktır.</small>";
+  }
+
+  /* =========================================================
+     BÖLÜM 3: CANVAS FARE SİMÜLASYONU (SADECE TARAYICI İÇİ)
+     ========================================================= */
+     
+  let lastX = 0, lastY = 0;
+  
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    drawSimulatedCursor(x, y);
+
+    // Bağlantı açıksa veriyi ilet
+    if (dataChannel && dataChannel.readyState === 'open') {
+      dataChannel.send(JSON.stringify({ type: 'move', x: x, y: y }));
+    }
   });
 
-  // Performans Çubuğunu Güncelleme (Gecikme/Bitrate simülasyonu)
-  setInterval(() => {
-      const bar = document.getElementById('signalBar');
-      const fluctuation = Math.floor(Math.random() * 10) - 5; 
-      let currentWidth = parseInt(bar.style.width);
-      bar.style.width = Math.min(100, Math.max(40, currentWidth + fluctuation)) + '%';
-  }, 2000);
+  function drawSimulatedCursor(x, y) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Used Future Tarzı Hedefleyici (Crosshair) İmleci
+    ctx.strokeStyle = '#a3a3a3';
+    ctx.lineWidth = 1.5;
+    
+    ctx.beginPath();
+    ctx.moveTo(x - 10, y);
+    ctx.lineTo(x + 10, y);
+    ctx.moveTo(x, y - 10);
+    ctx.lineTo(x, y + 10);
+    ctx.stroke();
+    
+    // İmleç merkez noktası
+    ctx.fillStyle = '#ff3333';
+    ctx.fillRect(x - 2, y - 2, 4, 4);
+  }
 </script>
 </body>
 </html>
