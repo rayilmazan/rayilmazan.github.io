@@ -3,595 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Çoklu Fotoğraf A4 PDF Oluşturucu</title>
-    <!-- jsPDF Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>PDF Küçültme Aracı</title>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 24px;
-            min-height: 100vh;
-        }
-
-        .header {
-            text-align: center;
-            max-width: 900px;
-            margin: 0 auto 24px auto;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 15px;
-        }
-
-        .main-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 24px;
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .panel {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-            height: fit-content;
-        }
-
-        .panel-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #0f172a;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .control-group {
-            margin-bottom: 16px;
-        }
-
-        .control-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #334155;
-        }
-
-        select, input[type="range"] {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: #fff;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .range-value {
-            float: right;
-            font-weight: normal;
-            color: var(--text-muted);
-        }
-
-        .dropzone {
-            border: 2px dashed #cbd5e1;
-            border-radius: 10px;
-            padding: 30px 20px;
-            text-align: center;
-            background-color: #f1f5f9;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 20px;
-        }
-
-        .dropzone:hover, .dropzone.dragover {
-            border-color: var(--primary-color);
-            background-color: #eff6ff;
-        }
-
-        .dropzone-icon {
-            font-size: 36px;
-            margin-bottom: 8px;
-        }
-
-        .stats-bar {
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
             display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e40af;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn:hover:not(:disabled) {
-            background-color: var(--primary-hover);
-        }
-
-        .btn:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background-color: #ef4444;
-            margin-top: 8px;
-            font-size: 13px;
-            padding: 8px;
-        }
-
-        .pages-container {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .page-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            border: 1px solid var(--border-color);
-        }
-
-        .page-card-header {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .a4-preview {
-            background-color: #ffffff;
-            border: 1px solid #cbd5e1;
-            margin: 0 auto;
-            display: grid;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-
-        .a4-preview.portrait {
-            width: 100%;
-            max-width: 500px;
-            aspect-ratio: 210 / 297;
-        }
-
-        .a4-preview.landscape {
-            width: 100%;
-            max-width: 650px;
-            aspect-ratio: 297 / 210;
-        }
-
-        .preview-cell {
-            position: relative;
-            background-color: #f8fafc;
-            border: 1px dashed #e2e8f0;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            overflow: hidden;
-            border-radius: 4px;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-
-        .preview-cell img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
         }
-
-        .preview-cell.cover img {
-            object-fit: cover;
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
         }
-
-        .remove-img-btn {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: rgba(239, 68, 68, 0.9);
+        .file-drop-area {
+            border: 2px dashed #007bff;
+            padding: 30px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #007bff;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+        .file-drop-area:hover {
+            background-color: #f0f8ff;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        #fileName {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+        button {
+            background-color: #28a745;
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
+            padding: 12px 20px;
+            border-radius: 6px;
             cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
+            font-size: 16px;
+            width: 100%;
+            transition: background 0.3s;
         }
-
-        .preview-cell:hover .remove-img-btn {
-            opacity: 1;
+        button:hover {
+            background-color: #218838;
         }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-            background: white;
-            border-radius: 12px;
-            border: 2px dashed var(--border-color);
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>📸 Çoklu Fotoğraf A4 PDF Oluşturucu</h1>
-        <p>Fotoğraflarınızı A4 sayfalarına optimum düzen ile yerleştirin ve minimum sayfa sayısında PDF indirin.</p>
-    </div>
-
-    <div class="main-layout">
-        <!-- Sol Ayar Paneli -->
-        <div class="panel">
-            <div class="panel-title">⚙️ Sayfa ve Izgara Ayarları</div>
-
-            <div class="control-group">
-                <label for="gridSelect">Sayfa Başına Fotoğraf Sayısı</label>
-                <select id="gridSelect">
-                    <option value="1">1 Fotoğraf / Sayfa (Tam Sayfa)</option>
-                    <option value="2" selected>2 Fotoğraf / Sayfa (1x2)</option>
-                    <option value="4">4 Fotoğraf / Sayfa (2x2 Izgara)</option>
-                    <option value="6">6 Fotoğraf / Sayfa (2x3 Izgara)</option>
-                    <option value="8">8 Fotoğraf / Sayfa (2x4 Izgara)</option>
-                    <option value="9">9 Fotoğraf / Sayfa (3x3 Izgara)</option>
-                    <option value="12">12 Fotoğraf / Sayfa (3x4 Izgara)</option>
-                    <option value="16">16 Fotoğraf / Sayfa (4x4 Izgara)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="orientationSelect">Sayfa Yönü</label>
-                <select id="orientationSelect">
-                    <option value="portrait">Dikey (Portrait)</option>
-                    <option value="landscape">Yatay (Landscape)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="fitSelect">Sığdırma Biçimi</label>
-                <select id="fitSelect">
-                    <option value="contain">Fotoğrafı Kırpma (Oranı Koru)</option>
-                    <option value="cover">Hücreyi Doldur (Kırparak Tam Kapla)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="marginInput">Sayfa Kenar Boşluğu <span class="range-value" id="marginVal">8 mm</span></label>
-                <input type="range" id="marginInput" min="0" max="25" value="8">
-            </div>
-
-            <div class="control-group">
-                <label for="gapInput">Fotoğraflar Arası Boşluk <span class="range-value" id="gapVal">4 mm</span></label>
-                <input type="range" id="gapInput" min="0" max="20" value="4">
-            </div>
-
-            <button id="downloadPdfBtn" class="btn" disabled>📄 PDF Olarak İndir</button>
-            <button id="clearAllBtn" class="btn btn-secondary" style="display:none;">🗑️ Tüm Fotoğrafları Temizle</button>
-        </div>
-
-        <!-- Sağ Önizleme Alanı -->
-        <div>
-            <div class="dropzone" id="dropzone">
-                <div class="dropzone-icon">🖼️</div>
-                <div>Fotoğrafları buraya sürükleyin veya tıklayarak seçin</div>
-                <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
-            </div>
-
-            <div class="stats-bar" id="statsBar" style="display: none;">
-                <span>Toplam Fotoğraf: <strong id="totalPhotosCount">0</strong></span>
-                <span>Hesaplanan Sayfa Sayısı: <strong id="totalPagesCount">0</strong></span>
-            </div>
-
-            <div class="pages-container" id="pagesContainer">
-                <div class="empty-state">
-                    <h3>Henüz fotoğraf yüklenmedi</h3>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="card">
+    <h2>PDF Küçültme Aracı</h2>
+    <form id="pdfForm">
+        <label for="pdfFile" class="file-drop-area">
+            <span>PDF Dosyasını Seçmek İçin Tıklayın</span>
+            <input type="file" id="pdfFile" accept="application/pdf" required>
+        </label>
+        <div id="fileName"></div>
+        <button type="submit" id="submitBtn">PDF'i Küçült</button>
+    </form>
+    <div id="status"></div>
+</div>
 
 <script>
-    let uploadedImages = [];
+    const fileInput = document.getElementById('pdfFile');
+    const fileNameDiv = document.getElementById('fileName');
+    const form = document.getElementById('pdfForm');
+    const statusDiv = document.getElementById('status');
 
-    const dropzone = document.getElementById('dropzone');
-    const fileInput = document.getElementById('fileInput');
-    const gridSelect = document.getElementById('gridSelect');
-    const orientationSelect = document.getElementById('orientationSelect');
-    const fitSelect = document.getElementById('fitSelect');
-    const marginInput = document.getElementById('marginInput');
-    const gapInput = document.getElementById('gapInput');
-    const pagesContainer = document.getElementById('pagesContainer');
-    const statsBar = document.getElementById('statsBar');
-    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-    const clearAllBtn = document.getElementById('clearAllBtn');
-
-    function getGridDimensions(count, orientation) {
-        let cols, rows;
-        switch (parseInt(count)) {
-            case 1: cols = 1; rows = 1; break;
-            case 2: cols = orientation === 'portrait' ? 1 : 2; rows = orientation === 'portrait' ? 2 : 1; break;
-            case 4: cols = 2; rows = 2; break;
-            case 6: cols = orientation === 'portrait' ? 2 : 3; rows = orientation === 'portrait' ? 3 : 2; break;
-            case 8: cols = orientation === 'portrait' ? 2 : 4; rows = orientation === 'portrait' ? 4 : 2; break;
-            case 9: cols = 3; rows = 3; break;
-            case 12: cols = orientation === 'portrait' ? 3 : 4; rows = orientation === 'portrait' ? 4 : 3; break;
-            case 16: cols = 4; rows = 4; break;
-            default: cols = 2; rows = 2;
-        }
-        return { cols, rows };
-    }
-
-    marginInput.addEventListener('input', (e) => {
-        document.getElementById('marginVal').textContent = e.target.value + ' mm';
-        renderPreviews();
-    });
-
-    gapInput.addEventListener('input', (e) => {
-        document.getElementById('gapVal').textContent = e.target.value + ' mm';
-        renderPreviews();
-    });
-
-    gridSelect.addEventListener('change', renderPreviews);
-    orientationSelect.addEventListener('change', renderPreviews);
-    fitSelect.addEventListener('change', renderPreviews);
-
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-    dropzone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropzone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
-    });
-
+    // Dosya seçildiğinde adını göster
     fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) { handleFiles(e.target.files); fileInput.value = ''; }
-    });
-
-    clearAllBtn.addEventListener('click', () => {
-        if (confirm('Tüm fotoğrafları silmek istediğinize emin misiniz?')) {
-            uploadedImages = [];
-            renderPreviews();
+        if (e.target.files.length > 0) {
+            fileNameDiv.textContent = `Seçilen Dosya: ${e.target.files[0].name}`;
         }
     });
 
-    function handleFiles(files) {
-        const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-        let loaded = 0;
-        imageFiles.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    uploadedImages.push({
-                        id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                        src: e.target.result,
-                        width: img.width,
-                        height: img.height,
-                        imgElement: img
-                    });
-                    loaded++;
-                    if (loaded === imageFiles.length) renderPreviews();
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function removeImage(id) {
-        uploadedImages = uploadedImages.filter(img => img.id !== id);
-        renderPreviews();
-    }
-
-    function renderPreviews() {
-        if (uploadedImages.length === 0) {
-            pagesContainer.innerHTML = `<div class="empty-state"><h3>Henüz fotoğraf yüklenmedi</h3></div>`;
-            statsBar.style.display = 'none';
-            downloadPdfBtn.disabled = true;
-            clearAllBtn.style.display = 'none';
+    // Form gönderildiğinde yapılacak işlemler
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            alert('Lütfen bir PDF dosyası seçin.');
             return;
         }
 
-        statsBar.style.display = 'flex';
-        downloadPdfBtn.disabled = false;
-        clearAllBtn.style.display = 'block';
-
-        const photosPerPage = parseInt(gridSelect.value);
-        const orientation = orientationSelect.value;
-        const fitMode = fitSelect.value;
-        const margin = parseInt(marginInput.value);
-        const gap = parseInt(gapInput.value);
-
-        const { cols, rows } = getGridDimensions(photosPerPage, orientation);
-        const totalPages = Math.ceil(uploadedImages.length / photosPerPage);
-
-        document.getElementById('totalPhotosCount').textContent = uploadedImages.length;
-        document.getElementById('totalPagesCount').textContent = totalPages;
-
-        pagesContainer.innerHTML = '';
-
-        for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
-            const pageCard = document.createElement('div');
-            pageCard.className = 'page-card';
-
-            pageCard.innerHTML = `<div class="page-card-header"><span>Sayfa ${pageIdx + 1} / ${totalPages}</span><span>${cols}x${rows} Izgara</span></div>`;
-
-            const a4Preview = document.createElement('div');
-            a4Preview.className = `a4-preview ${orientation}`;
-            a4Preview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            a4Preview.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            a4Preview.style.padding = `${margin}px`;
-            a4Preview.style.gap = `${gap}px`;
-
-            const startIdx = pageIdx * photosPerPage;
-            const endIdx = Math.min(startIdx + photosPerPage, uploadedImages.length);
-
-            for (let i = startIdx; i < endIdx; i++) {
-                const imgData = uploadedImages[i];
-                const cell = document.createElement('div');
-                cell.className = `preview-cell ${fitMode === 'cover' ? 'cover' : ''}`;
-
-                const imgEl = document.createElement('img');
-                imgEl.src = imgData.src;
-
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-img-btn';
-                removeBtn.innerHTML = '✕';
-                removeBtn.onclick = (e) => { e.stopPropagation(); removeImage(imgData.id); };
-
-                cell.appendChild(imgEl);
-                cell.appendChild(removeBtn);
-                a4Preview.appendChild(cell);
-            }
-
-            pageCard.appendChild(a4Preview);
-            pagesContainer.appendChild(pageCard);
-        }
-    }
-
-    downloadPdfBtn.addEventListener('click', async () => {
-        if (uploadedImages.length === 0) return;
-
-        downloadPdfBtn.disabled = true;
-        downloadPdfBtn.textContent = 'PDF Hazırlanıyor...';
-
-        await new Promise(r => setTimeout(r, 100));
-
-        try {
-            const { jsPDF } = window.jspdf;
-            const orientation = orientationSelect.value;
-            const photosPerPage = parseInt(gridSelect.value);
-            const fitMode = fitSelect.value;
-            const margin = parseFloat(marginInput.value);
-            const gap = parseFloat(gapInput.value);
-
-            const pdfWidth = orientation === 'portrait' ? 210 : 297;
-            const pdfHeight = orientation === 'portrait' ? 297 : 210;
-
-            const pdf = new jsPDF({
-                orientation: orientation === 'portrait' ? 'p' : 'l',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            const { cols, rows } = getGridDimensions(photosPerPage, orientation);
-            const availW = pdfWidth - (2 * margin) - ((cols - 1) * gap);
-            const availH = pdfHeight - (2 * margin) - ((rows - 1) * gap);
-            const cellW = availW / cols;
-            const cellH = availH / rows;
-
-            for (let i = 0; i < uploadedImages.length; i++) {
-                const itemIdx = i % photosPerPage;
-
-                if (i > 0 && itemIdx === 0) {
-                    pdf.addPage('a4', orientation === 'portrait' ? 'p' : 'l');
-                }
-
-                const col = itemIdx % cols;
-                const row = Math.floor(itemIdx / cols);
-                const cellX = margin + col * (cellW + gap);
-                const cellY = margin + row * (cellH + gap);
-
-                const imgData = uploadedImages[i];
-                const imgRatio = imgData.width / imgData.height;
-                const cellRatio = cellW / cellH;
-
-                let drawW, drawH, drawX, drawY;
-
-                if (fitMode === 'contain') {
-                    if (imgRatio > cellRatio) {
-                        drawW = cellW;
-                        drawH = cellW / imgRatio;
-                    } else {
-                        drawH = cellH;
-                        drawW = cellH * imgRatio;
-                    }
-                    drawX = cellX + (cellW - drawW) / 2;
-                    drawY = cellY + (cellH - drawH) / 2;
-                    pdf.addImage(imgData.src, 'JPEG', drawX, drawY, drawW, drawH);
-                } else {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = cellW * 4;
-                    canvas.height = cellH * 4;
-
-                    const sourceRatio = imgData.width / imgData.height;
-                    const targetRatio = canvas.width / canvas.height;
-                    let sX = 0, sY = 0, sW = imgData.width, sH = imgData.height;
-
-                    if (sourceRatio > targetRatio) {
-                        sW = imgData.height * targetRatio;
-                        sX = (imgData.width - sW) / 2;
-                    } else {
-                        sH = imgData.width / targetRatio;
-                        sY = (imgData.height - sH) / 2;
-                    }
-
-                    ctx.drawImage(imgData.imgElement, sX, sY, sW, sH, 0, 0, canvas.width, canvas.height);
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', cellX, cellY, cellW, cellH);
-                }
-            }
-
-            pdf.save(`fotograflar_a4_layout.pdf`);
-        } catch (err) {
-            alert('PDF oluşturulurken bir hata oluştu: ' + err.message);
-        } finally {
-            downloadPdfBtn.disabled = false;
-            downloadPdfBtn.textContent = '📄 PDF Olarak İndir';
-        }
+        statusDiv.textContent = "Dosya işleniyor, lütfen bekleyin...";
+        
+        // Simülasyon (Gerçek sıkıştırma için buraya sunucu taraflı API veya 
+        // istemci tarafı kütüphane entegrasyonu [örn: pdf-lib] yapılmalıdır)
+        setTimeout(() => {
+            statusDiv.innerHTML = "<span style='color: green;'>Arayüz başarıyla hazırlandı! Gerçek sıkıştırma için sunucu tarafı kodları gereklidir.</span>";
+        }, 2000);
     });
 </script>
+
 </body>
 </html>
