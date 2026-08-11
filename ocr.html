@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Türkçe Görselden Metne (OCR) Okuyucu</title>
+    <title>Türkçe & Roma Rakamı Destekli OCR</title>
     
     <!-- Tesseract.js Kütüphanesi (Görsel okuma için gerekli) -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -53,6 +53,7 @@
             font-size: 14px;
             color: #6B7280;
             margin-bottom: 25px;
+            line-height: 1.5;
         }
 
         .file-upload-wrapper {
@@ -213,9 +214,9 @@
 <body>
 
     <div class="container">
-        <h1>Türkçe OCR Okuyucu</h1>
+        <h1>Gelişmiş OCR Okuyucu</h1>
         <p class="description">
-            Bir belge fotoğrafı çekin veya galeriden yükleyin. Sistemdeki yazıları Türkçe karakter desteğiyle dijital metne çevirecektir.
+            Türkçe karakterleri ve <strong>Roma rakamlarını (I, II, IV, X, vb.)</strong> eksiksiz tanır. Belge fotoğrafı çekin veya yükleyin.
         </p>
 
         <!-- Dosya Yükleme Alanı -->
@@ -227,7 +228,7 @@
                     <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
                 <span>Fotoğraf Çek / Görsel Yükle</span>
-                <small style="color: #6B7280; margin-top: 5px;">(Tüm görsel formatları desteklenir)</small>
+                <small style="color: #6B7280; margin-top: 5px;">(Kitap ve belgeler için ideal)</small>
             </div>
             <!-- accept="image/*" mobilde kamera ve galeri seçeneği sunar -->
             <input type="file" id="imageInput" accept="image/*">
@@ -315,10 +316,11 @@
             resultContainer.classList.add('hidden');
 
             try {
-                // Tesseract işlemi başlatılıyor (Dil: Türkçe -> 'tur')
+                // Tesseract işlemi başlatılıyor 
+                // 'tur+eng' (Türkçe ve İngilizce ortak) ile Roma rakamları ve Türkçe karakterler sorunsuz algılanır
                 const result = await Tesseract.recognize(
                     selectedFile,
-                    'tur', // SADECE Türkçe karakter setini (ç,ş,ğ vb.) okumasını sağlar
+                    'tur+eng', 
                     {
                         logger: m => {
                             // İlerleme durumunu arayüze yansıt
@@ -326,7 +328,7 @@
                                 statusText.textContent = 'Yazılar Metne Çevriliyor... %' + Math.round(m.progress * 100);
                                 progressBar.style.width = (m.progress * 100) + '%';
                             } else if (m.status === 'loading tesseract core' || m.status === 'loading language traineddata') {
-                                statusText.textContent = 'Türkçe Dil Dosyaları Hazırlanıyor...';
+                                statusText.textContent = 'Türkçe ve Çoklu Dil Dosyaları İndiriliyor...';
                                 progressBar.style.width = '30%';
                             }
                         }
