@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotoğrafları PDF'e Dönüştür</title>
+    <!-- PDF oluşturmak için gerekli kütüphane -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .file-input-wrapper {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 2px dashed #007bff;
+            display: inline-block;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+            color: #007bff;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .custom-file-upload:hover {
+            background-color: #e6f0ff;
+        }
+        #previewContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .preview-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #218838;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Fotoğrafları PDF Yap</h2>
+    
+    <div class="file-input-wrapper">
+        <label for="imageInput" class="custom-file-upload">
+            📸 Fotoğraf Seç (Çoklu Seçilebilir)
+        </label>
+        <input type="file" id="imageInput" accept="image/*" multiple>
+    </div>
+
+    <div id="previewContainer"></div>
+
+    <button id="convertBtn" disabled>PDF'e Dönüştür ve İndir</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const convertBtn = document.getElementById('convertBtn');
+    const statusDiv = document.getElementById('status');
+
+    let loadedImages = [];
+
+    imageInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        previewContainer.innerHTML = '';
+        loadedImages = [];
+
+        if (files.length === 0) {
+            convertBtn.disabled = true;
+            return;
+        }
+
+        statusDiv.textContent = `${files.length} fotoğraf seçildi.`;
+        convertBtn.disabled = false;
+
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    loadedImages.push(img);
+                    
+                    // Ekran önizlemesi
+                    const preview = document.createElement('img');
+                    preview.src = event.target.result;
+                    preview.classList.add('preview-img');
+                    previewContainer.appendChild(preview);
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    convertBtn.addEventListener('click', async () => {
+        if (loadedImages.length === 0) return;
+
+        statusDiv.textContent = 'PDF hazırlanıyor...';
+        convertBtn.disabled = true;
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4'); // A4 boyutunda dikey PDF
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        for (let i = 0; i < loadedImages.length; i++) {
+            if (i > 0) {
+                pdf.addPage();
+            }
+
+            const img = loadedImages[i];
+            
+            // Boyut oranını koruyarak A4 sayfasına sığdır
+            let imgWidth = img.width;
+            let imgHeight = img.height;
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+            const finalWidth = imgWidth * ratio;
+            const finalHeight = imgHeight * ratio;
+
+            // Fotoğrafı sayfanın tam ortasına yerleştir
+            const x = (pdfWidth - finalWidth) / 2;
+            const y = (pdfHeight - finalHeight) / 2;
+
+            pdf.addImage(img, 'JPEG', x, y, finalWidth, finalHeight);
+        }
+
+        pdf.save('fotograflar.pdf');
+        statusDiv.textContent = 'PDF başarıyla indirildi!';
+        convertBtn.disabled = false;
+    });
+</script>
+
+</body>
+</html>
