@@ -1,257 +1,197 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>rayılmazan</title>
-<style>
-  /* --- GREEBLES & USED FUTURE TEMA --- */
-  body {
-    background-color: #5c5c5c; 
-    color: #b0b0b0;
-    font-family: 'Courier New', Courier, monospace;
-    margin: 0; 
-    padding: 20px;
-    background-image: 
-      linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2)), 
-      linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2));
-    background-size: 4px 4px;
-  }
-
-  /* Başlık ve Logo: Sola hizalı, %70 küçültülmüş logo */
-  .header-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    background: linear-gradient(180deg, #4a4a4a 0%, #2b2b2b 100%);
-    border: 2px solid #736b5e; 
-    border-radius: 3px;
-    padding: 8px 15px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.9), 3px 3px 6px rgba(0,0,0,0.6);
-    margin-bottom: 20px;
-    max-width: 800px;
-  }
-
-  .logo {
-    width: 24px; 
-    height: 24px;
-    margin-right: 15px;
-    filter: drop-shadow(1px 1px 1px #000);
-  }
-
-  .title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #d1d1d1;
-    text-shadow: -1px -1px 0px #222, 1px 1px 0px #000;
-    letter-spacing: 1px;
-  }
-
-  /* Mekanik Kontrol Paneli */
-  .control-panel {
-    background: #363636;
-    border: 3px solid #1f1f1f;
-    border-top-color: #8c8c8c; 
-    border-left-color: #8c8c8c;
-    padding: 15px;
-    max-width: 800px;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
-    position: relative;
-  }
-
-  .panel-screws {
-    position: absolute;
-    width: 8px; height: 8px;
-    background: #111;
-    border-radius: 50%;
-    box-shadow: inset 1px 1px 2px #555;
-  }
-  .screw-tl { top: 5px; left: 5px; }
-  .screw-tr { top: 5px; right: 5px; }
-  .screw-bl { bottom: 5px; left: 5px; }
-  .screw-br { bottom: 5px; right: 5px; }
-
-  .btn {
-    background: linear-gradient(to bottom, #555, #333);
-    color: #e0e0e0;
-    border: 2px solid #111;
-    border-top-color: #777;
-    border-left-color: #777;
-    padding: 8px 12px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    text-shadow: 1px 1px 0 #000;
-  }
-  .btn:active {
-    border-top-color: #111;
-    border-left-color: #111;
-    background: #2a2a2a;
-  }
-
-  /* Yalnızca Tarayıcı İçinde Çalışacak Tuval */
-  #screenCanvas {
-    background: #0a0a0a;
-    border: 2px dashed #736b5e;
-    margin-top: 15px;
-    cursor: crosshair;
-    width: 100%;
-    max-width: 800px;
-    height: 400px;
-    display: block;
-    box-shadow: inset 0 0 20px #000;
-  }
-
-  /* QR ve Kamera Alanları */
-  .qr-section {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  #qr-container {
-    background: #fff;
-    padding: 10px;
-    border: 2px solid #222;
-    display: none; 
-  }
-  #camera-preview {
-    width: 300px;
-    height: 300px;
-    border: 2px solid #444;
-    display: none;
-    background: #000;
-    object-fit: cover;
-  }
-
-  /* Performans / Sinyal Çubuğu */
-  .perf-monitor {
-    width: 100%; height: 12px; 
-    background: #1a1a1a; 
-    border: 1px solid #444;
-    border-top-color: #000;
-    margin-top: 15px;
-    position: relative;
-  }
-  .perf-bar {
-    width: 0%; height: 100%; 
-    background: #7a8b3e; 
-    transition: width 0.2s, background-color 0.2s;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fotoğrafları PDF'e Dönüştür</title>
+    <!-- PDF oluşturmak için gerekli kütüphane -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .file-input-wrapper {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 2px dashed #007bff;
+            display: inline-block;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+            color: #007bff;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .custom-file-upload:hover {
+            background-color: #e6f0ff;
+        }
+        #previewContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .preview-img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #218838;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
-<div class="header-container">
-  <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="50" cy="50" r="40" fill="none" stroke="#736b5e" stroke-width="8" stroke-dasharray="15 10"/>
-    <circle cx="50" cy="50" r="15" fill="#8c8c8c" stroke="#2b2b2b" stroke-width="4"/>
-  </svg>
-  <div class="title">rayılmazan</div>
-</div>
+<div class="container">
+    <h2>Fotoğrafları PDF Yap</h2>
+    
+    <div class="file-input-wrapper">
+        <label for="imageInput" class="custom-file-upload">
+            📸 Fotoğraf Seç (Çoklu Seçilebilir)
+        </label>
+        <input type="file" id="imageInput" accept="image/*" multiple>
+    </div>
 
-<div class="control-panel">
-  <div class="panel-screws screw-tl"></div>
-  <div class="panel-screws screw-tr"></div>
-  <div class="panel-screws screw-bl"></div>
-  <div class="panel-screws screw-br"></div>
+    <div id="previewContainer"></div>
 
-  <button class="btn" onclick="hostSession()">1. OTURUM BAŞLAT (QR ÜRET)</button>
-  <button class="btn" onclick="startScanner()">2. BAĞLAN (QR TARA)</button>
-  
-  <div class="qr-section">
-    <div id="qr-container"></div>
-    <video id="camera-preview" autoplay playsinline></video>
-  </div>
-  
-  <canvas id="screenCanvas" width="800" height="400"></canvas>
-  
-  <div class="perf-monitor">
-    <div class="perf-bar" id="signalBar" style="width: 5%;"></div>
-  </div>
+    <button id="convertBtn" disabled>PDF'e Dönüştür ve İndir</button>
+    <div id="status"></div>
 </div>
 
 <script>
-  /* =========================================================
-     UYGULAMA KONTROL MANTIĞI
-     ========================================================= */
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const convertBtn = document.getElementById('convertBtn');
+    const statusDiv = document.getElementById('status');
 
-  function hostSession() {
-    const qrContainer = document.getElementById('qr-container');
-    const signalBar = document.getElementById('signalBar');
-    
-    qrContainer.style.display = 'block';
-    qrContainer.innerHTML = ''; // Eski QR varsa temizle
-    
-    // Benzersiz oturum kimliği üret
-    const sessionId = 'RAY-' + Math.random().toString(36).substring(2, 9).toUpperCase();
-    
-    // Basit ve kararlı metin tabanlı veya görsel etiket gösterimi
-    const textNode = document.createElement('div');
-    textNode.style.fontFamily = 'monospace';
-    textNode.style.fontSize = '12px';
-    textNode.style.color = '#000';
-    textNode.style.padding = '5px';
-    textNode.innerText = 'OTURUM KODU:\n' + sessionId;
-    qrContainer.appendChild(textNode);
+    let loadedImages = [];
 
-    // Sinyal çubuğunu güncelle
-    signalBar.style.width = '60%';
-    signalBar.style.backgroundColor = '#7a8b3e';
-  }
+    imageInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        previewContainer.innerHTML = '';
+        loadedImages = [];
 
-  function startScanner() {
-    const video = document.getElementById('camera-preview');
-    const signalBar = document.getElementById('signalBar');
-    
-    video.style.display = 'block';
-    
-    // Kamera akışını başlat
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        video.srcObject = stream;
-        signalBar.style.width = '100%';
-        signalBar.style.backgroundColor = '#4e9a06';
-      })
-      .catch(err => {
-        alert('Kamera erişimi sağlanamadı veya izin verilmedi: ' + err.message);
-        signalBar.style.width = '20%';
-        signalBar.style.backgroundColor = '#a40000';
-      });
-  }
+        if (files.length === 0) {
+            convertBtn.disabled = true;
+            return;
+        }
 
-  // Canvas üzerindeki temel fare hareket simülasyonu hazırlığı
-  const canvas = document.getElementById('screenCanvas');
-  const ctx = canvas.getContext('2d');
-  
-  ctx.fillStyle = '#0a0a0a';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  ctx.fillStyle = '#444';
-  ctx.font = '12px Courier New';
-  ctx.fillText('// CANVAS HAZIR - TARAYICI İÇİ AKTİF', 20, 30);
+        statusDiv.textContent = `${files.length} fotoğraf seçildi.`;
+        convertBtn.disabled = false;
 
-  canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.floor(e.clientX - rect.left);
-    const y = Math.floor(e.clientY - rect.top);
-    
-    // Anlık ekran temizliği ve koordinat çizimi (Greebles hissi için)
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = '#736b5e';
-    ctx.fillText('// CANVAS HAZIR - TARAYICI İÇİ AKTİF', 20, 30);
-    
-    ctx.fillStyle = '#7a8b3e';
-    ctx.fillText('İMLEÇ KONUMU -> X: ' + x + ' | Y: ' + y, 20, 60);
-    
-    ctx.strokeStyle = '#7a8b3e';
-    ctx.strokeRect(x - 5, y - 5, 10, 10);
-  });
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    loadedImages.push(img);
+                    
+                    // Ekran önizlemesi
+                    const preview = document.createElement('img');
+                    preview.src = event.target.result;
+                    preview.classList.add('preview-img');
+                    previewContainer.appendChild(preview);
+                };
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    convertBtn.addEventListener('click', async () => {
+        if (loadedImages.length === 0) return;
+
+        statusDiv.textContent = 'PDF hazırlanıyor...';
+        convertBtn.disabled = true;
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4'); // A4 boyutunda dikey PDF
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        for (let i = 0; i < loadedImages.length; i++) {
+            if (i > 0) {
+                pdf.addPage();
+            }
+
+            const img = loadedImages[i];
+            
+            // Boyut oranını koruyarak A4 sayfasına sığdır
+            let imgWidth = img.width;
+            let imgHeight = img.height;
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+            const finalWidth = imgWidth * ratio;
+            const finalHeight = imgHeight * ratio;
+
+            // Fotoğrafı sayfanın tam ortasına yerleştir
+            const x = (pdfWidth - finalWidth) / 2;
+            const y = (pdfHeight - finalHeight) / 2;
+
+            pdf.addImage(img, 'JPEG', x, y, finalWidth, finalHeight);
+        }
+
+        pdf.save('fotograflar.pdf');
+        statusDiv.textContent = 'PDF başarıyla indirildi!';
+        convertBtn.disabled = false;
+    });
 </script>
+
 </body>
 </html>
