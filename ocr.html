@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gelişmiş Türkçe OCR & Otomatik A4 Belge Oluşturucu</title>
+    <title>Çoklu Görsel OCR & Otomatik A4 Oluşturucu</title>
     
-    <!-- Tesseract.js (OCR Kütüphanesi) -->
+    <!-- Kütüphaneler -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- html2pdf.js (PDF İndirme Kütüphanesi) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
@@ -16,534 +15,129 @@
             --primary-hover: #4338CA;
             --success-color: #10B981;
             --success-hover: #059669;
-            --pdf-color: #EF4444;
-            --pdf-hover: #DC2626;
-            --doc-color: #2563EB;
-            --doc-hover: #1D4ED8;
-            --bg-color: #E5E7EB;
+            --bg-color: #F3F4F6;
             --container-bg: #FFFFFF;
             --text-color: #1F2937;
-            --border-color: #D1D5DB;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .main-wrapper {
-            width: 100%;
-            max-width: 850px;
-        }
-
-        /* Sekme (Tab) Navigasyonu */
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 14px;
-            background-color: #FFFFFF;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--text-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .tab-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
-        }
-
-        .tab-content {
-            display: none;
-            background-color: var(--container-bg);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Ortak Yükleme Alanı */
-        .file-upload-wrapper {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .file-upload-label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 25px 20px;
-            border: 2px dashed var(--primary-color);
-            border-radius: 8px;
-            background-color: #EEF2FF;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .main-wrapper { width: 100%; max-width: 850px; }
+        
+        .file-upload-wrapper { position: relative; margin-bottom: 20px; }
+        .file-upload-label { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; border: 2px dashed var(--primary-color); border-radius: 8px; background-color: #EEF2FF; cursor: pointer; transition: all 0.3s; text-align: center; }
         .file-upload-label:hover { background-color: #E0E7FF; }
+        
+        /* Çoklu seçim için input */
+        #autoImageInput { opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; }
 
-        input[type="file"] {
-            opacity: 0;
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            cursor: pointer;
-        }
+        .status-container { display: none; margin: 15px 0; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #ddd; }
+        .progress-bar-bg { width: 100%; height: 10px; background-color: #E5E7EB; border-radius: 5px; overflow: hidden; margin-top: 5px; }
+        .progress-bar-fill { height: 100%; background-color: var(--primary-color); width: 0%; transition: width 0.3s ease; }
 
-        button {
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary { background-color: var(--primary-color); color: white; width: 100%; }
-        .btn-primary:hover { background-color: var(--primary-hover); }
-        .btn-primary:disabled { background-color: #9CA3AF; cursor: not-allowed; }
-
-        .btn-success { background-color: var(--success-color); color: white; }
-        .btn-success:hover { background-color: var(--success-hover); }
-
-        .btn-pdf { background-color: var(--pdf-color); color: white; }
-        .btn-pdf:hover { background-color: var(--pdf-hover); }
-
-        .btn-doc { background-color: var(--doc-color); color: white; }
-        .btn-doc:hover { background-color: var(--doc-hover); }
-
-        .btn-danger { background-color: #DC2626; color: white; }
-        .btn-danger:hover { background-color: #B91C1C; }
-
-        /* Yükleme İlerleme Durumu */
-        .status-container {
-            display: none;
-            margin: 15px 0;
-        }
-
-        .status-text {
-            font-size: 14px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 8px;
-            color: var(--primary-color);
-        }
-
-        .progress-bar-bg {
-            width: 100%; height: 8px;
-            background-color: #E5E7EB;
-            border-radius: 4px; overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%; background-color: var(--primary-color);
-            width: 0%; transition: width 0.2s ease;
-        }
-
-        /* A4 Belge Görünümü (Simülasyonu) */
-        .a4-container {
-            background-color: #525659;
-            padding: 20px;
-            border-radius: 8px;
-            max-height: 600px;
-            overflow-y: auto;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .a4-paper {
-            background-color: white;
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
-            box-sizing: border-box;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 14pt;
-            line-height: 1.6;
-            color: #000;
-            outline: none;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .a4-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: space-between;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        textarea {
-            width: 100%; height: 200px; padding: 12px;
-            border: 1px solid var(--border-color); border-radius: 8px;
-            font-size: 15px; resize: vertical; box-sizing: border-box;
-            margin-bottom: 15px; font-family: inherit;
-        }
-
-        .hidden { display: none !important; }
-
-        .spinner {
-            width: 16px; height: 16px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%; border-top-color: white;
-            animation: spin 1s ease-in-out infinite; display: none;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .badge {
-            background-color: #D1FAE5;
-            color: #065F46;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 8px;
-        }
+        .a4-paper { background-color: white; width: 100%; min-height: 297mm; padding: 20mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); font-family: 'Times New Roman', serif; font-size: 14pt; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; outline: none; }
+        
+        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; margin-top: 10px; }
+        .btn-pdf { background-color: #EF4444; }
+        .btn-doc { background-color: #2563EB; }
+        .btn-copy { background-color: var(--success-color); }
+        .btn-clear { background-color: #4B5563; }
     </style>
 </head>
 <body>
 
     <div class="main-wrapper">
-        
-        <!-- Sekme Butonları -->
-        <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('autoTab')">
-                📄 Otomatik A4 Belge Oluşturucu
-            </button>
-            <button class="tab-btn" onclick="switchTab('singleTab')">
-                🔍 Tekli Metin Okutma
-            </button>
+        <h2>📷 Çoklu Görsel OCR & A4 Birleştirici</h2>
+        <p>Fotoğrafları seçin, sistem hepsini sırayla okuyup A4 sayfasına eklesin.</p>
+
+        <!-- Çoklu Dosya Seçimi -->
+        <div class="file-upload-wrapper">
+            <div class="file-upload-label">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>Fotoğrafları Seçin (Çoklu Seçim Desteklenir)</span>
+            </div>
+            <input type="file" id="autoImageInput" accept="image/*" multiple>
         </div>
 
-        <!-- SEKMELER 1: OTOMATİK A4 BELGE MODU -->
-        <div id="autoTab" class="tab-content active">
-            <h2 style="margin-top:0; color:var(--primary-color);">Otomatik Belge Birleştirici</h2>
-            <p style="color:#6B7280; font-size:14px;">
-                Fotoğraf seçer seçmez <strong>otomatik okunur</strong> ve aşağıdaki A4 belgesine alt alta eklenir. İstediğiniz kadar fotoğraf çekip ekleyebilirsiniz (Sınır yoktur).
-            </p>
-
-            <div class="file-upload-wrapper">
-                <div class="file-upload-label" id="autoUploadLabel">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    <span style="margin-top:8px;">Fotoğraf Çek veya Sayfa Yükle</span>
-                    <small style="color: #6B7280; margin-top: 4px;">Seçildiği an otomatik okunup A4'e eklenecektir</small>
-                </div>
-                <!-- Otomatik tetikleme yapan input -->
-                <input type="file" id="autoImageInput" accept="image/*">
-            </div>
-
-            <!-- İlerleme Çubuğu -->
-            <div class="status-container" id="autoStatusContainer">
-                <div class="status-text" id="autoStatusText">Sayfa okunuyor...</div>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="autoProgressBar"></div>
-                </div>
-            </div>
-
-            <!-- A4 Belge Ekranı -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <label style="font-weight:bold;">A4 Belge Önizleme <span style="font-weight:normal; font-size:12px; color:#6B7280;">(Düzenlemek için içerideki metne tıklayabilirsiniz)</span></label>
-                <span class="badge" id="pageCounter">Eklenecek Sayfa: 0</span>
-            </div>
-
-            <div class="a4-container">
-                <!-- contenteditable="true" sayesinde kullanıcı eklenen metinlerde elle düzeltme yapabilir -->
-                <div class="a4-paper" id="a4Paper" contenteditable="true" placeholder="Henüz metin eklenmedi. Fotoğraf çektikçe yazılar buraya otomatik dolacaktır..."></div>
-            </div>
-
-            <!-- A4 İşlem Butonları -->
-            <div class="a4-actions">
-                <div class="action-group">
-                    <button class="btn-pdf" onclick="downloadPDF()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        PDF İndir
-                    </button>
-                    <button class="btn-doc" onclick="downloadDOC()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        DOCX (Word) İndir
-                    </button>
-                    <button class="btn-success" onclick="copyA4Text()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        Tüm Metni Kopyala
-                    </button>
-                </div>
-                <button class="btn-danger" onclick="clearA4Paper()">Temizle</button>
-            </div>
+        <!-- İlerleme Çubuğu -->
+        <div class="status-container" id="statusContainer">
+            <div id="statusText" style="font-weight:bold; font-size:14px;">Hazırlanıyor...</div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
         </div>
 
+        <!-- Belge Alanı -->
+        <div class="a4-paper" id="a4Paper" contenteditable="true"></div>
 
-        <!-- SEKMELER 2: TEKLİ OKUMA MODU -->
-        <div id="singleTab" class="tab-content">
-            <h2 style="margin-top:0; color:var(--primary-color);">Tekli Görsel Okuyucu</h2>
-            <p style="color:#6B7280; font-size:14px;">Görseli seçip butona basarak metne çevirebilirsiniz.</p>
-
-            <div class="file-upload-wrapper">
-                <div class="file-upload-label">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    <span>Görsel Yükle / Çek</span>
-                </div>
-                <input type="file" id="singleImageInput" accept="image/*">
-            </div>
-
-            <div id="singlePreviewContainer" class="hidden" style="text-align:center; margin-bottom:15px;">
-                <img id="singleImagePreview" style="max-width:100%; max-height:250px; border-radius:8px;">
-            </div>
-
-            <button id="singleProcessBtn" class="btn-primary" disabled>
-                <div class="spinner" id="singleSpinner"></div>
-                <span id="singleBtnText">Metni Okut (OCR)</span>
-            </button>
-
-            <div class="status-container" id="singleStatusContainer">
-                <div class="status-text" id="singleStatusText">Hazırlanıyor...</div>
-                <div class="progress-bar-bg"><div class="progress-bar-fill" id="singleProgressBar"></div></div>
-            </div>
-
-            <div id="singleResultContainer" class="hidden" style="margin-top:15px;">
-                <textarea id="singleOutputText" placeholder="Metin burada belirecek..."></textarea>
-                <button class="btn-success" style="width:100%;" onclick="copyText('singleOutputText')">
-                    Metni Kopyala
-                </button>
-            </div>
+        <!-- İşlemler -->
+        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn-pdf" onclick="downloadPDF()">PDF İndir</button>
+            <button class="btn-doc" onclick="downloadDOC()">DOCX İndir</button>
+            <button class="btn-copy" onclick="copyText()">Tümünü Kopyala</button>
+            <button class="btn-clear" onclick="clearAll()">Temizle</button>
         </div>
-
     </div>
 
     <script>
-        // Tab Geçiş İşlevi
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        let addedCount = 0;
-
-        // --- 1. OTOMATİK A4 BELGE MODU MANTIĞI ---
         const autoImageInput = document.getElementById('autoImageInput');
-        const autoStatusContainer = document.getElementById('autoStatusContainer');
-        const autoStatusText = document.getElementById('autoStatusText');
-        const autoProgressBar = document.getElementById('autoProgressBar');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
         const a4Paper = document.getElementById('a4Paper');
-        const pageCounter = document.getElementById('pageCounter');
 
-        // Otomatik fotoğraf seçildiğinde anında çalışır
+        // Çoklu dosya seçimi tetiklendiğinde
         autoImageInput.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
 
-            autoStatusContainer.style.display = 'block';
-            autoStatusText.textContent = 'Sayfa Türkçe ve Roma Rakamı Destekli Okunuyor...';
-            autoProgressBar.style.width = '10%';
+            statusContainer.style.display = 'block';
+            
+            // Sıralı işleme (Queue)
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                statusText.textContent = `İşleniyor: ${i + 1} / ${files.length} (${file.name})`;
+                progressBar.style.width = `${((i) / files.length) * 100}%`;
 
-            try {
-                // Tesseract 'tur+eng' ile Türkçe ve Roma Rakamlarını kusursuz tanır
-                const result = await Tesseract.recognize(
-                    file,
-                    'tur+eng',
-                    {
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                autoStatusText.textContent = 'Okunuyor... %' + Math.round(m.progress * 100);
-                                autoProgressBar.style.width = (m.progress * 100) + '%';
-                            }
-                        }
-                    }
-                );
-
-                const extractedText = result.data.text.trim();
-                
-                if (extractedText) {
-                    addedCount++;
+                try {
+                    const result = await Tesseract.recognize(file, 'tur+eng');
+                    const text = result.data.text.trim();
                     
-                    // Metni A4 kağıdının sonuna ekle (Aralarına boşluk bırakarak)
-                    if (a4Paper.innerText.trim().length > 0) {
-                        a4Paper.innerText += '\n\n' + extractedText;
-                    } else {
-                        a4Paper.innerText = extractedText;
+                    if (text) {
+                        a4Paper.innerText += (a4Paper.innerText ? "\n\n" : "") + text;
                     }
-                    
-                    pageCounter.textContent = 'Okunan Görsel Sayısı: ' + addedCount;
-                    autoStatusText.textContent = 'Başarıyla A4 Belgesine Eklendi!';
-                } else {
-                    alert('Görselde okunabilir bir metin bulunamadı.');
+                } catch (err) {
+                    console.error("Hata:", err);
                 }
-
-            } catch (err) {
-                console.error(err);
-                alert('Görsel okunurken bir hata oluştu.');
-            } finally {
-                setTimeout(() => {
-                    autoStatusContainer.style.display = 'none';
-                    autoProgressBar.style.width = '0%';
-                }, 1500);
-
-                // Input'u sıfırla ki aynı fotoğraf tekrar çekilirse yeniden algılasın
-                autoImageInput.value = '';
             }
+
+            statusText.textContent = 'Tüm işlemler tamamlandı!';
+            progressBar.style.width = '100%';
+            setTimeout(() => statusContainer.style.display = 'none', 2000);
+            
+            // Seçimi sıfırla (aynı dosyayı tekrar eklemek istersen diye)
+            autoImageInput.value = '';
         });
 
-        // PDF İndir İşlevi
+        // Yardımcı Fonksiyonlar
         function downloadPDF() {
-            if (!a4Paper.innerText.trim()) {
-                alert("İndirilecek metin bulunamadı!");
-                return;
-            }
-            
-            const element = document.getElementById('a4Paper');
-            const opt = {
-                margin:       15,
-                filename:     'Okunan_Belge.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            
-            html2pdf().set(opt).from(element).save();
+            html2pdf().from(a4Paper).save('Belge.pdf');
         }
 
-        // DOCX (Word) İndir İşlevi
         function downloadDOC() {
-            if (!a4Paper.innerText.trim()) {
-                alert("İndirilecek metin bulunamadı!");
-                return;
-            }
-
-            const textHTML = a4Paper.innerHTML.replace(/\n/g, '<br>');
-            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-                "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-                "xmlns='http://www.w3.org/TR/REC-html40'>"+
-                "<head><meta charset='utf-8'><title>Belge</title></head><body>";
-            const footer = "</body></html>";
-            const sourceHTML = header + textHTML + footer;
-
-            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-            const fileDownload = document.createElement("a");
-            document.body.appendChild(fileDownload);
-            fileDownload.href = source;
-            fileDownload.download = 'Okunan_Belge.doc';
-            fileDownload.click();
-            document.body.removeChild(fileDownload);
+            const content = a4Paper.innerHTML.replace(/\n/g, '<br>');
+            const blob = new Blob(['<html><head><meta charset="utf-8"></head><body>' + content + '</body></html>'], {type: 'application/msword'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Belge.doc";
+            a.click();
         }
 
-        // A4 Panosundaki Metni Kopyala
-        function copyA4Text() {
-            const text = a4Paper.innerText;
-            if (!text.trim()) return;
-
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Tüm A4 Belge metni panoya kopyalandı!");
-            });
+        function copyText() {
+            navigator.clipboard.writeText(a4Paper.innerText);
+            alert("Metin panoya kopyalandı!");
         }
 
-        // A4 Kağıdını Temizle
-        function clearA4Paper() {
-            if (confirm("A4 belgesindeki tüm metinler silinecek. Emin misiniz?")) {
-                a4Paper.innerText = '';
-                addedCount = 0;
-                pageCounter.textContent = 'Okunan Görsel Sayısı: 0';
-            }
-        }
-
-
-        // --- 2. TEKLİ MOD MANTIĞI ---
-        const singleImageInput = document.getElementById('singleImageInput');
-        const singleProcessBtn = document.getElementById('singleProcessBtn');
-        const singleImagePreview = document.getElementById('singleImagePreview');
-        const singlePreviewContainer = document.getElementById('singlePreviewContainer');
-        const singleStatusContainer = document.getElementById('singleStatusContainer');
-        const singleStatusText = document.getElementById('singleStatusText');
-        const singleProgressBar = document.getElementById('singleProgressBar');
-        const singleResultContainer = document.getElementById('singleResultContainer');
-        const singleOutputText = document.getElementById('singleOutputText');
-        let singleFile = null;
-
-        singleImageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                singleFile = file;
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    singleImagePreview.src = event.target.result;
-                    singlePreviewContainer.classList.remove('hidden');
-                    singleProcessBtn.disabled = false;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        singleProcessBtn.addEventListener('click', async function() {
-            if (!singleFile) return;
-
-            singleProcessBtn.disabled = true;
-            document.getElementById('singleSpinner').style.display = 'block';
-            document.getElementById('singleBtnText').textContent = 'Okunuyor...';
-            singleStatusContainer.style.display = 'block';
-
-            try {
-                const result = await Tesseract.recognize(singleFile, 'tur+eng', {
-                    logger: m => {
-                        if (m.status === 'recognizing text') {
-                            singleStatusText.textContent = 'Okunuyor... %' + Math.round(m.progress * 100);
-                            singleProgressBar.style.width = (m.progress * 100) + '%';
-                        }
-                    }
-                });
-
-                singleOutputText.value = result.data.text;
-                singleResultContainer.classList.remove('hidden');
-            } catch (err) {
-                alert('Hata oluştu!');
-            } finally {
-                document.getElementById('singleSpinner').style.display = 'none';
-                document.getElementById('singleBtnText').textContent = 'Metni Okut (OCR)';
-                singleProcessBtn.disabled = false;
-            }
-        });
-
-        function copyText(id) {
-            const txt = document.getElementById(id).value;
-            if (txt) {
-                navigator.clipboard.writeText(txt).then(() => alert("Kopyalandı!"));
-            }
+        function clearAll() {
+            if(confirm("Tüm sayfalar silinsin mi?")) a4Paper.innerText = '';
         }
     </script>
 </body>
