@@ -7,53 +7,122 @@
         body { font-family: sans-serif; background: #222; color: #fff; padding: 20px; display: flex; gap: 20px; }
         
         /* Düzenleme Paneli */
-        #panel { width: 300px; background: #333; padding: 15px; border-radius: 8px; }
-        #panel input, #panel textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+        #panel { width: 320px; background: #333; padding: 15px; border-radius: 8px; max-height: 90vh; overflow-y: auto; }
+        #panel label { display: block; margin-bottom: 5px; font-size: 12px; color: #aaa; }
+        #panel input, #panel textarea { width: 100%; margin-bottom: 15px; padding: 8px; box-sizing: border-box; background: #444; color: #fff; border: 1px solid #555; border-radius: 4px; }
         
         /* A4 Kağıdı */
-        .a4-kagit { width: 210mm; min-height: 297mm; background: white; color: #000; padding: 15mm; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        .header { border-bottom: 2px solid #000; margin-bottom: 20px; text-align: center; }
-        .content { display: flex; gap: 20px; height: 600px; }
-        .sutun { flex: 1; border: 1px dashed #ccc; padding: 10px; white-space: pre-wrap; }
-        .footer { border-top: 2px solid #000; margin-top: 20px; padding-top: 10px; text-align: center; font-weight: bold; }
+        .a4-kagit { width: 210mm; min-height: 297mm; background: white; color: #000; padding: 15mm; box-shadow: 0 0 10px rgba(0,0,0,0.5); box-sizing: border-box; display: flex; flex-direction: column; }
+        
+        /* Üst Tablo (zzzzzz.jpg Tasarımı) */
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-family: Arial, sans-serif; font-size: 13px; font-weight: bold; }
+        .header-table td { border: 1px solid #000; padding: 5px; }
+        .center-col { text-align: center; vertical-align: middle; }
+        .label-col { text-align: right; width: 60px; border-right: none; white-space: nowrap; }
+        .input-col { width: 140px; border-left: none; }
+        .puan-col { width: 60px; font-size: 15px; }
+        .sinif-col { width: 60px; font-size: 14px; }
 
-        @media print { #panel, button { display: none; } body { background: none; } .a4-kagit { box-shadow: none; } }
+        /* Soru Alanı */
+        .content { flex-grow: 1; padding: 10px 0; white-space: pre-wrap; font-family: Arial, sans-serif; font-size: 14px; }
+        
+        /* Alt Kısım */
+        .footer { display: flex; justify-content: space-between; margin-top: auto; padding-top: 20px; font-weight: bold; font-family: Arial, sans-serif; font-size: 14px; }
+
+        @media print { 
+            #panel, button { display: none !important; } 
+            body { background: none; padding: 0; margin: 0; display: block; } 
+            .a4-kagit { box-shadow: none; padding: 0; width: 100%; min-height: auto; } 
+            @page { margin: 15mm; }
+        }
     </style>
 </head>
 <body>
 
     <div id="panel">
         <h3>Sınav Ayarları</h3>
-        <input type="text" id="okulAdi" placeholder="Okul Adı" oninput="guncelle()">
+        
+        <label>Sol Sınıf Alanı (Örn: 9. SINIF)</label>
+        <input type="text" id="solSinif" placeholder="...... SINIF" oninput="guncelle()">
+        
+        <label>Okul Adı</label>
+        <input type="text" id="okulAdi" placeholder="HARPUT KAPI ANADOLU LİSESİ" oninput="guncelle()">
+        
+        <label>Eğitim Öğretim Yılı</label>
+        <input type="text" id="egitimYili" placeholder="2024-2025 EĞİTİM ÖĞRETİM YILI" oninput="guncelle()">
+        
+        <label>Ders Adı</label>
+        <input type="text" id="dersAdi" placeholder="........................ DERSİ" oninput="guncelle()">
+        
+        <label>Dönem ve Sınav Bilgisi</label>
+        <input type="text" id="sinavBilgisi" placeholder="1. DÖNEM 1. YAZILI (....... SENARYO)" oninput="guncelle()">
+        
+        <label>Öğretmen Adı</label>
         <input type="text" id="ogretmen" placeholder="Öğretmen Adı" oninput="guncelle()">
-        <input type="text" id="sure" placeholder="Sınav Süresi" oninput="guncelle()">
-        <textarea id="sorularA" placeholder="A Grubu Soruları" oninput="guncelle()" rows="5"></textarea>
-        <textarea id="sorularB" placeholder="B Grubu Soruları" oninput="guncelle()" rows="5"></textarea>
-        <button onclick="window.print()" style="width:100%; background:#28a745; color:white; border:none; padding:10px; cursor:pointer;">PDF/Yazdır</button>
+        
+        <label>Sınav Süresi (Dakika)</label>
+        <input type="text" id="sure" value="40" placeholder="40" oninput="guncelle()">
+        
+        <label>Sorular</label>
+        <textarea id="sorular" placeholder="Sorularınızı buraya girin..." oninput="guncelle()" rows="10"></textarea>
+        
+        <button onclick="window.print()" style="width:100%; background:#28a745; color:white; border:none; padding:12px; font-weight:bold; border-radius:4px; cursor:pointer; margin-top:10px;">PDF/Yazdır</button>
     </div>
 
     <div class="a4-kagit">
-        <div class="header">
-            <h2 id="viewOkul">OKUL ADI</h2>
-            <p>Ad Soyad: _______________ | Sınıf/No: ____/____ | Not: ____</p>
-        </div>
-        <div class="content">
-            <div class="sutun" id="viewA"><h4>A Grubu</h4></div>
-            <div class="sutun" id="viewB"><h4>B Grubu</h4></div>
-        </div>
+        <!-- zzzzzz.jpg Tablo Tasarımı -->
+        <table class="header-table">
+            <tr>
+                <td rowspan="4" class="center-col sinif-col" id="viewSolSinif">......<br>SINIF</td>
+                <td class="center-col" id="viewOkul">HARPUT KAPI ANADOLU LİSESİ</td>
+                <td class="label-col">ADI:</td>
+                <td class="input-col"></td>
+                <td rowspan="4" class="center-col puan-col">PUAN</td>
+            </tr>
+            <tr>
+                <td class="center-col" id="viewYil">2024-2025 EĞİTİM ÖĞRETİM YILI</td>
+                <td class="label-col">SOYADI:</td>
+                <td class="input-col"></td>
+            </tr>
+            <tr>
+                <td class="center-col" id="viewDers">........................ DERSİ</td>
+                <td class="label-col">SINIFI:</td>
+                <td class="input-col"></td>
+            </tr>
+            <tr>
+                <td class="center-col" id="viewSinav">1. DÖNEM 1. YAZILI (....... SENARYO)</td>
+                <td class="label-col">OKUL NO:</td>
+                <td class="input-col"></td>
+            </tr>
+        </table>
+
+        <!-- Tek Soru Alanı -->
+        <div class="content" id="viewSorular"></div>
+
+        <!-- Alt Kısım Tasarımı -->
         <div class="footer">
-            <p>Sınav Süresi: <span id="viewSure">__</span> | Başarılar Dilerim.</p>
-            <p>Öğretmen: <span id="viewOgretmen">_______</span></p>
+            <div>Sınav Süresi: <span id="viewSure">40</span> Dakika</div>
+            <div><span id="viewOgretmen">___________________</span></div>
         </div>
     </div>
 
     <script>
         function guncelle() {
-            document.getElementById('viewOkul').innerText = document.getElementById('okulAdi').value || 'OKUL ADI';
-            document.getElementById('viewOgretmen').innerText = document.getElementById('ogretmen').value || '_______';
-            document.getElementById('viewSure').innerText = document.getElementById('sure').value || '__';
-            document.getElementById('viewA').innerHTML = '<h4>A Grubu</h4>' + document.getElementById('sorularA').value;
-            document.getElementById('viewB').innerHTML = '<h4>B Grubu</h4>' + document.getElementById('sorularB').value;
+            // Üst Tablo Verileri
+            const valSolSinif = document.getElementById('solSinif').value;
+            document.getElementById('viewSolSinif').innerHTML = valSolSinif ? valSolSinif.replace(" ", "<br>") : "......<br>SINIF";
+            
+            document.getElementById('viewOkul').innerText = document.getElementById('okulAdi').value || 'HARPUT KAPI ANADOLU LİSESİ';
+            document.getElementById('viewYil').innerText = document.getElementById('egitimYili').value || '2024-2025 EĞİTİM ÖĞRETİM YILI';
+            document.getElementById('viewDers').innerText = document.getElementById('dersAdi').value || '........................ DERSİ';
+            document.getElementById('viewSinav').innerText = document.getElementById('sinavBilgisi').value || '1. DÖNEM 1. YAZILI (....... SENARYO)';
+            
+            // Soru İçeriği
+            document.getElementById('viewSorular').innerText = document.getElementById('sorular').value;
+            
+            // Alt Kısım Verileri
+            document.getElementById('viewSure').innerText = document.getElementById('sure').value || '40';
+            document.getElementById('viewOgretmen').innerText = document.getElementById('ogretmen').value || '___________________';
         }
     </script>
 </body>
