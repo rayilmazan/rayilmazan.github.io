@@ -6,19 +6,20 @@
     <title>rayılmazan tools</title>
     <style>
         :root {
-            --bg-color: #1e1e1e;
-            --panel-bg: #2c2c2c;
-            --metal-light: #5a5a5a;
-            --metal-dark: #111;
-            --accent-blue: #4a90e2; /* Bahsedilen mavi tonu */
-            --text-color: #d4d4d4;
+            --bg-color: #f4f4f4; /* Kirli beyaz arka plan */
+            --panel-bg: #e0e0e0; /* Yıpranmış beyaz panel */
+            --metal-light: #aaa; /* Panel kenarlığı için hafif metal */
+            --metal-dark: #666; /* Panel kenarlığı için koyu metal */
+            --accent-blue: #4a90e2; /* Mavi vurgu */
+            --text-color: #333; /* Koyu metin */
+            --rust-color: #a5611c; /* Pas rengi detayları için */
         }
 
         body {
             background-color: var(--bg-color);
             background-image: 
-                linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
-                linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+                linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%, #e6e6e6), 
+                linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%, #e6e6e6);
             background-size: 20px 20px;
             background-position: 0 0, 10px 10px;
             color: var(--text-color);
@@ -33,12 +34,19 @@
 
         .main-container {
             background: var(--panel-bg);
+            /* Kir ve aşınma dokusu ekle (CSS gradient ve gürültü overlay) */
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px),
+                url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHZpZXdCb3g9IjAgMCA0IDQiPjxnIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGcgZmlsbD0iIzMzMyIgZmlsbC1vcGFjaXR5PSIwLjA1Ij48cGF0aCBkPSJNMCAwaDR2NEgwVjB6bTIgMnYyaDJWMkgyeiIvPjwvZz48L2c+PC9zdmc+'); /* Hafif gürültü overlay */
+            background-size: 50px 50px, 50px 50px, 4px 4px;
             border: 3px solid var(--metal-light);
             border-bottom-color: var(--metal-dark);
             border-right-color: var(--metal-dark);
             box-shadow: 
-                inset 2px 2px 0px rgba(255, 255, 255, 0.1),
-                10px 10px 20px rgba(0, 0, 0, 0.8);
+                inset 2px 2px 0px rgba(255, 255, 255, 0.5), /* Daha parlak iç kenar */
+                5px 5px 15px rgba(0, 0, 0, 0.3), /* Daha hafif dış gölge */
+                inset -3px -3px 5px rgba(0, 0, 0, 0.1); /* Hafif kirli gölge */
             border-radius: 4px;
             padding: 30px;
             width: 100%;
@@ -46,12 +54,12 @@
             position: relative;
         }
 
-        /* Panel köşelerindeki vida detayları (Greeble) */
+        /* Panel köşelerindeki vida detayları (Paslı his) */
         .main-container::before, .main-container::after {
             content: '';
             position: absolute;
             width: 12px; height: 12px;
-            background: radial-gradient(circle, #777, #222);
+            background: radial-gradient(circle, #777, #444, #222);
             border-radius: 50%;
             box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 1px rgba(255,255,255,0.2);
         }
@@ -61,7 +69,7 @@
         .screw-bottom-left, .screw-bottom-right {
             position: absolute;
             width: 12px; height: 12px;
-            background: radial-gradient(circle, #777, #222);
+            background: radial-gradient(circle, #777, #444, #222);
             border-radius: 50%;
             box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 1px 1px 1px rgba(255,255,255,0.2);
             bottom: 10px;
@@ -72,7 +80,7 @@
         .header {
             display: flex;
             align-items: center;
-            border-bottom: 2px dashed #444;
+            border-bottom: 2px dashed #bbb; /* Daha açık kesikli çizgi */
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
@@ -81,9 +89,9 @@
             width: 80px;
             height: auto;
             border: 2px solid var(--metal-dark);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
             margin-right: 20px;
-            background: #000;
+            background: #fdfdfd; /* Logo konteyneri temiz beyaz yap */
             padding: 2px;
         }
 
@@ -92,8 +100,8 @@
             font-weight: bold;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: #fff;
-            text-shadow: 2px 2px 4px #000;
+            color: var(--text-color); /* Koyu metin */
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8); /* Açık gölge */
             margin: 0;
             flex-grow: 1;
         }
@@ -104,7 +112,7 @@
             background-color: var(--accent-blue);
             border-radius: 50%;
             box-shadow: 0 0 10px var(--accent-blue);
-            border: 2px solid #111;
+            border: 2px solid var(--metal-dark); /* Koyu çerçeve */
         }
 
         .grid-container {
@@ -117,11 +125,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
+            background: linear-gradient(135deg, #fdfdfd, #e6e6e6); /* Yıpranmış beyaz metal */
             border: 2px solid var(--metal-light);
             border-bottom-color: var(--metal-dark);
             border-right-color: var(--metal-dark);
-            color: #ddd;
+            color: var(--text-color); /* Koyu metin */
             text-decoration: none;
             padding: 15px 10px;
             font-size: 14px;
@@ -130,7 +138,7 @@
             text-transform: uppercase;
             position: relative;
             transition: all 0.1s ease-in-out;
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* Daha hafif gölge */
         }
 
         /* Düğme üzerindeki mekanik detayı */
@@ -142,20 +150,20 @@
             transform: translateY(-50%);
             width: 4px;
             height: 20px;
-            background: #111;
-            border-right: 1px solid #666;
+            background: var(--rust-color); /* Paslı gibi detayı yap */
+            border-right: 1px solid #ddd;
         }
 
         .tool-btn:hover {
-            background: linear-gradient(135deg, #3a4b5c, #1a2b3c);
+            background: linear-gradient(135deg, #dceefc, #bbdefb); /* Mavi tonlu beyaz */
             color: #fff;
             border-color: var(--accent-blue);
-            box-shadow: 0 0 8px rgba(74, 144, 226, 0.5), inset 0 0 5px rgba(0,0,0,0.5);
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.5), inset 0 0 5px rgba(0,0,0,0.3);
         }
 
         .tool-btn:active {
             transform: translateY(2px) translateX(2px);
-            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.8);
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4);
             border-top-color: var(--metal-dark);
             border-left-color: var(--metal-dark);
             border-bottom-color: var(--metal-light);
