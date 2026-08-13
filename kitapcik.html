@@ -64,15 +64,17 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             max-width: 210mm; /* A4 Genişliği */
-            min-height: 297mm; /* A4 Yüksekliği */
+            height: 297mm; /* Sütunun dolduğunu anlaması için sabit A4 yüksekliği */
             margin: 0 auto;
+            overflow: hidden; /* A4'ten taşan kısmı gizle veya alt sayfaya atılmasını sağla */
             
             /* İki sütun ayarları */
             column-count: 2;
             column-gap: 30px;
-            column-rule: 1px solid #ccc; /* Sütunlar arası çizgi */
+            column-rule: 1px solid #ccc; 
+            column-fill: auto; /* ÖNCE 1. SÜTUNU DOLDUR, SONRA 2. SÜTUNA GEÇ */
             text-align: justify;
-            white-space: pre-wrap; /* Paragraf boşluklarını korur */
+            white-space: pre-wrap; 
             font-size: 12pt;
             line-height: 1.5;
         }
@@ -84,58 +86,55 @@
                 margin: 0;
             }
             .kontrol-paneli {
-                display: none; /* Yazdırırken üst paneli gizle */
+                display: none; 
             }
             .kagit-alani {
                 box-shadow: none;
                 max-width: 100%;
-                min-height: auto; /* Boş sayfa sorununu çözer */
+                height: 297mm; 
                 padding: 0;
                 column-rule: 1px solid #000;
+                overflow: visible;
+            }
+            @page {
+                size: A4;
+                margin: 15mm;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Kullanıcı Giriş Alanı (Çıktıda Görünmez) -->
     <div class="kontrol-paneli">
         <h2>İki Sütunlu Metin Aracı</h2>
-        <p>Metninizi aşağıdaki kutuya yapıştırın. Aşağıdaki kağıt üzerinde anında iki sütun olarak şekillenecektir.</p>
+        <p>Metninizi aşağıdaki kutuya yapıştırın. Metin önce sol sütunu tamamen dolduracak, ardından sağ sütuna geçecektir.</p>
         
         <textarea id="metinGirdisi" placeholder="Metninizi buraya yazın veya yapıştırın..."></textarea>
         
         <div class="buton-grubu">
-            <!-- PDF Almak için tarayıcının yazdırma altyapısı kullanılır -->
             <button class="btn-pdf" onclick="window.print()">PDF Olarak Al (Yazdır)</button>
             <button class="btn-word" onclick="wordOlarakIndir()">Word Olarak İndir (.doc)</button>
         </div>
     </div>
 
-    <!-- Sonuç Çıktı Alanı (İki Sütunlu Kısım) -->
     <div class="kagit-alani" id="metinCiktisi"></div>
 
     <script>
         const girdi = document.getElementById('metinGirdisi');
         const cikti = document.getElementById('metinCiktisi');
 
-        // Kutudaki metin değiştikçe aşağıdaki alanı canlı olarak güncelle
         girdi.addEventListener('input', function() {
             cikti.textContent = girdi.value;
         });
 
-        // Word (Doc) olarak indirme fonksiyonu
         function wordOlarakIndir() {
-            // Metin içeriğini HTML formatına uygun şekilde (satır atlamalarını koruyarak) alıyoruz
             let htmlIcerik = cikti.innerHTML.replace(/\n/g, '<br>');
             
-            // MS Word'ün anlayabileceği temel HTML şablonu
             let header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Belge</title><style> body { font-family: Arial, sans-serif; } .ikili-sutun { column-count: 2; column-gap: 30px; } </style></head><body>";
             let footer = "</body></html>";
             
             let tamHTML = header + "<div class='ikili-sutun'>" + htmlIcerik + "</div>" + footer;
             
-            // Dosyayı oluştur ve indirmeyi tetikle
             let blob = new Blob(['\ufeff', tamHTML], { type: 'application/msword' });
             let url = URL.createObjectURL(blob);
             let link = document.createElement('a');
