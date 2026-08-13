@@ -65,7 +65,7 @@
         .print-container {
             background: white;
             width: 210mm;
-            min-height: 297mm;
+            min-height: 297mm; /* Ekran görünümü için A4 boyu */
             margin: 0 auto;
             padding: 15mm;
             box-sizing: border-box;
@@ -141,6 +141,8 @@
                 margin: 0;
                 width: 100%;
                 padding: 0;
+                min-height: auto !important; /* Boş sayfa hatasını önlemek için eklendi */
+                page-break-before: auto;
             }
             .editable-area:focus {
                 outline: none;
@@ -228,7 +230,6 @@
                 cevapOutput.innerHTML = '';
             }
             
-            // Kısa bir gecikme ile yazdırma penceresini aç (yapılan manuel düzenlemelerin korunması için)
             setTimeout(() => {
                 window.print();
             }, 300);
