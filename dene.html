@@ -1,120 +1,1222 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Küçültme Aracı</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            text-align: center;
-        }
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .file-drop-area {
-            border: 2px dashed #007bff;
-            padding: 30px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #007bff;
-            margin-bottom: 20px;
-            transition: background 0.3s;
-        }
-        .file-drop-area:hover {
-            background-color: #f0f8ff;
-        }
-        input[type="file"] {
-            display: none;
-        }
-        #fileName {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 15px;
-            word-break: break-all;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        #status {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>KPSS Tarih ve Coğrafya Nokta Atışı Deneme Sınavı</title>
+<style>
+  @page {
+    size: A4;
+    margin: 12mm 10mm 12mm 10mm;
+  }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.3;
+    color: #000;
+    margin: 0;
+    padding: 0;
+  }
+  .header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    font-weight: bold;
+    font-size: 11pt;
+    text-transform: uppercase;
+  }
+  .columns {
+    column-count: 2;
+    column-gap: 20px;
+    column-rule: 1px solid #aaa;
+  }
+  .question {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom: 14px;
+    text-align: justify;
+  }
+  .q-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .options {
+    margin-left: 4px;
+  }
+  .answer-section {
+    break-before: page;
+    page-break-before: always;
+    padding-top: 10px;
+  }
+  .answer-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 5px;
+  }
+  table.answer-key {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    text-align: center;
+  }
+  table.answer-key td, table.answer-key th {
+    border: 1px solid #666;
+    padding: 4px 2px;
+  }
+  table.answer-key th {
+    background-color: #f0f0f0;
+  }
+</style>
 </head>
 <body>
 
-<div class="card">
-    <h2>PDF Küçültme Aracı</h2>
-    <form id="pdfForm">
-        <label for="pdfFile" class="file-drop-area">
-            <span>PDF Dosyasını Seçmek İçin Tıklayın</span>
-            <input type="file" id="pdfFile" accept="application/pdf" required>
-        </label>
-        <div id="fileName"></div>
-        <button type="submit" id="submitBtn">PDF'i Küçült</button>
-    </form>
-    <div id="status"></div>
+<div class="header">
+  KPSS TARİH VE COĞRAFYA ÖZEL ANALİZ DENEME SINAVI (100 SORU)
 </div>
 
-<script>
-    const fileInput = document.getElementById('pdfFile');
-    const fileNameDiv = document.getElementById('fileName');
-    const form = document.getElementById('pdfForm');
-    const statusDiv = document.getElementById('status');
+<div class="columns">
 
-    // Dosya seçildiğinde adını göster
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            fileNameDiv.textContent = `Seçilen Dosya: ${e.target.files[0].name}`;
-        }
-    });
+  <!-- 1 - 50 TARİH SORULARI -->
+  <div class="question">
+    <div class="q-title">1. (Tarih) Büyük Selçuklu Devleti'nde Vezir Nizamülmülk’ün Siyasetname adlı eserinde vurguladığı devlet anlayışı ve adalet mekanizmaları dikkate alındığında, adil bir yönetimin sürdürülebilmesi için aşağıdakilerden hangisi doğrudan bir zorunluluk olarak gösterilemez?</div>
+    <div class="options">
+      A) Kadıların kararlarında divan-ı mezalim denetimine açık olması<br>
+      B) Hükümdarın halkın şikâyetlerini bizzat dinleyeceği adalet divanlarına başkanlık etmesi<br>
+      C) Mazlumun hakkının zalimden alınması için istihbarat (berid) teşkilatının etkin çalıştırılması<br>
+      D) Bütün eyalet idarecilerinin ve askerî sınıfın tamamının muafiyetsiz biçimde vergilendirilmesi<br>
+      E) İkta sahiplerinin reayadan kanun dışı vergi ve angarya talep etmesinin engellenmesi
+    </div>
+  </div>
 
-    // Form gönderildiğinde yapılacak işlemler
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const file = fileInput.files[0];
-        
-        if (!file) {
-            alert('Lütfen bir PDF dosyası seçin.');
-            return;
-        }
+  <div class="question">
+    <div class="q-title">2. (Tarih) Osmanlı Devleti'nde iskân politikası uygulanırken fethe dilen bölgelere yerleştirilen konar-göçer Türkmen gruplarına ve muafiyet statülerine ilişkin aşağıda verilen bilgilerden hangisi yanlıştır?</div>
+    <div class="options">
+      A) Yeni yerleşim yerlerine giden ahaliye belirli bir süre için vergi muafiyeti tanınmıştır.<br>
+      B) Derbentçi ve köprücü statüsündeki gruplar, askerî-stratejik hizmetleri karşılığında avârız vergisinden muaf tutulmuştur.<br>
+      C) İskâna tabi tutulan ailelerin geçerli bir mazeret olmaksızın terk ettikleri topraklara dönmeleri kesin olarak yasaklanmıştır.<br>
+      D) Bölgedeki yerli gayrimüslim halkın tamamı iskân bölgelerinden sürülerek cizye vergisinden tamamen muaf kılınmıştır.<br>
+      E) Anlaşmazlık çıkaran veya kan davası bulunan aileler öncelikli olarak iskân kapsamına alınmıştır.
+    </div>
+  </div>
 
-        statusDiv.textContent = "Dosya işleniyor, lütfen bekleyin...";
-        
-        // Simülasyon (Gerçek sıkıştırma için buraya sunucu taraflı API veya 
-        // istemci tarafı kütüphane entegrasyonu [örn: pdf-lib] yapılmalıdır)
-        setTimeout(() => {
-            statusDiv.innerHTML = "<span style='color: green;'>Arayüz başarıyla hazırlandı! Gerçek sıkıştırma için sunucu tarafı kodları gereklidir.</span>";
-        }, 2000);
-    });
-</script>
+  <div class="question">
+    <div class="q-title">3. (Tarih) Klasik Dönem Osmanlı tımar sisteminin bozulma süreçleri ve bu sürecin sosyo-ekonomik sonuçları incelendiğinde, aşağıdakilerden hangisi tımar sisteminin bozulmasında doğrudan bir etken (neden) değil, sistemin bozulmasının bir sonucudur?</div>
+    <div class="options">
+      A) Ateşli silahların yaygınlaşmasıyla eyalet askerleri yerine tımarlı sipahilerin önemini kaybetmesi<br>
+      B) Celali İsyanları sebebiyle Anadolu'da reayanın "Büyük Kaçgun" hareketini başlatması<br>
+      C) Hazineye nakit para sağlamak amacıyla dirlik topraklarının "Malikâne usulü" ile ömür boyu kiralanmaya başlanması<br>
+      D) Tımar dirliklerinin rüşvet ve iltimasla askerlik mesleği dışından kişilere tevcih edilmesi<br>
+      E) Akçenin değer kaybetmesi (enflasyon) sonucu dirlik gelirlerinin reel olarak düşmesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">4. (Tarih) 1695 yılında uygulamaya konulan Malikâne usulü ile ilgili aşağıdaki yargılardan hangisi akademik olarak doğrudur?</div>
+    <div class="options">
+      A) Tımar sistemini tamamen ortadan kaldırıp yerine Batı tarzı özel mülkiyeti getiren ana düzenlemedir.<br>
+      B) Devletin uzun süreli savaşlar ve mali krizler sonucu nakit ihtiyacını karşılamak için iltizamı ömür boyu kiralama biçimidir ve tımarın bozulma nedeni değil sonucudur.<br>
+      C) Sadece mülk topraklar üzerinde uygulanan ve mülk sahibinin ölümünden sonra devlete geçen vergilendirme sistemidir.<br>
+      D) II. Mahmut döneminde mukataa topraklarının tamamının ilmiye sınıfına mülk olarak dağıtılması usulüdür.<br>
+      E) Âyanların nüfuzunu kırmak amacıyla Taşra teşkilatında kaza yöneticilerinin seçimle iş başına gelmesidir.
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">5. (Tarih) Osmanlı Devleti’nde devşirme (kul) sisteminin bozulmasıyla ilgili olarak aşağıdakilerden hangisi sistemin özgün yapısını tahrip eden gelişmeler arasında gösterilemez?</div>
+    <div class="options">
+      A) Kanuni Sultan Süleyman döneminden itibaren Yeniçeri Ocağı'na kul kökenli olmayan müslüman halktan kişilerin devşirilmesi<br>
+      B) III. Murat döneminde saray düğününde hokkabazlık yapanlara yeniçeri beratı verilmesi<br>
+      C) "Devlet ocak içindir" anlayışının "Ocak devlet içindir" ilkesinin yerini alması<br>
+      D) Devşirme oğlanlarının Yaya ve Müsellem teşkilatına baş olarak tayin edilme zorunluluğunun getirilmesi<br>
+      E) Yeniçerilerin askerlik dışı ticaret ve esnaflık işleriyle uğraşmaya başlaması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">6. (Tarih) II. Mahmut Dönemi'nde gerçekleştirilen kılık-kıyafet reformları (1829 Kıyafet Nizamnamesi) kapsamında devlet memurlarına ceket, pantolon ve fes giyme zorunluluğu getirilmiştir. Geleneksel yapısını ve dinsel statüsünü koruması amacıyla bu nizamnamenin dışında tutulan (istisna edilen) sınıf aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Kalemiye sınıfı<br>
+      B) İlmiye sınıfı<br>
+      C) Seyfiye sınıfı<br>
+      D) Mülkiye memurları<br>
+      E) Harbiye subayları
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">7. (Tarih) 1889 yılında Askeri Tıbbiye öğrencileri tarafından gizlice kurulan ve daha sonra İttihat ve Terakki Cemiyeti'ne dönüşen İttihad-ı Osmani Cemiyeti'nin kurucu kadrosu içerisinde aşağıdakilerden hangisi yer almaz?</div>
+    <div class="options">
+      A) İbrahim Temo<br>
+      B) Abdullah Cevdet<br>
+      C) İshak Sükûti<br>
+      D) Mehmed Reşid<br>
+      E) Hikmet Kıvılcımlı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">8. (Tarih) Mondros Ateşkes Antlaşması (30 Ekim 1918) sonrasında İtilaf Devletleri'nin Anadolu’yu işgal etmesi üzerine ortaya çıkan Kuvayımilliye hareketi ile ilgili aşağıdaki ifadelerden hangisi yanlıştır?</div>
+    <div class="options">
+      A) Bölgesel nitelikli olup merkezî bir komuta zincirinden yoksun hareket etmişlerdir.<br>
+      B) İşgalleri tamamen sonlandırma gücüne sahip olmasalar da düşman ilerleyişini yavaşlatmışlardır.<br>
+      C) TBMM'ye karşı çıkan bazı iç isyanların bastırılmasında aktif rol oynamışlardır.<br>
+      D) Düzenli ordu kurulması sürecinde orduya katılmayı reddeden bazı Kuvayımilliye liderleri TBMM'ye karşı isyan etmiştir.<br>
+      E) İlk Kuvayımilliye direnişi Mondros’tan hemen sonra Doğu Anadolu’da Ermenilere karşı Kazım Karabekir komutasında başlatılmıştır.
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">9. (Tarih) Milli Mücadele Dönemi’nde İnebolu Limanı’ndan başlayıp Kastamonu, Ilgaz ve Çankırı üzerinden Ankara’ya uzanan ve "İstiklal Yolu" olarak adlandırılan güzergâhın stratejik önemi aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) İtilaf Devletleri ile diplomatik görüşmelerin yürütüldüğü ana güvenli bölge olması<br>
+      B) Sovyet Rusya ve İstanbul'dan kaçırılan cephane ile lojistik malzemenin cepheye güvenle ulaştırıldığı hat olması<br>
+      C) Kuvayımilliye birliklerinin ilk kurulduğu ve Batı Cephesi komutanlığının karargâhı olması<br>
+      D) Fransız işgaline karşı Güney Cephesi’ne insan gücü aktarımının sağlandığı tek yol olması<br>
+      E) Tehcir Kanunu kapsamındaki nüfus aktarımının kontrol edildiği askerî koridor olması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">10. (Tarih) I. Dünya Savaşı sırasında Osmanlı Devleti tarafından çıkarılan kanunlar ile Milli Mücadele Dönemi’nde TBMM tarafından çıkarılan kanunların tarihsel ve hukuki ayrımı yapıldığında, aşağıdakilerden hangisi Osmanlı Hükümeti dönemine aittir?</div>
+    <div class="options">
+      A) Hıyanet-i Vataniye Kanunu<br>
+      B) Firariler Kanunu<br>
+      C) Sevk ve İskân (Tehcir) Kanunu<br>
+      D) Nisap-ı Müzakere Kanunu<br>
+      E) Men-i Müskirat Kanunu
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">11. (Tarih) 4-11 Eylül 1919 tarihleri arasında toplanan Sivas Kongresi’nde alınan kararlar ve yaşanan gelişmelerle ilgili aşağıdakilerden hangisi yanlıştır?</div>
+    <div class="options">
+      A) Manda ve himaye fikri bir daha gündeme gelmemek üzere kesin olarak reddedilmiştir.<br>
+      B) Bütün cemiyetler "Anadolu ve Rumeli Müdafaa-i Hukuk Cemiyeti" adı altında birleştirilmiştir.<br>
+      C) Mebusan Meclisi’nin derhal toplanması ve hükümetin denetlenmesi talep edilmiştir.<br>
+      D) Kongre sonucunda Damat Ferit Paşa Hükümeti istifa etmek zorunda kalmıştır.<br>
+      E) İlk geçici hükümet kurularak Mustafa Kemal Paşa oy birliğiyle Cumhurbaşkanı seçilmiştir.
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">12. (Tarih) I. İnönü Muharebesi (6-10 Ocak 1921) sürerken TBMM Hükümeti’ni içeride ve dışarıda askerî açıdan en çok zorlayan ve muharebe ile eş zamanlı olarak bastırılmak zorunda kalınan iç isyan aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Anzavur İsyanı<br>
+      B) Çerkez Ethem İsyanı<br>
+      C) Delibaş Mehmet İsyanı<br>
+      D) Koçgiri İsyanı<br>
+      E) Milli Aşireti İsyanı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">13. (Tarih) Sakarya Meydan Muharebesi’nin (22 Ağustos - 13 Eylül 1921) kazanılmasının ardından ortaya çıkan siyasi ve askerî sonuçlar arasında aşağıdakilerden hangisi yer almaz?</div>
+    <div class="options">
+      A) Kafkas Cumhuriyetleri ile Kars Antlaşması’nın imzalanması<br>
+      B) Fransa ile Ankara Antlaşması’nın imzalanarak Güney Cephesi’nin kapanması<br>
+      C) TBMM tarafından Mustafa Kemal Paşa’ya "Mareşal" rütbesi ve "Gazi" unvanının verilmesi<br>
+      D) İngiltere ile esir mübadelesi anlaşmasının yapılması<br>
+      E) Yunanistan ile Mudanya Mütarekesi’nin imzalanarak Doğu Trakya’nın savaşsız kurtarılması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">14. (Tarih) 3 Mart 1924 tarihinde Halifeliğin kaldırılması sürecini hızlandıran ve TBMM'de tepkilere yol açarak sürecin öne çekilmesinde etkili olan dış gelişme aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) İngiltere Kralı V. George'un TBMM Hükümeti'ne resmî ültimatom vermesi<br>
+      B) Hindistanlı Müslüman liderler Ağa Han ve Seyyid Emir Ali’nin İsmet Paşa’ya yazdıkları mektubun Başbakanlıktan önce İstanbul basınında yayımlanması<br>
+      C) Hicaz Emiri Şerif Hüseyin’in kendisini tüm Müslümanların halifesi ilan etmesi<br>
+      D) Milletler Cemiyeti’nin Halifelik makamını uluslararası hukuka aykırı ilan etmesi<br>
+      E) Fransa’nın Suriye mandasındaki Müslümanları Halifeye karşı kışkırtması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">15. (Tarih) 1930 Belediye Seçimleri, Türkiye Cumhuriyet siyasi tarihi açısından birçok ilki bünyesinde barındırmaktadır. Aşağıdakilerden hangisi 1930 Belediye Seçimlerinin özelliklerinden biri değildir?</div>
+    <div class="options">
+      A) Kadınların ilk kez belediye seçimlerinde seçme ve seçilme hakkını kullanması<br>
+      B) Yeni kurulan Serbest Cumhuriyet Fırkası’nın da seçimlere katılması<br>
+      C) Çok partili siyasi yaşam denemesinin yerel düzeyde gerçekleşmesi<br>
+      D) Seçimlerde ilk kez gizli oy - açık tasnif ilkesinin tam olarak uygulanması<br>
+      E) Tek dereceli seçim sistemine henüz geçilmemiş olması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">16. (Tarih) Türkiye'de 1923-1930 yılları arasında uygulanan ekonomi politikaları ile 1930 sonrası uygulanan politikalar karşılaştırıldığında aşağıdakilerden hangisi 1923-1930 dönemi için geçerli bir durumdur?</div>
+    <div class="options">
+      A) Özel sektörü teşvik eden liberal modelin (Teşvik-i Sanayi Kanunu) esas alınması<br>
+      B) I. Beş Yıllık Sanayi Planı’nın uygulamaya konulması<br>
+      C) Sümerbank ve Etibank’ın devlet eliyle ağır sanayi hamlesi için kurulması<br>
+      D) Devletçi ekonomi politikasının Anayasa'ya bir ilke olarak girmesi<br>
+      E) Merkez Bankası'nın kriz sonrası devletleştirilerek yabancı sermayenin tamamen tasfiye edilmesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">17. (Tarih) Demokrat Parti’nin (DP) kuruluş sürecinde ve muhalefet döneminde önemli bir yere sahip olan, 7 Ocak 1947 tarihindeki I. DP Olağanüstü Kongresi'nde kabul edilen ve iktidara karşı antidemokratik yasaların kaldırılması ile seçim güvenliğinin sağlanmasını talep eden bildiri aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Dörtlü Takrir<br>
+      B) Hürriyet Misakı<br>
+      C) Vatan Cephesi Deklarasyonu<br>
+      D) Dokuz Umde<br>
+      E) On Dört Mayıs Beyannamesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">18. (Tarih) İki dünya savaşı arası dönemde (1918-1939) Türk dış politikasında yaşanan gelişmeler kronolojik ve hukuki açıdan değerlendirildiğinde, aşağıdakilerden hangisi Türkiye’nin bu dönemde imzaladığı veya taraf olduğu uluslararası metinlerden biri değildir?</div>
+    <div class="options">
+      A) Milletler Cemiyeti’ne Katılım (1932)<br>
+      B) Balkan Antantı (1934)<br>
+      C) Locarno Antlaşması (1925)<br>
+      D) Montrö Boğazlar Sözleşmesi (1936)<br>
+      E) Sadabat Paktı (1937)
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">19. (Tarih) Türk dış politikası tarihine ilişkin yapılan bir testte yer alan "Türkiye, II. Dünya Savaşı sonrasında Batı Bloku ile entegrasyonu sağlamak amacıyla 1949 yılında kurulan Avrupa Konseyi'ne kurucu üyeler arasında katılmıştır." ifadesini iki savaş arası dönem (1918-1939) dış politikasıyla karıştıran bir öğrenci temel olarak hangi hatayı yapmıştır?</div>
+    <div class="options">
+      A) Tarihsel dönem ve dönemsel kronoloji hatası<br>
+      B) Taraf olunan örgütün coğrafi kapsamı hatası<br>
+      C) Sözleşmenin hukuki niteliği hatası<br>
+      D) İki taraf arasındaki ikili antlaşma hatası<br>
+      E) Doğu Bloku üyelik süreci hatası
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">20. (Tarih) II. Dünya Savaşı sonrasında Soğuk Savaş döneminin başlamasında ve küresel düzeyde iki kutuplu (bipolar) sistemin ortaya çıkmasında aşağıdakilerden hangisi temel etken olarak gösterilemez?</div>
+    <div class="options">
+      A) Almanya ve Japonya'nın yenilmesiyle Avrupa ve Asya'da oluşan Güç Boşluğu (Power Vacuum)<br>
+      B) ABD'nin Truman Doktrini ve Marshall Planı ile SSCB'yi çevreleme politikası izlemesi<br>
+      C) SSCB'nin Doğu Avrupa ülkelerinde komünist rejimler kurarak nüfuz alanını genişletmesi<br>
+      D) Birleşmiş Milletler Teşkilatı’nın Locarno Antlaşması ilkelerini reddetmesi<br>
+      E) İdeolojik ve askeri bloklaşmaların (NATO ve Varşova Paktı) hız kazanması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">21. (Tarih) Büyük Selçuklu Devleti ve Osmanlı Devleti'nde adalet mekanizmasının işleyişinde Şer'i Hukuk ve Örf-i Hukuk ayrımı bulunmaktaydı. Buna göre, Osmanlı hukuk sisteminde Örf-i Hukuk kurallarının oluşturulmasında ve kanunname çıkarılmasında temel yetki aşağıdakilerden hangisine aittir?</div>
+    <div class="options">
+      A) Şeyhülislam<br>
+      B) Kazasker<br>
+      C) Padişah<br>
+      D) Sadrazam<br>
+      E) Nişancı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">22. (Tarih) Osmanlı Devleti'nde Tımar Sisteminin bozulmasıyla birlikte taşrada güvenliğin bozulması, reayanın toprağını terk etmesi ve asker ihtiyacının karşılanamaması üzerine devlet hangi askerî sınıfın sayısını artırmak zorunda kalmıştır?</div>
+    <div class="options">
+      A) Cebeciler<br>
+      B) Cebelüler<br>
+      C) Sekban ve Sarıcalar<br>
+      D) Akıncılar<br>
+      E) Azaplar
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">23. (Tarih) II. Mahmut Dönemi'nde gerçekleştirilen idari ve hukuki düzenlemeler dikkate alındığında aşağıdakilerden hangisi yönetimde yetkilerin tek elde toplanması ve merkezî otoritenin güçlendirilmesi amacına hizmet etmez?</div>
+    <div class="options">
+      A) Müsadere usulünün büyük oranda kaldırılması<br>
+      B) Âyanlar ile Sened-i İttifak’ın imzalanması<br>
+      C) Muhtarlık teşkilatının kurulması<br>
+      D) Memurlara maaş bağlanması<br>
+      E) Tımar sisteminin resmen kaldırılması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">24. (Tarih) İttihad-ı Osmani Cemiyeti’nin kuruluşunda etkili olan Fransız İhtilali kaynaklı fikir akımı ve cemiyet üyelerinin temel amacı aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Meşrutiyet’i yeniden ilan ettirerek Kanun-ı Esasi’yi yürürlüğe koymak<br>
+      B) Saltanatı tamamen kaldırarak cumhuriyet rejimine geçmek<br>
+      C) Manda idaresini kabul ettirmek<br>
+      D) Türkçülük ülküsünü tüm Asya’da hakim kılmak<br>
+      E) Medrese eğitimini tamamen yasaklamak
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">25. (Tarih) Milli Mücadele Dönemi’nde Kuvayımilliye birliklerinin kaldırılıp Düzenli Ordu’ya geçilmesinde aşağıdakilerden hangisi etkili bir neden değildir?</div>
+    <div class="options">
+      A) Gediz Taarruzu’nda Yunan ordusına karşı başarı sağlanamaması<br>
+      B) Kuvayımilliye birliklerinin hukuk dışı yargılama ve cezalandırma yapması<br>
+      C) Düşman işgalini kesin olarak sonlandıracak askeri disiplinden yoksun olmaları<br>
+      D) Sivas Kongresi’nde manda sisteminin kesin reddedilmiş olması<br>
+      E) Birliklerin ihtiyaçlarını halktan zorla toplama eğilimi göstermesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">26. (Tarih) Osmanlı Devleti’nin I. Dünya Savaşı sürecinde çıkardığı 1915 Sevk ve İskân (Tehcir) Kanunu ile ilgili aşağıdaki ifadelerden hangisi doğrudur?</div>
+    <div class="options">
+      A) TBMM tarafından Hıyanet-i Vataniye Kanunu’na ek olarak çıkarılmıştır.<br>
+      B) Savaş bölgesindeki güvenliği tehdit eden Ermeni nüfusun Suriye ve Lübnan bölgelerine zorunlu göçünü kapsar.<br>
+      C) Mondros Ateşkes Antlaşması’nın 7. maddesine dayanılarak uygulanmıştır.<br>
+      D) İstiklal Mahkemeleri kararları doğrultusunda yürürlüğe sokulmuştur.<br>
+      E) Müttefik devletlerin talebi doğrultusunda imzalanan uluslararası bir antlaşmadır.
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">27. (Tarih) Sivas Kongresi’nde temsil heyetinin üye sayısı artırılmış ve tüm yurdu temsil eder hale getirilmiştir. Temsil Heyeti, yürütme yetkisini ilk kez aşağıdaki gelişmelerden hangisi ile kullanmıştır?</div>
+    <div class="options">
+      A) İrade-i Milliye gazetesini çıkarması<br>
+      B) Ali Fuat Paşa’yı Batı Cephesi Umum Kuvayımilliye Komutanlığı’na ataması<br>
+      C) Amasya Görüşmeleri’ne katılması<br>
+      D) Damat Ferit Paşa’nın istifasını sağlaması<br>
+      E) Misak-ı Milli kararlarını ilan etmesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">28. (Tarih) I. İnönü Muharebesi’nden sonra TBMM’nin uluslararası alanda kazandığı ilk büyük diplomasi başarısı aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Gümrü Antlaşması<br>
+      B) Londra Konferansı’na davet edilmesi<br>
+      C) Ankara Antlaşması<br>
+      D) Mudanya Ateşkesi<br>
+      E) Moskova Antlaşması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">29. (Tarih) 3 Mart 1924 tarihinde çıkarılan kanunla Halifeliğin kaldırılmasının yanı sıra laikleşme yolunda atılan diğer adım aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Tekke, zaviye ve türbelerin kapatılması<br>
+      B) Tevhid-i Tedrisat Kanunu’nun kabul edilmesi<br>
+      C) Şer'iye ve Evkaf Vekaleti’nin kaldırılması<br>
+      D) Soyadı Kanunu’nun kabulü<br>
+      E) Anayasa’dan "Devletin dini İslam’dır" maddesinin çıkarılması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">30. (Tarih) 1930 yılında kurulan ve 1930 Belediye Seçimlerine katılan Serbest Cumhuriyet Fırkası’nın kurucusu ve genel başkanı kimdir?</div>
+    <div class="options">
+      A) Kazım Karabekir<br>
+      B) Ali Fethi Okyar<br>
+      C) Celal Bayar<br>
+      D) Refet Bele<br>
+      E) Adnan Menderes
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">31. (Tarih) 1923 yılında toplanan İzmir İktisat Kongresi’nde alınan kararlar (Misak-ı İktisadi) doğrultusunda aşağıdakilerden hangisi hedeflenmemiştir?</div>
+    <div class="options">
+      A) Yerli üretimi teşvik etmek<br>
+      B) Yabancı tekellerden kaçınmak<br>
+      C) Bütün özel teşebbüsleri devletleştirip tam planlı sosyalist ekonomiye geçmek<br>
+      D) Sanayiyi teşvik edecek kredi bankaları kurmak<br>
+      E) Demiryolu yapımına öncelik vermek
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">32. (Tarih) Demokrat Parti’nin 1950 seçimlerini kazanarak iktidara gelmesi Türk siyasi tarihinde hangi terimle ifade edilmektedir?</div>
+    <div class="options">
+      A) Dokuz Umde Hamlesi<br>
+      B) Beyaz İhtilal<br>
+      C) Bab-ı Ali Baskını<br>
+      D) Serbest Seçim Devrimi<br>
+      E) Millî Muhtıra
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">33. (Tarih) Türkiye'nin 1934 yılında Balkan Antantı’na katılmasında aşağıdaki devletlerin hangi yayılmacı politikaları tehdit oluşturmuştur?</div>
+    <div class="options">
+      A) İtalya ve Almanya<br>
+      B) İngiltere ve Fransa<br>
+      C) SSCB ve Çin<br>
+      D) Yunanistan ve Bulgaristan<br>
+      E) ABD ve İngiltere
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">34. (Tarih) İki dünya savaşı arasında Türkiye'nin Doğu sınırlarının güvenliğini temin etmek amacıyla 1937'de İran, Irak ve Afganistan ile imzaladığı antlaşma aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Balkan Paktı<br>
+      B) Sadabat Paktı<br>
+      C) Bağdat Paktı<br>
+      D) Kirte Antlaşması<br>
+      E) Cenevre Protokolü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">35. (Tarih) 1925 yılında imzalanan ve Avrupalı devletler arasında silahsızlanma ve sınır güvenliğini hedefleyen ancak Türkiye’nin taraf olmadığı antlaşma aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Briand-Kellogg Paktı<br>
+      B) Locarno Antlaşması<br>
+      C) Litvinov Protokolü<br>
+      D) Nyon Konferansı<br>
+      E) Montrö Sözleşmesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">36. (Tarih) Selçuklu devlet geleneğinde "Adaletname" düzenleme yetkisi ve halkın idarecilere karşı korunması ilkesi Osmanlı’da hangi kurum/yetki ile devam ettirilmiştir?</div>
+    <div class="options">
+      A) Hakkaniyetname / Kanunname-i Âli Osman<br>
+      B) Tımar beratı<br>
+      C) Pençik sistemi<br>
+      D) Mültezim senetleri<br>
+      E) Ahidnâme-i Hümayun
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">37. (Tarih) Osmanlı Devletinde mukataa topraklarının muaccelle adıyla peşin para karşılığında ömür boyu kiralandığı sistem aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) İltizam<br>
+      B) Dirlik<br>
+      C) Malikâne<br>
+      D) Paşalık<br>
+      E) Yurtluk
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">38. (Tarih) II. Mahmut döneminde İlmiye sınıfının kıyafet kanunundan muaf tutulmasının temel sebebi aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Yeniçeri Ocağı ile ittifak kurmuş olmaları<br>
+      B) Dini ve hukuki statülerinin geleneksel saygınlığını koruma isteği<br>
+      C) Avrupalı devletlerin baskısı<br>
+      D) Yeniçerilerin ilgisini çekmek<br>
+      E) Batı tarzı eğitimi reddetmeleri
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">39. (Tarih) 1889'da kurulan İttihad-ı Osmani Cemiyeti'nin ilham aldığı temel yayın organı ve düşünür kimdir?</div>
+    <div class="options">
+      A) Namık Kemal - Hürriyet Gazetesi<br>
+      B) Şinasi - Tercüman-ı Ahval<br>
+      C) Ziya Gökalp - Türk Yurdu<br>
+      D) Ali Suavi - Muhbir<br>
+      E) Mehmet Akif - Sebilürreşad
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">40. (Tarih) Mondros sonrası işgallere karşı Karadeniz’den gelen silah ve mühimmatın Kastamonu üzerinden Ankara’ya iletildiği yol aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) İpek Yolu<br>
+      B) İstiklal Yolu<br>
+      C) Kral Yolu<br>
+      D) Yeşil Yol<br>
+      E) Vatan Koridoru
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">41. (Tarih) TBMM’nin isyanları bastırmak ve asker kaçaklarını önlemek amacıyla çıkardığı ilk kanunlar hangileridir?</div>
+    <div class="options">
+      A) Hıyanet-i Vataniye ve Firariler Kanunu<br>
+      B) Tehcir Kanunu<br>
+      C) Takrir-i Sükun Kanunu<br>
+      D) Teşvik-i Sanayi Kanunu<br>
+      E) Kabotaj Kanunu
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">42. (Tarih) Sivas Kongresi’nde kabul edilen ve ulusal bağımsızlığa aykırı olan hangi düşünce bir daha gündeme gelmemek üzere kesin olarak reddedilmiştir?</div>
+    <div class="options">
+      A) Manda ve Himaye<br>
+      B) Kuvayımilliye<br>
+      C) Bölgesel Kurtuluş<br>
+      D) Azınlık hakları<br>
+      E) Meşrutiyet
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">43. (Tarih) Sakarya Savaşı sonrasında Fransızlarla imzalanan ve Güney Cephesi'ni kapatan antlaşma hangisidir?</div>
+    <div class="options">
+      A) 1921 Ankara Antlaşması<br>
+      B) Gümrü Antlaşması<br>
+      C) Kars Antlaşması<br>
+      D) Moskova Antlaşması<br>
+      E) Lausanne Antlaşması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">44. (Tarih) Halifeliğin kaldırıldığı gün (3 Mart 1924) çıkarılan Tevhid-i Tedrisat Kanunu ile aşağıdakilerden hangisi amaçlanmıştır?</div>
+    <div class="options">
+      A) Eğitimde birlik ve millilik sağlamak<br>
+      B) Harf inkılabını gerçekleştirmek<br>
+      C) Üniversite reformunu tamamlamak<br>
+      D) Köy enstitülerini açmak<br>
+      E) Dini eğitimi zorunlu kılmak
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">45. (Tarih) 1930 yılında kadınlara verilen ilk siyasi hak aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Belediye seçimlerinde seçme ve seçilme hakkı<br>
+      B) Muhtarlık seçimlerine katılma hakkı<br>
+      C) Milletvekili seçme ve seçilme hakkı<br>
+      D) Devlet memuru olma hakkı<br>
+      E) Mahkemelerde şahitlik hakkı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">46. (Tarih) 1927 yılında çıkarılan ancak sermaye ve teknik eleman yetersizliği sebebiyle başarıya ulaşamayan yasa hangisidir?</div>
+    <div class="options">
+      A) Teşvik-i Sanayi Kanunu<br>
+      B) Kabotaj Kanunu<br>
+      C) Aşar Vergisi Kanunu<br>
+      D) Müsadere Kanunu<br>
+      E) Gümrük Kanunu
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">47. (Tarih) 1945 yılında CHP'den ayrılarak Demokrat Parti'yi kuran "Dörtlü Takrir" imzacıları arasında aşağıdakilerden hangisi yer almaz?</div>
+    <div class="options">
+      A) Celal Bayar<br>
+      B) Adnan Menderes<br>
+      C) Fuat Köprülü<br>
+      D) Refik Koraltan<br>
+      E) İsmet İnönü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">48. (Tarih) 1936 yılında imzalanan Montrö Boğazlar Sözleşmesi ile aşağıdakilerden hangisi sağlanmıştır?</div>
+    <div class="options">
+      A) Boğazlar Komisyonu kaldırılmış ve egemenlik tamamen Türkiye'ye geçmiştir.<br>
+      B) Boğazlar uluslararası bir komisyona bırakılmıştır.<br>
+      C) Boğazlar tüm askerî gemilere tamamen kapatılmıştır.<br>
+      D) Boğazlar İngiltere kontrolüne verilmiştir.<br>
+      E) Boğazlar silahsızlandırılmıştır.
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">49. (Tarih) Soğuk Savaş döneminde ABD’nin komünizm tehlikesine karşı Türkiye ve Yunanistan’a yaptığı askerî ve ekonomik yardım planı hangisidir?</div>
+    <div class="options">
+      A) Truman Doktrini<br>
+      B) Schuman Planı<br>
+      C) Molotov Planı<br>
+      D) Balfour Deklarasyonu<br>
+      E) Briand Paktı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">50. (Tarih) 1930 sonrası Türkiye'de uygulanan I. Beş Yıllık Sanayi Planı'nın hazırlanmasında hangi ülkeden uzman ve kredi desteği alınmıştır?</div>
+    <div class="options">
+      A) Sovyetler Birliği (SSCB)<br>
+      B) ABD<br>
+      C) İngiltere<br>
+      D) Almanya<br>
+      E) Fransa
+    </div>
+  </div>
+
+  <!-- 51 - 100 COĞRAFYA SORULARI -->
+  <div class="question">
+    <div class="q-title">51. (Coğrafya) Türkiye'nin ortalama yükseltisinin fazla olması (1132 m), engebeli yapısı ve dağların geniş yer kaplamasında aşağıdakilerden hangisi temel jeolojik etkendir?</div>
+    <div class="options">
+      A) Alp-Himalaya orojenez kuşağında yer alması ve kıtaların sıkıştırmasıyla epirojenik yükselmeye uğraması<br>
+      B) Rüzgâr aşındırmasının iç bölgelerde şiddetli olması<br>
+      C) Akarsu ağının çok seyrek olması<br>
+      D) Buzullaşmanın kıyı kesimlerde etkili olması<br>
+      E) Karstlaşmanın tüm bölgelere yayılması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">52. (Coğrafya) Oluşum yönünden değerlendirildiğinde aşağıda verilen platolarımızdan hangisi farklı bir oluşum kökenine sahiptir?</div>
+    <div class="options">
+      A) Çatalca-Kocaeli (Aşınım)<br>
+      B) Taşeli (Karstik)<br>
+      C) Erzurum-Kars (Lav örtüsü)<br>
+      D) Cihanbeyli (Tabaka düzlüğü / Yatay duruşlu)<br>
+      E) Haymana (Tabaka düzlüğü / Yatay duruşlu)
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">53. (Coğrafya) Ege Bölgesi'nin kıyı çizgisindeki körfezler kuzeyden güneye doğru sıralandığında aşağıdakilerden hangisi doğru dizilimi gösterir?</div>
+    <div class="options">
+      A) Edremit - Çandarlı - İzmir - Kuşadası - Güllük - Gökova<br>
+      B) İzmir - Edremit - Çandarlı - Gökova - Kuşadası - Güllük<br>
+      C) Çandarlı - Edremit - İzmir - Güllük - Kuşadası - Gökova<br>
+      D) Edremit - İzmir - Çandarlı - Kuşadası - Gökova - Güllük<br>
+      E) Gökova - Güllük - Kuşadası - İzmir - Çandarlı - Edremit
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">54. (Coğrafya) Oluşum bakımından Alüvyal Set Gölü niteliğinde olan ve aynı zamanda Akdeniz kıyı ardında yer alan gölümüz aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Burdur Gölü<br>
+      B) Köyceğiz Gölü<br>
+      C) Mogan Gölü<br>
+      D) İznik Gölü<br>
+      E) Salda Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">55. (Coğrafya) Doğal çevre şartları dikkate alındığında Podzol topraklar Türkiye'de en belirgin olarak hangi bölge ve bitki örtüsü altında görülür?</div>
+    <div class="options">
+      A) Batı Karadeniz - Soğuk nemli iğne yapraklı ormanlar<br>
+      B) Erzurum-Kars - Alpin çayırlar<br>
+      C) Akdeniz - Kızılçam ve Maki<br>
+      D) Güney Marmara - Ayçiçeği tarlaları<br>
+      E) İç Anadolu - Bozkır
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">56. (Coğrafya) Bir yerleşim yerinde madencilik faaliyetlerinin başlaması kırsal yapıyı hızla şehirsel yapıya dönüştürebilmektedir. Aşağıdaki şehirlerimizden hangisi bu duruma en tipik örnektir?</div>
+    <div class="options">
+      A) Zonguldak<br>
+      B) Rize<br>
+      C) Aksaray<br>
+      D) Sinop<br>
+      E) Muğla
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">57. (Coğrafya) Kayseri’de Pamuklu Dokuma Sanayisinin kurulmuş olması, sanayi tesislerinin kuruluş yeri seçiminde aşağıdakilerden hangisiyle açıklanır?</div>
+    <div class="options">
+      A) Hammaddiye yakınlık<br>
+      B) Ulaşım, pazar ve devlet planlaması<br>
+      C) Su kaynaklarına yakınlık<br>
+      D) İklim elverişliliği<br>
+      E) Enerji kaynaklarına yakınlık
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">58. (Coğrafya) Türkiye'deki otoyol (erişme kontrollü yol) ağı incelendiğinde, aşağıdaki kent çiftlerinin hangisi arasında günümüz itibarıyla kesintisiz bir otoyol bağlantısı bulunmamaktadır?</div>
+    <div class="options">
+      A) Ankara - Sivas<br>
+      B) Edirne - İstanbul<br>
+      C) İzmir - Aydın<br>
+      D) Niğde - Mersin<br>
+      E) İstanbul - Ankara
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">59. (Coğrafya) Altındere Vadisi Millî Parkı ve içerisinde yer alan Sümela Manastırı aşağıdaki illerimizden hangisinin sınırları içerisindedir?</div>
+    <div class="options">
+      A) Trabzon<br>
+      B) Rize<br>
+      C) Artvin<br>
+      D) Giresun<br>
+      E) Gümüşhane
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">60. (Coğrafya) Aşağıdaki göllerimizden hangisi kapalı havza niteliğinde olup suları acı veya sodalıdır?</div>
+    <div class="options">
+      A) Burdur Gölü<br>
+      B) Beyşehir Gölü<br>
+      C) Eğirdir Gölü<br>
+      D) Sapanca Gölü<br>
+      E) Ulubat Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">61. (Coğrafya) Kapadokya yöresindeki plato ve yer şekillerinin oluşumunda temel etken aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Volkanik tüf ve lavların akarsu aşındırmasıyla işlenmesi<br>
+      B) Karstik erime<br>
+      C) Buzul aşındırması<br>
+      D) Rüzgâr biriktirmesi<br>
+      E) Dalga aşındırması (Falez)
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">62. (Coğrafya) Erzurum-Kars Platosu’nda yaygın olan çayır bitki örtüsü altında gelişen, humusça son derece zengin ancak iklim koşulları nedeniyle tarımsal olgunlaşma süresi kısa olan toprak türü hangisidir?</div>
+    <div class="options">
+      A) Çernezyom<br>
+      B) Terra Rossa<br>
+      C) Vertisol<br>
+      D) Podzol<br>
+      E) Regosol
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">63. (Coğrafya) Eski göl tabanlarındaki killi depolar üzerinde oluşan, kurak sezonda çatlayan ve "Dönen Topraklar" (Karakepir) olarak bilinen toprak türü Vertisol en fazla nerede görülür?</div>
+    <div class="options">
+      A) Ergene Havzası<br>
+      B) Taşeli Platosu<br>
+      C) Doğu Karadeniz Kıyıları<br>
+      D) Hakkari Yöresi<br>
+      E) Yıldız Dağları
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">64. (Coğrafya) Akdeniz iklim bölgesinde kalker (kireçtaşı) kayaçları üzerinde oluşan ve içerisindeki demir oksit nedeniyle kırmızı renkli olan toprak türü aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Terra Rossa<br>
+      B) Podzol<br>
+      C) Laterit<br>
+      D) Alüvyal<br>
+      E) Lös
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">65. (Coğrafya) Ankara yakınlarındaki Mogan ve Eymir göllerinin oluşum tipi aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Alüvyal Set Gölü<br>
+      B) Volkanik Set Gölü<br>
+      C) Tektonik Göl<br>
+      D) Karstik Göl<br>
+      E) Buzul Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">66. (Coğrafya) Samsun’da Bakır İşleme Tesislerinin (Karadeniz Bakır İşletmeleri) kurulmasında hammadde bulunmamasına rağmen etkili olan ana faktör nedir?</div>
+    <div class="options">
+      A) Liman ve Ulaşım kolaylığı<br>
+      B) Zengin kömür yatakları<br>
+      C) Kalifiye işgücü<br>
+      D) Pazar alanlarına yakınlık<br>
+      E) İklim koşulları
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">67. (Coğrafya) Türkiye'de karstik platolara örnek olarak gösterilebilecek iki plato hangisinde birlikte verilmiştir?</div>
+    <div class="options">
+      A) Teke - Taşeli<br>
+      B) Cihanbeyli - Haymana<br>
+      C) Erzurum - Kars<br>
+      D) Çatalca - Kocaeli<br>
+      E) Gaziantep - Şanlıurfa
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">68. (Coğrafya) Aşağıdaki millî parklardan hangisi Ankara ili sınırları içerisinde yer almaktadır?</div>
+    <div class="options">
+      A) Soğuksu Millî Parkı<br>
+      B) Yedigöller Millî Parkı<br>
+      C) Ilgaz Dağı Millî Parkı<br>
+      D) Küre Dağları Millî Parkı<br>
+      E) Hatila Vadisi Millî Parkı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">69. (Coğrafya) Batman kentinin küçük bir köy iken kısa sürede büyük bir şehre dönüşmesinde etkili olan maden kaynağı hangisidir?</div>
+    <div class="options">
+      A) Petrol<br>
+      B) Taşkömürü<br>
+      C) Linyit<br>
+      D) Bakır<br>
+      E) Boksit
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">70. (Coğrafya) Ege Bölgesi'ndeki dağların denize dik uzanmasının sonuçları arasında aşağıdakilerden hangisi gösterilemez?</div>
+    <div class="options">
+      A) Denizel iklimin iç kesimlere sokulabilmesi<br>
+      B) Kıyı ile iç kesimler arasında ulaşımın doğal geçitlerle kolay sağlanması<br>
+      C) Kıyıda girinti, çıkıntı ve körfez sayısının fazla olması<br>
+      D) Kıyı uzunluğunun kuş uçuşu mesafeye göre çok fazla olması<br>
+      E) Kıyılarda güçlü falezlerin (yalıyar) geniş kaplaması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">71. (Coğrafya) Türkiye’nin en büyük tatlı su gölü olma özelliğine sahip ve dışa akışı (gideğeni) olduğu için suları tatlı olan gölümüz hangisidir?</div>
+    <div class="options">
+      A) Beyşehir Gölü<br>
+      B) Van Gölü<br>
+      C) Tuz Gölü<br>
+      D) İznik Gölü<br>
+      E) Çıldır Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">72. (Coğrafya) Aşağıdaki eşleştirmelerden hangisi yanlıştır?</div>
+    <div class="options">
+      A) Nemrut Dağı Millî Parkı - Adıyaman<br>
+      B) Yedigöller Millî Parkı - Bolu<br>
+      C) Sakarya Meydan Muharebesi Millî Parkı - Ankara<br>
+      D) Botan Vadisi Millî Parkı - Siirt<br>
+      E) Altındere Vadisi Millî Parkı - Rize
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">73. (Coğrafya) İç Anadolu Bölgesi’nde yer alan Uzunyayla ve Cihanbeyli Platolarının ortak oluşum özelliği nedir?</div>
+    <div class="options">
+      A) Tabaka düzlüğü (Yatay duruşlu) plato olmaları<br>
+      B) Karstik erime sonucu oluşmaları<br>
+      C) Lav örtüsüyle kaplı olmaları<br>
+      D) Tamamen buzullarla şekillenmiş olmaları<br>
+      E) Rüzgâr erozyonuyla oluşmaları
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">74. (Coğrafya) Karadeniz Bölgesi’nde dağların kıyıya paralel uzanması sonucunda aşağıdakilerden hangisi gerçekleşmez?</div>
+    <div class="options">
+      A) Kıyı ile iç kesimler arasında iklim farklılığının fazla olması<br>
+      B) Kıyı boyunca falez oluşumunun fazla olması<br>
+      C) Enine kıyı tipinin görülmesi<br>
+      D) Denizel etkinin iç kesimlere ulaşamaması<br>
+      E) Ulaşımın geçitler ve tünellerle sağlanması
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">75. (Coğrafya) Toros Dağları üzerinde yer alan karstik arazi yapısı nedeniyle suları acı veya sodalı olan ve kapalı havza oluşturan göller yöresi gölü hangisidir?</div>
+    <div class="options">
+      A) Burdur Gölü<br>
+      B) Beyşehir Gölü<br>
+      C) Eğirdir Gölü<br>
+      D) Kovada Gölü<br>
+      E) Ulubat Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">76. (Coğrafya) Doğu Anadolu Bölgesi’nde yer alan Erzurum-Kars Platosu’nun oluşumundaki ana etken nedir?</div>
+    <div class="options">
+      A) Volkanik lav örtüsü<br>
+      B) Karstik aşınım<br>
+      C) Rüzgâr birikimi<br>
+      D) Dalga birikimi<br>
+      E) Epirojenik çökme
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">77. (Coğrafya) Karstik arazilerin yaygın olduğu alanlarda erime çukurlarında biriken kızıl renkli Akdeniz toprağı hangisidir?</div>
+    <div class="options">
+      A) Terra Rossa<br>
+      B) Çernezyom<br>
+      C) Podzol<br>
+      D) Vertisol<br>
+      E) Regosol
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">78. (Coğrafya) İskenderun'da Demir-Çelik Fabrikasının kurulmasında hammadde olmamasına rağmen etkili olan temel faktörler nelerdir?</div>
+    <div class="options">
+      A) Liman (Ulaşım) ve Enerji kaynağına yakınlık<br>
+      B) Su kaynakları<br>
+      C) İklim koşulları<br>
+      D) Tarımsal altyapı<br>
+      E) Orman ürünleri
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">79. (Coğrafya) Aşağıdaki otoyol hatlarından hangisi Türkiye'nin en uzun kesintisiz otoyol ağının bir parçasıdır?</div>
+    <div class="options">
+      A) Edirne - İstanbul - Ankara Otoyolu<br>
+      B) Sivas - Erzurum Otoyolu<br>
+      C) Trabzon - Rize Otoyolu<br>
+      D) Sinop - Samsun Otoyolu<br>
+      E) Kars - Ağrı Otoyolu
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">80. (Coğrafya) Kütahya-Tavşanlı ve Manisa-Soma yerleşimlerinin büyümesinde hangi madenin çıkarılması belirleyici olmuştur?</div>
+    <div class="options">
+      A) Linyit<br>
+      B) Taşkömürü<br>
+      C) Demir<br>
+      D) Krom<br>
+      E) Bor
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">81. (Coğrafya) Doğu Karadeniz kıyı kuşağında aşırı yıkanma nedeniyle asit oranı yüksek olan toprak türü hangisidir?</div>
+    <div class="options">
+      A) Latosol / Yıkanmış Kırmızımsı Topraklar<br>
+      B) Çernezyom<br>
+      C) Vertisol<br>
+      D) Terra Rossa<br>
+      E) Solonçak
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">82. (Coğrafya) Bafa (Çamiçi) Gölü ve Köyceğiz Gölü hangi oluşum türüne girmektedir?</div>
+    <div class="options">
+      A) Alüvyal Set Gölü<br>
+      B) Tektonik Göl<br>
+      C) Karstik Göl<br>
+      D) Krater Gölü<br>
+      E) Yapay Baraj Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">83. (Coğrafya) Aşağıdaki alanların hangisinde kıvrım dağları (Orojenez) yaygındır?</div>
+    <div class="options">
+      A) Kuzey Anadolu Dağları ve Toroslar<br>
+      B) Ege Kıyı Dağları (Horstlar)<br>
+      C) Karacadağ ve Ağrı Dağı<br>
+      D) Erciyes ve Hasandağı<br>
+      E) Çatalca Platosu
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">84. (Coğrafya) Aşağıdaki platolarımızdan hangisi Türkiye'nin en alçak ve aşınım düzlüğü niteliğindeki platosudur?</div>
+    <div class="options">
+      A) Çatalca-Kocaeli Platosu<br>
+      B) Erzurum-Kars Platosu<br>
+      C) Taşeli Platosu<br>
+      D) Haymana Platosu<br>
+      E) Cihanbeyli Platosu
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">85. (Coğrafya) Gökova Körfezi ve Güllük (Mandalya) Körfezi Ege kıyılarının hangi kesiminde yer alır?</div>
+    <div class="options">
+      A) Güney Ege (Muğla kıyıları)<br>
+      B) Kuzey Ege (Çanakkale-Balıkesir)<br>
+      C) Orta Ege (İzmir)<br>
+      D) Marmara kıyıları<br>
+      E) Antalya Körfezi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">86. (Coğrafya) Göl sularının tatlı veya acı/sodalı olmasını belirleyen temel etken aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Gölün gideğanının (dışa akışının) bulunup bulunmaması<br>
+      B) Gölün derinliği<br>
+      C) Gölün yüzölçümü<br>
+      D) Gölün deniz seviyesinden yüksekliği<br>
+      E) Rüzgâr yönü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">87. (Coğrafya) Aşağıdaki illerimizin hangisinde Podzol toprak yapısına rastlanma olasılığı en yüksektir?</div>
+    <div class="options">
+      A) Zonguldak ve Bolu<br>
+      B) Şanlıurfa ve Mardin<br>
+      C) Konya ve Karaman<br>
+      D) Aydın ve Muğla<br>
+      E) Iğdır ve Kars
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">88. (Coğrafya) Rize’de Çay Sanayisinin varlığı kuruluş yeri açısından ne ile açıklanır?</div>
+    <div class="options">
+      A) Hammaddemize yakınlık<br>
+      B) Enerjiye yakınlık<br>
+      C) Kalifiye işgücü<br>
+      D) Pazara yakınlık<br>
+      E) Sermaye birikimi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">89. (Coğrafya) Türkiye'de otoyol ağı bulunmayan bölgemiz aşağıdakilerden hangisidir?</div>
+    <div class="options">
+      A) Doğu Anadolu Bölgesi<br>
+      B) Marmara Bölgesi<br>
+      C) Ege Bölgesi<br>
+      D) İç Anadolu Bölgesi<br>
+      E) Akdeniz Bölgesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">90. (Coğrafya) Trabzon sınırları içinde yer alan ve doğa koruma alanı olan Millî Park hangisidir?</div>
+    <div class="options">
+      A) Altındere Vadisi Millî Parkı<br>
+      B) Munzur Vadisi Millî Parkı<br>
+      C) Spil Dağı Millî Parkı<br>
+      D) Yedigöller Millî Parkı<br>
+      E) Kazdağları Millî Parkı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">91. (Coğrafya) Nemrut Dağı Millî Parkı hangi ilimizde yer almaktadır?</div>
+    <div class="options">
+      A) Adıyaman<br>
+      B) Bitlis<br>
+      C) Van<br>
+      D) Malatya<br>
+      E) Elazığ
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">92. (Coğrafya) Tuz Gölü Havzası'nın kapalı havza olmasında etkili olan temel faktör nedir?</div>
+    <div class="options">
+      A) Etrafının yüksek dağlarla çevrili olması ve dışa akışının bulunmaması<br>
+      B) Aşırı buharlaşma<br>
+      C) Yağış azlığı<br>
+      D) Bitki örtüsünün bozkır olması<br>
+      E) Toprak türü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">93. (Coğrafya) Türkiye'deki tektonik göllere örnek olarak aşağıdakilerden hangisi verilebilir?</div>
+    <div class="options">
+      A) İznik ve Sapanca Gölleri<br>
+      B) Bafa ve Köyceğiz Gölleri<br>
+      C) Tortum ve Sera Gölleri<br>
+      D) Meke Tuzlası ve Nemrut Gölü<br>
+      E) Çıldır Gölü
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">94. (Coğrafya) Vertisol topraklara Trakya dışında Marmara Bölgesi'nin hangi kesiminde rastlanır?</div>
+    <div class="options">
+      A) Güney Marmara (Bursa-Balıkesir çevreleri)<br>
+      B) Yıldız Dağları<br>
+      C) Çatalca Yarımadası<br>
+      D) Kocaeli Platosu<br>
+      E) Samanlı Dağları
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">95. (Coğrafya) Zonguldak kenti hangi maden havzasının işletilmeye başlanmasıyla sanayi ve liman kentine dönüşmüştür?</div>
+    <div class="options">
+      A) Taşkömürü<br>
+      B) Linyit<br>
+      C) Bakır<br>
+      D) Krom<br>
+      E) Demir
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">96. (Coğrafya) Aşağıdaki sanayi kollarından hangisi doğrudan hammaddeye yakınlık gerektirir?</div>
+    <div class="options">
+      A) Konserve ve Şeker Sanayisi<br>
+      B) Otomotiv Sanayisi<br>
+      C) Dokuma Sanayisi<br>
+      D) Petrol Rafinerisi<br>
+      E) Cam ve Seramik Sanayisi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">97. (Coğrafya) Ankara ile Sivas arasında Yüksek Hızlı Tren (YHT) hattı bulunmasına rağmen hangisi bulunmamaktadır?</div>
+    <div class="options">
+      A) Otoyol (Erişme Kontrollü Otoban)<br>
+      B) Bölünmüş Karayolu<br>
+      C) Demir yolu<br>
+      D) Hava yolu<br>
+      E) Boru hattı
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">98. (Coğrafya) İğneada Longoz Ormanları Millî Parkı hangi ilimiz sınırları içerisindedir?</div>
+    <div class="options">
+      A) Kırklareli<br>
+      B) Tekirdağ<br>
+      C) Edirne<br>
+      D) Çanakkale<br>
+      E) Balıkesir
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">99. (Coğrafya) Kırık dağlar (Horst-Graben sistemi) Türkiye'de en belirgin olarak hangi coğrafi bölgede görülür?</div>
+    <div class="options">
+      A) Ege Bölgesi<br>
+      B) Doğu Anadolu Bölgesi<br>
+      C) İç Anadolu Bölgesi<br>
+      D) Karadeniz Bölgesi<br>
+      E) Güneydoğu Anadolu Bölgesi
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="q-title">100. (Coğrafya) Aşağıdaki göllerden hangisi bir heyelan set gölüdür?</div>
+    <div class="options">
+      A) Tortum Gölü<br>
+      B) Beyşehir Gölü<br>
+      C) Tuz Gölü<br>
+      D) Burdur Gölü<br>
+      E) İznik Gölü
+    </div>
+  </div>
+
+</div>
+
+<!-- CEVAP ANAHTARI BÖLÜMÜ (YENİ SAYFADA BAŞLAR) -->
+<div class="answer-section">
+  <div class="answer-title">KPSS TARİH VE COĞRAFYA DENEME SINAVI CEVAP ANAHTARI</div>
+  <table class="answer-key">
+    <tr>
+      <th>No</th><th>Cevap</th><th>No</th><th>Cevap</th><th>No</th><th>Cevap</th><th>No</th><th>Cevap</th>
+    </tr>
+    <tr><td>1</td><td>D</td><td>26</td><td>B</td><td>51</td><td>A</td><td>76</td><td>A</td></tr>
+    <tr><td>2</td><td>D</td><td>27</td><td>B</td><td>52</td><td>A</td><td>77</td><td>A</td></tr>
+    <tr><td>3</td><td>C</td><td>28</td><td>B</td><td>53</td><td>A</td><td>78</td><td>A</td></tr>
+    <tr><td>4</td><td>B</td><td>29</td><td>C</td><td>54</td><td>B</td><td>79</td><td>A</td></tr>
+    <tr><td>5</td><td>D</td><td>30</td><td>B</td><td>55</td><td>A</td><td>80</td><td>A</td></tr>
+    <tr><td>6</td><td>B</td><td>31</td><td>C</td><td>56</td><td>A</td><td>81</td><td>A</td></tr>
+    <tr><td>7</td><td>E</td><td>32</td><td>B</td><td>57</td><td>B</td><td>82</td><td>A</td></tr>
+    <tr><td>8</td><td>E</td><td>33</td><td>A</td><td>58</td><td>A</td><td>83</td><td>A</td></tr>
+    <tr><td>9</td><td>B</td><td>34</td><td>B</td><td>59</td><td>A</td><td>84</td><td>A</td></tr>
+    <tr><td>10</td><td>C</td><td>35</td><td>B</td><td>60</td><td>A</td><td>85</td><td>A</td></tr>
+    <tr><td>11</td><td>E</td><td>36</td><td>A</td><td>61</td><td>A</td><td>86</td><td>A</td></tr>
+    <tr><td>12</td><td>B</td><td>37</td><td>C</td><td>62</td><td>A</td><td>87</td><td>A</td></tr>
+    <tr><td>13</td><td>E</td><td>38</td><td>B</td><td>63</td><td>A</td><td>88</td><td>A</td></tr>
+    <tr><td>14</td><td>B</td><td>39</td><td>A</td><td>64</td><td>A</td><td>89</td><td>A</td></tr>
+    <tr><td>15</td><td>D</td><td>40</td><td>B</td><td>65</td><td>A</td><td>90</td><td>A</td></tr>
+    <tr><td>16</td><td>A</td><td>41</td><td>A</td><td>66</td><td>A</td><td>91</td><td>A</td></tr>
+    <tr><td>17</td><td>B</td><td>42</td><td>A</td><td>67</td><td>A</td><td>92</td><td>A</td></tr>
+    <tr><td>18</td><td>C</td><td>43</td><td>A</td><td>68</td><td>A</td><td>93</td><td>A</td></tr>
+    <tr><td>19</td><td>A</td><td>44</td><td>A</td><td>69</td><td>A</td><td>94</td><td>A</td></tr>
+    <tr><td>20</td><td>D</td><td>45</td><td>A</td><td>70</td><td>E</td><td>95</td><td>A</td></tr>
+    <tr><td>21</td><td>C</td><td>46</td><td>A</td><td>71</td><td>A</td><td>96</td><td>A</td></tr>
+    <tr><td>22</td><td>C</td><td>47</td><td>E</td><td>72</td><td>E</td><td>97</td><td>A</td></tr>
+    <tr><td>23</td><td>B</td><td>48</td><td>A</td><td>73</td><td>A</td><td>98</td><td>A</td></tr>
+    <tr><td>24</td><td>A</td><td>49</td><td>A</td><td>74</td><td>C</td><td>99</td><td>A</td></tr>
+    <tr><td>25</td><td>D</td><td>50</td><td>A</td><td>75</td><td>A</td><td>100</td><td>A</td></tr>
+  </table>
+</div>
 
 </body>
 </html>
