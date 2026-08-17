@@ -22,7 +22,7 @@
             padding: 16px;
         }
         .container {
-            max-width: 1400px;
+            max-width: 900px;
             margin: 0 auto;
         }
         header {
@@ -56,18 +56,12 @@
         .refresh-btn:hover {
             background-color: #1d4ed8;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 16px;
-        }
         .feed-card {
             background: var(--card-bg);
             border-radius: 12px;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-            height: 480px;
             overflow: hidden;
         }
         .feed-header {
@@ -90,18 +84,35 @@
         }
         .feed-items {
             padding: 14px 16px;
+            max-height: 75vh;
             overflow-y: auto;
-            flex-grow: 1;
         }
         .news-item {
             margin-bottom: 14px;
             padding-bottom: 14px;
             border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         .news-item:last-child {
             margin-bottom: 0;
             padding-bottom: 0;
             border-bottom: none;
+        }
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        .news-source {
+            font-weight: 600;
+            color: var(--primary-color);
+            background: #eff6ff;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
         .news-title {
             font-size: 0.9rem;
@@ -109,16 +120,11 @@
             color: #1e293b;
             text-decoration: none;
             display: block;
-            margin-bottom: 4px;
             line-height: 1.4;
         }
         .news-title:hover {
             color: var(--primary-color);
             text-decoration: underline;
-        }
-        .news-date {
-            font-size: 0.72rem;
-            color: var(--text-muted);
         }
         .loading, .error {
             text-align: center;
@@ -138,7 +144,16 @@
             <h1>Teknoloji RSS Canlı Akışı</h1>
             <button class="refresh-btn" onclick="loadAllFeeds()">Tümünü Yenile</button>
         </header>
-        <div class="grid" id="feedGrid"></div>
+        
+        <div class="feed-card">
+            <div class="feed-header">
+                <span>Teknoloji Akışı (Oyunlar Filtrelenmiştir)</span>
+                <span class="feed-badge" id="totalCount">Yükleniyor...</span>
+            </div>
+            <div class="feed-items" id="sharedFeedContainer">
+                <div class="loading">Haberler yükleniyor ve filtreleniyor...</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -148,6 +163,13 @@
             { name: "NTV Teknoloji", url: "https://www.ntv.com.tr/teknoloji.rss" },
             { name: "Technopat", url: "https://www.technopat.net/feed/" },
             { name: "Webtekno", url: "https://www.webtekno.com/rss.xml" }
+        ];
+
+        // Oyun ve espor ile ilgili filtrelenecek anahtar kelimeler
+        const oyunKelimeleri = [
+            'oyun', 'game', 'steam', 'ps5', 'xbox', 'playstation', 
+            'nintendo', 'epic games', 'espor', 'e-spor', 'twitch', 
+            'valorant', 'minecraft', 'gta', 'fifa', 'fc 24', 'fc 25'
         ];
 
         function formatDate(dateString) {
@@ -160,50 +182,67 @@
             }
         }
 
-        async function loadFeed(feed, container) {
-            const card = document.createElement('div');
-            card.className = 'feed-card';
-            card.innerHTML = `
-                <div class="feed-header">
-                    <span>${feed.name}</span>
-                    <span class="feed-badge">Canlı</span>
-                </div>
-                <div class="feed-items">
-                    <div class="loading">Yükleniyor...</div>
-                </div>
-            `;
-            container.appendChild(card);
+        async function loadAllFeeds() {
+            const container = document.getElementById('sharedFeedContainer');
+            const badge = document.getElementById('totalCount');
+            container.innerHTML = `<div class="loading">Haberler yükleniyor ve filtreleniyor...</div>`;
+            
+            let allNews = [];
 
-            const itemsContainer = card.querySelector('.feed-items');
+            // Tüm RSS kaynaklarını paralel olarak çek
+            const promises = feeds.map(async (feed) => {
+                try {
+                    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
 
-            try {
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}`;
-                const response = await fetch(apiUrl);
-                const data = await response.json();
+                    if (data.status === 'ok' && data.items) {
+                        data.items.forEach(item => {
+                            const titleLower = item.title.toLowerCase();
+                            // Başlıkta oyun kelimesi geçip geçmediğini kontrol et
+                            const isGame = oyunKelimeleri.some(kelime => titleLower.includes(kelime));
 
-                if (data.status === 'ok' && data.items) {
-                    itemsContainer.innerHTML = '';
-                    data.items.forEach(item => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'news-item';
-                        itemEl.innerHTML = `
-                            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-title">${item.title}</a>
-                            <div class="news-date">${formatDate(item.pubDate)}</div>
-                        `;
-                        itemsContainer.appendChild(itemEl);
-                    });
-                } else {
-                    itemsContainer.innerHTML = `<div class="error">Akış yüklenemedi.</div>`;
+                            // Oyun değilse listeye ekle
+                            if (!isGame) {
+                                allNews.push({
+                                    source: feed.name,
+                                    title: item.title,
+                                    link: item.link,
+                                    pubDate: item.pubDate
+                                });
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error(`${feed.name} yüklenirken hata oluştu:`, error);
                 }
-            } catch (error) {
-                itemsContainer.innerHTML = `<div class="error">Bağlantı hatası oluştu.</div>`;
-            }
-        }
+            });
 
-        function loadAllFeeds() {
-            const grid = document.getElementById('feedGrid');
-            grid.innerHTML = '';
-            feeds.forEach(feed => loadFeed(feed, grid));
+            await Promise.all(promises);
+
+            // Haberleri tarihe göre yeniden eskiye sırala
+            allNews.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+            // Ekrana bas
+            if (allNews.length > 0) {
+                container.innerHTML = '';
+                allNews.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'news-item';
+                    itemEl.innerHTML = `
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="news-title">${item.title}</a>
+                        <div class="news-meta">
+                            <span class="news-source">${item.source}</span>
+                            <span>${formatDate(item.pubDate)}</span>
+                        </div>
+                    `;
+                    container.appendChild(itemEl);
+                });
+                badge.textContent = `${allNews.length} Haber`;
+            } else {
+                container.innerHTML = `<div class="error">Gösterilecek haber bulunamadı.</div>`;
+                badge.textContent = `0 Haber`;
+            }
         }
 
         // Sayfa açıldığında yükle
