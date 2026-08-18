@@ -1,264 +1,107 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eğitim Analiz & Havuz Modülü</title>
-    <!-- Tesseract.js -->
+    <title>Eğitim Veri Merkezi (Depolama Modülü)</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
-        /* --- ENDÜSTRİYEL ARAYÜZ (EKRAN İÇİN) --- */
-        :root {
-            --metal-bg: #2b2b2b;
-            --panel-border: #4a4a4a;
-            --neon-green: #00ff00;
-            --neon-blue: #00e5ff;
-            --dark-screen: #0a0a0a;
-        }
-
-        body {
-            background-color: #1a1a1a;
-            color: #d0d0d0;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            margin: 0;
-        }
-
-        .interface {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--metal-bg);
-            border: 4px solid var(--panel-border);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: inset 0px 0px 15px rgba(0,0,0,0.8), 5px 5px 15px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        /* Greebles (Mekanik detaylar) */
-        .interface::before, .interface::after {
-            content: "O O";
-            position: absolute;
-            font-size: 10px; color: #111; letter-spacing: 850px; width: 100%; left: 15px;
-        }
-        .interface::before { top: 5px; } .interface::after { bottom: 5px; }
-
-        h1 { text-align: center; color: #888; border-bottom: 2px dashed #555; padding-bottom: 10px; font-size: 1.5em; }
-
-        .control-group { background: #222; padding: 15px; margin: 15px 0; border: 2px solid #333; border-left: 5px solid #555; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #aaa; }
-        
-        input[type="password"], input[type="file"] {
-            width: 100%; padding: 10px; background: #111; border: 1px solid #444; color: #fff; box-sizing: border-box; font-family: inherit;
-        }
-
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        
-        button {
-            padding: 15px; background: linear-gradient(to bottom, #555, #333); border: 2px solid #222;
-            color: #ddd; font-family: inherit; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.1s;
-        }
-        button:active { background: #222; border-top: 4px solid #111; }
-        .btn-primary { grid-column: span 2; background: linear-gradient(to bottom, #446644, #224422); border-color: #113311;}
-        .btn-print { background: linear-gradient(to bottom, #445566, #223344); border-color: #112233;}
-        .btn-clear { background: linear-gradient(to bottom, #663333, #441111); border-color: #330000;}
-
-        .terminal-screen {
-            background: var(--dark-screen); border: 3px inset #333; padding: 20px; height: 250px;
-            color: var(--neon-green); overflow-y: auto; margin-top: 20px; line-height: 1.6; white-space: pre-wrap;
-        }
-
-        .status-bar {
-            background: #111; border: 1px solid #444; padding: 10px; margin-top: 15px;
-            display: flex; justify-content: space-between; color: var(--neon-blue); font-weight: bold;
-        }
-
-        /* --- PDF ÇIKTISI İÇİN TEMİZ A4 TASARIMI --- */
-        .print-area { display: none; }
-
-        @media print {
-            body { background: white; color: black; padding: 0; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-            .interface { display: none; } /* Endüstriyel paneli gizle */
-            .print-area { display: block; padding: 20px; }
-            
-            .print-header { text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; padding-bottom: 10px; }
-            .print-item { break-inside: avoid; margin-bottom: 30px; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
-            .print-item h3 { margin: 0 0 10px 0; font-size: 14pt; }
-            .print-item p { margin: 5px 0; font-size: 11pt; line-height: 1.4; }
-            .questions { margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px; }
-        }
+        body { background: #121212; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
+        .container { max-width: 800px; margin: auto; border: 2px solid #333; padding: 20px; background: #1a1a1a; }
+        .box { border: 1px solid #444; padding: 15px; margin-bottom: 15px; }
+        textarea { width: 100%; height: 200px; background: #000; color: #0f0; border: 1px solid #333; font-family: monospace; }
+        button { padding: 10px; cursor: pointer; background: #333; color: #fff; border: 1px solid #555; }
+        .status { margin-top: 10px; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
-<!-- KONTROL PANELİ -->
-<div class="interface" id="uiPanel">
-    <h1>Eğitim Analiz & Havuz Modülü</h1>
-
-    <div class="control-group">
-        <label>API ANAHTARI (Sistem Bağlantısı):</label>
-        <input type="password" id="apiKey" placeholder="Anahtarı buraya girin...">
+<div class="container">
+    <h1>EĞİTİM VERİ MERKEZİ</h1>
+    
+    <div class="box">
+        <label>SORU FOTOĞRAFLARI YÜKLE (Metin Biriktir):</label><br>
+        <input type="file" id="imageInput" multiple accept="image/*">
+        <button onclick="processAndAppend()">DOKÜMANA EKLE</button>
     </div>
 
-    <div class="control-group">
-        <label>SORU FOTOĞRAFLARI (Çoklu Seçim Yapabilirsiniz):</label>
-        <input type="file" id="imageInput" accept="image/*" multiple>
+    <div class="box">
+        <label>BİRİKEN METİN DOKÜMANI:</label>
+        <textarea id="textStorage" placeholder="Burada biriken sorular olacak..."></textarea>
+        <button onclick="downloadDocument()">DOKÜMANI İNDİR (.txt)</button>
+        <button onclick="uploadDocument()">DOKÜMANI YÜKLE</button>
     </div>
 
-    <button class="btn-primary" onclick="startBatchAnalysis()">SEÇİLENLERİ TARA VE HAVUZA EKLE</button>
-
-    <div class="btn-row">
-        <button class="btn-print" onclick="generatePDF()">HAFTALIK BÜLTENİ PDF YAP</button>
-        <button class="btn-clear" onclick="clearPool()">HAVUZU TEMİZLE</button>
+    <div class="box">
+        <label>ANALİZ VE PDF ÜRETİMİ:</label><br>
+        <input type="password" id="apiKey" placeholder="Gemini API Key...">
+        <button onclick="generateFinalPDF()">ANALİZ ET VE PDF'E ÇEVİR</button>
     </div>
-
-    <div class="status-bar">
-        <span>HAVUZDAKİ SORU SAYISI: <span id="poolCount">0</span></span>
-        <span>DURUM: BEKLEMEDE</span>
-    </div>
-
-    <div class="terminal-screen" id="outputScreen">SİSTEM HAZIR... VERİ BEKLENİYOR...</div>
-</div>
-
-<!-- YAZDIRILACAK ALAN (Sadece PDF alırken görünür) -->
-<div class="print-area" id="printArea">
-    <div class="print-header">
-        <h2>Haftalık Konu Tekrarı ve Pekiştirme Soruları</h2>
-        <p>Tarih: <span id="printDate"></span></p>
-    </div>
-    <div id="printContent"></div>
+    
+    <div class="status" id="status">Sistem hazır.</div>
 </div>
 
 <script>
-    const outputScreen = document.getElementById('outputScreen');
-    const poolCountDisplay = document.getElementById('poolCount');
-    let questionPool = JSON.parse(localStorage.getItem('soruHavuzu')) || [];
+    const textStorage = document.getElementById('textStorage');
+    const status = document.getElementById('status');
 
-    // Sayfa açıldığında havuzdaki sayıyı güncelle
-    updatePoolCount();
-
-    function updatePoolCount() {
-        poolCountDisplay.innerText = questionPool.length;
-    }
-
-    function logToTerminal(message) {
-        const time = new Date().toLocaleTimeString();
-        outputScreen.innerHTML += `\n[${time}] > ${message}`;
-        outputScreen.scrollTop = outputScreen.scrollHeight;
-    }
-
-    async function startBatchAnalysis() {
-        const apiKey = document.getElementById('apiKey').value;
+    // 1. FOTOĞRAFLARI OKU VE TEXT ALANINA EKLE
+    async function processAndAppend() {
         const files = document.getElementById('imageInput').files;
-
-        if (!apiKey) { logToTerminal('HATA: API Anahtarı eksik.'); return; }
-        if (files.length === 0) { logToTerminal('HATA: Görsel seçilmedi.'); return; }
-
-        logToTerminal(`TOPLU İŞLEM BAŞLATILDI: ${files.length} dosya sırayla işlenecek...`);
-
-        // Tesseract motorunu bir kere yükle
         const worker = await Tesseract.createWorker('tur');
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            logToTerminal(`\n--- DOSYA ${i + 1}/${files.length} İŞLENİYOR ---`);
-            
-            try {
-                // OCR İşlemi
-                logToTerminal('Optik Tarama (OCR) yapılıyor...');
-                const ret = await worker.recognize(file);
-                const extractedText = ret.data.text;
-
-                if(extractedText.trim() === "") {
-                    logToTerminal('Uyarı: Bu görselden metin okunamadı, atlanıyor.');
-                    continue;
-                }
-
-                logToTerminal('Tarama Başarılı. Gemini AI ile analiz ediliyor...');
-
-                // Gemini API İsteği
-                const prompt = `Aşağıdaki metin, bir öğrencinin yanlış yaptığı bir sorudur. Lütfen şu formatta yanıt ver:
-                KONU: [Hangi ders ve alt konu olduğu]
-                ANALİZ: [Öğrencinin bu konuda neyi kaçırdığına dair 2 cümlelik açıklama]
-                SORULAR: [Bu konuyu pekiştirecek, A,B,C,D şıklı 3 yeni soru ve en altta cevap anahtarı]
-                
-                Soru Metni:
-                ${extractedText}`;
-
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-
-                const aiResponse = data.candidates[0].content.parts[0].text;
-                
-                // Havuza Ekle ve LocalStorage'a kaydet
-                questionPool.push({
-                    id: Date.now(),
-                    content: aiResponse
-                });
-                localStorage.setItem('soruHavuzu', JSON.stringify(questionPool));
-                updatePoolCount();
-
-                logToTerminal(`Dosya ${i + 1} başarıyla analiz edildi ve havuza eklendi.`);
-
-            } catch (error) {
-                logToTerminal(`HATA (Dosya ${i + 1}): ` + error.message);
-            }
+        status.innerText = "İşleniyor...";
+        
+        for (let file of files) {
+            const ret = await worker.recognize(file);
+            textStorage.value += "\n\n--- SORU ---\n" + ret.data.text;
         }
-
         await worker.terminate();
-        logToTerminal('\n=== TÜM İŞLEMLER TAMAMLANDI ===');
+        status.innerText = "Tüm fotoğraflar metne dönüştürüldü.";
     }
 
-    function generatePDF() {
-        if (questionPool.length === 0) {
-            alert("Havuzda soru yok! Önce analiz yapın.");
-            return;
-        }
+    // 2. DOSYA İŞLEMLERİ (İndirme/Yükleme)
+    function downloadDocument() {
+        const blob = new Blob([textStorage.value], {type: "text/plain"});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = "biriken_sorular.txt";
+        a.click();
+    }
 
-        // Yazdırılacak alanı doldur
-        document.getElementById('printDate').innerText = new Date().toLocaleDateString('tr-TR');
-        const printContent = document.getElementById('printContent');
-        printContent.innerHTML = '';
+    function uploadDocument() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = res => textStorage.value = res.target.result;
+            reader.readAsText(file);
+        };
+        input.click();
+    }
 
-        questionPool.forEach((item, index) => {
-            // Gemini'nin metnindeki alt satırları HTML <br> etiketine çeviriyoruz
-            const formattedText = item.content.replace(/\n/g, '<br>');
-            printContent.innerHTML += `
-                <div class="print-item">
-                    <h3>İncelenen Soru #${index + 1}</h3>
-                    <div class="questions">${formattedText}</div>
-                </div>
-            `;
+    // 3. ANALİZ ET VE PDF ÜRET
+    async function generateFinalPDF() {
+        const apiKey = document.getElementById('apiKey').value;
+        const text = textStorage.value;
+
+        status.innerText = "Gemini ile analiz ediliyor, lütfen bekleyin...";
+        
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ contents: [{ parts: [{ text: `Aşağıdaki metin biriken yanlış sorular kümesidir. Bunları analiz et ve benzer konularda pekiştirme soruları üret: ${text}` }] }] })
         });
 
-        // Tarayıcının yazdırma penceresini tetikle
-        // CSS kuralları sayesinde metalik arayüz gizlenecek, sadece temiz sayfa yazdırılacak.
-        window.print();
-    }
+        const data = await response.json();
+        const result = data.candidates[0].content.parts[0].text;
 
-    function clearPool() {
-        if(confirm("Havuzdaki tüm sorular silinecek. Emin misiniz?")) {
-            questionPool = [];
-            localStorage.removeItem('soruHavuzu');
-            updatePoolCount();
-            logToTerminal("Havuz temizlendi. Yeni haftaya hazır.");
-        }
+        // PDF üretimi (Print özelliği ile)
+        const win = window.open('', '', 'width=800,height=600');
+        win.document.write(`<html><body><h1>Pekiştirme Soruları</h1><pre style="white-space:pre-wrap;">${result}</pre></body></html>`);
+        win.print();
+        status.innerText = "İşlem tamamlandı.";
     }
 </script>
-
 </body>
 </html>
-
-Bu Sistemin İşleyişi
- * Çoklu Seçim Desteği: <input type="file" multiple> sayesinde klasöründeki 5 fotoğrafı aynı anda seçebilirsin. Sistem "for döngüsü" ile sırayla tarar ve işler (Aynı anda yüklenip Tesseract'ı veya tarayıcıyı çökertmez).
- * Kalıcı Hafıza: localStorage kullanımı sayesinde yanlışlıkla sekmeyi kapatsan bile analiz edilen veriler kaybolmaz. Pazartesi 5, Çarşamba 5 soru atarsın; sistem 10 soruyu aklında tutar.
- * Mükemmel Baskı (Window.print): "HAFTALIK BÜLTENİ PDF YAP" butonuna bastığında arayüzdeki o siyah/mekanik tasarım tamamen devreden çıkar. Yerine bembeyaz bir arka plan, siyah düzgün okunabilir yazılar ve sınırları çizilmiş bir CSS mizanpajı gelir. İster yazıcıdan çıktı alırsın, ister "PDF olarak kaydet" diyerek arşivlersin.
-Kod üzerinde değiştirmemi istediğin bir renk veya yazdırma düzeni ayarı var mı?
