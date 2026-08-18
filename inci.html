@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Eğitim Veri Merkezi (Depolama Modülü)</title>
+    <title>Eğitim Veri Merkezi (Sınav Modülü)</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         body { background: #121212; color: #00ff00; font-family: 'Courier New', monospace; padding: 20px; }
@@ -19,7 +19,7 @@
     <h1>EĞİTİM VERİ MERKEZİ</h1>
     
     <div class="box">
-        <label>SORU FOTOĞRAFLARI YÜKLE (Metin Biriktir):</label><br>
+        <label>SORU FOTOĞRAFLARI YÜKLE:</label><br>
         <input type="file" id="imageInput" multiple accept="image/*">
         <button onclick="processAndAppend()">DOKÜMANA EKLE</button>
     </div>
@@ -27,14 +27,15 @@
     <div class="box">
         <label>BİRİKEN METİN DOKÜMANI:</label>
         <textarea id="textStorage" placeholder="Burada biriken sorular olacak..."></textarea>
-        <button onclick="downloadDocument()">DOKÜMANI İNDİR (.txt)</button>
-        <button onclick="uploadDocument()">DOKÜMANI YÜKLE</button>
+        <button onclick="downloadDocument()">TXT İNDİR</button>
+        <button onclick="uploadDocument()">TXT YÜKLE</button>
     </div>
 
     <div class="box">
-        <label>ANALİZ VE PDF ÜRETİMİ:</label><br>
-        <input type="password" id="apiKey" placeholder="Gemini API Key...">
-        <button onclick="generateFinalPDF()">ANALİZ ET VE PDF'E ÇEVİR</button>
+        <label>API ANAHTARI (AIza ile başlar):</label><br>
+        <input type="password" id="apiKey" style="width:100%; background:#000; color:#fff; border:1px solid #333;" placeholder="AIza...">
+        <br><br>
+        <button onclick="generateFinalPDF()">ANALİZ ET VE PDF ÜRET</button>
     </div>
     
     <div class="status" id="status">Sistem hazır.</div>
@@ -44,21 +45,19 @@
     const textStorage = document.getElementById('textStorage');
     const status = document.getElementById('status');
 
-    // 1. FOTOĞRAFLARI OKU VE TEXT ALANINA EKLE
     async function processAndAppend() {
         const files = document.getElementById('imageInput').files;
         const worker = await Tesseract.createWorker('tur');
-        status.innerText = "İşleniyor...";
+        status.innerText = "Görseller okunuyor...";
         
         for (let file of files) {
             const ret = await worker.recognize(file);
-            textStorage.value += "\n\n--- SORU ---\n" + ret.data.text;
+            textStorage.value += "\n\n--- HATALI SORU ---\n" + ret.data.text;
         }
         await worker.terminate();
-        status.innerText = "Tüm fotoğraflar metne dönüştürüldü.";
+        status.innerText = "Tüm fotoğraflar metne eklendi.";
     }
 
-    // 2. DOSYA İŞLEMLERİ (İndirme/Yükleme)
     function downloadDocument() {
         const blob = new Blob([textStorage.value], {type: "text/plain"});
         const a = document.createElement('a');
@@ -79,26 +78,44 @@
         input.click();
     }
 
-    // 3. ANALİZ ET VE PDF ÜRET
     async function generateFinalPDF() {
         const apiKey = document.getElementById('apiKey').value;
         const text = textStorage.value;
 
-        status.innerText = "Gemini ile analiz ediliyor, lütfen bekleyin...";
+        if(!apiKey.startsWith('AIza')) { alert("API anahtarınız 'AIza' ile başlamalıdır. Lütfen AI Studio'dan doğru anahtarı aldığınızdan emin olun."); return; }
+
+        status.innerText = "Gemini AI analiz ediyor, bekleyin...";
         
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ contents: [{ parts: [{ text: `Aşağıdaki metin biriken yanlış sorular kümesidir. Bunları analiz et ve benzer konularda pekiştirme soruları üret: ${text}` }] }] })
+            body: JSON.stringify({ contents: [{ parts: [{ text: `Aşağıdaki metin öğrencinin yanlış yaptığı soruları içeriyor. Bunları analiz et. 
+            Ardından ortaokul seviyesine uygun, her biri 4 şıklı (A,B,C,D) olacak şekilde 10 adet pekiştirme sorusu üret. 
+            Cevap anahtarını en sona ekle.
+            Metin: ${text}` }] }] })
         });
 
         const data = await response.json();
         const result = data.candidates[0].content.parts[0].text;
 
-        // PDF üretimi (Print özelliği ile)
+        // PDF üretimi (İki Sütunlu)
         const win = window.open('', '', 'width=800,height=600');
-        win.document.write(`<html><body><h1>Pekiştirme Soruları</h1><pre style="white-space:pre-wrap;">${result}</pre></body></html>`);
+        win.document.write(`<html>
+            <head>
+                <style>
+                    body { font-family: 'Arial', sans-serif; padding: 40px; }
+                    .content { column-count: 2; column-gap: 40px; line-height: 1.5; }
+                    h1 { text-align: center; }
+                </style>
+            </head>
+            <body>
+                <h1>Pekiştirme Sınavı</h1>
+                <div class="content">
+                    ${result.replace(/\n/g, '<br>')}
+                </div>
+            </body>
+        </html>`);
         win.print();
         status.innerText = "İşlem tamamlandı.";
     }
