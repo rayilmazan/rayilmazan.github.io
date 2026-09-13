@@ -50,7 +50,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            flex-wrap: wrap; /* Mobil için */
+            flex-wrap: wrap;
             gap: 12px;
         }
 
@@ -85,7 +85,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
-            flex-wrap: wrap; /* Mobil için */
+            flex-wrap: wrap;
         }
 
         /* BUTONLAR */
@@ -363,7 +363,6 @@
 
     <header class="app-header">
         <div class="brand-container">
-            <!-- ÖZEL LOGONUZ (URL üzerinden) -->
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan Logo" class="brand-logo-img">
             <div>
                 <div class="brand-title">rayılmazan</div>
@@ -450,19 +449,47 @@
     </main>
 
     <script>
-        // MEB BTY Dersi 5. ve 6. Sınıf İlk 4 Hafta Kazanımları (2026-2027)
+        // MEB BTY Dersi 5. ve 6. Sınıf Tüm Dönem (18 Hafta) Planı Kazanımları Birebir Metinler
         const mebKazanimlari = {
             "5": {
-                1: ["BT.5.1.1.1. Bilişim teknolojilerinin günlük yaşamdaki önemini tartışır.", "BT.5.1.1.2. Bilgisayar sistemlerinin temel kavramlarını ve işlevlerini açıklar."],
-                2: ["BT.5.1.1.3. Bilişim teknolojilerinin beden ve ruh sağlığına etkilerini yorumlar."],
-                3: ["BT.5.1.2.1. Dosya ve klasör yönetimini kavrar.", "BT.5.1.2.2. Dijital ortamlarda bilgi arama stratejilerini kullanır."],
-                4: ["BT.5.2.1.1. Bilişim teknolojileri kullanırken dikkat edilmesi gereken etik ilkeleri açıklar."]
+                1: ["BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme"],
+                2: ["BTY.5.1.2. Bilişim teknolojilerinin kullanımında sağlığı korumaya yönelik önlemler alabilme"],
+                3: ["BTY.5.1.3. Bilişim teknolojilerinin etik kullanımına özen gösterebilme"],
+                4: ["BTY.5.2.1. Dosya ve klasör yönetimini gerçekleştirebilme"],
+                5: ["BTY.5.2.2. Dijital ortamlarda etkili arama stratejileri kullanabilme"],
+                6: ["BTY.5.2.3. Güvenli dosya paylaşımı ve bulut depolama araçlarını kullanabilme"],
+                7: ["BTY.5.3.1. Metin belgesi oluşturma ve biçimlendirme araçlarını kullanabilme"],
+                8: ["BTY.5.3.2. Metin belgesine görsel ve tablo ekleyerek düzenleyebilme"],
+                9: ["BTY.5.3.3. Hazırladığı metin belgelerini farklı biçimlerde kaydedebilme ve paylaşabilme"],
+                10: ["BTY.5.4.1. Sunum hazırlama programının arayüzünü ve temel özelliklerini tanıyabilme"],
+                11: ["BTY.5.4.2. Sunum dosyalarına metin, görsel ve çoklu ortam öğeleri ekleyebilme"],
+                12: ["BTY.5.4.3. Hazırladığı sunumları efekt ve geçişler ekleyerek düzenleyebilme"],
+                13: ["BTY.5.5.1. Problem çözme kavramını ve günlük hayattaki karşılıklarını açıklayabilme"],
+                14: ["BTY.5.5.2. Problemi çözmek için mantıksal ve adım adım adımlar (algoritma) tasarlayabilme"],
+                15: ["BTY.5.5.3. Tasarladığı algoritmaları akış şemaları ile ifade edebilme"],
+                16: ["BTY.5.6.1. Blok tabanlı programlama ortamının arayüzünü tanıyabilme"],
+                17: ["BTY.5.6.2. Blok tabanlı programlama ortamında temel karakter ve sahne oluşturabilme"],
+                18: ["BTY.5.6.3. Blok tabanlı kod bloklarını kullanarak basit animasyon ve etkileşimli hikayeler oluşturabilme"]
             },
             "6": {
-                1: ["BT.6.1.1.1. Bilişim teknolojilerinin günlük yaşamdaki önemini tartışır.", "BT.6.1.1.2. Bilişim teknolojilerinin beden ve ruh sağlığına etkilerini yorumlar."],
-                2: ["BT.6.1.1.3. Bilişim teknolojileri kullanırken dikkat edilmesi gereken etik ilkeleri açıklar."],
-                3: ["BT.6.1.2.1. İşletim sistemlerinin temel görevlerini ve bileşenlerini açıklar."],
-                4: ["BT.6.1.2.2. Ağ yapısını ve internete bağlanma sürecini açıklar."]
+                1: ["BTY.6.1.1. Bilişim teknolojileri ve toplumsal etkilerini değerlendirebilme"],
+                2: ["BTY.6.1.2. Dijital yurttaşlık ilkelerine uygun davranışlar sergileyebilme"],
+                3: ["BTY.6.1.3. Kişisel veri güvenliği ve gizliliğini korumaya yönelik tedbirler alabilme"],
+                4: ["BTY.6.2.1. İşletim sistemlerinin temel işlevlerini ve özelliklerini açıklayabilme"],
+                5: ["BTY.6.2.2. Bilgisayar ağları ve internet teknolojilerinin çalışma mantığını kavrayabilme"],
+                6: ["BTY.6.2.3. Ağ güvenliği ve olası tehditlere karşı alınabilecek önlemleri belirleyebilme"],
+                7: ["BTY.6.3.1. Hesap tablosu programının arayüzünü ve temel veri türlerini tanıyabilme"],
+                8: ["BTY.6.3.2. Hesap tablosunda verileri düzenleme, biçimlendirme ve temel formülleri kullanabilme"],
+                9: ["BTY.6.3.3. Hesap tablosundaki verileri kullanarak grafikler oluşturabilme ve yorumlayabilme"],
+                10: ["BTY.6.4.1. Özgün ve etkili dijital içerikler tasarlayabilme"],
+                11: ["BTY.6.4.2. Dijital materyallerde telif hakları ve açık kaynak lisanslarına dikkat edebilme"],
+                12: ["BTY.6.5.1. Karmaşık problemleri alt problemlere ayırarak çözüm üretebilme"],
+                13: ["BTY.6.5.2. Algoritmalarda karar yapılarını (koşul ifadelerini) kullanabilme"],
+                14: ["BTY.6.5.3. Algoritmalarda döngü yapılarını (tekrar eden adımları) tasarlayabilme"],
+                15: ["BTY.6.6.1. Blok tabanlı programlamada değişken tanımlama ve kullanabilme"],
+                16: ["BTY.6.6.2. Blok tabanlı programlamada listeler ve dizileri yönetebilme"],
+                17: ["BTY.6.6.3. Blok tabanlı programlamada alt programlar (fonksiyonlar) oluşturabilme"],
+                18: ["BTY.6.6.4. Blok tabanlı programlama ile işlevsel bir oyun veya uygulama tasarlayabilme"]
             }
         };
 
@@ -482,7 +509,7 @@
 
         let userAnswers = {};
         let currentWeek = 1;
-        const maxWeeks = 4; // Örnek veride 4 hafta var
+        const maxWeeks = 18; // Tüm dönem (18 hafta)
 
         document.addEventListener('DOMContentLoaded', () => {
             calculateCurrentWeek();
@@ -490,13 +517,12 @@
             renderQuestions();
         });
 
-        // 14 Eylül 2026 MEB Takvimi Başlangıcına Göre Hafta Hesaplama
         function calculateCurrentWeek() {
             const today = new Date();
             const schoolStartDate = new Date("2026-09-14T00:00:00");
             
             if (today < schoolStartDate) {
-                currentWeek = 1; // Okul açılmadıysa 1. haftayı baz al
+                currentWeek = 1;
             } else {
                 const diffTime = Math.abs(today - schoolStartDate);
                 const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -509,11 +535,8 @@
             updateWeekDisplay();
         }
 
-        // İleri / Geri Hafta Değiştirme
         function changeWeek(direction) {
             currentWeek += direction;
-            
-            // Sınırlandırmalar
             if (currentWeek < 1) currentWeek = 1;
             if (currentWeek > maxWeeks) currentWeek = maxWeeks;
             
@@ -526,13 +549,12 @@
             document.getElementById('currentWeekTextScreen').innerText = currentWeek;
         }
 
-        // Sınıf seçildiğinde Öğrenme Çıktılarını (Kazanımları) Güncelle
         function updateCurriculum() {
             const grade = document.getElementById('gradeSelect').value;
             document.getElementById('currentGradeText').innerText = grade;
             document.getElementById('printGradeTitle').innerText = grade;
             
-            const outcomes = mebKazanimlari[grade][currentWeek] || ["Kazanım verisi bulunamadı. Lütfen takvimi kontrol edin."];
+            const outcomes = mebKazanimlari[grade][currentWeek] || ["Kazanım verisi bulunamadı."];
             
             const listHTML = outcomes.map(out => `<li>${out}</li>`).join('');
             document.getElementById('screenOutcomesList').innerHTML = listHTML;
