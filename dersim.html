@@ -312,10 +312,11 @@
             background: rgba(255,255,255,0.1);
             color: white;
             border: 1px solid rgba(255,255,255,0.2);
-            padding: 0.4rem 1rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            font-weight: 600;
         }
 
         .slide-btn:hover {
@@ -406,7 +407,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 0.5rem;
+            padding: 0.6rem;
             border-radius: 6px;
             cursor: pointer;
             transition: background 0.15s;
@@ -434,7 +435,147 @@
             border-top: 1px solid var(--border-color);
         }
 
-        /* PRINT STYLESHEET FOR EXAM & TEST WORKSHEETS */
+        /* 📱 RESPONSIVE / MOBİL UYUMLULUK STİLLERİ */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.8rem;
+            }
+
+            .brand-area {
+                width: 100%;
+            }
+
+            .brand-logo {
+                height: 42px;
+            }
+
+            .logo-text h1 {
+                font-size: 1.15rem;
+            }
+
+            .logo-text p {
+                font-size: 0.78rem;
+            }
+
+            .date-badge {
+                width: 100%;
+                text-align: center;
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .main-container {
+                margin: 1rem auto;
+                padding: 0 0.5rem;
+            }
+
+            .grade-tabs {
+                width: 100%;
+            }
+
+            .tab-btn {
+                flex: 1;
+                padding: 0.7rem 0.5rem;
+                font-size: 0.95rem;
+                text-align: center;
+            }
+
+            .week-nav {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                gap: 0.8rem;
+            }
+
+            .week-select-group {
+                flex-direction: column;
+                align-items: stretch;
+                width: 100%;
+            }
+
+            .week-select-group label {
+                font-size: 0.85rem;
+            }
+
+            select {
+                width: 100%;
+                font-size: 0.9rem;
+            }
+
+            .nav-btn {
+                width: 100%;
+                text-align: center;
+                padding: 0.7rem;
+            }
+
+            .register-card {
+                padding: 1rem;
+            }
+
+            .register-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .outcome-text {
+                font-size: 0.9rem;
+            }
+
+            .lesson-section, .quiz-section {
+                padding: 1rem;
+            }
+
+            .slides-viewer {
+                padding: 1.2rem;
+                min-height: auto;
+            }
+
+            .slide-title {
+                font-size: 1.15rem;
+            }
+
+            .slide-body {
+                font-size: 0.9rem;
+            }
+
+            .slide-controls {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .slide-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .exam-banner {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .exam-btn, .print-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .question-card {
+                padding: 0.9rem;
+            }
+
+            .option-label {
+                padding: 0.7rem 0.5rem; /* Touch friendly on mobile */
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 🖨️ PRINT STYLESHEET FOR EXAM & TEST WORKSHEETS */
         @media print {
             body {
                 background: white;
@@ -442,7 +583,6 @@
                 padding: 0;
             }
 
-            /* SINIF DEFTERİ KARTI KISMI (.register-card) YAZDIRMA EKRANINDA GİZLENDİ */
             header, .grade-tabs, .week-nav, .register-card, .lesson-section, .slide-controls, .exam-banner, footer, .print-btn, .result-box, input[type="radio"] {
                 display: none !important;
             }
@@ -545,7 +685,7 @@
             <button class="nav-btn" onclick="changeWeek(1)">Sonraki Hafta →</button>
         </div>
 
-        <!-- Class Register Outcome Card (Web arayüzünde görünür, PDF çıktısında otomatik gizlenir) -->
+        <!-- Class Register Outcome Card -->
         <div class="register-card">
             <div class="register-header">
                 <span class="register-tag">Sınıf Defterine Yazılacak Öğrenme Çıktısı (Yıllık Plandan Birebir)</span>
@@ -577,7 +717,7 @@
 
         <!-- Quiz & Exam Section -->
         <div class="quiz-section">
-            <!-- PRINTABLE HEADER SHEET (PDF/YAZDIRMA EKRANINDA BAŞLIK VE YENİ LOGO) -->
+            <!-- PRINTABLE HEADER SHEET (NO MEB TEXT) -->
             <div class="print-header-sheet">
                 <div>
                     <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h2>
