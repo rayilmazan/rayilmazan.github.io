@@ -38,7 +38,7 @@
             padding-bottom: 60px;
         }
 
-        /* UYGULAMA ÜST BARI (Screen Mode) */
+        /* UYGULAMA ÜST BARI */
         .app-header {
             background-color: #1e293b;
             color: #ffffff;
@@ -58,10 +58,10 @@
             gap: 12px;
         }
 
-        .brand-logo-svg {
-            width: 38px;
-            height: 38px;
-            color: #38bdf8;
+        .brand-logo-img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
         }
 
         .brand-title {
@@ -100,47 +100,32 @@
             text-decoration: none;
         }
 
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: #ffffff;
-        }
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
-        }
+        .btn-primary { background-color: var(--accent-color); color: #ffffff; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid #475569; color: #e2e8f0; }
+        .btn-outline:hover { background-color: #334155; }
+        .btn-success { background-color: var(--success-color); color: #ffffff; }
+        .btn-success:hover { background-color: #15803d; }
 
-        .btn-secondary {
-            background-color: #334155;
-            color: #f1f5f9;
-        }
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
-
-        .btn-outline {
-            background-color: transparent;
+        /* SINIF SEÇİCİ */
+        .grade-selector {
+            background: #334155;
+            color: white;
             border: 1px solid #475569;
-            color: #e2e8f0;
-        }
-        .btn-outline:hover {
-            background-color: #334155;
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            color: #ffffff;
-        }
-        .btn-success:hover {
-            background-color: #15803d;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
         }
 
-        /* ANA İÇERİK KONTEYNERİ */
         .main-container {
             max-width: 1050px;
             margin: 28px auto;
             padding: 0 20px;
         }
 
-        /* İSTATİSTİK VE KONTROL BARI */
+        /* İSTATİSTİK VE KAZANIM BARI */
         .quiz-control-bar {
             background: var(--bg-card);
             border-radius: var(--radius-lg);
@@ -149,61 +134,73 @@
             box-shadow: var(--shadow-sm);
             margin-bottom: 24px;
             display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .stats-row {
+            display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
         }
 
-        .stats-group {
-            display: flex;
-            gap: 20px;
+        .stats-group { display: flex; gap: 20px; }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+
+        /* ÖĞRENME ÇIKTILARI (EKRAN) */
+        .outcomes-panel {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent-color);
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
         }
 
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
+        .outcomes-title {
+            font-size: 0.85rem;
             font-weight: 700;
+            color: var(--accent-hover);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .stat-value {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .outcomes-list {
+            list-style-type: none;
+            font-size: 0.9rem;
             color: var(--text-main);
+            font-weight: 500;
         }
 
-        /* DİJİTAL EKRAN SORU LİSTESİ */
-        .questions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .outcomes-list li {
+            margin-bottom: 4px;
+            padding-left: 14px;
+            position: relative;
         }
 
+        .outcomes-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* SORU KARTLARI */
+        .questions-list { display: flex; flex-direction: column; gap: 20px; }
         .question-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 22px 26px;
             box-shadow: var(--shadow-sm);
-            transition: border-color 0.2s ease;
         }
-
-        .question-card:hover {
-            border-color: #cbd5e1;
-        }
-
-        .question-header {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
+        .question-header { display: flex; gap: 12px; margin-bottom: 14px; }
         .question-badge {
             background-color: var(--accent-light);
             color: var(--accent-color);
@@ -214,170 +211,44 @@
             height: fit-content;
             white-space: nowrap;
         }
-
-        .question-text {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-top: 14px;
-        }
-
+        .question-text { font-size: 1.05rem; font-weight: 600; color: var(--text-main); }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+        
         .option-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            background-color: #fafafa;
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            border: 1px solid var(--border-color); border-radius: var(--radius-md);
+            cursor: pointer; background-color: #fafafa;
         }
-
-        .option-item:hover {
-            background-color: var(--accent-light);
-            border-color: #93c5fd;
-        }
-
         .option-item input[type="radio"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #94a3b8;
-            border-radius: 50%;
-            outline: none;
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0;
+            appearance: none; width: 18px; height: 18px;
+            border: 2px solid #94a3b8; border-radius: 50%;
+            outline: none; cursor: pointer; position: relative; flex-shrink: 0;
         }
-
         .option-item input[type="radio"]:checked {
-            border-color: var(--accent-color);
-            background-color: var(--accent-color);
+            border-color: var(--accent-color); background-color: var(--accent-color);
             box-shadow: inset 0 0 0 3px #ffffff;
         }
+        .option-letter { font-weight: 700; color: var(--text-muted); width: 20px; }
+        .option-text { font-size: 0.95rem; color: var(--text-main); flex-grow: 1; }
 
-        .option-letter {
-            font-weight: 700;
-            color: var(--text-muted);
-            width: 20px;
-        }
+        /* CEVAP KONTROL */
+        .question-card.correct { border-color: var(--success-color); background-color: var(--success-bg); }
+        .question-card.incorrect { border-color: var(--danger-color); background-color: var(--danger-bg); }
+        .explanation-box { margin-top: 14px; padding: 10px 14px; border-radius: 6px; font-size: 0.88rem; display: none; }
+        .question-card.correct .explanation-box { display: block; background-color: #dcfce7; color: #14532d; border: 1px solid #86efac; }
+        .question-card.incorrect .explanation-box { display: block; background-color: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
 
-        .option-text {
-            font-size: 0.95rem;
-            color: var(--text-main);
-            flex-grow: 1;
-        }
-
-        /* CEVAP KONTROL BİLDİRİM BİÇİMLERİ */
-        .question-card.correct {
-            border-color: var(--success-color);
-            background-color: var(--success-bg);
-        }
-
-        .question-card.incorrect {
-            border-color: var(--danger-color);
-            background-color: var(--danger-bg);
-        }
-
-        .explanation-box {
-            margin-top: 14px;
-            padding: 10px 14px;
-            border-radius: 6px;
-            font-size: 0.88rem;
-            display: none;
-        }
-
-        .question-card.correct .explanation-box {
-            display: block;
-            background-color: #dcfce7;
-            color: #14532d;
-            border: 1px solid #86efac;
-        }
-
-        .question-card.incorrect .explanation-box {
-            display: block;
-            background-color: #fee2e2;
-            color: #7f1d1d;
-            border: 1px solid #fca5a5;
-        }
-
-        /* SONUÇ MODALI / PANELİ */
-        .result-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .result-content {
-            background: #ffffff;
-            width: 90%;
-            max-width: 450px;
-            padding: 30px;
-            border-radius: var(--radius-lg);
-            text-align: center;
-            box-shadow: var(--shadow-md);
-        }
-
-        .score-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: var(--accent-light);
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 16px auto;
-            border: 4px solid var(--accent-color);
-        }
-
-        /* YAZDIRILABİLİR SINAV KAĞIDI BAŞLIĞI (Sadece PDF / Print Esnasında Görünür) */
-        .printable-exam-header {
-            display: none;
-        }
+        .printable-exam-header { display: none; }
 
         /* ======================================================= */
         /* PDF / PRINT DÜZENİ (2 SÜTUNLU SINAV FORMATI)            */
         /* ======================================================= */
         @media print {
-            @page {
-                size: A4 portrait;
-                margin: 12mm 12mm 15mm 12mm;
-            }
+            @page { size: A4 portrait; margin: 12mm 12mm 15mm 12mm; }
+            body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; font-size: 10pt !important; }
+            .app-header, .quiz-control-bar, .explanation-box, .non-printable { display: none !important; }
+            .main-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
 
-            body {
-                background: #ffffff !important;
-                color: #000000 !important;
-                padding: 0 !important;
-                font-size: 10pt !important;
-            }
-
-            /* Ekran elemanlarını gizle */
-            .app-header, .quiz-control-bar, .explanation-box, .result-modal, .non-printable {
-                display: none !important;
-            }
-
-            .main-container {
-                max-width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-            /* RESMÎ SINAV BAŞLIĞI (PRINT) */
             .printable-exam-header {
                 display: block !important;
                 border: 2px solid #000000;
@@ -386,171 +257,69 @@
             }
 
             .header-top-row {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                border-bottom: 1.5px solid #000000;
-                padding-bottom: 8px;
-                margin-bottom: 8px;
+                display: flex; align-items: center; justify-content: space-between;
+                border-bottom: 1.5px solid #000000; padding-bottom: 8px; margin-bottom: 8px;
             }
 
-            .logo-brand-box {
-                display: flex;
-                align-items: center;
-                gap: 10px;
+            .logo-brand-box { display: flex; align-items: center; gap: 8px; }
+            
+            .logo-brand-box img {
+                width: 45px !important;
+                height: 45px !important;
+                object-fit: contain;
             }
 
-            .logo-brand-box svg {
-                width: 36px;
-                height: 36px;
-                color: #000000 !important;
-            }
+            .brand-name-text { font-size: 16pt; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
 
-            .brand-name-text {
-                font-size: 16pt;
-                font-weight: 800;
-                letter-spacing: -0.5px;
-                text-transform: uppercase;
-            }
+            .exam-title-center { text-align: center; flex-grow: 1; padding: 0 10px; }
+            .exam-title-center h1 { font-size: 11pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
+            .exam-title-center h2 { font-size: 9.5pt; font-weight: 600; }
 
-            .exam-title-center {
-                text-align: center;
-                flex-grow: 1;
-                padding: 0 10px;
-            }
+            .score-box-print { border: 1px solid #000000; padding: 4px 8px; text-align: center; font-weight: 700; }
 
-            .exam-title-center h1 {
-                font-size: 11pt;
-                font-weight: 800;
-                text-transform: uppercase;
-            }
-
-            .exam-title-center h2 {
-                font-size: 9.5pt;
-                font-weight: 600;
-            }
-
-            /* ÖĞRENCİ BİLGİ TABLOSU */
             .student-info-grid {
-                display: grid;
-                grid-template-columns: 2fr 1.5fr 1fr;
-                gap: 8px;
-                font-size: 9pt;
-                font-weight: 600;
+                display: grid; grid-template-columns: 2fr 1.5fr 1fr; gap: 8px; font-size: 9pt; font-weight: 600; margin-bottom: 8px;
             }
 
-            .info-item {
-                display: flex;
-                align-items: center;
-            }
-
-            .score-box-print {
-                border: 1px solid #000000;
-                padding: 4px 8px;
-                text-align: center;
-                font-weight: 700;
-            }
-
-            .exam-instructions {
+            /* PDF ÖĞRENME ÇIKTILARI KUTUSU */
+            .print-outcomes-box {
                 font-size: 8pt;
-                font-style: italic;
-                margin-top: 6px;
-                border-top: 1px dashed #000000;
-                padding-top: 4px;
+                border: 1px dashed #000000;
+                padding: 6px;
+                background-color: #f8f8f8 !important;
+                margin-bottom: 6px;
             }
+            .print-outcomes-box strong { display: block; margin-bottom: 3px; }
+            .print-outcomes-list { margin: 0; padding-left: 12px; }
+            
+            .exam-instructions { font-size: 8pt; font-style: italic; margin-top: 4px; border-top: 1px dashed #000000; padding-top: 4px; }
 
-            /* İKİ SÜTUNLU SINAV DÜZENİ */
-            .questions-list {
-                column-count: 2 !important;
-                column-gap: 24px !important;
-                column-rule: 1px solid #64748b !important;
-                display: block !important;
-            }
-
+            /* İKİ SÜTUNLU DÜZEN */
+            .questions-list { column-count: 2 !important; column-gap: 24px !important; column-rule: 1px solid #64748b !important; display: block !important; }
             .question-card {
-                break-inside: avoid !important;
-                page-break-inside: avoid !important;
-                border: none !important;
-                padding: 0 0 14px 0 !important;
-                margin-bottom: 14px !important;
-                border-bottom: 1px solid #e2e8f0 !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                background: transparent !important;
+                break-inside: avoid !important; page-break-inside: avoid !important;
+                border: none !important; padding: 0 0 14px 0 !important; margin-bottom: 14px !important;
+                border-bottom: 1px solid #e2e8f0 !important; box-shadow: none !important; border-radius: 0 !important;
             }
-
-            .question-header {
-                margin-bottom: 6px !important;
-                gap: 6px !important;
-            }
-
-            .question-badge {
-                background: none !important;
-                color: #000000 !important;
-                padding: 0 !important;
-                font-size: 9.5pt !important;
-                font-weight: 800 !important;
-            }
-
-            .question-text {
-                font-size: 9.5pt !important;
-                color: #000000 !important;
-                font-weight: 600 !important;
-            }
-
-            .options-grid {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important; /* Seçenekleri yan yana ikişerli diz */
-                gap: 4px 8px !important;
-                margin-top: 6px !important;
-            }
-
-            .option-item {
-                border: none !important;
-                padding: 2px 0 !important;
-                background: transparent !important;
-                gap: 4px !important;
-            }
-
-            .option-item input[type="radio"] {
-                display: none !important; /* Radyo butonunu kağıtta gizle */
-            }
-
-            .option-letter {
-                font-weight: 800 !important;
-                color: #000000 !important;
-                width: auto !important;
-            }
-
-            .option-letter::after {
-                content: ")";
-                margin-right: 4px;
-            }
-
-            .option-text {
-                font-size: 9pt !important;
-                color: #000000 !important;
-            }
+            .question-header { margin-bottom: 6px !important; gap: 6px !important; }
+            .question-badge { color: #000000 !important; padding: 0 !important; font-size: 9.5pt !important; font-weight: 800 !important; background: none !important;}
+            .question-text { font-size: 9.5pt !important; color: #000000 !important; font-weight: 600 !important; }
+            
+            .options-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 4px 8px !important; margin-top: 6px !important; }
+            .option-item { border: none !important; padding: 2px 0 !important; gap: 4px !important; }
+            .option-item input[type="radio"] { display: none !important; }
+            .option-letter { font-weight: 800 !important; color: #000000 !important; width: auto !important; }
+            .option-letter::after { content: ")"; margin-right: 4px; }
+            .option-text { font-size: 9pt !important; color: #000000 !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- SADECE EKRANDA GÖRÜNEN ÜST GEZİNTİ BARI -->
     <header class="app-header">
         <div class="brand-container">
-            <!-- SIMETRİK GEOMETRİK SVG LOGO -->
-            <svg class="brand-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5" stroke="currentColor" stroke-width="5" fill="none"/>
-                <polygon points="50,18 78,34 78,66 50,82 22,66 22,34" stroke="currentColor" stroke-width="3" fill="none" opacity="0.7"/>
-                <circle cx="50" cy="50" r="12" fill="currentColor"/>
-                <line x1="50" y1="5" x2="50" y2="36" stroke="currentColor" stroke-width="4"/>
-                <line x1="50" y1="64" x2="50" y2="95" stroke="currentColor" stroke-width="4"/>
-                <line x1="10" y1="27.5" x2="36" y2="42.5" stroke="currentColor" stroke-width="4"/>
-                <line x1="90" y1="27.5" x2="64" y2="42.5" stroke="currentColor" stroke-width="4"/>
-                <line x1="10" y1="72.5" x2="36" y2="57.5" stroke="currentColor" stroke-width="4"/>
-                <line x1="90" y1="72.5" x2="64" y2="57.5" stroke="currentColor" stroke-width="4"/>
-            </svg>
+            <!-- ÖZEL LOGONUZ (URL üzerinden) -->
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="Rayılmazan Logo" class="brand-logo-img">
             <div>
                 <div class="brand-title">Rayılmazan</div>
                 <div class="brand-subtitle">Dijital Sınav ve İnteraktif Soru Platformu</div>
@@ -558,39 +327,33 @@
         </div>
 
         <div class="header-actions">
+            <select id="gradeSelect" class="grade-selector" onchange="updateCurriculum()">
+                <option value="5">5. Sınıf Sınavı</option>
+                <option value="6">6. Sınıf Sınavı</option>
+            </select>
             <button class="btn btn-outline" onclick="resetQuiz()">🔄 Temizle</button>
             <button class="btn btn-success" onclick="checkAnswers()">✔️ Cevapları Kontrol Et</button>
             <button class="btn btn-primary" onclick="printExam()">🖨️ PDF / Sınav Kağıdı İndir</button>
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
     <main class="main-container">
 
-        <!-- RESMÎ 2 SÜTUNLU SINAV KAĞIDI BAŞLIĞI (PDF / Print Çıktısında Görünür) -->
+        <!-- RESMÎ 2 SÜTUNLU SINAV KAĞIDI BAŞLIĞI (PDF) -->
         <div class="printable-exam-header">
             <div class="header-top-row">
                 <div class="logo-brand-box">
-                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5" stroke="#000" stroke-width="6" fill="none"/>
-                        <polygon points="50,18 78,34 78,66 50,82 22,66 22,34" stroke="#000" stroke-width="3" fill="none"/>
-                        <circle cx="50" cy="50" r="12" fill="#000"/>
-                        <line x1="50" y1="5" x2="50" y2="36" stroke="#000" stroke-width="4"/>
-                        <line x1="50" y1="64" x2="50" y2="95" stroke="#000" stroke-width="4"/>
-                        <line x1="10" y1="27.5" x2="36" y2="42.5" stroke="#000" stroke-width="4"/>
-                        <line x1="90" y1="27.5" x2="64" y2="42.5" stroke="#000" stroke-width="4"/>
-                    </svg>
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="Rayılmazan Logo">
                     <span class="brand-name-text">RAYILMAZAN</span>
                 </div>
 
                 <div class="exam-title-center">
                     <h1>BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h1>
-                    <h2>1. DÖNEM 1. YAZILI DEĞERLENDİRME SINAVI</h2>
+                    <h2><span id="printGradeTitle">5</span>. SINIF 1. DÖNEM DEĞERLENDİRME SINAVI</h2>
                 </div>
 
                 <div class="score-box-print">
-                    ALDIĞI NOT<br>
-                    <span style="font-size:14pt;">/ 100</span>
+                    ALDIĞI NOT<br><span style="font-size:14pt;">/ 100</span>
                 </div>
             </div>
 
@@ -600,311 +363,176 @@
                 <div class="info-item"><strong>Numarası:</strong> &nbsp;__________</div>
             </div>
 
+            <div class="print-outcomes-box">
+                <strong>Bu Sınavın Ölçtüğü Öğrenme Çıktıları (<span class="currentWeekTextPrint"></span>. Hafta):</strong>
+                <ul class="print-outcomes-list" id="printOutcomesList"></ul>
+            </div>
+
             <div class="exam-instructions">
                 Açıklama: Her soru eşit puandır. Cevaplarınızı soru seçeneklerinin yanına açıkça işaretleyiniz. Başarılar dileriz!
             </div>
         </div>
 
-        <!-- İSTATİSTİK BARI (Sadece Ekran Görünümünde) -->
+        <!-- İSTATİSTİK VE ÖĞRENME ÇIKTILARI BARI -->
         <div class="quiz-control-bar non-printable">
-            <div class="stats-group">
-                <div class="stat-item">
-                    <span class="stat-label">Toplam Soru</span>
-                    <span class="stat-value" id="stat-total">0</span>
+            <div class="stats-row">
+                <div class="stats-group">
+                    <div class="stat-item"><span class="stat-label">Toplam Soru</span><span class="stat-value" id="stat-total">0</span></div>
+                    <div class="stat-item"><span class="stat-label">Cevaplanan</span><span class="stat-value" id="stat-answered" style="color: var(--accent-color);">0</span></div>
+                    <div class="stat-item"><span class="stat-label">Kalan</span><span class="stat-value" id="stat-remaining" style="color: var(--text-muted);">0</span></div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Cevaplanan</span>
-                    <span class="stat-value" id="stat-answered" style="color: var(--accent-color);">0</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Kalan</span>
-                    <span class="stat-value" id="stat-remaining" style="color: var(--text-muted);">0</span>
-                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">Format: <strong>Çoktan Seçmeli Test</strong></div>
             </div>
-            <div>
-                <span style="font-size: 0.85rem; color: var(--text-muted);">Format: <strong>Çoktan Seçmeli Test</strong></span>
+            
+            <div class="outcomes-panel">
+                <div class="outcomes-title">
+                    <span>📚 İlgili Haftanın Öğrenme Çıktıları (<span id="currentGradeText">5</span>. Sınıf)</span>
+                    <span style="color:var(--text-muted);">🗓️ MEB Takvimi: <strong id="currentWeekTextScreen"></strong>. Hafta (14 Eylül 2026 Başlangıçlı)</span>
+                </div>
+                <ul class="outcomes-list" id="screenOutcomesList">
+                    <!-- Javascript ile dinamik dolacak -->
+                </ul>
             </div>
         </div>
 
-        <!-- SORU LİSTESİ KONTEYNERİ -->
-        <div class="questions-list" id="questions-container">
-            <!-- Sorular JavaScript ile dinamik olarak yüklenecektir -->
-        </div>
+        <!-- SORU LİSTESİ -->
+        <div class="questions-list" id="questions-container"></div>
 
     </main>
 
-    <!-- SONUÇ PENCERESİ (MODAL) -->
-    <div class="result-modal" id="resultModal">
-        <div class="result-content">
-            <h2 style="color: var(--text-main);">Sınav Değerlendirmesi</h2>
-            <div class="score-circle" id="modalScore">0</div>
-            <p id="modalFeedbackText" style="font-weight: 600; color: var(--text-muted); margin-bottom: 16px;">Başarı Durumu</p>
-            
-            <div style="display: flex; justify-content: space-around; margin-bottom: 24px; font-size: 0.9rem;">
-                <div><strong style="color: var(--success-color);" id="modalCorrect">0</strong> Doğru</div>
-                <div><strong style="color: var(--danger-color);" id="modalIncorrect">0</strong> Yanlış</div>
-                <div><strong style="color: var(--text-muted);" id="modalEmpty">0</strong> Boş</div>
-            </div>
-
-            <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeResultModal()">İncelemeye Dön</button>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT MANTIĞI -->
     <script>
-        // ÖRNEK MÜFREDAT SORU BANKASI (Bilişim Teknolojileri ve Yazılım)
-        const defaultQuestions = [
-            {
-                id: 1,
-                question: "Aşağıdakilerden hangisi bir bilgisayar sistemindeki **dahili (iç) donanım** birimlerinden biridir?",
-                options: [
-                    "Klavye",
-                    "İşlemci (CPU)",
-                    "Yazıcı (Printer)",
-                    "Fare (Mouse)"
-                ],
-                correct: 1,
-                explanation: "İşlemci (CPU), anakart üzerine takılan temel bir iç (dahili) donanım birimidir."
+        // MEB BTY Dersi 5. ve 6. Sınıf İlk 4 Hafta Kazanımları (2026-2027)
+        const mebKazanimlari = {
+            "5": {
+                1: ["BT.5.1.1.1. Bilişim teknolojilerinin günlük yaşamdaki önemini tartışır.", "BT.5.1.1.2. Bilgisayar sistemlerinin temel kavramlarını ve işlevlerini açıklar."],
+                2: ["BT.5.1.1.3. Bilişim teknolojilerinin beden ve ruh sağlığına etkilerini yorumlar."],
+                3: ["BT.5.1.2.1. Dosya ve klasör yönetimini kavrar.", "BT.5.1.2.2. Dijital ortamlarda bilgi arama stratejilerini kullanır."],
+                4: ["BT.5.2.1.1. Bilişim teknolojileri kullanırken dikkat edilmesi gereken etik ilkeleri açıklar."]
             },
-            {
-                id: 2,
-                question: "Bilgisayarda çalıştırılan programların geçici verilerinin tutulduğu ve elektrik kesildiğinde verilerin silindiği bellek birimi hangisidir?",
-                options: [
-                    "Sabit Disk (HDD/SSD)",
-                    "Ekran Kartı",
-                    "RAM Bellek",
-                    "ROM Bellek"
-                ],
-                correct: 2,
-                explanation: "RAM (Geçici) bellek, elektrik kesildiğinde üzerindeki verileri kaybeden geçici veri alanıdır."
-            },
-            {
-                id: 3,
-                question: "Dosya adlarında noktadan sonra gelen 3 veya 4 harfli kısma 'dosya uzantısı' denir. Aşağıdakilerden hangisi bir **ses/müzik** dosyası uzantısıdır?",
-                options: [
-                    ".mp3",
-                    ".docx",
-                    ".png",
-                    ".pdf"
-                ],
-                correct: 0,
-                explanation: ".mp3 ses, .docx kelime işlemci belgesi, .png resim, .pdf ise taşınabilir belge formatıdır."
-            },
-            {
-                id: 4,
-                question: "Siber güvenlik açısından aşağıdakilerden hangisi **güçlü bir parola** oluşturma ilkelerine uygundur?",
-                options: [
-                    "12345678",
-                    "adsoyad2026",
-                    "Krm!84#mP9",
-                    "qwertyuiop"
-                ],
-                correct: 2,
-                explanation: "Güçlü bir parola en az 8 karakterli, büyük/küçük harf, rakam ve özel semboller içermelidir."
-            },
-            {
-                id: 5,
-                question: "Belirli bir problemi çözmek veya bir amaca ulaşmak için adım adım tasarlanan mantıksal yola ne ad verilir?",
-                options: [
-                    "İşletim Sistemi",
-                    "Algoritma",
-                    "İnternet Protokolü",
-                    "Veri Tabanı"
-                ],
-                correct: 1,
-                explanation: "Algoritma, bir sorunun çözümünde izlenecek sıralı adımlar dizisidir."
-            },
-            {
-                id: 6,
-                question: "Akış şemalarında (Flowchart) **karar verme / karşılaştırma** işlemleri için hangi geometrik sembol kullanılır?",
-                options: [
-                    "Dikdörtgen",
-                    "Elips",
-                    "Eşkenar Dörtgen (Baklava)",
-                    "Paralelkenar"
-                ],
-                correct: 2,
-                explanation: "Eşkenar dörtgen (baklava dilimi) akış şemalarında 'Evet/Hayır' kararlarını temsil eder."
-            },
-            {
-                id: 7,
-                question: "Başkalarına ait dijital eserleri izin almadan ve kaynak göstermeden kendi eseri gibi kullanmak hangi ihlale girer?",
-                options: [
-                    "Telif Hakkı ve İnternet Etiği",
-                    "Veri Sıkıştırma Hatası",
-                    "Ağ Paylaşımı İhlali",
-                    "Donanım Güncellemesi"
-                ],
-                correct: 0,
-                explanation: "Eser sahibinin izni olmadan içerik kullanmak Telif Hakkı yasalarına ve dijital etiğe aykırıdır."
-            },
-            {
-                id: 8,
-                question: "Açık kaynak kodlu olan ve Türkiye'de TÜBİTAK ULAKBİM tarafından geliştirilen ulusal işletim sistemimiz hangisidir?",
-                options: [
-                    "Windows 11",
-                    "Pardus",
-                    "MacOS",
-                    "Android"
-                ],
-                correct: 1,
-                explanation: "Pardus, Türkiye'nin yerli ve açık kaynak kodlu Linux tabanlı işletim sistemidir."
-            },
-            {
-                id: 9,
-                question: "Birden fazla bilgisayarın birbirleriyle veri alışverişi yapabilmesi için bağlandığı sistem yapısına ne ad verilir?",
-                options: [
-                    "Yazılım Paketleri",
-                    "Siber Algoritma",
-                    "Bilgisayar Ağı (Network)",
-                    "İşlemci Yolu"
-                ],
-                correct: 2,
-                explanation: "Bilgisayar ağı (Network), cihazların haberleşmesini ve kaynak paylaşımını sağlar."
-            },
-            {
-                id: 10,
-                question: "Aşağıdakilerden hangisi dosyalarımızı internet üzerinde güvenle saklamamızı sağlayan **bulut depolama** servislerinden biri değildir?",
-                options: [
-                    "Google Drive",
-                    "Microsoft OneDrive",
-                    "Dropbox",
-                    "MS Paint"
-                ],
-                correct: 3,
-                explanation: "MS Paint basit bir çizim programıdır; bulut depolama servisi değildir."
+            "6": {
+                1: ["BT.6.1.1.1. Bilişim teknolojilerinin günlük yaşamdaki önemini tartışır.", "BT.6.1.1.2. Bilişim teknolojilerinin beden ve ruh sağlığına etkilerini yorumlar."],
+                2: ["BT.6.1.1.3. Bilişim teknolojileri kullanırken dikkat edilmesi gereken etik ilkeleri açıklar."],
+                3: ["BT.6.1.2.1. İşletim sistemlerinin temel görevlerini ve bileşenlerini açıklar."],
+                4: ["BT.6.1.2.2. Ağ yapısını ve internete bağlanma sürecini açıklar."]
             }
+        };
+
+        // BTY Örnek Soru Bankası
+        const sampleQuestions = [
+            { id: 1, question: "Aşağıdakilerden hangisi bir bilgisayar sistemindeki **dahili (iç) donanım** birimlerinden biridir?", options: ["Klavye", "İşlemci (CPU)", "Yazıcı (Printer)", "Fare (Mouse)"], correct: 1, explanation: "İşlemci (CPU) anakart üzerine takılan iç donanımdır." },
+            { id: 2, question: "Bilgisayarda çalıştırılan programların geçici verilerinin tutulduğu, elektrik kesildiğinde silinen bellek hangisidir?", options: ["Sabit Disk", "Ekran Kartı", "RAM Bellek", "ROM Bellek"], correct: 2, explanation: "RAM bellek elektrik kesildiğinde verileri kaybeder." },
+            { id: 3, question: "Siber güvenlik açısından hangisi **güçlü bir parola** ilkelerine uygundur?", options: ["12345678", "adsoyad2026", "Krm!84#mP9", "qwertyuiop"], correct: 2, explanation: "Güçlü parola büyük/küçük harf, rakam ve sembol içerir." },
+            { id: 4, question: "Başkalarına ait dijital eserleri izin almadan kendi eseri gibi kullanmak hangi ihlale girer?", options: ["Telif Hakkı ve İnternet Etiği", "Veri Sıkıştırma Hatası", "Ağ Paylaşımı İhlali", "Donanım Güncellemesi"], correct: 0, explanation: "İzinsiz kullanım Telif Hakkı ihlalidir." },
+            { id: 5, question: "Birden fazla bilgisayarın birbirleriyle veri alışverişi yapabilmesi için bağlandığı sisteme ne ad verilir?", options: ["Yazılım", "Algoritma", "Bilgisayar Ağı (Network)", "İşlemci"], correct: 2, explanation: "Bilgisayar ağı (Network) cihazların haberleşmesini sağlar." }
         ];
 
         let userAnswers = {};
+        let currentWeek = 1;
 
-        // SAYFA YÜKLENDİĞİNDE
         document.addEventListener('DOMContentLoaded', () => {
+            calculateCurrentWeek();
+            updateCurriculum();
             renderQuestions();
-            updateStats();
         });
 
-        // SORULARI EKRANA BASTIRMA
+        // 14 Eylül 2026 MEB Takvimi Başlangıcına Göre Hafta Hesaplama
+        function calculateCurrentWeek() {
+            const today = new Date();
+            const schoolStartDate = new Date("2026-09-14T00:00:00");
+            
+            if (today < schoolStartDate) {
+                currentWeek = 1; // Okul açılmadıysa 1. haftayı baz al
+            } else {
+                const diffTime = Math.abs(today - schoolStartDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                currentWeek = Math.floor(diffDays / 7) + 1;
+            }
+            
+            // Eğer haftalar 4'ü geçerse (örnek veri 4 haftalık) son haftada kalsın.
+            if(currentWeek > 4) currentWeek = 4;
+            
+            document.querySelectorAll('.currentWeekTextPrint').forEach(el => el.innerText = currentWeek);
+            document.getElementById('currentWeekTextScreen').innerText = currentWeek;
+        }
+
+        // Sınıf seçildiğinde Öğrenme Çıktılarını (Kazanımları) Güncelle
+        function updateCurriculum() {
+            const grade = document.getElementById('gradeSelect').value;
+            document.getElementById('currentGradeText').innerText = grade;
+            document.getElementById('printGradeTitle').innerText = grade;
+            
+            const outcomes = mebKazanimlari[grade][currentWeek] || ["Kazanım verisi bulunamadı."];
+            
+            const listHTML = outcomes.map(out => `<li>${out}</li>`).join('');
+            document.getElementById('screenOutcomesList').innerHTML = listHTML;
+            document.getElementById('printOutcomesList').innerHTML = listHTML;
+        }
+
         function renderQuestions() {
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
-
-            defaultQuestions.forEach((q, index) => {
+            
+            // Gerçekte sınıf düzeyine göre sorular çekilebilir, şimdilik örnek havuzu basıyoruz
+            sampleQuestions.forEach((q, index) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
                 card.id = `q-card-${q.id}`;
-
                 const letters = ['A', 'B', 'C', 'D'];
 
                 card.innerHTML = `
                     <div class="question-header">
                         <span class="question-badge">Soru ${index + 1}</span>
-                        <div class="question-text">${escapeHtml(q.question)}</div>
+                        <div class="question-text">${q.question}</div>
                     </div>
                     <div class="options-grid">
                         ${q.options.map((opt, optIndex) => `
                             <label class="option-item" onclick="selectOption(${q.id}, ${optIndex})">
                                 <input type="radio" name="question_${q.id}" value="${optIndex}" ${userAnswers[q.id] === optIndex ? 'checked' : ''}>
                                 <span class="option-letter">${letters[optIndex]}</span>
-                                <span class="option-text">${escapeHtml(opt)}</span>
+                                <span class="option-text">${opt}</span>
                             </label>
                         `).join('')}
                     </div>
                     <div class="explanation-box" id="explanation-${q.id}">
-                        <strong>Açıklama:</strong> ${escapeHtml(q.explanation)}
+                        <strong>Açıklama:</strong> ${q.explanation}
                     </div>
                 `;
                 container.appendChild(card);
             });
+            updateStats();
         }
 
-        // SEÇENEK SEÇİMİ
         function selectOption(questionId, optionIndex) {
             userAnswers[questionId] = optionIndex;
             updateStats();
         }
 
-        // İSTATİSTİKLERİ GÜNCELLEME
         function updateStats() {
-            const total = defaultQuestions.length;
+            const total = sampleQuestions.length;
             const answered = Object.keys(userAnswers).length;
-            const remaining = total - answered;
-
             document.getElementById('stat-total').innerText = total;
             document.getElementById('stat-answered').innerText = answered;
-            document.getElementById('stat-remaining').innerText = remaining;
+            document.getElementById('stat-remaining').innerText = total - answered;
         }
 
-        // CEVAPLARI KONTROL ETME & PUANLAMA
         function checkAnswers() {
-            let correctCount = 0;
-            let incorrectCount = 0;
-            let emptyCount = 0;
-
-            defaultQuestions.forEach(q => {
+            sampleQuestions.forEach(q => {
                 const card = document.getElementById(`q-card-${q.id}`);
                 const userAns = userAnswers[q.id];
-
                 card.classList.remove('correct', 'incorrect');
-
-                if (userAns === undefined) {
-                    emptyCount++;
-                } else if (userAns === q.correct) {
-                    correctCount++;
-                    card.classList.add('correct');
-                } else {
-                    incorrectCount++;
-                    card.classList.add('incorrect');
-                }
+                if (userAns === q.correct) card.classList.add('correct');
+                else if (userAns !== undefined) card.classList.add('incorrect');
             });
-
-            const totalQuestions = defaultQuestions.length;
-            const score = Math.round((correctCount / totalQuestions) * 100);
-
-            // Modal İstatistiklerini Doldur
-            document.getElementById('modalScore').innerText = score;
-            document.getElementById('modalCorrect').innerText = correctCount;
-            document.getElementById('modalIncorrect').innerText = incorrectCount;
-            document.getElementById('modalEmpty').innerText = emptyCount;
-
-            let feedback = "Tebrikler, mükemmel sonuç!";
-            if (score < 50) feedback = "Biraz daha tekrar yapmalısın.";
-            else if (score < 80) feedback = "İyi bir performans!";
-
-            document.getElementById('modalFeedbackText').innerText = feedback;
-            document.getElementById('resultModal').style.display = 'flex';
+            alert("Cevaplar kontrol edildi. Yanlış olan sorular kırmızı, doğrular yeşil işaretlendi.");
         }
 
-        function closeResultModal() {
-            document.getElementById('resultModal').style.display = 'none';
-        }
-
-        // TESTİ SIFIRLAMA
         function resetQuiz() {
             userAnswers = {};
-            defaultQuestions.forEach(q => {
-                const card = document.getElementById(`q-card-${q.id}`);
-                if (card) {
-                    card.classList.remove('correct', 'incorrect');
-                }
-            });
             renderQuestions();
-            updateStats();
         }
 
-        // PDF / YAZDIRMA TETİKLEYİCİ
         function printExam() {
             window.print();
-        }
-
-        // GÜVENLİ METİN KAÇIŞI
-        function escapeHtml(str) {
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
         }
     </script>
 </body>
