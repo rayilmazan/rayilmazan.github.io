@@ -114,26 +114,29 @@
 
             <!-- TEST ALANI (PDF ÇIKTISI İÇİN YAZDIRILACAK ALAN) -->
             <div id="printable-area" class="bg-white text-slate-800 rounded-2xl p-8 mt-6 hidden shadow-inner">
-                <!-- PDF Header Logo ve İsim -->
+                <!-- PDF Header Bilgileri -->
                 <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
-                    <div class="flex items-center gap-3">
-                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" 
-                             alt="Logo" class="h-10 w-auto object-contain">
-                        <span class="font-bold text-indigo-700 text-lg">rayılmazan</span>
+                    <div>
+                        <span class="font-bold text-indigo-700 text-lg">Bilişim Teknolojileri ve Yazılım</span>
                     </div>
                     <div class="text-right text-xs text-slate-500">
-                        <p id="quiz-pdf-info" class="font-semibold text-slate-700">Bilişim Teknolojileri Değerlendirme Sınavı</p>
+                        <p id="quiz-pdf-info" class="font-semibold text-slate-700">Değerlendirme Sınavı</p>
                         <p>Adı Soyadı: ........................................ Sınıf/No: ............</p>
                     </div>
                 </div>
 
+                <!-- Sorular Alanı -->
                 <div id="quiz-content-area" class="space-y-6">
-                    <!-- Sorular buraya dinamik eklenecek -->
+                    <!-- Dinamik ve dolu içerikli sorular buraya gelecek -->
                 </div>
 
-                <!-- PDF Footer / Kağıdın en altı -->
+                <!-- PDF Footer / Kağıdın en altı (Logo ve rayılmazan) -->
                 <div class="mt-12 pt-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
-                    <span class="font-bold text-indigo-700">rayılmazan</span>
+                    <div class="flex items-center gap-2">
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" 
+                             alt="Logo" class="h-6 w-auto object-contain">
+                        <span class="font-bold text-indigo-700">rayılmazan</span>
+                    </div>
                     <span>Başarılar Dileriz...</span>
                 </div>
 
@@ -150,7 +153,7 @@
 
     <!-- JAVASCRIPT MEB TAKVİMİ VE PLAN MANTIĞI -->
     <script>
-        // MEB 2026-2027 İş Günü Takvimi Veri Tabanı (Haftalık Plan ve Öğrenim Çıktıları)
+        // MEB 2026-2027 İş Günü Takvimi Veri Tabanı
         const schoolPlans = {
             5: [
                 { week: 1, start: "2026-09-14", end: "2026-09-18", topic: "Bilişim Teknolojileri ve Güvenlik", outcome: "Bilişim teknolojilerinin günlük yaşamdaki önemini ve güvenli kullanımını fark eder." },
@@ -159,38 +162,35 @@
                 { week: 4, start: "2026-10-05", end: "2026-10-09", topic: "Dosya Yönetimi ve Depolama", outcome: "Dosya uzantılarını tanır, klasörleme ve bulut depolama araçlarını kullanır." },
                 { week: 5, start: "2026-10-12", end: "2026-10-16", topic: "İş Sağlığı ve Güvenliği", outcome: "Bilgisayar kullanımından kaynaklı ergonomik riskleri önlemek için tedbir alır." },
                 { week: 6, start: "2026-10-19", end: "2026-10-23", topic: "Problem Çözme Kavramları", outcome: "Günlük hayattaki problemleri çözmek için mantıksal adımlar tasarlar." },
-                { week: 7, start: "2026-10-26", end: "2026-10-30", topic: "Algoritma ve Akış Şemaları (1. Sınav Haftası)", outcome: "Algoritma mantığını anlar, basit akış şeması sembollerini tanır ve uygular.", isExam: true },
+                { week: 7, start: "2026-10-26", end: "2026-10-30", topic: "Algoritma ve Akış Şemaları", outcome: "Algoritma mantığını anlar, basit akış şeması sembollerini tanır ve uygular.", isExam: true },
                 { week: 8, start: "2026-11-02", end: "2026-11-06", topic: "Görsel Programlamaya Giriş", outcome: "Blok tabanlı programlama arayüzünü tanır ve temel karakter hareketleri kodlar." },
                 { week: 9, start: "2026-11-09", end: "2026-11-13", topic: "Blok Tabanlı Projeler - 1", outcome: "Blok tabanlı programlamada olaylar ve döngü yapılarını kullanır." },
-                // 16-20 Kasım Ara Tatil
                 { week: 10, start: "2026-11-23", end: "2026-11-27", topic: "Blok Tabanlı Projeler - 2", outcome: "Koşullu ifadeleri kullanarak etkileşimli animasyon ve oyunlar hazırlar." },
                 { week: 11, start: "2026-11-30", end: "2026-12-04", topic: "Veri ve Değişkenler", outcome: "Programlama sürecinde basit değişkenler tanımlar ve veri saklar." },
                 { week: 12, start: "2026-12-07", end: "2026-12-11", topic: "Özgün Ürün Tasarımı", outcome: "Belirli bir amaca yönelik dijital içerik veya oyun tasarımı yapar." },
                 { week: 13, start: "2026-12-14", end: "2026-12-18", topic: "İnternet Arama Motorları", outcome: "Bilgiye güvenli ve doğru şekilde ulaşmak için gelişmiş arama teknikleri kullanır." },
                 { week: 14, start: "2026-12-21", end: "2026-12-25", topic: "Dijital İletişim ve İşbirliği", outcome: "E-posta gönderme kurallarını öğrenir ve ortak çalışma araçlarını kullanır." },
-                { week: 15, start: "2026-12-28", end: "2027-01-01", topic: "Sunu Hazırlama Araçları (2. Sınav Haftası)", outcome: "Etkili ve kurallara uygun dijital sunumlar hazırlar.", isExam: true },
+                { week: 15, start: "2026-12-28", end: "2027-01-01", topic: "Sunu Hazırlama Araçları", outcome: "Etkili ve kurallara uygun dijital sunumlar hazırlar.", isExam: true },
                 { week: 16, start: "2027-01-04", end: "2027-01-08", topic: "Kelime İşlemci Programları - 1", outcome: "Belge oluşturma, biçimlendirme ve metin düzenleme araçlarını kullanır." },
                 { week: 17, start: "2027-01-11", end: "2027-01-15", topic: "Kelime İşlemci Programları - 2", outcome: "Belge içine tablo, resim ekleyerek biçimlendirir ve çıktı alır." },
                 { week: 18, start: "2027-01-18", end: "2027-01-22", topic: "Dönem Tekrarı ve Değerlendirme", outcome: "Dönem boyunca edinilen bilgi ve becerileri pratik projelerle pekiştirir." },
-                // --- 2. DÖNEM ---
                 { week: 19, start: "2027-02-08", end: "2027-02-12", topic: "İnternette Hak ve Sorumluluklar", outcome: "Dijital dünyada telif hakları ve lisans türlerini kavrar." },
                 { week: 20, start: "2027-02-15", end: "2027-02-19", topic: "Tablo Grafik Tasarımı - 1", outcome: "Elektronik tablo programında veri analizi yapar." },
                 { week: 21, start: "2027-02-22", end: "2027-02-26", topic: "Tablo Grafik Tasarımı - 2", outcome: "Tablolardan sütun ve pasta grafikler oluşturur." },
                 { week: 22, start: "2027-03-01", end: "2027-03-05", topic: "Problem Çözme Stratejileri", outcome: "Karmaşık problemleri alt problemlere ayırarak çözer." },
-                // 08-12 Mart Ara Tatil
-                { week: 23, start: "2027-03-15", end: "2027-03-19", topic: "Algoritma Tasarımı (3. Sınav Öncesi)", outcome: "Koşullu durumlara ait akış şemaları tasarlar.", isExam: true },
+                { week: 23, start: "2027-03-15", end: "2027-03-19", topic: "Algoritma Tasarımı", outcome: "Koşullu durumlara ait akış şemaları tasarlar.", isExam: true },
                 { week: 24, start: "2027-03-22", end: "2027-03-26", topic: "Gelişmiş Blok Kodlama", outcome: "Oyun içi değişkenler ve skor algoritmaları geliştirir." },
                 { week: 25, start: "2027-03-29", end: "2027-04-02", topic: "İnternet Güvenliği Projeleri", outcome: "Siber zorbalıkla mücadele yöntemlerini tartışır." },
-                { week: 26, start: "2027-04-05", end: "2027-04-09", topic: "Dijital Medya Okuryazarlığı", outcome: "Medya içeriklerinin doğruluk kontrolünü (fact-check) yapar." },
+                { week: 26, start: "2027-04-05", end: "2027-04-09", topic: "Dijital Medya Okuryazarlığı", outcome: "Medya içeriklerinin doğruluk kontrolünü yapar." },
                 { week: 27, start: "2027-04-12", end: "2027-04-16", topic: "3B Tasarıma Giriş - 1", outcome: "Üç boyutlu nesne tasarımı arayüzünü tanır." },
                 { week: 28, start: "2027-04-19", end: "2027-04-23", topic: "3B Tasarıma Giriş - 2", outcome: "Temel geometrik formları birleştirerek 3B model üretir." },
                 { week: 29, start: "2027-04-26", end: "2027-04-30", topic: "İnternet Tabanlı İşbirlikçi Araçlar", outcome: "Bulut tabanlı ortak çalışma platformlarında ortak ürün oluşturur." },
-                { week: 30, start: "2027-05-03", end: "2027-05-07", topic: "Blok Tabanlı Final Projesi - 1 (4. Sınav Öncesi)", outcome: "Özgün bir interaktif hikaye veya oyun tasarlar.", isExam: true },
+                { week: 30, start: "2027-05-03", end: "2027-05-07", topic: "Blok Tabanlı Final Projesi - 1", outcome: "Özgün bir interaktif hikaye veya oyun tasarlar.", isExam: true },
                 { week: 31, start: "2027-05-10", end: "2027-05-14", topic: "Blok Tabanlı Final Projesi - 2", outcome: "Projesindeki hataları (bug) ayıklar ve test eder." },
                 { week: 32, start: "2027-05-24", end: "2027-05-28", topic: "Bilişim Tarihi ve Öncüleri", outcome: "Bilişim teknolojilerinin gelişmesine katkı sağlayan bilim insanlarını tanır." },
                 { week: 33, start: "2027-05-31", end: "2027-06-04", topic: "Yıl Sonu Dijital Portfolyo", outcome: "Yıl boyunca yapılan çalışmaları dijital portfolyoda toplar." },
                 { week: 34, start: "2027-06-07", end: "2027-06-11", topic: "Proje Sunumları ve Sergileme", outcome: "Geliştirdiği dijital ürünü sınıf arkadaşlarına sunar." },
-                { week: 35, start: "2027-06-14", end: "2027-06-18", topic: "Güvenli Teknoloji Kullanımı ve Tatil", outcome: "Yaz döneminde dijital sağlığı koruma yöntemlerini özetler." },
+                { week: 35, start: "2027-06-14", end: "2027-06-18", topic: "Güvenli Teknoloji Kullanımı", outcome: "Yaz döneminde dijital sağlığı koruma yöntemlerini özetler." },
                 { week: 36, start: "2027-06-21", end: "2027-06-25", topic: "Yıl Sonu Değerlendirmesi", outcome: "Eğitim öğretim yılının genel bir değerlendirmesini yapar." }
             ],
             6: [
@@ -200,39 +200,61 @@
                 { week: 4, start: "2026-10-05", end: "2026-10-09", topic: "Etkili Sunum Tasarımı", outcome: "Sunum hazırlama ilkelerine uygun, görsel açıdan zengin projeler geliştirir." },
                 { week: 5, start: "2026-10-12", end: "2026-10-16", topic: "Gelişmiş Tablo Hesaplama - 1", outcome: "Elektronik tablo programında hücre, satır, sütun yönetimi ve veri girişi yapar." },
                 { week: 6, start: "2026-10-19", end: "2026-10-23", topic: "Gelişmiş Tablo Hesaplama - 2", outcome: "Temel matematiksel formüller ve fonksiyonları (Topla, Ortalama vb.) uygular." },
-                { week: 7, start: "2026-10-26", end: "2026-10-30", topic: "Algoritma Analizi ve Mantıksal Sınama (1. Sınav Haftası)", outcome: "Karmaşık problemlere yönelik alternatif çözüm yolları ve akış şemaları hazırlar.", isExam: true },
+                { week: 7, start: "2026-10-26", end: "2026-10-30", topic: "Algoritma Analizi ve Mantıksal Sınama", outcome: "Karmaşık problemlere yönelik alternatif çözüm yolları ve akış şemaları hazırlar.", isExam: true },
                 { week: 8, start: "2026-11-02", end: "2026-11-06", topic: "Blok Tabanlı Gelişmiş Uygulamalar", outcome: "Fonksiyonlar ve alt programlar oluşturarak blok tabanlı kodlamayı optimize eder." },
                 { week: 9, start: "2026-11-09", end: "2026-11-13", topic: "Oyun Tasarım Temelleri", outcome: "Kapsamlı bir dijital oyun senaryosu ve kuralları tasarlar." },
-                // 16-20 Kasım Ara Tatil
                 { week: 10, start: "2026-11-23", end: "2026-11-27", topic: "Blok Tabanlı Oyun Projesi - 1", outcome: "Oyun içi skor, puan ve can mekaniklerini kodlar." },
                 { week: 11, start: "2026-11-30", end: "2026-12-04", topic: "Blok Tabanlı Oyun Projesi - 2", outcome: "Çarpışma algoritmaları ve seviye geçişlerini programlar." },
                 { week: 12, start: "2026-12-07", end: "2026-12-11", topic: "Grafik ve Tasarım Araçları - 1", outcome: "Vektörel çizim araçlarını kullanarak özgün dijital tasarımlar oluşturur." },
                 { week: 13, start: "2026-12-14", end: "2026-12-18", topic: "Grafik ve Tasarım Araçları - 2", outcome: "Görsel düzenleme, filtreleme ve afiş tasarımı yapar." },
                 { week: 14, start: "2026-12-21", end: "2026-12-25", topic: "İnternet Etiği ve Telif Hakları", outcome: "Creative Commons ve telif hakları kavramlarını inceleyerek yasalara uygun paylaşım yapar." },
-                { week: 15, start: "2026-12-28", end: "2027-01-01", topic: "Veri Analizi ve Grafikler (2. Sınav Haftası)", outcome: "Tablolardaki verileri sütun, çubuk ve pasta grafiklerine dönüştürerek yorumlar.", isExam: true },
+                { week: 15, start: "2026-12-28", end: "2027-01-01", topic: "Veri Analizi ve Grafikler", outcome: "Tablolardaki verileri sütun, çubuk ve pasta grafiklerine dönüştürerek yorumlar.", isExam: true },
                 { week: 16, start: "2027-01-04", end: "2027-01-08", topic: "Web Tasarımına Giriş - 1", outcome: "Temel HTML etiketlerini öğrenerek basit web sayfaları tasarlar." },
-                { week: 17, start: "2027-01-11", end: "2027-01-15", topic: "Web Tasarımına Giriş - 2", outcome: "Web sayfalarına köprü (bağlantı) ve resim ekleyerek biçimlendirir." },
+                { week: 17, start: "2027-01-11", end: "2027-01-15", topic: "Web Tasarımına Giriş - 2", outcome: "Web sayfalarına köprü ve resim ekleyerek biçimlendirir." },
                 { week: 18, start: "2027-01-18", end: "2027-01-22", topic: "Yıl Sonu Proje Sunumları", outcome: "Dönem boyunca geliştirilen web ve yazılım projelerinin sunumunu yapar." },
-                // --- 2. DÖNEM ---
-                { week: 19, start: "2027-02-08", end: "2027-02-12", topic: "Gelişmiş Web Tasarımı (CSS Temelleri)", outcome: "Web sayfalarını biçimlendirmek için stil dosyaları kullanır." },
+                { week: 19, start: "2027-02-08", end: "2027-02-12", topic: "Gelişmiş Web Tasarımı (CSS)", outcome: "Web sayfalarını biçimlendirmek için stil dosyaları kullanır." },
                 { week: 20, start: "2027-02-15", end: "2027-02-19", topic: "Veritabanı Mantığı ve Tablolar", outcome: "Verilerin tablolarda nasıl saklandığını ve sorgulandığını kavrar." },
                 { week: 21, start: "2027-02-22", end: "2027-02-26", topic: "Siber Güvenlik ve Tehditler", outcome: "Zararlı yazılım türlerini ve bunlardan korunma yollarını açıklar." },
-                { week: 22, start: "2027-03-01", end: "2027-03-05", topic: "Yapay Zeka ve Makine Öğrenmesi", outcome: "Yapay zekanın günlük yaşamdaki kullanım alanlarını ve çalışma mantığını fark eder." },
-                // 08-12 Mart Ara Tatil
-                { week: 23, start: "2027-03-15", end: "2027-03-19", topic: "Python Programlamaya Giriş (3. Sınav Öncesi)", outcome: "Metin tabanlı programlama dilinin arayüzünü ve temel komutlarını tanır.", isExam: true },
+                { week: 22, start: "2027-03-01", end: "2027-03-05", topic: "Yapay Zeka ve Makine Öğrenmesi", outcome: "Yapay zekanın günlük yaşamdaki kullanım alanlarını fark eder." },
+                { week: 23, start: "2027-03-15", end: "2027-03-19", topic: "Python Programlamaya Giriş", outcome: "Metin tabanlı programlama dilinin arayüzünü ve temel komutlarını tanır.", isExam: true },
                 { week: 24, start: "2027-03-22", end: "2027-03-26", topic: "Python Değişkenler ve Veri Tipleri", outcome: "Python'da değişken tanımlar ve ekrana veri yazdırır." },
-                { week: 25, start: "2027-03-29", end: "2027-04-02", topic: "Python Koşullu İfadeler (If-Else)", outcome: "Metin tabanlı dilde karar yapılarını kodlar." },
-                { week: 26, start: "2027-04-05", end: "2027-04-09", topic: "Python Döngüler (For ve While)", outcome: "Tekrarlı işlemleri döngü yapılarıyla çözer." },
+                { week: 25, start: "2027-03-29", end: "2027-04-02", topic: "Python Koşullu İfadeler", outcome: "Metin tabanlı dilde karar yapılarını kodlar." },
+                { week: 26, start: "2027-04-05", end: "2027-04-09", topic: "Python Döngüler", outcome: "Tekrarlı işlemleri döngü yapılarıyla çözer." },
                 { week: 27, start: "2027-04-12", end: "2027-04-16", topic: "Mobil Uygulama Tasarımı - 1", outcome: "Mobil uygulama geliştirme platformunun arayüzünü kullanır." },
-                { week: 28, start: "2027-04-19", end: "2027-04-23", topic: "Mobil Uygulama Tasarımı - 2", outcome: "Basit arayüz bileşenleri (buton, görsel, metin) yerleştirir." },
-                { week: 29, start: "2027-04-26", end: "2027-04-30", topic: "Mobil Uygulama Kodlama", outcome: "Bileşenler arası olay yönetimini (event handling) programlar." },
-                { week: 30, start: "2027-05-03", end: "2027-05-07", topic: "Nesnelerin İnterneti (IoT) (4. Sınav Öncesi)", outcome: "Akıllı ev sistemleri ve sensör mantığını açıklar.", isExam: true },
+                { week: 28, start: "2027-04-19", end: "2027-04-23", topic: "Mobil Uygulama Tasarımı - 2", outcome: "Basit arayüz bileşenleri yerleştirir." },
+                { week: 29, start: "2027-04-26", end: "2027-04-30", topic: "Mobil Uygulama Kodlama", outcome: "Bileşenler arası olay yönetimini programlar." },
+                { week: 30, start: "2027-05-03", end: "2027-05-07", topic: "Nesnelerin İnterneti (IoT)", outcome: "Akıllı ev sistemleri ve sensör mantığını açıklar.", isExam: true },
                 { week: 31, start: "2027-05-10", end: "2027-05-14", topic: "Robotik Kodlama Temelleri", outcome: "Temel robot kartı ve devre bağlantı mantığını kavrar." },
-                { week: 32, start: "2027-05-24", end: "2027-05-28", topic: "Dijital Vatandaşlık ve Etik Tartışmalar", outcome: "Teknolojinin geleceği ve etik konular üzerinde fikir yürütür." },
-                { week: 33, start: "2027-05-31", end: "2027-06-04", topic: "Yıl Sonu Bitirme Projesi Tasarımı", outcome: "Orta okul kademesini kapsayan kapsamlı bir bilişim projesi tasarlar." },
+                { week: 32, start: "2027-05-24", end: "2027-05-28", topic: "Dijital Vatandaşlık Tartışmaları", outcome: "Teknolojinin geleceği ve etik konular üzerinde fikir yürütür." },
+                { week: 33, start: "2027-05-31", end: "2027-06-04", topic: "Yıl Sonu Bitirme Projesi Tasarımı", outcome: "Kapsamlı bir bilişim projesi tasarlar." },
                 { week: 34, start: "2027-06-07", end: "2027-06-11", topic: "Proje Geliştirme ve Hata Ayıklama", outcome: "Projesindeki kod hatalarını gidererek çalışır hale getirir." },
                 { week: 35, start: "2027-06-14", end: "2027-06-18", topic: "Bitirme Projesi Sergisi", outcome: "Geliştirdiği projeyi sergiler ve savunur." },
                 { week: 36, start: "2027-06-21", end: "2027-06-25", topic: "Yıl Sonu Değerlendirme ve Kapanış", outcome: "Bilişim teknolojileri dersi kazanımlarını genel olarak değerlendirir." }
+            ]
+        };
+
+        // Konulara Özel Zengin Soru Bankası Havuzu (Şıklı ve Kaliteli İçerik)
+        const questionBank = {
+            "Bilişim Teknolojileri ve Güvenlik": [
+                { q: "Aşağıdakilerden hangisi bilişim teknolojilerinin günlük hayatımızda sağladığı faydalardan biri **değildir**?", options: ["A) Bilgiye hızlı ve kolay erişim sağlama", "B) İşlemleri daha kısa sürede tamamlama", "C) Yüz yüze sosyal iletişimi tamamen ortadan kaldırma", "D) Uzaktan eğitim ve çalışma imkanı sunma"], ans: "C" },
+                { q: "Aşağıdaki davranışlardan hangisi güvenli internet kullanımı kurallarına **uygundur**?", options: ["A) Tanımadığımız kişilerden gelen dosya isteklerini kabul etmek", "B) Kişisel şifrelerimizi kimseyle paylaşmamak ve güçlü şifre seçmek", "C) Her gördüğümüz internet sitesine T.C. kimlik numaramızı yazmak", "D) Siber zorbalara aynı sertlikte karşılık vermek"], ans: "B" },
+                { q: "Bilgisayar başında uzun süre hareketsiz oturmak en çok hangi sağlık sorununa yol açar?", options: ["A) Göz ve bel/boyun kas ağrıları", "B) İşitme kaybı", "C) Tat alma duyusunun zayıflaması", "D) Saç dökülmesi"], ans: "A" },
+                { q: "Aşağıdakilerden hangisi zararlı yazılımlardan (virüs, truva atı vb.) korunmak için yapılması gerekenlerden biridir?", options: ["A) Antirivirüs programı kullanmamak", "B) Güvenilir olmayan sitelerden oyun indirmek", "C) İşletim sistemi ve güvenlik yazılımlarını düzenli güncellemek", "D) E-posta ekindeki bilinmeyen dosyaları doğrudan açmak"], ans: "C" },
+                { q: "Bilgisayar donanım birimlerinden hangisi temel veri işleme ve hesaplama merkezidir?", options: ["A) Sabit Disk (HDD)", "B) Merkezi İşlem Birimi (İşlemci / CPU)", "C) Güç Kaynağı", "D) Ekran Kartı"], ans: "B" }
+            ],
+            "Dijital Yurttaşlık ve Etik": [
+                { q: "İnternet ortamında bıraktığımız her türlü dijital iz ve verinin bütününe ne ad verilir?", options: ["A) Dijital Ayak İzi", "B) Bulut Bellek", "C) Sanal Sürücü", "D) IP Adresi"], ans: "A" },
+                { q: "Başkalarına ait dijital eserleri, görselleri veya yazıları sahibinden izin almadan ticari amaçla kullanmak hangi kavrama aykırıdır?", options: ["A) Açık Kaynak Kod", "B) Telif Hakları ve Etik Kurallar", "C) Dijital Dönüşüm", "D) Donanım Mimarisi"], ans: "B" },
+                { q: "Bir sosyal medya platformunda veya mesajlaşma uygulamasında birini rahatsız edici, tehdit edici mesajlar göndermeye ne denir?", options: ["A) Phishing (Oltalama)", "B) Siber Zorbalık", "C) Firewall", "D) Algoritma"], ans: "B" },
+                { q: "Güçlü bir şifre oluştururken aşağıdakilerden hangisinin kullanılması **önerilmez**?", options: ["A) Büyük ve küçük harfler", "B) Rakamlar ve özel simgeler", "C) Kolay tahmin edilebilir doğum tarihi veya '123456'", "D) En az 8 karakter uzunluk"], ans: "C" },
+                { q: "İnternette bilgi ararken karşılaştığımız her bilginin doğru olup olmadığını araştırma becerisine ne ad verilir?", options: ["A) Donanım Montajı", "B) Dijital Okuryazarlık", "C) Kodlama Dili", "D) İşletim Sistemi"], ans: "B" }
+            ],
+            "Algoritma ve Akış Şemaları": [
+                { q: "Belirli bir problemi çözmek veya bir amacı gerçekleştirmek için izlenecek adım adım mantıksal yola ne denir?", options: ["A) Algoritma", "B) Piksel", "C) Donanım", "D) İşletim Sistemi"], ans: "A" },
+                { q: "Akış şemalarında 'başlangıç' ve 'bitiş' işlemlerini göstermek için hangi geometrik şekil kullanılır?", options: ["A) Dikdörtgen", "B) Paralelkenar", "C) Elips (Oval)", "D) Eşkenar Dörtgen"], ans: "C" },
+                { q: "Akış şemalarında karar verme (koşul) durumlarını belirtmek için hangi şekil kullanılır?", options: ["A) Elips", "B) Eşkenar Dörtgen (Baklava dilimi)", "C) Daire", "D) Çizgi"], ans: "B" },
+                { q: "Aşağıdakilerden hangisi günlük hayattan bir algoritma örneğidir?", options: ["A) Çay demlemek için önce suyu kaynatıp ardından çay eklemek", "B) Bilgisayar kasasına bakmak", "C) İnternette rastgele gezinmek", "D) Ekranda renkleri incelemek"], ans: "A" },
+                { q: "Akış şemalarında veri giriş ve çıkış işlemlerini (kullanıcıdan değer alma vb.) göstermek için hangi şekil kullanılır?", options: ["A) Paralelkenar", "B) Dikdörtgen", "C) Kare", "D) Üçgen"], ans: "A" }
             ]
         };
 
@@ -332,16 +354,22 @@
             let container = document.getElementById('quiz-content-area');
             container.innerHTML = "";
 
+            // Havuzda eşleşen konu var mı kontrol et, yoksa genel sorular üret
+            let topicPool = questionBank[weekData.topic] || questionBank["Bilişim Teknolojileri ve Güvenlik"];
+
             for (let i = 1; i <= questionCount; i++) {
+                // Havuzdan döngüsel olarak veya rastgele soru çekelim
+                let template = topicPool[(i - 1) % topicPool.length];
+                
                 let qDiv = document.createElement('div');
                 qDiv.className = "p-4 bg-slate-50 rounded-xl border border-slate-200 text-sm";
                 qDiv.innerHTML = `
-                    <p class="font-bold text-slate-900 mb-2">Soru ${i}: (${weekData.topic}) Konusu ile ilgili temel kavramları göz önüne alarak doğru seçeneği işaretleyiniz?</p>
+                    <p class="font-bold text-slate-900 mb-3">Soru ${i}: ${template.q}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 pl-2">
-                        <div>A) Seçenek A açıklaması</div>
-                        <div>B) Seçenek B açıklaması</div>
-                        <div>C) Seçenek C açıklaması</div>
-                        <div>D) Seçenek D açıklaması</div>
+                        <div class="p-1.5 bg-white rounded border border-slate-100">${template.options[0]}</div>
+                        <div class="p-1.5 bg-white rounded border border-slate-100">${template.options[1]}</div>
+                        <div class="p-1.5 bg-white rounded border border-slate-100">${template.options[2]}</div>
+                        <div class="p-1.5 bg-white rounded border border-slate-100">${template.options[3]}</div>
                     </div>
                 `;
                 container.appendChild(qDiv);
