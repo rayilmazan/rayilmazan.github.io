@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayılmazan - Dijital Sınav ve Soru Platformu</title>
+    <title>rayılmazan - Haftalık Ders İçeriği</title>
     <style>
         :root {
             --bg-primary: #f8fafc;
@@ -50,6 +50,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap; /* Mobil için */
+            gap: 12px;
         }
 
         .brand-container {
@@ -83,6 +85,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap; /* Mobil için */
         }
 
         /* BUTONLAR */
@@ -106,6 +109,8 @@
         .btn-outline:hover { background-color: #334155; }
         .btn-success { background-color: var(--success-color); color: #ffffff; }
         .btn-success:hover { background-color: #15803d; }
+        .btn-secondary { background-color: #475569; color: white; }
+        .btn-secondary:hover { background-color: #334155; }
 
         /* SINIF SEÇİCİ */
         .grade-selector {
@@ -148,10 +153,17 @@
             padding-bottom: 16px;
         }
 
-        .stats-group { display: flex; gap: 20px; }
+        .stats-group { display: flex; gap: 20px; flex-wrap: wrap;}
         .stat-item { display: flex; flex-direction: column; }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
         .stat-value { font-size: 1.25rem; font-weight: 700; color: var(--text-main); }
+
+        /* HAFTA KONTROLLERİ */
+        .week-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         /* ÖĞRENME ÇIKTILARI (EKRAN) */
         .outcomes-panel {
@@ -168,6 +180,8 @@
             margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .outcomes-list {
@@ -200,7 +214,7 @@
             padding: 22px 26px;
             box-shadow: var(--shadow-sm);
         }
-        .question-header { display: flex; gap: 12px; margin-bottom: 14px; }
+        .question-header { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap;}
         .question-badge {
             background-color: var(--accent-light);
             color: var(--accent-color);
@@ -211,7 +225,7 @@
             height: fit-content;
             white-space: nowrap;
         }
-        .question-text { font-size: 1.05rem; font-weight: 600; color: var(--text-main); }
+        .question-text { font-size: 1.05rem; font-weight: 600; color: var(--text-main); width: 100%;}
         .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
         
         .option-item {
@@ -239,6 +253,37 @@
         .question-card.incorrect .explanation-box { display: block; background-color: #fee2e2; color: #7f1d1d; border: 1px solid #fca5a5; }
 
         .printable-exam-header { display: none; }
+
+        /* ======================================================= */
+        /* RESPONSIVE (Mobil Uyumluluk)                            */
+        /* ======================================================= */
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+            .btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            .stats-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .week-controls {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 10px;
+            }
+            .question-card {
+                padding: 15px;
+            }
+        }
 
         /* ======================================================= */
         /* PDF / PRINT DÜZENİ (2 SÜTUNLU SINAV FORMATI)            */
@@ -269,7 +314,7 @@
                 object-fit: contain;
             }
 
-            .brand-name-text { font-size: 16pt; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+            .brand-name-text { font-size: 16pt; font-weight: 800; letter-spacing: -0.5px; text-transform: lowercase; }
 
             .exam-title-center { text-align: center; flex-grow: 1; padding: 0 10px; }
             .exam-title-center h1 { font-size: 11pt; font-weight: 800; text-transform: uppercase; margin-bottom: 2px; }
@@ -319,21 +364,21 @@
     <header class="app-header">
         <div class="brand-container">
             <!-- ÖZEL LOGONUZ (URL üzerinden) -->
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="Rayılmazan Logo" class="brand-logo-img">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan Logo" class="brand-logo-img">
             <div>
-                <div class="brand-title">Rayılmazan</div>
-                <div class="brand-subtitle">Dijital Sınav ve İnteraktif Soru Platformu</div>
+                <div class="brand-title">rayılmazan</div>
+                <div class="brand-subtitle">Haftalık Ders İçeriği</div>
             </div>
         </div>
 
         <div class="header-actions">
             <select id="gradeSelect" class="grade-selector" onchange="updateCurriculum()">
-                <option value="5">5. Sınıf Sınavı</option>
-                <option value="6">6. Sınıf Sınavı</option>
+                <option value="5">5. Sınıf</option>
+                <option value="6">6. Sınıf</option>
             </select>
             <button class="btn btn-outline" onclick="resetQuiz()">🔄 Temizle</button>
-            <button class="btn btn-success" onclick="checkAnswers()">✔️ Cevapları Kontrol Et</button>
-            <button class="btn btn-primary" onclick="printExam()">🖨️ PDF / Sınav Kağıdı İndir</button>
+            <button class="btn btn-success" onclick="checkAnswers()">✔️ Kontrol Et</button>
+            <button class="btn btn-primary" onclick="printExam()">🖨️ PDF İndir</button>
         </div>
     </header>
 
@@ -343,13 +388,13 @@
         <div class="printable-exam-header">
             <div class="header-top-row">
                 <div class="logo-brand-box">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="Rayılmazan Logo">
-                    <span class="brand-name-text">RAYILMAZAN</span>
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="rayılmazan Logo">
+                    <span class="brand-name-text">rayılmazan</span>
                 </div>
 
                 <div class="exam-title-center">
                     <h1>BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h1>
-                    <h2><span id="printGradeTitle">5</span>. SINIF 1. DÖNEM DEĞERLENDİRME SINAVI</h2>
+                    <h2><span id="printGradeTitle">5</span>. SINIF DEĞERLENDİRME SINAVI</h2>
                 </div>
 
                 <div class="score-box-print">
@@ -381,13 +426,17 @@
                     <div class="stat-item"><span class="stat-label">Cevaplanan</span><span class="stat-value" id="stat-answered" style="color: var(--accent-color);">0</span></div>
                     <div class="stat-item"><span class="stat-label">Kalan</span><span class="stat-value" id="stat-remaining" style="color: var(--text-muted);">0</span></div>
                 </div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Format: <strong>Çoktan Seçmeli Test</strong></div>
+                
+                <div class="week-controls">
+                    <button class="btn btn-secondary" onclick="changeWeek(-1)">◀ Önceki Hafta</button>
+                    <span style="font-weight: bold; font-size: 1.1rem;"><span id="currentWeekTextScreen"></span>. Hafta</span>
+                    <button class="btn btn-secondary" onclick="changeWeek(1)">Sonraki Hafta ▶</button>
+                </div>
             </div>
             
             <div class="outcomes-panel">
                 <div class="outcomes-title">
                     <span>📚 İlgili Haftanın Öğrenme Çıktıları (<span id="currentGradeText">5</span>. Sınıf)</span>
-                    <span style="color:var(--text-muted);">🗓️ MEB Takvimi: <strong id="currentWeekTextScreen"></strong>. Hafta (14 Eylül 2026 Başlangıçlı)</span>
                 </div>
                 <ul class="outcomes-list" id="screenOutcomesList">
                     <!-- Javascript ile dinamik dolacak -->
@@ -417,17 +466,23 @@
             }
         };
 
-        // BTY Örnek Soru Bankası
+        // BTY Örnek Soru Bankası (10 Soru)
         const sampleQuestions = [
             { id: 1, question: "Aşağıdakilerden hangisi bir bilgisayar sistemindeki **dahili (iç) donanım** birimlerinden biridir?", options: ["Klavye", "İşlemci (CPU)", "Yazıcı (Printer)", "Fare (Mouse)"], correct: 1, explanation: "İşlemci (CPU) anakart üzerine takılan iç donanımdır." },
             { id: 2, question: "Bilgisayarda çalıştırılan programların geçici verilerinin tutulduğu, elektrik kesildiğinde silinen bellek hangisidir?", options: ["Sabit Disk", "Ekran Kartı", "RAM Bellek", "ROM Bellek"], correct: 2, explanation: "RAM bellek elektrik kesildiğinde verileri kaybeder." },
             { id: 3, question: "Siber güvenlik açısından hangisi **güçlü bir parola** ilkelerine uygundur?", options: ["12345678", "adsoyad2026", "Krm!84#mP9", "qwertyuiop"], correct: 2, explanation: "Güçlü parola büyük/küçük harf, rakam ve sembol içerir." },
             { id: 4, question: "Başkalarına ait dijital eserleri izin almadan kendi eseri gibi kullanmak hangi ihlale girer?", options: ["Telif Hakkı ve İnternet Etiği", "Veri Sıkıştırma Hatası", "Ağ Paylaşımı İhlali", "Donanım Güncellemesi"], correct: 0, explanation: "İzinsiz kullanım Telif Hakkı ihlalidir." },
-            { id: 5, question: "Birden fazla bilgisayarın birbirleriyle veri alışverişi yapabilmesi için bağlandığı sisteme ne ad verilir?", options: ["Yazılım", "Algoritma", "Bilgisayar Ağı (Network)", "İşlemci"], correct: 2, explanation: "Bilgisayar ağı (Network) cihazların haberleşmesini sağlar." }
+            { id: 5, question: "Birden fazla bilgisayarın birbirleriyle veri alışverişi yapabilmesi için bağlandığı sisteme ne ad verilir?", options: ["Yazılım", "Algoritma", "Bilgisayar Ağı (Network)", "İşlemci"], correct: 2, explanation: "Bilgisayar ağı (Network) cihazların haberleşmesini sağlar." },
+            { id: 6, question: "Bilgisayarın çalışmasını sağlayan ve diğer tüm programların üzerinde çalıştığı temel yazılıma ne ad verilir?", options: ["Kelime İşlemci", "İşletim Sistemi", "Web Tarayıcı", "Oyun Yazılımı"], correct: 1, explanation: "İşletim sistemi (Örn: Windows, Linux) bilgisayarın temel yazılımıdır." },
+            { id: 7, question: "İnternette arama yaparken belirli bir ifadeyi tam olarak aratmak için hangi işaret kullanılır?", options: ["Tırnak İşareti (\"\")", "Yıldız (*)", "Artı (+)", "Eksi (-)"], correct: 0, explanation: "Tırnak işareti, kelime grubunun tam olarak aranmasını sağlar." },
+            { id: 8, question: "Aşağıdakilerden hangisi bir 'Zararlı Yazılım' (Malware) türü **değildir**?", options: ["Virüs", "Truva Atı (Trojan)", "Antivirüs", "Solucan (Worm)"], correct: 2, explanation: "Antivirüs zararlı yazılımlara karşı koruma sağlayan programlardır." },
+            { id: 9, question: "Bilgisayara dışarıdan bilgi girmemizi sağlayan donanımlara ne ad verilir?", options: ["Çıkış Birimi", "Giriş Birimi", "Depolama Birimi", "İşlem Birimi"], correct: 1, explanation: "Klavye, fare gibi donanımlar Giriş Birimi'dir." },
+            { id: 10, question: "Aşağıdaki dosya uzantılarından hangisi bir **resim/fotoğraf** dosyasına aittir?", options: [".docx", ".mp3", ".jpg", ".exe"], correct: 2, explanation: ".jpg ve .png gibi uzantılar resim dosyalarını belirtir." }
         ];
 
         let userAnswers = {};
         let currentWeek = 1;
+        const maxWeeks = 4; // Örnek veride 4 hafta var
 
         document.addEventListener('DOMContentLoaded', () => {
             calculateCurrentWeek();
@@ -448,9 +503,25 @@
                 currentWeek = Math.floor(diffDays / 7) + 1;
             }
             
-            // Eğer haftalar 4'ü geçerse (örnek veri 4 haftalık) son haftada kalsın.
-            if(currentWeek > 4) currentWeek = 4;
+            if(currentWeek > maxWeeks) currentWeek = maxWeeks;
+            if(currentWeek < 1) currentWeek = 1;
             
+            updateWeekDisplay();
+        }
+
+        // İleri / Geri Hafta Değiştirme
+        function changeWeek(direction) {
+            currentWeek += direction;
+            
+            // Sınırlandırmalar
+            if (currentWeek < 1) currentWeek = 1;
+            if (currentWeek > maxWeeks) currentWeek = maxWeeks;
+            
+            updateWeekDisplay();
+            updateCurriculum();
+        }
+
+        function updateWeekDisplay() {
             document.querySelectorAll('.currentWeekTextPrint').forEach(el => el.innerText = currentWeek);
             document.getElementById('currentWeekTextScreen').innerText = currentWeek;
         }
@@ -461,7 +532,7 @@
             document.getElementById('currentGradeText').innerText = grade;
             document.getElementById('printGradeTitle').innerText = grade;
             
-            const outcomes = mebKazanimlari[grade][currentWeek] || ["Kazanım verisi bulunamadı."];
+            const outcomes = mebKazanimlari[grade][currentWeek] || ["Kazanım verisi bulunamadı. Lütfen takvimi kontrol edin."];
             
             const listHTML = outcomes.map(out => `<li>${out}</li>`).join('');
             document.getElementById('screenOutcomesList').innerHTML = listHTML;
@@ -472,7 +543,6 @@
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
             
-            // Gerçekte sınıf düzeyine göre sorular çekilebilir, şimdilik örnek havuzu basıyoruz
             sampleQuestions.forEach((q, index) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
