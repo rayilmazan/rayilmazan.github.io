@@ -3,1831 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilişim Teknolojileri ve Yazılım Dersi | rayılmazan</title>
-
+    <title>Rayılmazan - Dijital Müfredat Asistanı</title>
+    <!-- PDF oluşturma işlemi için jsPDF kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
-            --primary: #1e40af;
-            --primary-dark: #1e3a8a;
-            --secondary: #0284c7;
-            --accent: #d97706;
-            --bg-gray: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --border-color: #cbd5e1;
-            --success: #16a34a;
+            --bg-color: #0f1115;
+            --panel-bg: #1a1d24;
+            --text-primary: #c5cddb;
+            --text-secondary: #7e899c;
+            --accent: #d25a29; 
+            --border-color: #2c313c;
+            --panel-border: inset 2px 2px 5px rgba(255,255,255,0.05), inset -2px -2px 5px rgba(0,0,0,0.5);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+        
         body {
-            background-color: var(--bg-gray);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding-bottom: 40px;
+            margin: 0; padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Courier New', Courier, monospace;
+            background-image: linear-gradient(rgba(15, 17, 21, 0.9), rgba(15, 17, 21, 0.9)),
+                url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h40v40H0z" fill="none"/><path d="M0 39h40M39 0v40" stroke="%231a1d24" stroke-width="1"/></svg>');
         }
 
         header {
-            background: linear-gradient(135deg, #0f172a, var(--primary-dark));
-            color: white;
-            padding: 1.2rem 2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .brand-area {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .brand-logo {
-            height: 52px;
-            width: auto;
-            background: white;
-            padding: 3px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
-        .logo-text h1 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .logo-text p {
-            font-size: 0.85rem;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .author-badge {
-            font-size: 0.85rem;
-            color: #f1f5f9;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .date-badge {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            backdrop-filter: blur(4px);
-            font-size: 0.85rem;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-
-        .main-container {
-            max-width: 1200px;
-            margin: 1.5rem auto;
-            padding: 0 1rem;
-        }
-
-        /* Grade Tabs */
-        .grade-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
             border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px; margin-bottom: 20px;
         }
 
-        .tab-btn {
-            padding: 0.8rem 2rem;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
+        header img { height: 60px; margin-right: 20px; filter: grayscale(20%) drop-shadow(0 0 5px var(--accent)); }
+        header h1 { margin: 0; color: var(--accent); font-size: 2em; letter-spacing: 2px; text-transform: uppercase; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { 
+            flex: 1; padding: 15px; text-align: center; cursor: pointer;
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            box-shadow: var(--panel-border); font-weight: bold; color: var(--text-secondary);
             transition: all 0.2s ease;
         }
+        .tab.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
 
-        .tab-btn:hover {
-            color: var(--primary);
+        .container { 
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            padding: 20px; position: relative; box-shadow: var(--panel-border);
+        }
+        
+        .container::before {
+            content: ''; position: absolute; top: 10px; right: 10px; width: 30px; height: 10px;
+            background: repeating-linear-gradient(90deg, var(--border-color), var(--border-color) 2px, transparent 2px, transparent 4px);
         }
 
-        .tab-btn.active {
-            color: var(--primary) !important;
-            border-bottom: 3px solid var(--primary) !important;
-            background-color: #eff6ff;
-            border-radius: 8px 8px 0 0;
+        .week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        button { 
+            background: var(--bg-color); color: var(--accent); border: 1px solid var(--accent); 
+            padding: 10px 20px; cursor: pointer; font-family: inherit; font-weight: bold;
+            box-shadow: 2px 2px 0px var(--accent);
+        }
+        button:active { transform: translate(2px, 2px); box-shadow: none; }
+        
+        .date-display { font-size: 1.2em; color: var(--accent); text-align: center; }
+
+        .data-box { 
+            border: 1px solid var(--border-color); padding: 15px; margin-bottom: 20px;
+            background: #111317; box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+        .data-box h3 { color: var(--text-secondary); margin-top: 0; font-size: 1em; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; text-transform: uppercase;}
+        .outcome { font-size: 1.1em; color: #fff; line-height: 1.5;}
+
+        .slider-wrapper { overflow-x: auto; white-space: nowrap; padding-bottom: 15px; }
+        .slide { 
+            display: inline-block; width: 300px; margin-right: 15px; 
+            background: var(--bg-color); border: 1px solid var(--border-color); 
+            padding: 15px; white-space: normal; vertical-align: top;
+            border-left: 3px solid var(--accent); height: 150px; overflow-y: auto;
         }
 
-        /* Navigation Bar */
-        .week-nav {
-            background: var(--card-bg);
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
+        .assessment { 
+            margin-top: 30px; border-top: 2px dashed var(--border-color); padding-top: 20px; text-align: center; 
         }
-
-        .nav-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .nav-btn:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .week-select-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        select {
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            font-size: 0.95rem;
-            outline: none;
-            background: white;
-            font-weight: 600;
-        }
-
-        /* Register Card (Sınıf Defteri) */
-        .register-card {
-            background: linear-gradient(135deg, #ffffff, #f0f9ff);
-            border-left: 6px solid var(--primary);
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-            margin-bottom: 1.5rem;
-        }
-
-        .register-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .register-tag {
-            background: var(--primary);
-            color: white;
-            font-size: 0.75rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .outcome-code {
-            font-weight: 700;
-            color: var(--primary-dark);
-            font-size: 1.1rem;
-        }
-
-        .outcome-text {
-            font-size: 1rem;
-            color: var(--text-main);
-            margin-top: 0.4rem;
-            white-space: pre-line;
-        }
-
-        /* Presentation / Slides Section */
-        .lesson-section {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .slides-viewer {
-            position: relative;
-            background: #0f172a;
-            color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            min-height: 380px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            border: 2px solid #334155;
-        }
-
-        .slide-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .slide-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .slide-header {
-            font-size: 0.85rem;
-            color: #38bdf8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        .slide-title {
-            font-size: 1.35rem;
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-            color: #f8fafc;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 0.4rem;
-        }
-
-        .slide-body {
-            font-size: 0.98rem;
-            color: #cbd5e1;
-            line-height: 1.7;
-        }
-
-        .slide-body p {
-            margin-bottom: 0.8rem;
-        }
-
-        .slide-body ul {
-            margin-left: 1.2rem;
-            margin-bottom: 0.8rem;
-        }
-
-        .slide-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #334155;
-        }
-
-        .slide-btn {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 0.5rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
-        }
-
-        .slide-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-
-        .slide-indicator {
-            font-size: 0.85rem;
-            color: #94a3b8;
-        }
-
-        /* Quiz & Exam Section */
-        .quiz-section {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .exam-banner {
-            background: #fffbeeb0;
-            border: 1px solid #fde68a;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .exam-btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
-        }
-
-        .exam-btn:hover {
-            background-color: #b45309;
-        }
-
-        .print-btn {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .print-btn:hover {
-            background-color: #15803d;
-        }
-
-        .question-card {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.2rem;
-            margin-bottom: 1rem;
-            background: #fff;
-        }
-
-        .question-title {
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-        }
-
-        .options-list {
-            list-style: none;
-        }
-
-        .option-item {
-            margin-bottom: 0.4rem;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0.6rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .option-label:hover {
-            background: var(--bg-gray);
-        }
-
-        .result-box {
-            margin-top: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .correct { color: var(--success); }
-        .incorrect { color: #dc2626; }
-
-        footer {
-            margin-top: 3rem;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* 📱 RESPONSIVE / MOBİL UYUMLULUK STİLLERİ */
-        @media (max-width: 768px) {
-            header { padding: 1rem; }
-            .header-container { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
-            .brand-area { width: 100%; }
-            .brand-logo { height: 44px; }
-            .logo-text h1 { font-size: 1.15rem; }
-            .logo-text p { font-size: 0.78rem; }
-            .date-badge { width: 100%; text-align: center; font-size: 0.8rem; padding: 0.4rem 0.8rem; }
-            .main-container { margin: 1rem auto; padding: 0 0.5rem; }
-            .grade-tabs { width: 100%; }
-            .tab-btn { flex: 1; padding: 0.7rem 0.5rem; font-size: 0.95rem; text-align: center; }
-            .week-nav { flex-direction: column; align-items: stretch; padding: 1rem; gap: 0.8rem; }
-            .week-select-group { flex-direction: column; align-items: stretch; width: 100%; }
-            select { width: 100%; font-size: 0.9rem; }
-            .nav-btn { width: 100%; text-align: center; padding: 0.7rem; }
-            .register-card { padding: 1rem; }
-            .register-header { flex-direction: column; align-items: flex-start; gap: 6px; }
-            .outcome-text { font-size: 0.9rem; }
-            .lesson-section, .quiz-section { padding: 1rem; }
-            .slides-viewer { padding: 1.2rem; min-height: auto; }
-            .slide-title { font-size: 1.15rem; }
-            .slide-body { font-size: 0.9rem; }
-            .slide-controls { flex-direction: column; gap: 0.8rem; }
-            .slide-btn { width: 100%; text-align: center; }
-            .exam-banner { flex-direction: column; align-items: stretch; }
-            .exam-btn, .print-btn { width: 100%; justify-content: center; }
-            .question-card { padding: 0.9rem; }
-            .option-label { padding: 0.7rem 0.5rem; font-size: 0.9rem; }
-        }
-
-        /* 🖨️ PRINT STYLESHEET FOR EXAM & TEST WORKSHEETS */
-        @media print {
-            body { background: white; color: black; padding: 0; }
-            header, .grade-tabs, .week-nav, .register-card, .lesson-section, .slide-controls, .exam-banner, footer, .print-btn, .result-box, input[type="radio"] {
-                display: none !important;
-            }
-            .main-container { max-width: 100%; margin: 0; padding: 0; }
-            .quiz-section { box-shadow: none; padding: 0; }
-            .print-header-sheet {
-                display: block !important; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px;
-            }
-            .print-info-fields {
-                display: flex !important; justify-content: space-between; margin-bottom: 20px; border: 1px solid #000; padding: 8px 12px; font-size: 0.9rem;
-            }
-            .question-card { border: none; border-bottom: 1px solid #ccc; padding: 10px 0; page-break-inside: avoid; }
-            .option-label { padding: 2px 0; }
-            .option-label::before { content: "◯ "; font-size: 1.1rem; }
-            .print-footer-signature {
-                display: flex !important; justify-content: space-between; margin-top: 30px; font-size: 0.85rem; border-top: 1px dotted #000; padding-top: 8px;
-            }
-        }
-
-        .print-header-sheet, .print-info-fields, .print-footer-signature { display: none; }
+        
+        /* Custom Scrollbar for slides */
+        ::-webkit-scrollbar { height: 8px; width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="header-container">
-            <div class="brand-area">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="Logo" class="brand-logo">
-                <div class="logo-text">
-                    <h1>Bilişim Teknolojileri ve Yazılım Dersi</h1>
-                    <p>Akıllı Ders Asistanı <span class="author-badge"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IYK7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan</span></p>
-                </div>
-            </div>
-            <div class="date-badge" id="currentDateDisplay">
-                Sistem Tarihi Yükleniyor...
-            </div>
-        </div>
+        <img id="header-logo" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" alt="Logo">
+        <h1>RAYILMAZAN</h1>
     </header>
 
-    <div class="main-container">
-        <!-- Grade Tabs -->
-        <div class="grade-tabs">
-            <button id="btnGrade5" class="tab-btn active" onclick="switchGrade(5)">5. Sınıf</button>
-            <button id="btnGrade6" class="tab-btn" onclick="switchGrade(6)">6. Sınıf</button>
-        </div>
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab(5)">5. SINIF PLANI</div>
+        <div class="tab" onclick="switchTab(6)">6. SINIF PLANI</div>
+    </div>
 
-        <!-- Week Navigation -->
+    <div class="container">
         <div class="week-nav">
-            <button class="nav-btn" onclick="changeWeek(-1)">← Önceki Hafta</button>
-            
-            <div class="week-select-group">
-                <label for="weekSelect"><strong>Eğitim Haftası:</strong></label>
-                <select id="weekSelect" onchange="onWeekSelectChange(this.value)">
-                    <!-- Options populated dynamically -->
-                </select>
-            </div>
-
-            <button class="nav-btn" onclick="changeWeek(1)">Sonraki Hafta →</button>
+            <button onclick="changeWeek(-1)">&lt; Önceki Hafta</button>
+            <div class="date-display" id="week-display">Hafta Hesaplanıyor...</div>
+            <button onclick="changeWeek(1)">Sonraki Hafta &gt;</button>
         </div>
 
-        <!-- Class Register Outcome Card -->
-        <div class="register-card">
-            <div class="register-header">
-                <span class="register-tag">Sınıf Defterine Yazılacak Öğrenme Çıktısı (Yıllık Plandan Birebir)</span>
-                <span class="outcome-code" id="outcomeCode">BTY.5.1.1</span>
-            </div>
-            <div class="outcome-text" id="outcomeText">
-                Yükleniyor...
-            </div>
+        <div class="data-box">
+            <h3>Konu / İçerik</h3>
+            <div id="topic-display" class="outcome">Yükleniyor...</div>
         </div>
 
-        <!-- Presentation / Slides Section -->
-        <div class="lesson-section">
-            <div class="section-title">
-                <span>📚 Ders Akışı (Öğrenme Çıktıları ve Süreç Bileşenleri)</span>
-            </div>
+        <div class="data-box">
+            <h3>Öğrenim Çıktısı (Deftere Yazılacak)</h3>
+            <div id="outcome-display" class="outcome">Yükleniyor...</div>
+        </div>
 
-            <div class="slides-viewer">
-                <div id="slideContainer">
-                    <!-- Slides injected dynamically -->
-                </div>
-
-                <div class="slide-controls">
-                    <button class="slide-btn" onclick="moveSlide(-1)">◀ Önceki Slayt</button>
-                    <span class="slide-indicator" id="slideIndicator">Slayt 1 / 6</span>
-                    <button class="slide-btn" onclick="moveSlide(1)">Sonraki Slayt ▶</button>
-                </div>
+        <div class="data-box">
+            <h3>Süreç Bileşenleri</h3>
+            <div class="slider-wrapper" id="process-slider">
+                <!-- Slaytlar buraya eklenecek -->
             </div>
         </div>
 
-        <!-- Quiz & Exam Section -->
-        <div class="quiz-section">
-            <!-- PRINTABLE HEADER SHEET (PDF Baskı Görünümü) -->
-            <div class="print-header-sheet">
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h2>
-                <p><strong id="printGradeTitle">5. Sınıf</strong> Çalışma ve Değerlendirme Kağıdı</p>
-                <p style="font-size: 0.85rem; margin-top: 4px;" id="printTopicTitle">Konu: ...</p>
-            </div>
-
-            <div class="print-info-fields">
-                <span><strong>Adı Soyadı:</strong> ....................................................</span>
-                <span><strong>Sınıfı / No:</strong> ............. / ........</span>
-                <span><strong>Puan:</strong> ..........</span>
-            </div>
-
-            <div class="exam-banner" id="examBanner" style="display: none;">
-                <div>
-                    <strong>📝 Sınav Haftası Öncesi Karma Deneme Sınavı Modülü</strong>
-                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen tüm konulardan derlenen karma deneme sınavı hazırlayabilirsiniz.</p>
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="exam-btn" onclick="generatePracticeExam()">Sınav Sorularını Hazırla (En Az 30 Soru)</button>
-                </div>
-            </div>
-
-            <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                <span id="quizTitleDisplay">❓ Değerlendirme Soruları (En Az 10 Soru)</span>
-                <button class="print-btn" onclick="printTestSheet()">🖨️ Test / Sınav Çıktısı Al (PDF)</button>
-            </div>
-
-            <div id="quizContainer">
-                <!-- Quiz questions injected dynamically -->
-            </div>
-
-            <div class="print-footer-signature">
-                <span>2026-2027 Eğitim-Öğretim Yılı</span>
-                <span>Bilişim Teknolojileri ve Yazılım Dersi</span>
-                <span style="display: flex; align-items: center; gap: 4px; font-weight: 700; font-family: monospace;">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan
-                </span>
-            </div>
+        <div class="assessment">
+            <p id="exam-status" style="color: var(--text-secondary);"></p>
+            <button onclick="generateTestPDF()">DEĞERLENDİRME TESTİ (PDF) HAZIRLA</button>
         </div>
     </div>
 
-    <footer>
-        <p>Bilişim Teknolojileri ve Yazılım Dersi &copy; 2026-2027 | Hazırlayan: 
-            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-family: monospace; color: var(--primary);">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan
-            </span>
-        </p>
-    </footer>
+<script>
+    // 2026-2027 Eğitim Öğretim Yılı plan verileri
+    const planData = {
+        5: [
+            { week: 1, topic: "Bilişim Teknolojilerinin Sınıflandırılması", outcome: "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme", process: "Öğrencilerle tanışma etkinliği, ders içerikleri ve TYMM BTY hakkında bilgilendirme yapılır.<br>a) Bilişim teknolojilerine ilişkin temel kavramları belirler.<br>b) Geçmişten günümüze benzerlik ve farklılıkları ilişkilendirir." },
+            { week: 2, topic: "Bilişim Teknolojilerinin Etkileri ve Dijital Sağlık", outcome: "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme<br>BTY.5.1.2. Birey ve toplum üzerindeki etkilerini özetleyebilme", process: "c) Kullanım alanlarına göre gruplandırır.<br>a) Olumlu ve olumsuz yönleri ile ilgili çözümleme yapar.<br>b) Fiziksel güvenlik önlemleri ile ilgili sınıflandırma yapar.<br>c) Beden ve ruh sağlığı üzerindeki etkilerini ifade eder." },
+            { week: 3, topic: "Dijital Vatandaşlık Uygulamaları", outcome: "BTY.5.1.3. Dijital vatandaşlık uygulamalarını sınıflandırabilme", process: "a) Dijital kimlik kavramını belirler.<br>b) Dijital ayak izinin etkilerini ilişkilendirir.<br>c) Dijital vatandaşlık uygulamalarını kullanım alanlarına göre gruplandırır." },
+            { week: 4, topic: "Yapay Zekâda Temel Kavram ve Özellikler", outcome: "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme", process: "a) Yapay zekâya ilişkin merak ettiği konuları tanımlar.<br>b) Yapay zekâ hakkında bilgi toplar.<br>c) Toplanan bilgilerin doğruluğunu değerlendirir." },
+            { week: 5, topic: "Codeweek 2026", outcome: "Yerli ve millî teknolojiler temasıyla okul içi kodlama", process: "Kodlama ve problem çözme etkinlikleri yapılır." },
+            { week: 6, topic: "Bilgisayar Sistemlerinin Kullanımı", outcome: "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", process: "a) Temel bileşenleri belirler.<br>b) Bileşenler arası ilişkileri belirler (Donanım)." },
+            { week: 7, topic: "Bilgisayar Sistemlerinin Kullanımı (Yazılım)", outcome: "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", process: "b) Bilgisayar sistemlerinin temel bileşenleri arasındaki ilişkileri belirler (Yazılım)." },
+            { week: 8, topic: "Dosya ve Klasör Yönetimi", outcome: "BTY.5.1.6. Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme", process: "a) Temel dosya ve klasör düzenleme işlemlerini belirler.<br>b) Sıkıştırma işlemlerini değerlendirir." },
+            { week: 15, topic: "Bilgisayar Ağları ve Ağ Bileşenleri", outcome: "BTY.5.3.1. Bilgisayar ağları ve bileşenlerini sorgulayabilme", process: "a) Bilgisayar ağları hakkında bilgi toplar.<br>b) Topladığı bilgiler hakkında çıkarım yapar." },
+            { week: 16, topic: "Bilgisayar Ağ Türleri ve Bağlanma Yöntemleri", outcome: "BTY.5.3.2. Bilgisayar ağları ve bağlanma yöntemlerini sınıflandırabilme", process: "a) Bağlanma yöntemlerini belirler.<br>b) Bileşenlerin işlevlerini gruplandırır." }
+        ],
+        6: [
+            { week: 1, topic: "Yenilikçi Bilişim Teknolojileri", outcome: "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme", process: "a) Yenilikçi kavramları belirler.<br>b) Günlük hayatı kolaylaştırmadaki rolüyle ilişkilendirir.<br>c) Kullanım alanlarına göre gruplandırır." },
+            { week: 2, topic: "Bilişim Teknolojilerinin Geleceği", outcome: "BTY.6.1.2. Bilişim teknolojinin gelecekteki durumlarına yönelik çıkarım yapabilme", process: "a) Gelişimden yola çıkarak varsayımlarda bulunur.<br>b) Olası durumlarına yönelik örüntüleri listeler.<br>c) Toplum üzerindeki etkilerini değerlendirir." },
+            { week: 3, topic: "Tablolama Programlarına Giriş", outcome: "BTY.6.2.1. Tablolama programlarından yararlanabilme", process: "a) Temel özelliklerini tanır.<br>b) Arayüz özelliklerini kullanır.<br>c) Verimliliği açısından değerlendirir." },
+            { week: 4, topic: "Veri Toplama, Düzenleme ve Analizi", outcome: "BTY.6.2.2. Problemleri belirleyebilme<br>BTY.6.2.4. Bulgulara ulaşabilme", process: "a) Veriye dayalı araştırma soruları oluşturur.<br>b) Verileri toplar ve kullanıma hazır hâle getirir.<br>c) Tablolama programları kullanarak verileri analiz eder." },
+            { week: 5, topic: "Codeweek 2026", outcome: "Yerli ve millî teknolojiler temasıyla okul içi kodlama", process: "Kodlama ve problem çözme etkinlikleri yapılır." },
+            { week: 6, topic: "Ses Düzenleme Programlarına Giriş", outcome: "BTY.6.2.5. Ses düzenleme programlarından yararlanabilme", process: "a) Ses dosyası hazırlanacak problemi belirler.<br>b) Hikâye/senaryo unsurlarını belirler." },
+            { week: 7, topic: "Ses Dosyası Geliştirme", outcome: "BTY.6.2.7. Ses dosyası geliştirebilme", process: "a) Tasarlanan unsurlardan uyumlu ses dosyası oluşturur.<br>b) Belirlenen ölçütler açısından değerlendirir." },
+            { week: 8, topic: "Video Düzenleme Programlarına Giriş", outcome: "BTY.6.2.8. Video düzenleme programlarından yararlanabilme", process: "a) Video dosyası için problemi belirler.<br>b) Hikâye/senaryo oluşturur." },
+            { week: 15, topic: "Yapay Zekâda Verinin Rolü", outcome: "BTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme", process: "a) Gerekli araçları belirler.<br>b) Bilgileri bulur ve doğrular.<br>c) Ulaşılan bilgileri kaydeder." },
+            { week: 16, topic: "Yapay Zekâ Araçları", outcome: "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme", process: "a) Kullanacağı yapay zekâ aracını belirler.<br>b) Aracı kullanır ve verimliliğini değerlendirir." }
+        ]
+    };
 
-    <script>
-        // MEB 2026-2027 Academic Calendar Weeks
-        const WEEKS_CALENDAR = [
-            { week: 1, start: '2026-09-14', end: '2026-09-18', name: '1. Hafta (14-18 Eylül 2026)' },
-            { week: 2, start: '2026-09-21', end: '2026-09-25', name: '2. Hafta (21-25 Eylül 2026)' },
-            { week: 3, start: '2026-09-28', end: '2026-10-02', name: '3. Hafta (28 Eylül - 2 Ekim 2026)' },
-            { week: 4, start: '2026-10-05', end: '2026-10-09', name: '4. Hafta (5-9 Ekim 2026)' },
-            { week: 5, start: '2026-10-12', end: '2026-10-16', name: '5. Hafta (12-16 Ekim 2026 - Codeweek)' },
-            { week: 6, start: '2026-10-19', end: '2026-10-23', name: '6. Hafta (19-23 Ekim 2026)' },
-            { week: 7, start: '2026-10-26', end: '2026-10-30', name: '7. Hafta (26-30 Ekim 2026 - Ortak Sınav Öncesi)', isExamUpcoming: true },
-            { week: 8, start: '2026-11-02', end: '2026-11-06', name: '8. Hafta (2-6 Kasım 2026)' },
-            { week: 9, start: '2026-11-09', end: '2026-11-13', name: '9. Hafta (9-13 Kasım 2026 - Atatürk H.)' },
-            { week: 10, start: '2026-11-23', end: '2026-11-27', name: '10. Hafta (23-27 Kasım 2026)' },
-            { week: 11, start: '2026-11-30', end: '2026-12-04', name: '11. Hafta (30 Kasım - 4 Aralık 2026)' },
-            { week: 12, start: '2026-12-07', end: '2026-12-11', name: '12. Hafta (7-11 Aralık 2026)' },
-            { week: 13, start: '2026-12-14', end: '2026-12-18', name: '13. Hafta (14-18 Aralık 2026 - Tutum H.)' },
-            { week: 14, start: '2026-12-21', end: '2026-12-25', name: '14. Hafta (21-25 Aralık 2026)' },
-            { week: 15, start: '2026-12-28', end: '2027-01-01', name: '15. Hafta (28 Aralık 2026 - 1 Ocak 2027)', isExamUpcoming: true },
-            { week: 16, start: '2027-01-04', end: '2027-01-08', name: '16. Hafta (4-8 Ocak 2027)' },
-            { week: 17, start: '2027-01-11', end: '2027-01-15', name: '17. Hafta (11-15 Ocak 2027)' },
-            { week: 18, start: '2027-01-18', end: '2027-01-22', name: '18. Hafta (18-22 Ocak 2027 - Dönem Sonu)' }
-        ];
+    let currentGrade = 5;
+    let currentWeek = 1;
+    let logoBase64 = null;
 
-        // 5th Grade Curriculum - COMPLETE 18 WEEKS (VERBATIM FROM ANNUAL PLAN)
-        const DATA_GRADE5 = {
-            1: {
-                code: "BTY.5.1.1",
-                topic: "Bilişim Teknolojilerinin Sınıflandırılması",
-                outcomeText: "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme\na) Bilişim teknolojilerine ilişkin temel kavramları belirler.\nb) Geçmişten günümüze bilişim teknolojilerindeki benzerlik ve farklılıkları ilişkilendirir.\nc) Bilişim teknolojilerini kullanım alanlarına göre gruplandırır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ (YILLIK PLAN)", title: "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme", body: "<p><strong>Süreç Bileşenleri:</strong></p><ul><li><strong>a)</strong> Bilişim teknolojilerine ilişkin temel kavramları belirler.</li><li><strong>b)</strong> Geçmişten günümüze bilişim teknolojilerindeki benzerlik ve farklılıkları ilişkilendirir.</li><li><strong>c)</strong> Bilişim teknolojilerini kullanım alanlarına göre gruplandırır.</li></ul>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Mevcut Bilgi Düzeyi & Beyin Fırtınası", body: "<p><strong>Öğretmen Yönergesi:</strong> Öğrencilerin bilişim teknolojilerine ilişkin mevcut bilgi düzeyleri ve ön öğrenmelerini belirlemek için beyin fırtınası yapılır.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Günlük Yaşam Alışkanlıkları ve Sorular", body: "<p>Evde veya okulda teknolojik cihazlar olmasaydı alışkanlıklarımız nasıl değişirdi?</p>" },
-                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Temel Kavramlar & Teknolojinin Faydaları", body: "<p>İletişim, Bilgi, Bilişim, Teknoloji, BİT, Donanım, Yazılım ve İnternet kavramları açıklanır.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK (10 DK)", title: "Kelime Kavanozu & Grup Çalışması", body: "<p>Kavram kartları kullanılarak kullanım alanlarına göre gruplandırma yapılır.</p>" },
-                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Ders Özeti", body: "<p>Teknolojinin hayatımıza kattığı kolaylıklar ve sorumluluklar özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Aşağıdakilerden hangisi bilişim teknolojilerinde 'donanım' kavramına örnektir?", options: ["A) İşletim sistemi", "B) Klavye", "C) Arama motoru", "D) Antivirüs programı"], correct: 1 },
-                    { q: "Teknolojinin hayatımıza sağladığı temel avantaj aşağıdakilerden hangisidir?", options: ["A) İşleri yavaşlatmak", "B) Bilgiye erişimi kolaylaştırmak", "C) Elektrik tüketimini artırmak", "D) Yüz yüze iletişimi engellemek"], correct: 1 },
-                    { q: "Bilişim teknolojilerini kullanırken kaynağı belirsiz kulaktan dolma bilgileri paylaşmamak hangi etik kurala örnektir?", options: ["A) Tasarruf", "B) Sorumluluk bilinci", "C) Donanım güncellemesi", "D) Ergonomi"], correct: 1 },
-                    { q: "Geçmişte kullanılan 'daktilo' aracının günümüzdeki karşılığı hangisidir?", options: ["A) Bilgisayar ve Klavye", "B) Akıllı Saat", "C) Kulaklık", "D) Modem"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bilişim teknolojilerinin kullanım alanlarından biri DEĞİLDİR?", options: ["A) Eğitim ve EBA", "B) Sağlık ve MHRS", "C) Bankacılık", "D) Taş devri alet yapımı"], correct: 3 },
-                    { q: "Aşağıdakilerden hangisi fiziksel bir nesne olmayıp bilgisayara ne yapacağını söyleyen komutlar bütünüdür?", options: ["A) Donanım", "B) Yazılım", "C) Fare", "D) Ekran"], correct: 1 },
-                    { q: "Geçmişteki kasetçalar cihazının günümüzdeki karşılığı aşağıdakilerden hangisidir?", options: ["A) Çevrim içi müzik platformları", "B) Disket", "C) Daktilo", "D) Tüplü TV"], correct: 0 },
-                    { q: "Bilgisayarın fiziksel parçalarının tamamına ne ad verilir?", options: ["A) Yazılım", "B) Donanım", "C) İnternet", "D) Kod"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi teknolojinin verimliliği artırma etkisine örnektir?", options: ["A) İşlerin daha uzun sürmesi", "B) Daha az enerji ile daha çok iş yapılması", "C) Verilerin kaybolması", "D) Kağıt israfının artması"], correct: 1 },
-                    { q: "İletişim, bilgi ve teknolojinin birleşimiyle oluşan alana ne denir?", options: ["A) Donanım", "B) Bilişim Teknolojileri", "C) Biyoloji", "D) Coğrafya"], correct: 1 }
-                ]
-            },
-            2: {
-                code: "BTY.5.1.2",
-                topic: "Bilişim Teknolojilerinin Etkileri ve Dijital Sağlık",
-                outcomeText: "BTY.5.1.2. Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme\na) Farklı bilişim teknolojilerinin olumlu ve olumsuz yönleri ile ilgili çözümleme yapar.\nb) Farklı bilişim teknolojilerinin kullanımına göre fiziksel güvenlik önlemleri ile ilgili sınıflandırma yapar.\nc) Bilişim teknolojilerini kullanmanın beden ve ruh sağlığı üzerindeki etkilerini kendi cümleleriyle ifade eder.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ (YILLIK PLAN)", title: "BTY.5.1.2. Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme", body: "<p><strong>Süreç Bileşenleri:</strong></p><ul><li><strong>a)</strong> Olumlu ve olumsuz yönler</li><li><strong>b)</strong> Fiziksel güvenlik önlemleri</li><li><strong>c)</strong> Beden ve ruh sağlığı üzerindeki etkiler</li></ul>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Teknoloji Kullanımı", body: "<p>Gün içinde en çok hangi teknolojileri kullanıyorsunuz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Dijital Sağlık", body: "<p>Ekran başında uzun süre kalmanın sağlık üzerindeki etkileri nelerdir?</p>" },
-                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Ergonomi Kuralları", body: "<p>Dik oturuş, ekran mesafesi ve 30 dakika kuralı açıklanır.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK (10 DK)", title: "Duruş Analizi", body: "<p>Öğrenciler ikili gruplar halinde ergonomi kontrolü yapar.</p>" },
-                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Sağlıklı Yaşam", body: "<p>Fiziksel ve ruhsal esenlik kuralları özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayar başında kambur oturmanın uzun vadeli olumsuz etkisi nedir?", options: ["A) Ekran çözünürlüğü düşer", "B) Bel ve boyun ağrıları oluşur", "C) İnternet yavaşlar", "D) Klavye bozulur"], correct: 1 },
-                    { q: "Bilgisayar kullanırken göz sağlığını korumak için ekran mesafesi ne kadar olmalıdır?", options: ["A) 10-15 cm", "B) 50-70 cm", "C) 2 metre", "D) 5 metre"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi dijital sağlık için uygulanan 30 dakika kuralıdır?", options: ["A) 30 dakika kesintisiz oyun oynamak", "B) Her 30 dakikada bir mola verip gözleri dinlendirmek", "C) Günde 30 saat bilgisayar bakmak", "D) Ekranı 30 kez kapatıp açmak"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi kontrolsüz ve aşırı teknoloji kullanımının olumsuz etkisidir?", options: ["A) Spor yapmaya zaman kalmaması ve uyku düzeninin bozulması", "B) Ders başarısının artması", "C) Göz sağlığının iyileşmesi", "D) Sosyal ilişkilerin güçlenmesi"], correct: 0 },
-                    { q: "İnsan sağlığına uygun çalışma ortamı tasarlama bilimine ne ad verilir?", options: ["A) Ergonomi", "B) Donanım", "C) İnternet", "D) Algoritma"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi ergonomik bir çalışma ortamında olması gereken özelliklerdendir?", options: ["A) Karanlıkta ekrana bakmak", "B) Sandalyenin sırtı desteklemesi", "C) Yüzüstü yatarak bilgisayar kullanmak", "D) Ekrana 5 cm yakın durmak"], correct: 1 },
-                    { q: "Teknoloji kullanımında 'bildirim yorgunluğu' hangi sağlık boyutuna örnektir?", options: ["A) Bilişsel/Davranışsal Sağlık", "B) Donanım Sağlığı", "C) Ağ Sağlığı", "D) Yazılım Güncellemesi"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi teknolojinin OLUMLU yönlerine örnektir?", options: ["A) Bilgiye hızlı ve kolay erişim", "B) Ekran bağımlılığı", "C) Duruş bozuklukları", "D) Bildirim stresi"], correct: 0 },
-                    { q: "Ekran başında uzun süre kalındığında oluşan göz kuruluğunu önlemek için ne yapılmalıdır?", options: ["A) Sık sık göz kırpmak ve uzağa bakmak", "B) Ekran parlaklığını en son seviyeye getirmek", "C) Hiç mola vermemek", "D) Ekrana daha yakın bakmak"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi doğru oturuş pozisyonunda diz ve dirseklerin sahip olması gereken açıdır?", options: ["A) Yaklaşık 90 derece", "B) 180 derece düz", "C) 10 derece", "D) 360 derece"], correct: 0 }
-                ]
-            },
-            3: {
-                code: "BTY.5.1.3",
-                topic: "Dijital Vatandaşlık Uygulamaları",
-                outcomeText: "BTY.5.1.3. Dijital vatandaşlık uygulamalarını sınıflandırabilme\na) Dijital kimlik kavramını belirler.\nb) Dijital ayak izinin etkilerini bilişim teknolojilerinin kullanım alanları ile ilişkilendirir.\nc) Dijital vatandaşlık uygulamalarını kullanım alanlarına göre gruplandırır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.1.3. Dijital vatandaşlık uygulamaları", body: "<p><strong>Süreç Bileşenleri:</strong> Dijital kimlik, dijital ayak izi ve vatandaşlık hizmetleri.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Paylaşım Öncesi Düşünme", body: "<p>Paylaşım yaparken nelere dikkat etmeliyiz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "EBA ve Dijital Profil", body: "<p>EBA ve E-Devlet gibi platformların kullanımı.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Dijital Ayak İzi", body: "<p>İnternette bırakılan kalıcı izlerin önemi açıklanır.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Dijital Kimlik Kartı", body: "<p>Güvenli şifre ve kimlik oluşturma çalışması yapılır.</p>" },
-                    { stage: "ÖZET", title: "Güvenli Birey", body: "<p>Gizlilik ve güvenlik kuralları özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "İnternet ortamında bıraktığımız tüm iz ve kayıtların bütününe ne ad verilir?", options: ["A) Donanım adresi", "B) Dijital Ayak İzi", "C) Ekran çözünürlüğü", "D) Sıkıştırılmış dosya"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi dijital ortamda paylaşılması RİSKLİ olan kritik bilgilerdendir?", options: ["A) T.C. Kimlik Numarası ve Ev Adresi", "B) En sevdiği renk", "C) Takım amblemi", "D) Sevdiği çizgi film"], correct: 0 },
-                    { q: "E-Devlet, EBA ve MHRS gibi sistemler dijital vatandaşlığın hangi alanına örnektir?", options: ["A) Dijital Oyunculuk", "B) Dijital Vatandaşlık Hizmetleri", "C) Siber Zorbalık", "D) Donanım Üretimi"], correct: 1 },
-                    { q: "Güçlü bir şifre oluştururken aşağıdakilerden hangisine dikkat edilmelidir?", options: ["A) '123456' gibi kolay sayılar seçmek", "B) Harf, sayı ve özel karakterleri karma kullanmak", "C) Doğum tarihini şifre yapmak", "D) Şifreyi herkesle paylaşmak"], correct: 1 },
-                    { q: "İnternette başkasına ait bir resmi izin almadan kendi eserimiz gibi paylaşmak neye aykırıdır?", options: ["A) Donanım hızına", "B) Dijital Etik ve Telif Haklarına", "C) İşletim Sistemine", "D) Ağ Bağlantısına"], correct: 1 },
-                    { q: "Çevrim içi ortamlarda kendimizi temsil eden hayali isim veya profil bilgilerine ne denir?", options: ["A) Dijital Kimlik", "B) Anakart", "C) Tarayıcı", "D) İşlemci"], correct: 0 },
-                    { q: "İnternette siber zorbalık veya gizlilik ihlali ile karşılaşıldığında ilk ne yapılmalıdır?", options: ["A) Şifreyi silip kaçmak", "B) Güvenilir bir yetişkine (aile/öğretmen) veya BTK'ya bildirmek", "C) Zorbalığa karşılık vermek", "D) Bilgisayarı çöpe atmak"], correct: 1 },
-                    { q: "EBA platformunu kullanırken gösterilmesi gereken doğru dijital vatandaşlık davranışı hangisidir?", options: ["A) Saygılı ve nezaketli dil kullanmak", "B) Yanıltıcı bilgiler yüklemek", "C) Başkasının hesabıyla girmek", "D) Şifreyi panoya yazmak"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi dijital vatandaşın sorumluluklarından biridir?", options: ["A) Telif hakkına uymak", "B) İzinsiz içerik yaymak", "C) Zararlı yazılım üretmek", "D) Ekranı kırmak"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi dijital izlerin özelliklerindendir?", options: ["A) İnternette uzun süre kalıcı olabilmesi", "B) Birkaç dakikada kendiliğinden yok olması", "C) Sadece televizyonda görünmesi", "D) Kâğıda basılamaması"], correct: 0 }
-                ]
-            },
-            4: {
-                code: "BTY.5.1.4",
-                topic: "Yapay Zekâda Temel Kavram ve Özellikler",
-                outcomeText: "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme\na) Yapay zekâ ile ilgili temel kavram ve özelliklere ilişkin merak ettiği konuları tanımlar.\nb) Yapay zekâ ile ilgili temel kavram ve özellikleri hakkında sorular sorar.\nc) Yapay zekâ ile ilgili temel kavram ve özellikleri hakkında bilgi toplar.\nç) Yapay zekâ ile ilgili temel kavram ve özellikleri hakkında toplanan bilgilerin doğruluğunu değerlendirir.\nd) Yapay zekânın olası etkilerine ilişkin topladığı bilgiler üzerinden çıkarım yapar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.1.4. Yapay Zekâ Temel Kavramlar", body: "<p><strong>Süreç Bileşenleri:</strong> Yapay zekâ kavramları, soru sorma ve veri toplama.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Makineler Düşünebilir mi?", body: "<p>Makinelerin karar verme yetenekleri tartışılır.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Turing Testi", body: "<p>Alan Turing ve yapay zekânın tarihsel gelişimi.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Yapay Zekâ Tanımı", body: "<p>Bilgisayarların insan zekâsını taklit etme süreci.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Örnek Sınıflandırma", body: "<p>Yapay zekâ olan ve olmayan sistemler ayırt edilir.</p>" },
-                    { stage: "ÖZET", title: "Doğru Veri", body: "<p>Yapay zekâ için güvenilir verinin önemi vurgulanır.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayarların insan zekasını, öğrenme ve problem çözme yetilerini taklit etmesine ne denir?", options: ["A) Donanım kartı", "B) Yapay Zekâ", "C) İşletim sistemi", "D) Disket"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi günlük hayatta karşılaştığımız Yapay Zekâ uygulamalarından biridir?", options: ["A) Sesli Asistanlar (Siri/Google)", "B) Analog Duvar Saati", "C) Daktilo", "D) Tahta Kalemi"], correct: 0 },
-                    { q: "1950 yılında 'Makineler düşünebilir mi?' sorusunu ortaya atarak yapay zekânın öncüsü olan bilim insanı kimdir?", options: ["A) Alan Turing", "B) Isaac Newton", "C) Edison", "D) Galileo"], correct: 0 },
-                    { q: "Cahit Arf 1959 yılındaki makalesinde hangi konuyu tartışmıştır?", options: ["A) 'Makine Düşünebilir mi ve Nasıl Düşünebilir?'", "B) 'Televizyonun İcadı'", "C) 'İnternet Kabloları'", "D) 'Yazıcı Çıktıları'"], correct: 0 },
-                    { q: "Yapay zekânın doğru ve başarılı kararlar verebilmesi için en çok neye ihtiyacı vardır?", options: ["A) Kaliteli ve güvenilir Veriye", "B) Sadece boya kalemine", "C) Kağıt israfına", "D) Elektrik kesintisine"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi yapay zekâya ÖRNEK DEĞİLDİR?", options: ["A) Otonom (sürücüsüz) araçlar", "B) Standart hesap makinesi", "C) Yüz tanıma sistemleri", "D) Satranç şampiyonunu yenen yazılımlar"], correct: 1 },
-                    { q: "İnsan zekasi (Doğal Zekâ) ile Yapay Zekâ arasındaki en büyük fark nedir?", options: ["A) İnsanın duygu, bilinç ve sezgilere sahip olması", "B) Yapay zekanın yemek yemesi", "C) İnsanın elektrikle çalışması", "D) Hiçbir fark yoktur"], correct: 0 },
-                    { q: "Yapay zekâya hatalı ve yanlış veriler yüklenirse ne gerçekleşir?", options: ["A) Yanlış ve hatalı sonuçlar üretir", "B) Bilgisayar patlar", "C) Mükemmel sonuçlar verir", "D) Ekran renk değiştirir"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi sağlık alanındaki yapay zekâ kullanımına örnektir?", options: ["A) Erken hastalık teşhisi ve röntgen analizi", "B) İlaç kutusunu katlamak", "C) Hastane kapısını silmek", "D) Yatak çarşafı yıkamak"], correct: 0 },
-                    { q: "Gelecekte yapay zekânın yaygınlaşması hangi etik sorumluluğu getirir?", options: ["A) Veri gizliliği ve tarafsızlığı koruma sorumluluğu", "B) Cihazları kırma hakkı", "C) Şifreleri herkese dağıtma", "D) Çevreyi kirletme"], correct: 0 }
-                ]
-            },
-            5: {
-                code: "OKUL TEMELLİ PLAN",
-                topic: "Codeweek 2026 Kodlama Etkinliği",
-                outcomeText: "Yerli ve millî teknolojiler temasıyla okul içi kodlama, problem çözme ve algoritma tasarımı etkinlikleri yapılır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "Codeweek Kodlama Etkinliği", body: "<p><strong>Süreç Bileşenleri:</strong> Algoritma ve blok tabanlı kodlama etkinlikleri.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Problem Çözme", body: "<p>Günlük hayatta karşılaşılan problemler ve çözüm yolları.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Algoritma Adımları", body: "<p>İşlem sırasının mantıksal sıralaması.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Blok Kodlama", body: "<p>Scratch ve Code.org platformlarının temel mantığı.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Yerli Teknolojiler Simülasyonu", body: "<p>TOGG ve KAAN temalı kodlama tasarımı.</p>" },
-                    { stage: "ÖZET", title: "Hata Ayıklama", body: "<p>Debugging ve mantıksal kontrol.</p>" }
-                ],
-                quiz: [
-                    { q: "Bir problemi çözmek için izlenen adım adım mantıksal yola ne ad verilir?", options: ["A) Algoritma", "B) Donanım", "C) İnternet", "D) Yazıcı"], correct: 0 },
-                    { q: "Kodlama yaparken bir adımı yanlış sıraya koyarsak ne gerçekleşir?", options: ["A) Program hata verir veya yanlış çalışır", "B) Bilgisayar patlar", "C) İnternet hızlanır", "D) Hiçbir şey olmaz"], correct: 0 },
-                    { q: "Codeweek etkinliği neyi teşvik etmek için düzenlenir?", options: ["A) Kodlama ve dijital okuryazarlığı", "B) Kağıt israfını", "C) Televizyon izlemeyi", "D) Araba sürmeyi"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi blok tabanlı bir kodlama arayüzüdür?", options: ["A) Scratch / Code.org", "B) Hesap makinesi", "C) Daktilo", "D) Paint"], correct: 0 },
-                    { q: "Programlamada hataları bulup düzeltme işlemine ne denir?", options: ["A) Hata Ayıklama (Debugging)", "B) Format atma", "C) Yazıcı çıktısı", "D) Ekran görüntüsü"], correct: 0 },
-                    { q: "Bir karakterin ekranda 10 adım ilerlemesi için hangi blok kullanılır?", options: ["A) Hareket Bloğu", "B) Ses Bloğu", "C) Kalem Bloğu", "D) Dekor Bloğu"], correct: 0 },
-                    { q: "Kodlamada bir işlemin sürekli tekrarlanmasını sağlayan yapı hangisidir?", options: ["A) Döngü (Loop)", "B) Değişken", "C) Başla", "D) Dur"], correct: 0 },
-                    { q: "Yerli ve millî teknoloji hamlemize örnek olarak hangisi verilebilir?", options: ["A) TOGG ve KAAN", "B) Daktilo", "C) Tüplü TV", "D) Kasetçalar"], correct: 0 },
-                    { q: "Bir algoritmanın her zaman nasıl sonlanması gerekir?", options: ["A) Sonlu sayıda adımda", "B) Sonsuz döngüde kilitlenerek", "C) Rastgele kapanarak", "D) Hiç başlamayarak"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi günlük hayattaki bir algoritma örneğidir?", options: ["A) Yemek tarifi adımları", "B) Rüzgar esmesi", "C) Yağmur yağması", "D) Güneş doğması"], correct: 0 }
-                ]
-            },
-            6: {
-                code: "BTY.5.1.5",
-                topic: "Bilgisayar Sistemlerinin Kullanımı (Donanım)",
-                outcomeText: "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme\na) Bilgisayar sistemlerinin temel bileşenlerini belirler.\nb) Bilgisayar sistemlerinin temel bileşenleri arasındaki ilişkileri belirler.\n(Donanım konusu ele alınır.)",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.1.5. Bilgisayar Sistemleri ve Donanım", body: "<p><strong>Süreç Bileşenleri:</strong> Temel donanım bileşenleri ve aralarındaki ilişkiler.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Fiziksel Parçalar", body: "<p>Bilgisayarı oluşturan dış ve iç birimler.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Organlar ve Donanım", body: "<p>İnsan vücudu ile bilgisayar mimarisinin benzeşimi.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "İç ve Dış Donanım", body: "<p>İşlemci, RAM, anakart ve çevre birimleri.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Deve Cüce Donanım Oyunu", body: "<p>Giriş ve çıkış birimleri etkinliklerle pekiştirilir.</p>" },
-                    { stage: "ÖZET", title: "Hafıza Birimleri", body: "<p>Bit, Byte ve depolama birimleri özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayarın tüm iç parçalarının üzerine takıldığı ana devre kartı hangisidir?", options: ["A) Anakart", "B) Ekran Kartı", "C) Sabit Disk", "D) Klavye"], correct: 0 },
-                    { q: "Bilgisayarın 'beyni' olarak adlandırılan ve tüm işlemleri yürüten parça hangisidir?", options: ["A) İşlemci (CPU)", "B) Hoparlör", "C) Fare", "D) Yazıcı"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir 'Giriş Birimi'dir?", options: ["A) Klavye", "B) Ekran", "C) Hoparlör", "D) Yazıcı"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir 'Çıkış Birimi'dir?", options: ["A) Ekran / Monitör", "B) Fare", "C) Klavye", "D) Mikrofon"], correct: 0 },
-                    { q: "Bilgisayarda verilerin kalıcı olarak saklandığı depolama birimi hangisidir?", options: ["A) Sabit Disk (HDD/SSD)", "B) RAM Bellek", "C) İşlemci", "D) Fan"], correct: 0 },
-                    { q: "Bilgisayar çalıştığı sürece geçici verileri tutan, elektrik kesilince silinen bellek türü nedir?", options: ["A) RAM Bellek", "B) Sabit Disk", "C) DVD", "D) USB Bellek"], correct: 0 },
-                    { q: "Dijital verinin en küçük ölçü birimi aşağıdakilerden hangisidir?", options: ["A) Bit", "B) Kilobyte", "C) Gigabyte", "D) Terabyte"], correct: 0 },
-                    { q: "1 Byte kaç Bit'ten oluşur?", options: ["A) 8 Bit", "B) 1024 Bit", "C) 10 Bit", "D) 100 Bit"], correct: 0 },
-                    { q: "Aşağıdaki hafıza birimlerinden hangisi en büyüktür?", options: ["A) Terabyte (TB)", "B) Gigabyte (GB)", "C) Megabyte (MB)", "D) Kilobyte (KB)"], correct: 0 },
-                    { q: "Kağıttaki bir resmi veya belgeyi bilgisayara aktarmaya yarayan donanım nedir?", options: ["A) Tarayıcı (Scanner)", "B) Yazıcı (Printer)", "C) Hoparlör", "D) Plotter"], correct: 0 }
-                ]
-            },
-            7: {
-                code: "BTY.5.2.1",
-                topic: "İşletim Sistemleri ve Dosya Yönetimi",
-                outcomeText: "BTY.5.2.1. İşletim sistemlerinin temel işlevlerini ve dosya yönetimini kavrayabilme\na) İşletim sistemi kavramını ve çeşitlerini belirler.\nb) Dosya ve klasör yönetim işlemlerini uygular.\nc) Sıkıştırılmış dosya formatlarını kullanır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.2.1. İşletim Sistemi ve Dosya Yönetimi", body: "<p><strong>Süreç Bileşenleri:</strong> İşletim sistemi çeşitleri, klasör oluşturma ve dosya uzantıları.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Masaüstü ve Pardus/Windows", body: "<p>Bilgisayarı açtığımızda bizi karşılayan ilk ekran.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Dosya Düzeni", body: "<p>Defterlerimiz ve dolaplarımız ile bilgisayardaki klasör yapısı arasındaki ilişki.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "İşletim Sistemi Görevleri", body: "<p>Pardus, Windows, Android gibi sistemlerin donanımı yönetme işlevi.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Klasör Oluşturma", body: "<p>Öğrenciler kendi adlarına klasör açıp dosya taşır.</p>" },
-                    { stage: "ÖZET", title: "Uzantılar", body: "<p>.txt, .docx, .jpg, .zip uzantıları özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Donanım ile kullanıcı arasındaki köprüyü kuran temel yazılıma ne denir?", options: ["A) İşletim Sistemi", "B) Tarayıcı", "C) Yazıcı", "D) Klavye"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir işletim sistemidir?", options: ["A) Pardus", "B) Microsoft Word", "C) Paint", "D) Google Chrome"], correct: 0 },
-                    { q: "Dosyaları düzenli tutmak ve gruplamak için açılan dijital kutulara ne denir?", options: ["A) Klasör", "B) İşlemci", "C) Piksel", "D) Kablo"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir metin (word) belgesi dosya uzantısıdır?", options: ["A) .docx", "B) .mp3", "C) .jpg", "D) .exe"], correct: 0 },
-                    { q: "Birden fazla dosyayı tek bir pakette sıkıştırıp boyutunu küçültmek için hangi uzantı kullanılır?", options: ["A) .zip / .rar", "B) .txt", "C) .png", "D) .avi"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi açık kaynak kodlu ve millî işletim sistemimizdir?", options: ["A) Pardus", "B) Windows", "C) macOS", "D) iOS"], correct: 0 },
-                    { q: "Silinen dosyaların geçici olarak tutulduğu alanın adı nedir?", options: ["A) Geri Dönüşüm Kutusu", "B) Tarayıcı", "C) RAM", "D) Anakart"], correct: 0 },
-                    { q: "Bir dosyanın adını değiştirmek için klavyeden hangi tuş sıkça kullanılır?", options: ["A) F2", "B) Enter", "C) Esc", "D) Space"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi resim dosyası uzantısıdır?", options: ["A) .jpg / .png", "B) .mp3", "C) .pptx", "D) .xlsx"], correct: 0 },
-                    { q: "Masaüstünde yeni bir klasör oluşturmak için hangi işlem yapılır?", options: ["A) Sağ tık -> Yeni -> Klasör", "B) Ekranı silmek", "C) Bilgisayarı kapatmak", "D) Fişi çekmek"], correct: 0 }
-                ]
-            },
-            8: {
-                code: "BTY.5.2.2",
-                topic: "Kelime İşlemci Programları (Yazı Belgesi Oluşturma)",
-                outcomeText: "BTY.5.2.2. Kelime işlemci programlarını kullanarak belgeler biçimlendirebilme\na) Kelime işlemci arayüzünü tanır.\nb) Metin biçimlendirme ve hizalama işlemlerini yapar.\nc) Belgeye tablo ve resim ekler.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.2.2. Kelime İşlemci Programları", body: "<p><strong>Süreç Bileşenleri:</strong> Yazı biçimlendirme, paragraf ayarları ve nesne ekleme.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Dijital Metinler", body: "<p>Ödevlerimizi bilgisayarda hazırlarken hangi araçları kullanıyoruz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Daktilodan Word'e", body: "<p>Geçmişteki yazı yazma araçları ile günümüz kelime işlemcilerinin kıyaslanması.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Biçimlendirme Araçları", body: "<p>Yazı tipi, boyutu, kalın, italik, altı çizili ve renk ayarları.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Şiir veya Ödev Hazırlama", body: "<p>Öğrenciler kendi adlarına bir şiir yazıp biçimlendirir.</p>" },
-                    { stage: "ÖZET", title: "Belge Kaydetme", body: "<p>Farklı formatlarda kaydetme ve yazdırma önizlemesi.</p>" }
-                ],
-                quiz: [
-                    { q: "Rapor, ödev ve dilekçe yazmak için kullanılan yazılım türüne ne ad verilir?", options: ["A) Kelime İşlemci (Word)", "B) Tablolama", "C) Antivirüs", "D) Hesap Makinesi"], correct: 0 },
-                    { q: "Kelime işlemci programında yazıyı 'kalın' yapmak için hangi kısayol tuşları kullanılır?", options: ["A) Ctrl + K (Bold)", "B) Ctrl + C", "C) Ctrl + V", "D) Ctrl + P"], correct: 0 },
-                    { q: "Yazıyı ortalamak için hangi hizalama düğmesi seçilmelidir?", options: ["A) Ortala", "B) Sola Yasla", "C) Sağa Yasla", "D) İki Yana Yasla"], correct: 0 },
-                    { q: "Belgeye resim eklemek için hangi menü sekmesi kullanılır?", options: ["A) Ekle", "B) Giriş", "C) Dosya", "D) Görünüm"], correct: 0 },
-                    { q: "Yazının boyutunu ve karakter tipini nereden değiştirebiliriz?", options: ["A) Yazı Tipi (Font) paneli", "B) Ses ayarları", "C) Yazıcı ayarları", "D) İnternet menüsü"], correct: 0 },
-                    { q: "Kelime işlemci belgesinde yapılan bir hatayı geri almak için hangi kısayol kullanılır?", options: ["A) Ctrl + Z", "B) Ctrl + Y", "C) Ctrl + S", "D) Ctrl + A"], correct: 0 },
-                    { q: "Belgeyi hızlıca kaydetmek için kullanılan tuş kombinasyonu nedir?", options: ["A) Ctrl + S (Save)", "B) Ctrl + P", "C) Ctrl + N", "D) Ctrl + F"], correct: 0 },
-                    { q: "Metin içerisindeki bir kelimeyi başka bir kelimeyle değiştirmek için hangi araç kullanılır?", options: ["A) Bul ve Değiştir", "B) Kes ve Yapıştır", "C) Yazdır", "D) Sil"], correct: 0 },
-                    { q: "Belgeye tablo eklemek için hangi öğe kullanılır?", options: ["A) Satır ve sütun kesişimlerinden oluşan tablo", "B) Sadece resim", "C) Ses dosyası", "D) Video"], correct: 0 },
-                    { q: "Kelime işlemci programında hazırlanan dosyanın varsayılan uzantısı nedir?", options: ["A) .docx", "B) .xlsx", "C) .pptx", "D) .mp4"], correct: 0 }
-                ]
-            },
-            9: {
-                code: "BTY.5.2.3",
-                topic: "Sunum Hazırlama Programları",
-                outcomeText: "BTY.5.2.3. Sunum programlarını kullanarak etkili sunumlar hazırlayabilme\na) Sunum arayüzünü ve slayt ekleme mantığını kavrar.\nb) Metin, görsel ve animasyon ekler.\nc) Sunumu tasarlar ve sunar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.2.3. Sunum Hazırlama", body: "<p><strong>Süreç Bileşenleri:</strong> Slayt tasarımı, görsel entegrasyonu ve sunum akışı.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Görsel Anlatım", body: "<p>Projelerimizi arkadaşlarımıza anlatırken hangi görsel araçları kullanıyoruz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Slayt Mantığı", body: "<p>Poster hazırlamak ile dijital slayt hazırlamak arasındaki benzerlikler.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Sunum Araçları", body: "<p>PowerPoint veya LibreOffice Impress arayüzü ve tema seçimi.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Tanıtım Slaytı", body: "<p>Öğrenciler kendi ilgi alanlarında 3 slaytlık mini sunum hazırlar.</p>" },
-                    { stage: "ÖZET", title: "Sunum Kuralları", body: "<p>Yazı az, görsel ve net anlatım kuralı vurgulanır.</p>" }
-                ],
-                quiz: [
-                    { q: "Topluluk önünde projeleri ve bilgileri görsel slaytlarla aktarmak için ne kullanılır?", options: ["A) Sunum Programı (PowerPoint)", "B) Hesap Makinesi", "C) Tablolama", "D) Klasör"], correct: 0 },
-                    { q: "Sunum dosyasındaki her bir sayfaya ne ad verilir?", options: ["A) Slayt", "B) Hücre", "C) Satır", "D) Sütun"], correct: 0 },
-                    { q: "Yeni bir slayt eklemek için hangi kısayol tuşu kullanılır?", options: ["A) Ctrl + M", "B) Ctrl + C", "C) Ctrl + S", "D) Ctrl + P"], correct: 0 },
-                    { q: "Hazırlanan sunumu tam ekran oynatmak (başlatmak) için hangi tuşa basılır?", options: ["A) F5", "B) F1", "C) F2", "D) F10"], correct: 0 },
-                    { q: "Etkili bir sunum hazırlarken slaytlarda nelere dikkat edilmelidir?", options: ["A) Çok fazla yazı yerine görsel ve maddeler kullanılmalıdır", "B) Tüm ekran yazıyla doldurulmalıdır", "C) Renkler gözü yormalıdır", "D) Resim hiç konulmamalıdır"], correct: 0 },
-                    { q: "Slaytlar arasındaki geçişlere hareket kazandıran özelliğin adı nedir?", options: ["A) Slayt Geçişleri (Transitions)", "B) Yazı Tipi", "C) Kenarlık", "D) Donanım"], correct: 0 },
-                    { q: "Slayt üzerindeki yazı veya resimlerin hareket etmesini sağlayan özelliğe ne denir?", options: ["A) Özel Animasyonlar", "B) Klasör", "C) Sıkıştırma", "D) İşletim Sistemi"], correct: 0 },
-                    { q: "Sunum programında hazırlanan dosyanın varsayılan uzantısı nedir?", options: ["A) .pptx", "B) .docx", "C) .xlsx", "D) .txt"], correct: 0 },
-                    { q: "Sunuma ses veya video eklemek hangi menüden yapılır?", options: ["A) Ekle", "B) Giriş", "C) Tasarım", "D) Görünüm"], correct: 0 },
-                    { q: "Sunumun arka plan rengini veya temasını nereden değiştirebiliriz?", options: ["A) Tasarım sekmesinden", "B) Ses sekmesinden", "C) Çıkış tuşundan", "D) Dosya silme"], correct: 0 }
-                ]
-            },
-            10: {
-                code: "BTY.5.3.1",
-                topic: "Algoritma ve Mantıksal Tasarım",
-                outcomeText: "BTY.5.3.1. Günlük yaşam problemleri için algoritma tasarlayabilme\na) Problemin çözüm adımlarını belirler.\nb) Algoritmayı sıralı ve mantıksal olarak kurgular.\nc) Akış şeması sembollerini tanır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.3.1. Algoritma Tasarımı", body: "<p><strong>Süreç Bileşenleri:</strong> Problem analizi, adım sıralaması ve akış şemaları.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Günlük Rutinler", body: "<p>Sabah okul hazırlığı yaparken izlediğimiz adımlar nelerdir?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Mantıksal Sıralama", body: "<p>Yemek tarifi veya çay demleme adımlarının sırasının önemi.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Algoritma Kuralları", body: "<p>Başlangıç, adım adım ilerleme, koşullar ve bitiş.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Çay Demleme Algoritması", body: "<p>Tahtada adım adım algoritma yazılır.</p>" },
-                    { stage: "ÖZET", title: "Akış Şemaları", body: "<p>Elips, dikdörtgen ve paralelkenar simgeleri özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bir problemi çözmek veya belirli bir amaca ulaşmak için takip edilen adım adım mantıksal yola ne denir?", options: ["A) Algoritma", "B) Donanım", "C) İşletim Sistemi", "D) Tarayıcı"], correct: 0 },
-                    { q: "Her algoritmanın başında ve sonunda mutlaka ne bulunmalıdır?", options: ["A) Başla ve Bitir komutları", "B) Müzik", "C) Oyun", "D) İnternet kablosu"], correct: 0 },
-                    { q: "Akış şemalarında 'işlem' adımlarını göstermek için hangi geometrik şekil kullanılır?", options: ["A) Dikdörtgen", "B) Elips", "C) Eşkenar Dörtgen", "D) Daire"], correct: 0 },
-                    { q: "Akış şemalarında 'başlangıç ve bitiş' noktalarını belirtmek için hangi şekil kullanılır?", options: ["A) Elips (Oval)", "B) Dikdörtgen", "C) Kare", "D) Üçgen"], correct: 0 },
-                    { q: "Akış şemalarında 'karar' verme durumlarını (örneğin: hava yağmurlu mu?) göstermek için hangi şekil kullanılır?", options: ["A) Eşkenar Dörtgen (Baklava dilimi)", "B) Çember", "C) Dikdörtgen", "D) Düz çizgi"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi günlük hayattaki bir algoritma örneğidir?", options: ["A) Çay demleme adımları", "B) Bulutun şekli", "C) Rüzgarın esmesi", "D) Yağmurun yağması"], correct: 0 },
-                    { q: "Algoritmada adımların sırası yanlış olursa ne olur?", options: ["A) Sonuç yanlış olur veya problem çözülemez", "B) Bilgisayar hızlanır", "C) İnternet gelir", "D) Hiçbir şey değişmez"], correct: 0 },
-                    { q: "Akış şemalarında yönü ve akışı gösteren işaretler nelerdir?", options: ["A) Ok işaretleri (Yön tuşları)", "B) Renkli lambalar", "C) Sayılar", "D) Harfler"], correct: 0 },
-                    { q: "Bir algoritmanın sonsuz döngüye girmemesi için nasıl sonlanması gerekir?", options: ["A) Sonlu sayıda adımda bitmesi gerekir", "B) Hiç bitmemelidir", "C) Rastgele kapanmalıdır", "D) Elektrik kesilmelidir"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi algoritma tasarımının ilk aşamasıdır?", options: ["A) Problemin tanımını yapmak", "B) Oyunu kaydetmek", "C) Bilgisayarı kapatmak", "D) Yazıcıyı fişe takmak"], correct: 0 }
-                ]
-            },
-            11: {
-                code: "BTY.5.3.2",
-                topic: "Blok Tabanlı Kodlama Temelleri",
-                outcomeText: "BTY.5.3.2. Blok tabanlı kodlama ortamında temel algoritmalar oluşturabilme\na) Blok tabanlı arayüzü tanır.\nb) Karakter hareket ettirme ve olay bloklarını kullanır.\nc) Basit animasyonlar tasarlar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.3.2. Blok Tabanlı Kodlama", body: "<p><strong>Süreç Bileşenleri:</strong> Sürükle-bırak bloklar, olaylar ve karakter hareketleri.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Dijital Oyunlar", body: "<p>Oynadığımız oyunların arkasındaki kodlar nasıl çalışıyor?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Bulmaca Çözme", body: "<p>Blokların yapboz parçaları gibi birbirine geçmesi.</p>"},
-                    { stage: "KEŞFETME & SUNUM", title: "Scratch Arayüzü", body: "<p>Sahne, karakter (kukla), blok paleti ve kod alanı.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Karakteri Yürüttme", body: "<p>Tıklandığında 10 adım git ve ses çıkar blokları uygulanır.</p>" },
-                    { stage: "ÖZET", title: "Olaylar", body: "<p>'Yeşil bayrağa tıklandığında' olayı özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Kod yazmayı kolaylaştıran, yapboz parçaları gibi sürüklenip bırakılan sisteme ne denir?", options: ["A) Blok Tabanlı Kodlama", "B) Sabit Disk", "C) İşletim Sistemi", "D) Tarayıcı"], correct: 0 },
-                    { q: "Scratch programında ekrandaki hareket eden ana karakterlere ne ad verilir?", options: ["A) Kukla (Sprite)", "B) Sahne", "C) Klasör", "D) Slayt"], correct: 0 },
-                    { q: "Karakterlerin üzerinde gezindiği arka plan alanına ne denir?", options: ["A) Sahne (Stage)", "B) İşlemci", "C) RAM", "D) Yazıcı"], correct: 0 },
-                    { q: "Scratch programını başlatmak için kullanılan en yaygın olay bloğu hangisidir?", options: ["A) Yeşil Bayrağa Tıklandığında", "B) Bilgisayarı Kapattığında", "C) Elektrik Kesildiğinde", "D) Fişi Çektiğinde"], correct: 0 },
-                    { q: "Karakterin 10 adım ileri gitmesini sağlayan blok hangi kategoriye aittir?", options: ["A) Hareket", "B) Görünüş", "C) Ses", "D) Olaylar"], correct: 0 },
-                    { q: "Karakterin konuşturulması veya 'Merhaba' dedirtilmesi için hangi blok kullanılır?", options: ["A) Görünüş bloğu", "B) Hareket bloğu", "C) Kontrol bloğu", "D) Algılama bloğu"], correct: 0 },
-                    { q: "Blok tabanlı kodlamada bir kodun sürekli tekrarlanmasını sağlayan yapı hangisidir?", options: ["A) Sürekli Tekrarla (Döngü)", "B) Başla", "C) Dur", "D) Sil"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi blok tabanlı bir kodlama platformudur?", options: ["A) Scratch / Code.org", "B) Microsoft Word", "C) Paint", "D) Hesap Makinesi"], correct: 0 },
-                    { q: "Yazılan kodlarda bir hata olduğunda programın çalışmaması durumuna ne denir?", options: ["A) Hata (Bug)", "B) Güncelleme", "C) Format", "D) Sıkıştırma"], correct: 0 },
-                    { q: "Karakterin ses çıkarmasını sağlayan blok hangi kategoridedir?", options: ["A) Ses", "B) Hareket", "C) Olaylar", "D) Değişken"], correct: 0 }
-                ]
-            },
-            12: {
-                code: "BTY.5.3.3",
-                topic: "Kontrol Yapıları ve Döngüler",
-                outcomeText: "BTY.5.3.3. Blok tabanlı kodlamada kontrol yapıları ve döngüleri kullanabilme\na) Koşullu ifadeleri (Eğer... ise) kavrar.\nb) Döngü yapılarının (Tekrarla) mantığını uygular.\nc) Algoritmada tekrarı önleyen çözümler üretir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.3.3. Kontrol Yapıları", body: "<p><strong>Süreç Bileşenleri:</strong> Koşullar (Eğer) ve Döngüler (Tekrarla).</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Günlük Hayatta Koşullar", body: "<p>Hava yağmurluysa şemsiye alırım cümlesindeki mantık.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Tekrarlayan İşler", body: "<p>Aynı adımı 10 kez yazmak yerine döngü kullanmanın avantajı.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Eğer-İse ve Döngüler", body: "<p>Koşullu durumlar ve 10 defa tekrarla blokları incelenir.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Labirent Çözme", body: "<p>Code.org üzerinde döngü bulmacaları çözülür.</p>" },
-                    { stage: "ÖZET", title: "Kod Tasarrufu", body: "<p>Döngülerin kod satırını nasıl azalttığı özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Kodlamada belirli bir şart gerçekleştiğinde çalışan yapılara ne denir?", options: ["A) Koşul / Şart Yapıları (Eğer - İse)", "B) Donanım", "C) Yazıcı", "D) Klasör"], correct: 0 },
-                    { q: "Aynı kodların defalarca alt alta yazılmasını önleyerek işleri kolaylaştıran yapı nedir?", options: ["A) Döngüler (Loops)", "B) İşlemci", "C) Sabit Disk", "D) Monitör"], correct: 0 },
-                    'BTY.5.3.3 Döngü ve Koşul Soruları devam eder...',
-                    { q: "Scratch programında 10 defa tekrarla bloğu hangi kategori içerisindedir?", options: ["A) Kontrol", "B) Hareket", "C) Ses", "D) Görünüş"], correct: 0 },
-                    { q: "'Eğer kenara geldiyse geri dön' komutu hangi yapıya örnektir?", options: ["A) Koşullu Durum", "B) Döngü", "C) Matematik", "D) Ses"], correct: 0 },
-                    { q: "Kodlamada döngü kullanmanın en büyük faydası nedir?", options: ["A) Kod kalabalığını önlemek ve zamandan kazanmak", "B) Bilgisayarı yavaşlatmak", "C) Elektrik tüketmek", "D) Ekranı karartmak"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir koşul cümlesidir?", options: ["A) Hava yağmurluysa mont giy", "B) Bilgisayarı aç", "C) Fareyi hareket ettir", "D) Sesi kapat"], correct: 0 },
-                    { q: "Code.org platformunda tekrarlanan hareketleri kısaltmak için hangi blok kullanılır?", options: ["A) '... kere tekrarla' döngü bloğu", "B) Ses bloğu", "C) Renk bloğu", "D) Durdur bloğu"], correct: 0 },
-                    { q: "Sonsuz döngü ne anlama gelir?", options: ["A) Koşul sağlanmadığı sürece hiç durmadan tekrarlayan yapı", "B) Bilgisayarın kapanması", "C) İnternetin kopması", "D) Dosyanın silinmesi"], correct: 0 },
-                    { q: "Karakter duvara çarptığında durması için hangi yapı kullanılmalıdır?", options: ["A) Eğer çarptıysa dur", "B) Sürekli zıpla", "C) Sesi aç", "D) Rengi değiştir"], correct: 0 }
-                ]
-            },
-            13: {
-                code: "BTY.5.4.1",
-                topic: "İnternet Ağları ve Temel Kavramlar",
-                outcomeText: "BTY.5.4.1. Bilgisayarlar arası iletişim ve internet ağlarını kavrayabilme\na) Ağ ve internet kavramlarını tanımlar.\nb) Yerel ağ (LAN) ve Geniş alan ağı (WAN) farkını bilir.\nc) IP adresi ve modem kavramlarını açıklar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.4.1. İnternet ve Bilgisayar Ağları", body: "<p><strong>Süreç Bileşenleri:</strong> LAN, WAN, IP adresi ve modem.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Ağa Bağlanma", body: "<p>Evde internete nasıl bağlanıyoruz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Posta ve IP", body: "<p>Ev adresimiz ile bilgisayarın IP adresi arasındaki benzeşim.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Modem ve Ağ Türleri", body: "<p>Yerel ağlar (okul ağı) ve küresel ağ (internet) açıklanır.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Ağ Şeması Çizimi", body: "<p>Tahtada bilgisayar, modem ve internet bağlantı şeması çizilir.</p>" },
-                    { stage: "ÖZET", title: "Güvenli Bağlantı", body: "<p>Wi-Fi ve kablolu bağlantı farkları özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "İki veya daha fazla bilgisayarın bilgi paylaşımı için birbirine bağlanmasıyla oluşan yapıya ne denir?", options: ["A) Bilgisayar Ağı (Network)", "B) İşletim Sistemi", "C) Sabit Disk", "D) Slayt"], correct: 0 },
-                    { q: "Dünyadaki milyonlarca bilgisayar ağının birbirine bağlanmasıyla oluşan küresel ağa ne denir?", options: ["A) İnternet", "B) Intranet", "C) Klasör", "D) Word"], correct: 0 },
-                    { q: "Evimizdeki veya okulunkis gibi dar alandaki bilgisayarları birbirine bağlayan ağ türü hangisidir?", options: ["A) LAN (Yerel Alan Ağı)", "B) WAN (Geniş Alan Ağı)", "C) Bluetooth", "D) Uydu"], correct: 0 },
-                    { q: "Ağ üzerindeki her bilgisayarın kendine ait kimlik numarasına ne ad verilir?", options: ["A) IP Adresi", "B) Ev Adresi", "C) Şifre", "D) Uzantı"], correct: 0 },
-                    { q: "Bilgisayarları internete bağlamamızı sağlayan cihazın adı nedir?", options: ["A) Modem / Router", "B) Yazıcı", "C) Tarayıcı", "D) Hoparlör"], correct: 0 },
-                    { q: "Kablosuz internet bağlantısının yaygın adı nedir?", options: ["A) Wi-Fi", "B) USB", "C) HDMI", "D) RAM"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi Geniş Alan Ağına (WAN) örnektir?", options: ["A) İnternet", "B) Okul Bilgisayar Laboratuvarı Ağı", "C) Evdeki iki telefon arası", "D) Yazıcı bağlantısı"], correct: 0 },
-                    { q: "İnternet sitelerinin adreslerinin başına yazılan 'www' ne anlama gelir?", options: ["A) World Wide Web (Dünya Çapında Ağ)", "B) Windows Word Web", "C) Wireless Web", "D) Web Yazıcı"], correct: 0 },
-                    { q: "Ağ kablosunun takıldığı giriş yuvasına ne denir?", options: ["A) Ethernet / RJ45 Portu", "B) USB Yuvası", "C) Elektrik Fişi", "D) Kulaklık Girişi"], correct: 0 },
-                    { q: "İnternet tarayıcısı (Browser) örneği hangisidir?", options: ["A) Google Chrome / Edge", "B) Microsoft Word", "C) Paint", "D) Windows"], correct: 0 }
-                ]
-            },
-            14: {
-                code: "BTY.5.4.2",
-                topic: "Web Tarayıcıları ve Güvenli Arama",
-                outcomeText: "BTY.5.4.2. Web tarayıcılarını kullanarak güvenli bilgi arayabilme\na) Web tarayıcısı kavramını açıklar.\nb) Arama motorlarını etkin kullanır.\nc) Güvenilir ve doğru bilgiyi ayırt eder.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.4.2. Web Tarayıcıları ve Arama", body: "<p><strong>Süreç Bileşenleri:</strong> Tarayıcılar, arama motorları ve güvenilirlik.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Bilgi Arama", body: "<p>Ödevimiz olduğunda internette nasıl arama yapıyoruz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Doğru Bilgi", body: "<p>Her okuduğumuz bilgi doğru mu?</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Arama İpuçları", body: "<p>Tırnak işareti kullanma ve güvenilir uzantılar (.edu, .gov).</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Güvenli Arama Çalışması", body: "<p>Öğrenciler arama motorunda akademik kaynak aratır.</p>" },
-                    { stage: "ÖZET", title: "Kaynak Gösterme", body: "<p>Bilgiyi alırken kaynak belirtmenin önemi.</p>" }
-                ],
-                quiz: [
-                    { q: "İnternette web sitelerini gezip sayfaları açmamızı sağlayan yazılımlara ne denir?", options: ["A) Web Tarayıcısı (Browser)", "B) İşletim Sistemi", "C) Donanım", "D) Tablolama"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir web tarayıcısıdır?", options: ["A) Google Chrome / Firefox", "B) Microsoft Word", "C) Paint", "D) Windows"], correct: 0 },
-                    { q: "İnternette aradığımız bilgilere ulaşmamızı sağlayan sistemlere ne denir?", options: ["A) Arama Motoru (Google, Yandex)", "B) Klasör", "C) Yazıcı", "D) Modem"], correct: 0 },
-                    { q: "İnternette bulduğumuz bir bilginin güvenilir olduğunu anlamak için neye bakmalıyız?", options: ["A) Resmi ve akademik uzantılara (.edu, .gov)", "B) Reklamlara", "C) Kulaktan dolma bilgilere", "D) Rastgele sitelere"], correct: 0 },
-                    { q: "Arama yaparken tam eşleşen kelime aratmak için hangi işaret kullanılır?", options: ["A) Tırnak işareti (\"...\")", "B) Soru işareti (?)", "C) Ünlem (!)", "D) Artı (+)"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi güvenli bir web sitesi adresinin başlangıcında yer alır?", options: ["A) https://", "B) http:// (güvensiz)", "C) ftp://", "D) file://"], correct: 0 },
-                    { q: "İnternette zararlı içeriklerden korunmak için kullanılan program nedir?", options: ["A) Antivirüs", "B) Kelime İşlemci", "C) Paint", "D) Sunum"], correct: 0 },
-                    { q: "Web tarayıcısında sık kullandığımız siteleri tek tıkla açmak için nereye ekleriz?", options: ["A) Yer İmleri / Favoriler", "B) Çöp Kutusu", "C) Denetim Masası", "D) Başlat menüsü"], correct: 0 },
-                    { q: "Arama motorunda resim aratırken hangi sekme kullanılır?", options: ["A) Görseller / Resimler", "B) Harita", "C) Alışveriş", "D) Kitap"], correct: 0 },
-                    { q: "İnternette yabancı siteleri kendi dilimize çevirmek için ne kullanılır?", options: ["A) Çeviri / Translate Araçları", "B) Yazıcı", "C) Ses kaydedici", "D) Hesap makinesi"], correct: 0 }
-                ]
-            },
-            15: {
-                code: "BTY.5.5.1",
-                topic: "Yıl Sonu Proje Tasarımı ve Değerlendirme",
-                outcomeText: "BTY.5.5.1. Bilişim teknolojileri ve kodlama bilgilerini birleştirerek proje tasarlayabilme\na) Özgün bir problem belirler.\nb) Çözüm için algoritma ve kodlama tasarlar.\nc) Projesini sunar ve değerlendirir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.5.1. Yıl Sonu Proje Tasarımı", body: "<p><strong>Süreç Bileşenleri:</strong> Proje geliştirme, kodlama ve sunum.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Dönem Değerlendirmesi", body: "<p>Bu yıl ders boyunca neler öğrendik?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Proje Fikirleri", body: "<p>Öğrendiklerimizle hayatı kolaylaştıracak hangi projeyi yapabiliriz?</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Proje Adımları", body: "<p>Problem belirleme, algoritma kurma, Scratch ile kodlama ve sunma.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Mini Oyun / Hikaye Tasarımı", body: "<p>Öğrenciler Scratch üzerinde ortak proje tasarlar.</p>" },
-                    { stage: "ÖZET", title: "Değerlendirme", body: "<p>Akran değerlendirme formları ile projeler incelenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Öğrendiğimiz tüm bilişim ve kodlama bilgilerini birleştirerek ortaya çıkardığımız özgün çalışmaya ne denir?", options: ["A) Proje", "B) Hata", "C) Silme", "D) Donanım arızası"], correct: 0 },
-                    { q: "Proje geliştirirken ilk yapılması gereken adım nedir?", options: ["A) Çözülecek problemi belirlemek", "B) Bilgisayarı kapatmak", "C) Oyuna başlamak", "D) Fişi çekmek"], correct: 0 },
-                    'BTY.5.5.1 Proje ve Değerlendirme Soruları...',
-                    { q: "Scratch ile yapılan bir oyun projesinde puan tutmak için ne oluşturulur?", options: ["A) Değişken (Variable)", "B) Klasör", "C) Yazıcı", "D) Slayt"], correct: 0 },
-                    { q: "Projeyi tamamladıktan sonra başkalarına anlatmak için ne hazırlanır?", options: ["A) Sunum ve Tanıtım", "B) Fiş", "C) Çöp kutusu", "D) Antivirüs"], correct: 0 },
-                    { q: "Projede karşılaşılan hataları çözme sürecine ne denir?", options: ["A) Hata Ayıklama (Debugging)", "B) Format", "C) Donanım", "D) Tarayıcı"], correct: 0 },
-                    { q: "Özgün bir fikir üretme sürecine ne ad verilir?", options: ["A) Tasarım / Beyin Fırtınası", "B) Kopyalama", "C) Silme", "D) Kapatma"], correct: 0 },
-                    { q: "Bir projede başkasına ait fikirleri izin almadan kullanmak neye aykırıdır?", options: ["A) Telif Hakları ve Etiğe", "B) Hız testine", "C) Ekran çözünürlüğüne", "D) İşletim sistemine"], correct: 0 },
-                    { q: "Projemizi sunarken net ve anlaşılır olmanın önemi nedir?", options: ["A) İzleyicilerin projeyi anlamasını sağlamak", "B) Zaman kaybetmek", "C) Bilgisayarı yormak", "D) Elektrik harcamak"], correct: 0 },
-                    { q: "Yıl sonu projesi olarak aşağıdakilerden hangisi tasarlanabilir?", options: ["A) Eğitici bir Scratch oyunu veya animasyon", "B) Boş bir klasör", "C) Kırık klavye", "D) Sönük ekran"], correct: 0 }
-                ]
-            },
-            16: {
-                code: "BTY.5.6.1",
-                topic: "Dijital Güvenlik ve Şifreleme",
-                outcomeText: "BTY.5.6.1. Dijital dünyada kişisel güvenlik ve şifreleme yöntemlerini kavrayabilme\na) Güçlü şifre özelliklerini bilir.\nb) Kişisel verilerin korunmasını sağlar.\nc) Siber zorbalıkla mücadele yollarını fark eder.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.6.1. Dijital Güvenlik", body: "<p><strong>Süreç Bileşenleri:</strong> Güçlü şifreler, kişisel veri koruma ve siber zorbalık.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Şifre Güvenliği", body: "<p>Kullandığımız şifreler ne kadar güvenli?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Ev Anahtarı", body: "<p>Evimizin kapısını kilitlediğimiz gibi hesaplarımızı da şifrelerle korumamız.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Güçlü Şifre Oluşturma", body: "<p>Büyük harf, küçük harf, rakam ve özel karakter kombinasyonları.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Şifre Güç Testi", body: "<p>Örnek şifreler analiz edilir.</p>" },
-                    { stage: "ÖZET", title: "Destek Almak", body: "<p>Sorun yaşandığında aileye ve öğretmenlere haber verme.</p>" }
-                ],
-                quiz: [
-                    { q: "Aşağıdakilerden hangisi 'Güçlü Şifre' tanımına uygundur?", options: ["A) Adı ve soyadı içeren şifre", "B) '123456' sayısı", "C) Büyük-küçük harf, rakam ve özel karakter içeren şifre", "D) Doğum tarihi"], correct: 2 },
-                    { q: "Kişisel şifrelerimizi kiminle paylaşmalıyız?", options: ["A) Sadece anne ve babamızla", "B) İnternetteki arkadaşlarımızla", "C) Tanımadığımız kişilerle", "D) Herkesle"], correct: 0 },
-                    'BTY.5.6.1 Güvenlik ve Şifreleme Soruları...',
-                    { q: "İnternette başkalarını rahatsız eden, tehdit eden kişilere ne denir?", options: ["A) Siber Zorba", "B) Bilgisayar Mühendisi", "C) Grafikçi", "D) Donanımcı"], correct: 0 },
-                    { q: "Kişisel gizliliğimizi korumak için sosyal medyada hangi bilgiler paylaşılmamalıdır?", options: ["A) Ev adresi, T.C. kimlik ve telefon numarası", "B) Sevdiğimiz renk", "C) Çizgi film karakteri", "D) Okulun adı"], correct: 0 },
-                    { q: "Hesaplarımızın çalınmasını önlemek için iki aşamalı doğrulama ne işe yarar?", options: ["A) Ekstra güvenlik katmanı sağlar", "B) Bilgisayarı kapatır", "C) İnterneti keser", "D) Şifreyi siler"], correct: 0 },
-                    { q: "Zararlı yazılımlardan (virüs) korunmak için bilgisayara ne yüklenmelidir?", options: ["A) Güncel Antivirüs Programı", "B) Oyun", "C) Film", "D) Müzik"], correct: 0 },
-                    { q: "Tanımadığımız kişilerden gelen e-postalardaki ek dosyaları açarsak ne olabilir?", options: ["A) Bilgisayara virüs bulaşabilir", "B) Bilgisayar hızlanır", "C) İnternet sınırsız olur", "D) Hiçbir şey olmaz"], correct: 0 },
-                    { q: "Sosyal medyada rahatsız edici mesajlar aldığımızda ilk ne yapmalıyız?", options: ["A) Ekran görüntüsü alıp yetişkine bildirmek ve engellemek", "B) Cevap verip tartışmak", "C) Bilgisayarı kırmak", "D) Görmezden gelip arkadaş kalmak"], correct: 0 },
-                    { q: "Kişisel verilerin korunması kanununun ülkemizdeki kısaltılmış adı nedir?", options: ["A) KVKK", "B) EBA", "C) MEB", "D) BTK"], correct: 0 }
-                ]
-            },
-            17: {
-                code: "BTY.5.7.1",
-                topic: "Dijital İçerik Üretimi ve Haklar",
-                outcomeText: "BTY.5.7.1. Dijital içerik üretiminde telif hakları ve etik kuralları kavrayabilme\na) Telif hakkı (Copyright) kavramını açıklar.\nb) Creative Commons lisanslarını tanır.\nc) Dijital içeriklerde kaynak gösterir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.7.1. Telif Hakları", body: "<p><strong>Süreç Bileşenleri:</strong> Telif hakları, Creative Commons ve kaynak gösterme.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Eser Sahibi", body: "<p>Resim çizen veya şarkı söyleyen birinin hakları.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "İzinsiz Kullanım", body: "<p>Başkasının resmini kendi resmimiz gibi paylaşmanın etik boyutu.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Telif Hakları ve Lisanslar", body: "<p>Copyright ve Creative Commons simgeleri incelenir.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Kaynak Gösterme Pratiği", body: "<p>Ödevlerde internet sitesinden alıntı yaparken kaynak yazma.</p>" },
-                    { stage: "ÖZET", title: "Saygı", body: "<p>Eser sahiplerinin haklarına saygı duyulması gerektiği özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bir eserin, kitabın veya dijital içeriğin yasal olarak kopyalanmasını ve sahibinin haklarını koruyan sisteme ne denir?", options: ["A) Telif Hakkı (Copyright)", "B) Donanım", "C) İşletim Sistemi", "D) Sıkıştırma"], correct: 0 },
-                    { q: "İnternetten bulduğumuz bir içeriği ödevimizde kullanırken ne yapmalıyız?", options: ["A) Kaynak göstermeliyiz", "B) Kendi eserimiz gibi satmalıyız", "C) Adını silmeliyiz", "D) Hiçbir şey yapmamalıyız"], correct: 0 },
-                    'BTY.5.7.1 Telif Hakları Soruları...',
-                    { q: "Eser sahiplerinin eserlerini belirli kurallarla paylaşmasına izin veren lisans sisteminin adı nedir?", options: ["A) Creative Commons (CC)", "B) Windows", "C) Word", "D) USB"], correct: 0 },
-                    { q: "İnternetten korsan film veya oyun indirmek ve yaymak neye girer?", options: ["A) Telif hakkı ihlali ve yasa dışı suç", "B) Yasal hak", "C) Donanım bakımı", "D) Güncelleme"], correct: 0 },
-                    { q: "Kendi ürettiğimiz özgün bir içeriğe telif hakkı koymak bize hangi hakkı verir?", options: ["A) Eserin izinsiz çoğaltılmasını engelleme", "B) Bilgisayarı hızlandırma", "C) İnterneti bedava yapma", "D) Yazıcıyı çalıştırma"], correct: 0 },
-                    { q: "Bir fotoğrafın üzerinde CC (Creative Commons) simgesi varsa bu ne anlama gelir?", options: ["A) Belirli şartlarda paylaşılmasına izin verildiğini", "B) Kesinlikle yasak olduğunu", "C) Silindiğini", "D) Ücretli olduğunu"], correct: 0 },
-                    { q: "Ödevlerimizde internetten aldığımız metinleri doğrudan kopyalayıp yapıştırmak yerine ne yapmalıyız?", options: ["A) Kendi cümlelerimizle özetleyip kaynak belirtmeliyiz", "B) Hiç okumadan koymalıyız", "C) Resimle kapatmalıyız", "D) Şifrelemeliyiz"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi dijital etik kurallarına uygundur?", options: ["A) Başkasının emeğine saygı duyup kaynak göstermek", "B) Başkasının hesabını çalmak", "C) Korsan oyun yaymak", "D) Dosyaları silmek"], correct: 0 },
-                    { q: "Telif hakkı sembolü olan harf hangisidir?", options: ["A) © (C harfi daire içinde)", "B) ®", "C) ™", "D) $"], correct: 0 }
-                ]
-            },
-            18: {
-                code: "BTY.5.8.1",
-                topic: "Yıl Sonu Genel Tekrar ve Değerlendirme",
-                outcomeText: "BTY.5.8.1. Yıl boyunca öğrenilen bilişim teknolojileri ve yazılım konularını genel değerlendirme\na) Bütün üniteleri tekrar eder.\nb) Uygulamalı becerilerini sergiler.\nc) Dönem sonu değerlendirmesini tamamlar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.5.8.1. Yıl Sonu Genel Tekrar", body: "<p><strong>Süreç Bileşenleri:</strong> Tüm kazanımların tekrarı ve genel değerlendirme.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Yılın Özeti", body: "<p>Bilişim dersinde bu yıl neler öğrendik?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Geleceğe Hazırlık", body: "<p>Öğrendiklerimizin ortaokul ve günlük yaşamdaki yeri.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Kapsamlı Soru Çözümü", body: "<p>Tüm ünitelerden seçilen sorularla genel tekrar.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Final Yarışması", body: "<p>Sınıf içi bilgi yarışması ve eğlenceli etkinlikler.</p>" },
-                    { stage: "ÖZET", title: "Kapanış", body: "<p>Başarılı bir dönemin kutlanması ve iyi tatil dilekleri.</p>" }
-                ],
-                quiz: [
-                    { q: "Bu eğitim-öğretim yılı boyunca bilişim dersinde öğrendiğimiz en temel konu aşağıdakilerden hangisidir?", options: ["A) Teknoloji, algoritma, kodlama ve dijital vatandaşlık", "B) Sadece oyun oynamak", "C) Televizyon izlemek", "D) Kağıt kesmek"], correct: 0 },
-                    { q: "Bilgisayarın fiziksel parçalarına ne ad verilir?", options: ["A) Donanım", "B) Yazılım", "C) İnternet", "D) Algoritma"], correct: 0 },
-                    'BTY.5.8.1 Genel Tekrar Soruları...',
-                    { q: "Bilgisayara ne yapacağını söyleyen komutlar bütününe ne denir?", options: ["A) Yazılım", "B) Donanım", "C) Monitör", "D) Kablo"], correct: 0 },
-                    { q: "Bir problemi çözmek için izlenen adım adım mantıksal yola ne denir?", options: ["A) Algoritma", "B) Klasör", "C) Tarayıcı", "D) Disket"], correct: 0 },
-                    { q: "Blok tabanlı kodlama yaparken karakterleri hareket ettirmek için hangi platformu kullandık?", options: ["A) Scratch / Code.org", "B) Paint", "C) Word", "D) Hesap Makinesi"], correct: 0 },
-                    { q: "İnternette güvenli ve bilinçli bir kullanıcı olmaya ne denir?", options: ["A) Dijital Vatandaşlık", "B) Donanımcılık", "C) Oyunculuk", "D) Sürücülük"], correct: 0 },
-                    { q: "Sunum hazırlamak için hangi programı kullandık?", options: ["A) PowerPoint", "B) Word", "C) Paint", "D) Excel"], correct: 0 },
-                    { q: "Tablolama yapmak ve hesap tutmak için hangi programı kullandık?", options: ["A) Excel / Etablolar", "B) Word", "C) Paint", "D) Sunum"], correct: 0 },
-                    { q: "Gelecekte teknolojinin gelişmesiyle hayatımıza daha çok neyin girmesi beklenmektedir?", options: ["A) Yapay Zekâ ve Otonom Sistemler", "B) Daktilo", "C) Kasetçalar", "D) Tüplü TV"], correct: 0 }
-                ]
+    // Logo resmini PDF'e basabilmek için base64 formatına dönüştürüyoruz
+    async function initLogo() {
+        try {
+            const res = await fetch("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png");
+            const blob = await res.blob();
+            const reader = new FileReader();
+            reader.onloadend = function() { logoBase64 = reader.result; }
+            reader.readAsDataURL(blob);
+        } catch (e) {
+            console.warn("Logo yüklenirken CORS veya ağ hatası oluştu, PDF'te sadece metin kullanılacak.");
+        }
+    }
+    
+    function calculateCurrentWeek() {
+        const startDate = new Date('2026-09-14T00:00:00');
+        const today = new Date();
+        const diffTime = today - startDate;
+        const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
+        currentWeek = diffWeeks >= 0 ? diffWeeks + 1 : 1; 
+        if(currentWeek > 36) currentWeek = 36; 
+    }
+
+    function switchTab(grade) {
+        currentGrade = grade;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        renderData();
+    }
+
+    function changeWeek(direction) {
+        currentWeek += direction;
+        if(currentWeek < 1) currentWeek = 1;
+        if(currentWeek > 36) currentWeek = 36;
+        renderData();
+    }
+
+    function isExamPrepWeek(week) {
+        // Sınav haftalarından önceki haftalar (Örnek: 7., 14., 24. ve 32. haftalar)
+        const prepWeeks = [7, 14, 24, 32];
+        return prepWeeks.includes(week);
+    }
+
+    function renderData() {
+        document.getElementById('week-display').innerText = `${currentWeek}. HAFTA (Sınıf: ${currentGrade})`;
+        
+        let plan = planData[currentGrade].find(p => p.week === currentWeek);
+        if(!plan) {
+            plan = { topic: "Veri Bulunamadı", outcome: "Bu hafta için sistemde plan kaydı yoktur.", process: "Boş" };
+        }
+
+        document.getElementById('topic-display').innerHTML = plan.topic;
+        document.getElementById('outcome-display').innerHTML = plan.outcome;
+
+        // Süreç bileşenlerini yan yana dizilmiş slayt kartlarına ayırma
+        const processSlider = document.getElementById('process-slider');
+        const processes = plan.process.split('<br>').filter(p => p.trim() !== '');
+        
+        processSlider.innerHTML = processes.map((p, index) => {
+            return `<div class="slide">
+                        <strong style="color: var(--accent);">Bileşen ${index + 1}</strong>
+                        <p>${p}</p>
+                    </div>`;
+        }).join('');
+
+        // Sınav öncesi kontrolü
+        const examStatus = document.getElementById('exam-status');
+        if (isExamPrepWeek(currentWeek)) {
+            examStatus.innerText = "SİSTEM UYARISI: Önümüzdeki hafta sınav haftasıdır. Test içeriği 30 soruluk deneme olarak ayarlanmıştır.";
+        } else {
+            examStatus.innerText = "SİSTEM BİLGİSİ: Standart hafta değerlendirmesi. Test içeriği 10 soru olarak ayarlanmıştır.";
+        }
+    }
+
+    function generateTestPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const isPrep = isExamPrepWeek(currentWeek);
+        const questionCount = isPrep ? 30 : 10;
+        
+        let plan = planData[currentGrade].find(p => p.week === currentWeek) || { topic: "Genel Konular" };
+
+        doc.setFont("courier", "bold");
+        doc.setFontSize(16);
+        doc.text(`RAYILMAZAN - ${currentGrade}. SINIF DEGERLENDIRME TESTI`, 105, 20, null, null, "center");
+        
+        doc.setFont("courier", "normal");
+        doc.setFontSize(10);
+        
+        let yPos = 35;
+        for(let i = 1; i <= questionCount; i++) {
+            if(yPos > 260) {
+                doc.addPage();
+                yPos = 20;
             }
-        };
-
-        // 6th Grade Curriculum - COMPLETE 18 WEEKS (VERBATIM FROM ANNUAL PLAN)
-        const DATA_GRADE6 = {
-            1: {
-                code: "BTY.6.1.1",
-                topic: "Yenilikçi Bilişim Teknolojileri",
-                outcomeText: "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme\na) Yenilikçi bilişim teknolojilerine ilişkin kavramları belirler.\nb) Yenilikçi teknolojileri, bilişim teknolojilerinin günlük hayatı kolaylaştırmadaki rolüyle ilişkilendirir.\nc) Yenilikçi bilişim teknolojilerini kullanım alanlarına göre gruplandırır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ (YILLIK PLAN)", title: "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme", body: "<p><strong>Süreç Bileşenleri:</strong></p><ul><li><strong>a)</strong> Kavramları belirler.</li><li><strong>b)</strong> Günlük hayatı kolaylaştırma rolü.</li><li><strong>c)</strong> Kullanım alanlarına göre gruplandırma.</li></ul>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Yenilikçi Teknolojilere Hazır Bulunuşluk", body: "<p>Grup tartışması ile yenilikçi teknolojiler analiz edilir.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Sanal vs Artırılmış Gerçeklik", body: "<p>AR ve VR teknolojilerinin farkları tartışılır.</p>" },
-                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Yenilikçi Teknolojiler", body: "<p>Artırılmış gerçeklik, sanal gerçeklik ve giyilebilir teknolojiler.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK (10 DK)", title: "Renkli Gerçeklik Deneyimi", body: "<p>AR destekli uygulamalar incelenir.</p>" },
-                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Toplumsal ve Çevresel Fayda", body: "<p>Yeşil beceriler ve sürdürülebilirlik özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Gerçek dünya görüntüsü üzerine dijital nesneler ve katmanlar ekleyen teknoloji hangisidir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Sabit Disk", "D) Disket"], correct: 1 },
-                    { q: "Kullanıcıyı tamamen dış dünyadan soyutlayarak sanal bir evrene sokan teknoloji nedir?", options: ["A) Sabit Disk", "B) Akıllı Saat", "C) Sanal Gerçeklik (VR)", "D) Artırılmış Gerçeklik (AR)"], correct: 2 },
-                    { q: "Aşağıdakilerden hangisi 'Giyilebilir Teknoloji'ye örnektir?", options: ["A) Masaüstü Bilgisayar Kasası", "B) Tüplü Televizyon", "C) Yazıcı", "D) Akıllı Saat ve Akıllı Bileklik"], correct: 3 },
-                    { q: "Artırılmış gerçeklik teknolojisinin eğitimdeki faydası aşağıdakilerden hangisidir?", options: ["A) Soyut ve tehlikeli deneyleri güvenle görselleştirmek", "B) Kitapları yok etmek", "C) Sadece oyun oynamak", "D) Bilgisayarı bozmak"], correct: 0 },
-                    { q: "Giyilebilir teknolojilerin sağlık alanındaki temel kullanımı nedir?", options: ["A) Fotoğraf basmak", "B) Nabız, adım ve uyku takibi yapmak", "C) Çöp toplamak", "D) Araba sürmek"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi Yenilikçi Bilişim Teknolojilerinden biridir?", options: ["A) Daktilo", "B) Telgraf", "C) Yapay Zekâ ve AR/VR", "D) Kasetçalar"], correct: 2 },
-                    { q: "Sanal gerçeklik kaskı takan bir öğrenci ders esnasında ne deneyimler?", options: ["A) Kendisini uzayda veya tarihi bir mekanda hisseder", "B) Sadece kağıt okur", "C) Hiçbir şey görmez", "D) Sadece ses duyar"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi teknolojinin 'Yeşil Beceri' (çevreye faydalı) kullanımına örnektir?", options: ["A) Sürekli gereksiz çıktı almak", "B) Dijital belgelerle kağıt israfını önlemek", "C) Cihazları açık bırakmak", "D) Elektronik atıkları doğaya atmak"], correct: 1 },
-                    { q: "AR teknolojisi ile bir ders kitabındaki organ resmine bakıldığında ne gerçekleşir?", options: ["A) Kitap yırtılır", "B) Ekran kararır", "C) Resim 3 boyutlu canlanır ve hareket eder", "D) Ses kesilir"], correct: 2 },
-                    { q: "Gelecekte yenilikçi teknolojilerin yaygınlaşması hangi alanda büyük değişim yaratır?", options: ["A) Yalnızca taş devri aletlerinde", "B) Hiçbir alanda", "C) Sadece mum kullanımında", "D) Eğitim, sağlık, ulaşım ve üretimde"], correct: 3 }
-                ]
-            },
-            2: {
-                code: "BTY.6.1.2",
-                topic: "Bilişim Teknolojilerinin Geleceği",
-                outcomeText: "BTY.6.1.2. Bilişim teknolojilerinin gelecekteki durumlarına yönelik çıkarım yapabilme\na) Bilişim teknolojilerinin günümüze kadar olan gelişiminden yola çıkarak varsayımlarda bulunur.\nb) Bilişim teknolojilerinin gelecekteki olası durumlarına yönelik örüntüleri listeler.\nc) Bilişim teknolojilerinin gelecekteki olası durumlarına yönelik karşılaştırmalar yapar.\nç) Bilişim teknolojilerinin olası gelişimlerinin toplum üzerindeki etkilerine ilişkin önermeler sunar.\nd) Bilişim teknolojilerinin olası gelişimlerinin toplum üzerindeki etkilerini değerlendirir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ (YILLIK PLAN)", title: "BTY.6.1.2. Bilişim teknolojilerinin geleceği", body: "<p><strong>Süreç Bileşenleri:</strong> Varsayımlar, örüntüler ve toplumsal etkiler.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Geleceğin Cihazları", body: "<p>20 yıl sonra cep telefonları nasıl olacak?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Meslekler", body: "<p>Gelecekte hangi meslekler ortaya çıkacak?</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Tarihsel Evrim", body: "<p>Alan Turing ve ENIAC'tan günümüze gelişim.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Yarının Dünyası Senaryosu", body: "<p>SWOT analizi ile teknoloji tasarımı.</p>" },
-                    { stage: "ÖZET", title: "Değerlendirme", body: "<p>Teknolojinin toplum üzerindeki etkileri.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayar biliminin öncülerinden kabul edilen bilim insanı kimdir?", options: ["A) Alan Turing", "B) Isaac Newton", "C) Thomas Edison", "D) Galileo"], correct: 0 },
-                    { q: "Bilgisayarların tarihsel gelişiminde ilk bilgisayarlardan günümüze doğru ne tür bir değişim olmuştur?", options: ["A) Cihazlar büyümüş ve yavaşlamıştır", "B) Cihazlar küçülmüş, hızlanmış ve güçlenmiştir", "C) Fiyatları milyarlarca kat artmıştır", "D) Hiçbir şey değişmemiştir"], correct: 1 },
-                    { q: "Aşağıdakilerden hangisi gelecekte öne çıkması beklenen mesleklerden biridir?", options: ["A) Daktilo Tamircisi", "B) Kaset Kopyalayıcısı", "C) Yapay Zekâ Mühendisi ve Siber Güvenlik Uzmanı", "D) Telgraf Operatörü"], correct: 2 },
-                    { q: "Cahit Arf 1959 yılında yazmış olduğu makalede hangi soruyu tartışmıştır?", options: ["A) 'Televizyon Nasıl Yapılır?'", "B) 'Araba Nasıl Sürülür?'", "C) 'İnternet Nedir?'", "D) 'Makine Düşünebilir mi ve Nasıl Düşünebilir?'"], correct: 3 },
-                    { q: "Teknolojinin gelecekteki durumuna ilişkin tahmin yürütürken neye bakılır?", options: ["A) Geçmişten günümüze olan gelişim örüntülerine", "B) Rüzgarın yönüne", "C) Sadece oyun fiyatlarına", "D) Rastgele sayılara"], correct: 0 },
-                    { q: "Gelecekte otonom (sürücüsüz) araçların yaygınlaşması toplumu nasıl etkiler?", options: ["A) Herkesin ehliyet alma zorunluluğunu artırır", "B) Trafik kazalarını ve insan hatasını azaltabilir", "C) Benzin fiyatını sıfırlar", "D) Yolları yok eder"], correct: 1 },
-                    { q: "Geleceğin teknolojilerini tasarlarken çevreye duyarlılık ne olarak adlandırılır?", options: ["A) Donanım Sürücüsü", "B) Yazılım İhlali", "C) Yeşil Beceriler ve Sürdürülebilirlik", "D) Ekran Çözünürlüğü"], correct: 2 },
-                    { q: "Aşağıdakilerden hangisi gelecekte sağlık alanında yaşanabilecek olası bir gelişmedir?", options: ["A) Hastanelerin tamamen kapanması", "B) İlaçların yasaklanması", "C) Doktorların yok olması", "D) Yapay zekâ destekli erken teşhis ve robotik cerrahi"], correct: 3 },
-                    { q: "Geçmişte oda büyüklüğünde olan ENIAC gibi bilgisayarların günümüzdeki muadili nedir?", options: ["A) Akıllı Cep Telefonları ve Tabletler", "B) Abaküs", "C) Daktilo", "D) Hesap Cetveli"], correct: 0 },
-                    { q: "Gelecekte teknolojinin toplum üzerindeki olumsuz etkilerinden biri ne olabilir?", options: ["A) Bilgiye erişimin imkansızlaşması", "B) Bireyler arasında yüz yüze iletişimin azalması ve hareketsizlik", "C) Okulların tamamen yok olması", "D) Cihazların hiç çalışmaması"], correct: 1 }
-                ]
-            },
-            3: {
-                code: "BTY.6.2.1",
-                topic: "Tablolama Programlarına Giriş",
-                outcomeText: "BTY.6.2.1. Tablolama programlarından yararlanabilme\na) Tablolama programlarının temel özelliklerini tanır.\nb) Uygun tablolama programını belirler.\nc) Belirlenen tablolama programının arayüz özelliklerini kullanır.\nç) Kullanılan tablolama programını kullanım alanları/verimliliği açısından değerlendirir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.2.1. Tablolama Programları", body: "<p><strong>Süreç Bileşenleri:</strong> Satır, sütun, hücre ve temel formüller.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Veri Düzenleme", body: "<p>Çok fazla veriyi düzenlemek için nasıl bir yol izlenir?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Meslekler ve Tablolar", body: "<p>Muhasebeciler ve mühendislerin tablo kullanımı.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Excel ve Etablolar", body: "<p>A1 hücresi, satır ve sütun mantığı açıklanır.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Haftalık Gider Tablosu", body: "<p>Otomatik toplamlama (=TOPLA) uygulaması yapılır.</p>" },
-                    { stage: "ÖZET", title: "Grafikler", body: "<p>Verilerin grafiklerle görselleştirilmesi.</p>" }
-                ],
-                quiz: [
-                    { q: "Tablolama programında satır ve sütunların kesiştiği kutucuklara ne ad verilir?", options: ["A) Hücre", "B) Sayfa", "C) Klasör", "D) Slayt"], correct: 0 },
-                    { q: "Tablolama programında 'A' sütunu ile '3' satırının kesiştiği hücre adlandırması hangisidir?", options: ["A) A3", "B) 3A", "C) A-3", "D) A+3"], correct: 0 },
-                    { q: "Tablolama programında bir formül ya da hesaplama her zaman hangi simge ile başlar?", options: ["A) Eşittir (=)", "B) Artı (+)", "C) Soru işareti (?)", "D) Yıldız (*)"], correct: 0 },
-                    { q: "Belli bir aralıktaki sayıların toplamını almak için hangi fonksiyon kullanılır?", options: ["A) =TOPLA()", "B) =ORTALAMA()", "C) =SAY()", "D) =YAZ()"], correct: 0 },
-                    { q: "Sayısal verilerin görsel olarak ifade edilmesine ne ad verilir?", options: ["A) Grafik", "B) Yazılım", "C) Donanım", "D) Kod"], correct: 0 },
-                    { q: "Düşey olan ve harflerle (A, B, C...) simgelenen yapılara ne denir?", options: ["A) Sütun", "B) Satır", "C) Hücre", "D) Menü"], correct: 0 },
-                    { q: "Yatay olan ve sayılarla (1, 2, 3...) simgelenen yapılara ne denir?", options: ["A) Satır", "B) Sütun", "C) Hücre", "D) Grafik"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir tablolama dosya uzantısıdır?", options: ["A) .xlsx", "B) .mp3", "C) .jpg", "D) .exe"], correct: 0 },
-                    { q: "Tablolama programları en çok hangi alanda büyük kolaylık sağlar?", options: ["A) Hesaplama, veri düzenleme ve grafik oluşturmada", "B) Sadece müzik dinlemede", "C) Resim çizmede", "D) Oyun oynamada"], correct: 0 },
-                    { q: "Seçili hücrelerdeki en büyük sayıyı bulan fonksiyon hangisidir?", options: ["A) =MAK()", "B) =MİN()", "C) =TOPLA()", "D) =EĞER()"], correct: 0 }
-                ]
-            },
-            4: {
-                code: "BTY.6.2.2",
-                topic: "Gelişmiş Tablolama ve Fonksiyonlar",
-                outcomeText: "BTY.6.2.2. Tablolama programlarında gelişmiş fonksiyonlar ve grafikler oluşturabilme\na) Mantıksal ve aritmetik fonksiyonları (ORTALAMA, EĞER) kullanır.\nb) Verileri sıralar ve filtreler.\nc) Grafik türlerini veriye uygun olarak seçer.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.2.2. Gelişmiş Tablolama", body: "<p><strong>Süreç Bileşenleri:</strong> ORTALAMA, EĞER fonksiyonları, sıralama ve filtreleme.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Not Hesaplama", body: "<p>Yazılı notlarımızın ortalamasını bilgisayarda nasıl hesaplarız?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Şartlı İşlemler", body: "<p>Notu 50'den büyükse 'Geçti' yazdırma mantığı.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "ORTALAMA ve EĞER", body: "<p>=ORTALAMA() ve =EĞER() fonksiyonlarının kullanımı.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Karne Notu Tablosu", body: "<p>Öğrenciler kendi not çizelgesini oluşturur.</p>" },
-                    { stage: "ÖZET", title: "Filtreleme", body: "<p>Veriler içinde arama ve sıralama işlemleri özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Seçilen hücrelerin aritmetik ortalamasını hesaplayan fonksiyon hangisidir?", options: ["A) =ORTALAMA()", "B) =TOPLA()", "C) =SAY()", "D) =MAK()"], correct: 0 },
-                    { q: "Belirli bir koşula bağlı olarak doğru ya da yanlış sonuç döndüren fonksiyon hangisidir?", options: ["A) =EĞER()", "B) =TOPLA()", "C) =KAYDET()", "D) =YAZ()"], correct: 0 },
-                    'BTY.6.2.2 Gelişmiş Tablolama Soruları...',
-                    { q: "Tablodaki verileri büyükten küçüğe veya A'dan Z'ye dizme işlemine ne denir?", options: ["A) Sıralama (Sort)", "B) Filtreleme", "C) Silme", "D) Sıkıştırma"], correct: 0 },
-                    { q: "Tabloda istenen kritere uyan verileri listelemede kullanılan özelliğin adı nedir?", options: ["A) Filtreleme (Filter)", "B) Formül", "C) Hücre", "D) Slayt"], correct: 0 },
-                    { q: "Sayısal oranları göstermek için en uygun grafik türü hangisidir?", options: ["A) Pasta Grafik (Pie)", "B) Sadece metin", "C) Klasör", "D) Resim"], correct: 0 },
-                    { q: "=EĞER(A1>50; \"Geçti\"; \"Kaldı\") formülünün anlamı nedir?", options: ["A) A1 50'den büyükse Geçti, değilse Kaldı yazar", "B) A1'i siler", "C) Toplama yapar", "D) Hata verir"], correct: 0 },
-                    { q: "Tablolama programında verileri görselleştirmek için hangi sekme kullanılır?", options: ["A) Ekle -> Grafik", "B) Dosya -> Çıkış", "C) Düzen -> Sil", "D) Görünüm -> Kapat"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir mantıksal fonksiyondur?", options: ["A) EĞER", "B) TOPLA", "C) ORTALAMA", "D) MİN"], correct: 0 },
-                    { q: "Tabloda sütun genişliği yetersiz geldiğinde hücrede ne görülür?", options: ["A) ### işaretleri", "B) Hata kodu", "C) Hiçbir şey", "D) Resim"], correct: 0 }
-                ]
-            },
-            5: {
-                code: "OKUL TEMELLİ PLAN",
-                topic: "Codeweek 2026 Gelişmiş Kodlama ve Algoritma",
-                outcomeText: "Yerli ve millî teknolojiler temasıyla 6. sınıfa uygun gelişmiş blok tabanlı kodlama ve akıllı sistem simülasyonları tasarlanır.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "Codeweek 6. Sınıf Kodlama Etkinliği", body: "<p><strong>Süreç Bileşenleri:</strong> Algoritma, değişkenler ve akıllı sistem simülasyonu.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Akıllı Şehirler", body: "<p>Teknolojinin şehirleri nasıl akıllı hale getirdiği.</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Sensörler ve Kodlar", body: "<p>Giriş verisi ve çıkış eylemi ilişkisi.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "İleri Düzey Bloklar", body: "<p>Değişken tanımlama ve operatör blokları.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Kızılelma / İHA Simülasyonu", body: "<p>Blok kodlarla İHA uçurma simülasyonu yapılır.</p>" },
-                    { stage: "ÖZET", title: "Algoritmik Düşünce", body: "<p>Kodlama haftası etkinlikleri değerlendirilir.</p>" }
-                ],
-                quiz: [
-                    { q: "Kodlama yaparken puan, hız veya sayaç gibi değişen değerleri tutmak için ne kullanılır?", options: ["A) Değişken (Variable)", "B) Sabit Disk", "C) Monitör", "D) Fiş"], correct: 0 },
-                    { q: "Akıllı tarım veya akıllı ev sistemlerinde veriyi toplayan birim nedir?", options: ["A) Sensör", "B) Hoparlör", "C) Yazıcı", "D) Tuş takımı"], correct: 0 },
-                    'Codeweek ve Algoritma Soruları...',
-                    { q: "İHA ve SİHA'ların otomatik uçuş yapmasını sağlayan sisteme ne denir?", options: ["A) Otopilot / Yazılım", "B) Manuel direksiyon", "C) Pedallı sistem", "D) Manuel fren"], correct: 0 },
-                    { q: "Blok tabanlı kodlamada iki sayıyı karşılaştırmak için hangi bloklar kullanılır?", options: ["A) Operatörler (Büyüktür, küçüktür)", "B) Ses blokları", "C) Dekor blokları", "D) Kalem blokları"], correct: 0 },
-                    { q: "Kodlamada sürekli çalışan ve koşula bağlı duran yapılara ne denir?", options: ["A) Olaylar ve Koşullu Döngüler", "B) Dosya", "C) Klasör", "D) Uzantı"], correct: 0 },
-                    { q: "Millî teknoloji hamlemizin insansız savaş uçağı projesinin adı nedir?", options: ["A) Bayraktar KIZILELMA", "B) Daktilo", "C) Disket", "D) Monitör"], correct: 0 },
-                    { q: "Kod kalabalığını önlemek için aynı kod bloklarını paketleyip yeniden kullanmaya ne denir?", options: ["A) Fonksiyon / Blok Tanımlama", "B) Silme", "C) Format", "D) Tarama"], correct: 0 },
-                    { q: "Kodlama haftasının (Codeweek) temel amacı nedir?", options: ["A) Kodlamayı eğlenceli ve erişilebilir kılmak", "B) Bilgisayarları bozmak", "C) Kağıt harcamak", "D) Elektrik kesmek"], correct: 0 },
-                    { q: "Bir oyun projesinde süre bittiğinde oyunu bitiren blok hangi yapıdadır?", options: ["A) Koşul (Eğer süre = 0 ise dur)", "B) Ses bloğu", "C) Görünüş bloğu", "D) Hareket bloğu"], correct: 0 }
-                ]
-            },
-            6: {
-                code: "BTY.6.3.1",
-                topic: "Gelişmiş Blok Tabanlı Kodlama ve Değişkenler",
-                outcomeText: "BTY.6.3.1. Blok tabanlı kodlama ortamında değişkenleri ve operatörleri kullanabilme\na) Değişken tanımlar ve değer atar.\nb) Aritmetik ve mantıksal operatörleri kullanır.\nc) Skor ve sayaç tabanlı oyun tasarlar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.3.1. Değişkenler ve Operatörler", body: "<p><strong>Süreç Bileşenleri:</strong> Değişkenler, operatörler ve oyun tasarımı.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Skor Tutma", body: "<p>Oynadığımız oyunlarda skor nasıl artıyor?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Matematiksel Mantık", body: "<p>Bilgisayarda toplama ve karşılaştırma işlemleri.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Değişken Oluşturma", body: "<p>Scratch'te 'Değişken Yap' komutu ve kullanım alanı.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Puanlı Yakalama Oyunu", body: "<p>Karakter nesneyi aldığında puanı 1 artıran kod yazılır.</p>" },
-                    { stage: "ÖZET", title: "Operatörler", body: "<p>Büyüktür, küçüktür ve eşittir operatörleri özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayar hafızasında değeri sürekli değişebilen veri saklama kutucuklarına ne denir?", options: ["A) Değişken (Variable)", "B) Sabit Disk", "C) Monitör", "D) Yazıcı"], correct: 0 },
-                    { q: "Scratch oyunlarında toplanan puanı ekranda göstermek için ilk ne oluşturulmalıdır?", options: ["A) Puan adında bir Değişken", "B) Yeni bir kukla", "C) Ses dosyası", "D) Arka plan"], correct: 0 },
-                    'BTY.6.3.1 Değişkenler ve Operatörler Soruları...',
-                    { q: "Matematiksel karşılaştırma ve mantıksal işlemlerin yapıldığı blok kategorisi hangisidir?", options: ["A) Operatörler", "B) Hareket", "C) Ses", "D) Görünüş"], correct: 0 },
-                    { q: "Puan değişkeninin değerini her yakalamada 1 artırmak için hangi blok kullanılır?", options: ["A) 'Puan' değişkenini 1 kadar değiştir", "B) Puanı 0 yap", "C) Puanı sil", "D) Sesi kapat"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir mantıksal operatördür?", options: ["A) Ve / Veya / Değil", "B) Topla / Çıkar", "C) Yaz / Oku", "D) Aç / Kapat"], correct: 0 },
-                    { q: "Oyun başladığında puanın sıfırlanması için hangi kod bloğu eklenmelidir?", options: ["A) 'Puan' değişkenini 0 yap", "B) Puanı gizle", "C) Puanı artır", "D) Oyunu sil"], correct: 0 },
-                    { q: "İki metni birbirine bağlamak veya birleştirmek için hangi operatör kullanılır?", options: ["A) Birleştir (...) ve (...) ", "B) Böl", "C) Çarp", "D) Çıkar"], correct: 0 },
-                    { q: "Bir değişkenin değerini ekranda gizlemek veya göstermek için ne yapılır?", options: ["A) Değişken kutucuğundaki tik işaretini kaldırıp seçmek", "B) Bilgisayarı kapatmak", "C) Oyunu silmek", "D) Fişi çekmek"], correct: 0 },
-                    { q: "Değişkenler oyunlarda en çok ne amaçla kullanılır?", options: ["A) Skor, can ve süre takibi yapmak", "B) Bilgisayarı soğutmak", "C) İnternete bağlanmak", "D) Yazı yazdırmak"], correct: 0 }
-                ]
-            },
-            7: {
-                code: "BTY.6.3.2",
-                topic: "Fonksiyonlar ve Alt Programlar",
-                outcomeText: "BTY.6.3.2. Blok tabanlı kodlamada kendi bloklarını oluşturma (fonksiyonlar) becerisi kazanabilme\na) Blok oluşturma mantığını kavrar.\nb) Kod tekrarını önlemek için fonksiyon yazar.\nc) Karmaşık projeleri modüler hale getirir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.3.2. Fonksiyonlar", body: "<p><strong>Süreç Bileşenleri:</strong> Kendi bloğunu oluşturma ve kod modülerliği.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Tekrarlayan Kodlar", body: "<p>Aynı kodları farklı yerlerde tekrar tekrar yazmak yerine ne yapabiliriz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Tarif Paketleri", body: "<p>Hazır çorba tarifi gibi kod paketleri oluşturma.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Kendi Bloğunu Oluştur", body: "<p>Scratch 'Blok Oluştur' (My Blocks) özelliğinin kullanımı.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Zıplama Fonksiyonu", body: "<p>Karakterin zıplama hareketleri tek bir fonksiyon bloğunda toplanır.</p>" },
-                    { stage: "ÖZET", title: "Modüler Kodlama", body: "<p>Projelerin daha düzenli ve hatasız olmasını sağladığı özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Kod kalabalığını önlemek ve aynı komut grubunu tek pakette toplamak için ne oluşturulur?", options: ["A) Fonksiyon / Kendi Bloğunu Oluştur", "B) Sabit Disk", "C) İşletim Sistemi", "D) Klasör"], correct: 0 },
-                    { q: "Scratch programında kendi bloğumuzu oluşturmak için hangi menü kullanılır?", options: ["A) Bloklarım (My Blocks)", "B) Hareket", "C) Görünüş", "D) Ses"], correct: 0 },
-                    'BTY.6.3.2 Fonksiyonlar Soruları...',
-                    { q: "Fonksiyon (Kendi Bloğunu Oluştur) kullanmanın en büyük avantajı nedir?", options: ["A) Kod tekrarını önlemek ve programı düzenli tutmak", "B) Bilgisayarı yavaşlatmak", "C) İnterneti kesmek", "D) Ekranı karartmak"], correct: 0 },
-                    { q: "Bir kez yazılıp programın farklı yerlerinde defalarca çağrılabilen alt programlara ne denir?", options: ["A) Fonksiyon", "B) Klasör", "C) Donanım", "D) Uzantı"], correct: 0 },
-                    { q: "Fonksiyonlar parametre alabilir mi?", options: ["A) Evet, giriş değerleri alarak esnek çalışabilir", "B) Hayır, asla alamaz", "C) Sadece sayı alabilir", "D) Sadece ses alabilir"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi modüler kodlamanın yararlarındandır?", options: ["A) Hataları kolay bulma ve düzeltme (Debugging)", "B) Kodların karmaşıklaşması", "C) Programın çalışmaması", "D) Dosyanın silinmesi"], correct: 0 },
-                    { q: "Karakterin her hamle yaptığında aynı ses ve hareketi yapması için ne tanımlanabilir?", options: ["A) Fonksiyon", "B) Çöp kutusu", "C) Tarayıcı", "D) Yazıcı"], correct: 0 },
-                    { q: "Scratch'te yeni bir blok tanımlarken adına ne denir?", options: ["A) Blok Adı / Tanımlayıcı", "B) Uzantı", "C) IP", "D) RAM"], correct: 0 },
-                    { q: "Fonksiyon bloğu çağrılmadığı sürece çalışır mı?", options: ["A) Hayır, sadece kod içinde çağrıldığı yerde çalışır", "B) Evet, sürekli çalışır", "C) Bilgisayar açıldığı an çalışır", "D) İnternete bağlanınca çalışır"], correct: 0 }
-                ]
-            },
-            8: {
-                code: "BTY.6.4.1",
-                topic: "İnternet Mimarisi ve Veri İletimi",
-                outcomeText: "BTY.6.4.1. İnternet mimarisi ve veri iletim prensiplerini kavrayabilme\na) Paket anahtarlama ve IP protokolünü açıklar.\nb) Sunucu (Server) ve İstemci (Client) ilişkisini bilir.\nc) Güvenli veri iletiminin önemini kavrar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.4.1. İnternet Mimarisi", body: "<p><strong>Süreç Bileşenleri:</strong> İstemci, sunucu, paketler ve IP protokolü.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Web Sitelerine Nasıl Ulaşıyoruz?", body: "<p>Bir siteye tıkladığımızda bilgiler bize nasıl geliyor?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Kargo Paketleri", body: "<p>Büyük bir eşyanın parçalara bölünüp kargolanması ve alıcıda birleştirilmesi.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "İstemci ve Sunucu", body: "<p>Client (istek yapan) ve Server (barındıran/sunan) kavramları.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Paket Taşıma Simülasyonu", body: "<p>Sınıf içinde veri paketlerinin iletimi canlandırılır.</p>" },
-                    { stage: "ÖZET", title: "Protokoller", body: "<p>HTTP ve HTTPS protokollerinin güvenli veri iletimindeki rolü.</p>" }
-                ],
-                quiz: [
-                    { q: "İnternette bilgi talep eden bilgisayara veya cihaza ne ad verilir?", options: ["A) İstemci (Client)", "B) Sunucu (Server)", "C) Yazıcı", "D) Tarayıcı"], correct: 0 },
-                    { q: "Web sitelerinin dosyalarını barındıran ve sürekli açık olan güçlü bilgisayarlara ne denir?", options: ["A) Sunucu (Server)", "B) İstemci", "C) Fare", "D) Klavye"], correct: 0 },
-                    'BTY.6.4.1 İnternet Mimarisi Soruları...',
-                    { q: "İnternette büyük verilerin küçük parçalara bölünerek iletilmesine ne denir?", options: ["A) Paket Anahtarlama (Packet Switching)", "B) Klasörleme", "C) Sıkıştırma", "D) Formatlama"], correct: 0 },
-                    { q: "Güvenli web sitelerinde veri iletişimini şifreleyen protokol hangisidir?", options: ["A) HTTPS", "B) HTTP", "C) FTP", "D) TCP"], correct: 0 },
-                    { q: "Sunucu ile istemci arasındaki veri alışverişi sırasında kullanılan kurallar bütününe ne denir?", options: ["A) Protokol", "B) Donanım", "C) İşletim sistemi", "D) Kablo"], correct: 0 },
-                    { q: "İnternette bir web sitesine girdiğimizde adres çubuğuna ne yazarız?", options: ["A) URL (Web Adresi)", "B) IP şifresi", "C) Donanım kodu", "D) RAM boyutu"], correct: 0 },
-                    { q: "Gönderilen veri paketleri hedefe ulaştığında ne olur?", options: ["A) Eksiksiz bir şekilde yeniden birleştirilir", "B) Silinir", "C) Çoğaltılır", "D) Yakılır"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi sunucu bilgisayarların özelliklerindendir?", options: ["A) 7/24 açık ve yüksek depolama kapasiteli olması", "B) Çanta gibi taşınması", "C) Pille çalışması", "D) Ekransız olması"], correct: 0 },
-                    { q: "İnternet bağlantısının hızını ölçmek için ne kullanılır?", options: ["A) Hız Testi (SpeedTest)", "B) Antivirüs", "C) Word", "D) Paint"], correct: 0 }
-                ]
-            },
-            9: {
-                code: "BTY.6.4.2",
-                topic: "Bulut Bilişim ve Dijital Depolama",
-                outcomeText: "BTY.6.4.2. Bulut bilişim teknolojilerini ve avantajlarını kavrayabilme\na) Bulut bilişim (Cloud Computing) kavramını tanımlar.\nb) Bulut depolama servislerini kullanır.\nc) Verilere her yerden erişim ve yedeklemenin önemini kavrar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.4.2. Bulut Bilişim", body: "<p><strong>Süreç Bileşenleri:</strong> Bulut depolama, yedekleme ve her yerden erişim.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Dosyaları Nerede Saklıyoruz?", body: ["USB bellekler bozulursa fotoğraflarımıza ne olur?"], bodyHtml: "<p>USB bellekler bozulursa fotoğraflarımıza ne olur?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Sanal Depolar", body: "<p>Fiziksel flash bellekler ile internet üzerindeki bulut depoların kıyaslanması.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Bulut Bilişim Nedir?", body: "<p>Google Drive, OneDrive gibi servislerle internet üzerinden dosya saklama.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Buluta Dosya Yükleme", body: "<p>Öğrenciler bulut hesabına örnek bir belge yükler.</p>" },
-                    { stage: "ÖZET", title: "Yedekleme Güvencesi", body: "<p>Veri kaybını önlemede bulut bilişimin önemi.</p>" }
-                ],
-                quiz: [
-                    { q: "Dosyalarımızı kendi bilgisayarımızda değil, internet üzerindeki sunucularda saklamaya ne denir?", options: ["A) Bulut Bilişim (Cloud Computing)", "B) Donanım", "C) Yerel Disk", "D) Disket"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir bulut depolama servisidir?", options: ["A) Google Drive / OneDrive", "B) Microsoft Word", "C) Paint", "D) Antivirüs"], correct: 0 },
-                    'BTY.6.4.2 Bulut Bilişim Soruları...',
-                    { q: "Bulut depolamanın en büyük avantajı nedir?", options: ["A) İnternet olan her yerden ve her cihazdan dosyalara erişebilmek", "B) Bilgisayarı bozmak", "C) Elektrik tüketimini artırmak", "D) İnterneti yavaşlatmak"], correct: 0 },
-                    { q: "Önemli dosyalarımızı buluta kaydetmek hangi amaçla yapılır?", options: ["A) Yedekleme ve veri kaybını önleme", "B) Dosyaları silme", "C) Bilgisayarı formatlama", "D) Ekranı renklendirme"], correct: 0 },
-                    { q: "Bulut bilişimde dosyalar nerede saklanır?", options: ["A) Uzaktaki güçlü sunucularda", "B) Cebimizde", "C) Fare içinde", "D) Klavyede"], correct: 0 },
-                    { q: "Bulut depolama kullanmak için neye ihtiyaç vardır?", options: ["A) Aktif internet bağlantısına", "B) Yazıcıya", "C) Tarayıcıya", "D) Fişe"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bulut bilişimin dezavantajı veya riski olabilir?", options: ["A) İnternet yoksa dosyalara ulaşamamak", "B) Çok hızlı çalışması", "C) Ücretsiz olması", "D) Kolay kullanım"], correct: 0 },
-                    { q: "Google Drive üzerinden ortak dosya çalışması yapmanın yararı nedir?", options: ["A) Aynı belge üzerinde aynı anda birlikte çalışabilmek", "B) Dosyanın silinmesi", "C) İnternetin kesilmesi", "D) Bilgisayarın patlaması"], correct: 0 },
-                    { q: "Bulut depolama servisleri genellikle ne kadar ücretsiz alan sunar?", options: ["A) Belirli bir Gigabyte (GB) kapasitede", "B) Sonsuz", "C) Hiç", "D) 1 Terabayt"], correct: 0 }
-                ]
-            },
-            10: {
-                code: "BTY.6.5.1",
-                topic: "Web Tasarımına Giriş ve HTML Temelleri",
-                outcomeText: "BTY.6.5.1. HTML ve web tasarımı temellerini kavrayabilme\na) Web sitelerinin çalışma mantığını ve HTML dilini tanır.\nb) Temel HTML etiketlerini (html, head, body, h1, p) kullanır.\nc) Basit bir web sayfası tasarlar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.5.1. HTML ve Web Tasarımı", body: "<p><strong>Süreç Bileşenleri:</strong> HTML etiketleri, tarayıcı yorumlama ve basit web sayfası.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Web Siteleri Nasıl Yapılıyor?", body: "<p>Gezdiğimiz web sitelerinin arkasında hangi kodlar var?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "İskelet ve Yapı", body: "<p>HTML'in bir binanın tuğlaları ve iskeleti olmasındaki rolü.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "HTML Etiketleri", body: "<p>&lt;html&gt;, &lt;head&gt;, &lt;body&gt;, &lt;h1&gt;, &lt;p&gt; etiketleri.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "İlk Web Sayfam", body: "<p>Not defterinde 'Merhaba Dünya' yazıp .html uzantılı kaydetme.</p>" },
-                    { stage: "ÖZET", title: "Etiket Mantığı", body: "<p>Açılış ve kapanış etiketleri (&lt;p&gt;...&lt;/p&gt;) özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Web sayfalarının iskeletini oluşturan metin tabanlı işaretleme diline ne denir?", options: ["A) HTML", "B) USB", "C) RAM", "D) CPU"], correct: 0 },
-                    { q: "HTML kodlarında etiketler genellikle hangi işaretler arasına yazılır?", options: ["A) < ve > (Küçüktür ve Büyüktür)", "B) { ve }", "C) [ ve ]", "D) ( ve )"], correct: 0 },
-                    'BTY.6.5.1 HTML Temelleri Soruları...',
-                    { q: "Bir HTML belgesinin ana gövde bölümünü belirten etiket hangisidir?", options: ["A) <body>", "B) <head>", "C) <title>", "D) <html"], correct: 0 },
-                    { q: "Web sayfasında en büyük başlığı oluşturmak için hangi etiket kullanılır?", options: ["A) <h1>", "B) <p>", "C) <br>", "D) <b>"], correct: 0 },
-                    { q: "HTML'de paragraf yazmak için hangi etiket kullanılır?", options: ["A) <p>", "B) <h1>", "C) <img>", "D) <a>"], correct: 0 },
-                    { q: "Hazırladığımız HTML dosyasının tarayıcıda açılabilmesi için uzantısı ne olmalıdır?", options: ["A) .html veya .htm", "B) .docx", "C) .xlsx", "D) .pptx"], correct: 0 },
-                    { q: "HTML etiketlerinin çoğunun bir de neyi bulunur?", options: ["A) Kapanış etiketi (örn: </p>)", "B) Ses dosyası", "C) Pili", "D) Fişi"], correct: 0 },
-                    { q: "Web sayfasının sekmesinde görünen başlığı yazmak için hangi etiket kullanılır?", options: ["A) <title>", "B) <body>", "C) <h1>", "D) <p>"], correct: 0 },
-                    { q: "Alt alta satır geçişi (alt satıra inme) yapmak için hangi etiket kullanılır?", options: ["A) <br>", "B) <p>", "C) <h1>", "D) <b>"], correct: 0 }
-                ]
-            },
-            11: {
-                code: "BTY.6.5.2",
-                topic: "Web Sayfalarını Biçimlendirme (CSS Giriş)",
-                outcomeText: "BTY.6.5.2. CSS kullanarak web sayfalarını biçimlendirebilme\na) CSS (Cascading Style Sheets) kavramını açıklar.\nb) Yazı rengi, arka plan ve boyut ayarlarını yapar.\nc) Tasarım ve estetik kurallarını uygular.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.5.2. CSS ile Biçimlendirme", body: "<p><strong>Süreç Bileşenleri:</strong> CSS stilleri, renkler, arka plan ve estetik tasarım.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Renkler ve Estetik", body: "<p>Web sitelerini güzel ve renkli yapan nedir?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Bina ve Boya", body: "<p>HTML binanın iskeletiyse, CSS de boyası ve dekorasyonudur.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "CSS Kod Yapısı", body: "<p>background-color, color, font-size özellikleri incelenir.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Renkli Sayfa Tasarımı", body: "<p>Sayfa arka planı mavi, başlık rengi beyaz yapılır.</p>" },
-                    { stage: "ÖZET", title: "Görsel Uyum", body: "<p>Web tasarımında sadelik ve okunabilirlik vurgulanır.</p>" }
-                ],
-                quiz: [
-                    { q: "Web sayfalarının renk, stil ve görsel düzenlemelerini yapmak için kullanılan dile ne denir?", options: ["A) CSS (Cascading Style Sheets)", "B) HTML", "C) USB", "D) RAM"], correct: 0 },
-                    { q: "Web sayfasının arka plan rengini değiştirmek için hangi CSS komutu kullanılır?", options: ["A) background-color", "B) color", "C) font-size", "D) text-align"], correct: 0 },
-                    'BTY.6.5.2 CSS ve Biçimlendirme Soruları...',
-                    { q: "Yazı rengini değiştirmek için hangi CSS özelliği kullanılır?", options: ["A) color", "B) background", "C) border", "D) margin"], correct: 0 },
-                    { q: "CSS kodları HTML içinde hangi etiket arasına yazılır?", options: ["A) <style>", "B) <p>", "C) <body>", "D) <title>"], correct: 0 },
-                    { q: "Yazı boyutunu (büyüklüğünü) ayarlamak için hangi özellik kullanılır?", options: ["A) font-size", "B) color", "C) width", "D) height"], correct: 0 },
-                    { q: "CSS kullanmanın web tasarımındaki temel avantajı nedir?", options: ["A) Tasarımı merkezileştirip sayfaları güzelleştirmek", "B) Bilgisayarı bozmak", "C) İnterneti hızlandırmak", "D) Dosya silmek"], correct: 0 },
-                    { q: "Metni ortalamak için hangi CSS komutu kullanılır?", options: ["A) text-align: center;", "B) color: red;", "C) font-weight: bold;", "D) background: blue;"], correct: 0 },
-                    { q: "HTML iskelet ile CSS biçimlendirme arasındaki ilişki nedir?", options: ["A) HTML yapı sunar, CSS görünüm kazandırır", "B) İkisi aynı şeydir", "C) CSS yapıdır, HTML renktir", "D) Hiçbir bağları yoktur"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir CSS renk tanımıdır?", options: ["A) color: red; veya #ff0000;", "B) <p>renk</p>", "C) html.red", "D) body.print"], correct: 0 }
-                ]
-            },
-            12: {
-                code: "BTY.6.6.1",
-                topic: "Dijital Haklar ve Bilgi Güvenliği",
-                outcomeText: "BTY.6.6.1. Dijital dünyada haklar, sorumluluklar ve bilgi güvenliğini kavrayabilme\na) Kişisel veri ve gizlilik haklarını bilir.\nb) Zararlı yazılımlar (virüs, truva atı, solucan) ve korunma yollarını açıklar.\nc) Dijital ayak izinin uzun vadeli etkilerini değerlendirir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.6.1. Bilgi Güvenliği ve Zararlı Yazılımlar", body: "<p><strong>Süreç Bileşenleri:</strong> Zararlı yazılımlar, antivirüsler ve veri gizliliği.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Bilgisayar Virüsleri", body: "<p>Bilgisayarlarımıza virüs nasıl bulaşır?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Sağlık ve Virüs", body: "<p>İnsanlardaki mikroplar ile bilgisayarlardaki zararlı yazılımların benzerliği.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Zararlı Yazılım Türleri", body: "<p>Virüs, Truva Atı (Trojan), Solucan ve Casus Yazılım (Spyware).</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Güvenlik Senaryoları", body: "<p>Şüpheli dosya ve bağlantılarla ilgili grup analizi yapılır.</p>" },
-                    { stage: "ÖZET", title: "Antivirüs Kalkanı", body: "<p>Güncel antivirüs kullanımının önemi özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayara zarar vermek, bilgi çorlamak veya sistemi kilitlemek için yazılan kötü niyetli yazılımlara ne denir?", options: ["A) Zararlı Yazılım (Malware / Virüs)", "B) İşletim Sistemi", "C) Tarayıcı", "D) Kelime İşlemci"], correct: 0 },
-                    { q: "Faydalı bir program gibi görünerek arkadan gizlice zarar veren zararlı yazılım türü hangisidir?", options: ["A) Truva Atı (Trojan)", "B) Antivirüs", "C) Word", "D) Excel"], correct: 0 },
-                    'BTY.6.6.1 Bilgi Güvenliği Soruları...',
-                    { q: "Bilgisayar ağlarında kendi kendine çoğalan ve sistemleri yavaşlatan zararlı yazılıma ne denir?", options: ["A) Solucan (Worm)", "B) Klavye", "C) Monitör", "D) Klasör"], correct: 0 },
-                    { q: "Kullanıcının haberİ olmadan bilgilerini toplayıp başkasına gönderen yazılım nedir?", options: ["A) Casus Yazılım (Spyware)", "B) Hesap Makinesi", "C) Paint", "D) Slayt"], correct: 0 },
-                    { q: "Zararlı yazılımlara karşı bilgisayarı koruyan programlara ne ad verilir?", options: ["A) Antivirüs / Güvenlik Duvarı (Firewall)", "B) Tarayıcı", "C) Tablolama", "D) Sunum"], correct: 0 },
-                    { q: "İnternette güvenli alışveriş ve veri iletimi için sitelerde ne aranmalıdır?", options: ["A) https:// protokolü ve kilit simgesi", "B) Reklamlar", "C) Çok fazla yazı", "D) Oyunlar"], correct: 0 },
-                    { q: "Kişisel verilerimizi korumak için alınacak en iyi önlem nedir?", options: ["A) Güçlü şifre kullanmak ve tanımayanlara veri vermemek", "B) Şifreyi duvara yazmak", "C) Bilgisayarı hiç kapatmamak", "D) İnterneti kesmek"], correct: 0 },
-                    { q: "Bilgisayarımıza flash bellek takarken dikkat etmemiz gereken güvenlik kuralı nedir?", options: ["A) Virüs taramasından geçirmek", "B) Doğrudan açmak", "C) Çöpe atmak", "D) Masaya vurmak"], correct: 0 },
-                    { q: "İnternette paylaştığımız fotoğrafların yıllar sonra bile internette kalmasına ne denir?", options: ["A) Kalıcı Dijital Ayak İzi", "B) Anlık mesaj", "C) Format", "D) Güncelleme"], correct: 0 }
-                ]
-            },
-            13: {
-                code: "BTY.6.7.1",
-                topic: "Dijital Vatandaşlık ve Sosyal Sorumluluk",
-                outcomeText: "BTY.6.7.1. Dijital vatandaşlık ve sosyal sorumluluk projelerini kavrayabilme\na) Dijital hak ve sorumlulukları analiz eder.\nb) Çevrim içi iletişimde etik kurallara uyar.\nc) Toplumsal sorunlara teknolojik çözüm önerileri sunar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.7.1. Dijital Vatandaşlık", body: "<p><strong>Süreç Bileşenleri:</strong> Dijital haklar, netiket (internet etiği) ve sosyal sorumluluk.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Sosyal Medya Nezaketi", body: "<p>İnternette başkalarıyla konuşurken nelere dikkat etmeliyiz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Gerçek Hayat vs Sanal Hayat", body: "<p>Gerçek hayatta söylemediğimiz bir şeyi sanal ortamda yazmanın etik boyutu.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Netiket (İnternet Etiği)", body: "<p>Büyük harfle yazmanın bağırmak anlamına gelmesi ve saygılı dil.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Sosyal Sorumluluk Projesi", body: "<p>Teknolojiyi kullanarak çevre veya sokak hayvanları yararına proje tasarımı.</p>" },
-                    { stage: "ÖZET", title: "Sorumlu Vatandaş", body: "<p>Dijital dünyada haklar kadar sorumlulukların da olduğu vurgulanır.</p>" }
-                ],
-                quiz: [
-                    { q: "İnternet ortamında uyulması gereken görgü ve nezaket kurallarına ne ad verilir?", options: ["A) Netiket (İnternet Etiği)", "B) Donanım", "C) Yazılım", "D) IP"], correct: 0 },
-                    { q: "Yazışmalarda sürekli BÜYÜK HARF kullanmak ne anlama gelir?", options: ["A) Karşı tarafa bağırmak / öfke göstermek", "B) Kibarlık", "C) Normal yazı", "D) Hız"], correct: 0 },
-                    'BTY.6.7.1 Dijital Vatandaşlık Soruları...',
-                    { q: "Aşağıdakilerden hangisi doğru bir dijital vatandaşlık davranışıdır?", options: ["A) Başkalarının haklarına saygı duymak ve nezaketli olmak", "B) Küfür etmek", "C) Başkasının hesabını ele geçirmek", "D) Yalan haber yaymak"], correct: 0 },
-                    { q: "Teknolojiyi kullanarak toplumsal bir soruna (örneğin çevre kirliliği) çözüm üretmeye ne denir?", options: ["A) Sosyal Sorumluluk Projesi", "B) Virüs üretimi", "C) Oyun indirme", "D) Format atma"], correct: 0 },
-                    { q: "İnternette gördüğümüz her habere inanıp paylaşmadan önce ne yapmalıyız?", options: ["A) Doğruluğunu güvenilir kaynaklardan teyit etmeliyiz", "B) Hemen yaymalıyız", "C) Silmeliyiz", "D) Bilgisayarı kapatmalıyız"], correct: 0 },
-                    { q: "Siber zorbalıkla karşılaşan bir öğrencinin yapması gereken en doğru hareket nedir?", options: ["A) Durumu aileye ve öğretmene bildirip ilgili kişiyi engellemek", "B) Karşılık verip küfür etmek", "C) Hiçbir şey yapmamak", "D) Bilgisayarı kırmak"], correct: 0 },
-                    { q: "Dijital haklarımızdan biri aşağıdakilerden hangisidir?", options: ["A) İnternette güvenli ve özgürce bilgiye erişim hakkı", "B) Başkalarını rahatsız etme hakkı", "C) Şifre çalma hakkı", "D) Virüs yayma hakkı"], correct: 0 },
-                    { q: "Çevrim içi ortamlarda başkalarının gizliliğine saygı duymak neyi gösterir?", options: ["A) Bilinçli ve etik bir dijital vatandaş olduğumuzu", "B) Bilgisayar bilmediğimizi", "C) İnternetimiz olmadığını", "D) Oyunu kaybettiğimizi"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi dijital bağımlılığı önlemek için yapılması gerekenlerdendir?", options: ["A) Ekran süresini sınırlayıp dışarıda aktiviteler yapmak", "B) Günde 10 saat oyun oynamak", "C) Gece sabaha kadar telefona bakmak", "D) Dersleri bırakmak"], correct: 0 }
-                ]
-            },
-            14: {
-                code: "BTY.6.8.1",
-                topic: "Robotik ve Fiziksel Programlama Giriş",
-                outcomeText: "BTY.6.8.1. Robotik ve fiziksel programlama temellerini kavrayabilme\na) Robotik ve mikrodenetleyici kavramlarını açıklar.\nb) Sensör ve motor mantığını kavrar.\nc) Basit fiziksel kodlama senaryoları tasarlar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.8.1. Robotik ve Fiziksel Programlama", body: "<p><strong>Süreç Bileşenleri:</strong> Mikrodenetleyiciler, sensörler ve motorlar.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Robotlar Hayatımızda Nerede?", body: "<p>Fabrikalarda veya akıllı evlerde robotlar nasıl çalışıyor?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Beyin ve Duyu Organları", body: "<p>Mikrodenetleyicinin beyin, sensörlerin ise duyu organları olması.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Arduino / Micro:bit", body: "<p>Fiziksel programlama kartları ve LED yakma uygulamaları.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Lamba Yakma Sensörü", body: "<p>Karanlıkta otomatik yanan lamba simülasyonu.</p>" },
-                    { stage: "ÖZET", title: "Girdi ve Çıktı", body: "<p>Sensör (girdi) ve LED/Motor (çıktı) ilişkisi özetlenir.</p>" }
-                ],
-                quiz: [
-                    { q: "Bilgisayardaki kodları gerçek hayattaki elektronik devrelerle buluşturan programlanabilir küçük beyinlere ne denir?", options: ["A) Mikrodenetleyici (Arduino / Micro:bit)", "B) Sabit Disk", "C) Monitör", "D) Klavye"], correct: 0 },
-                    { q: "Çevreden ışık, ısı, hareket gibi bilgileri algılayan elektronik elemanlara ne ad verilir?", options: ["A) Sensör", "B) Motor", "C) Kablo", "D) Fiş"], correct: 0 },
-                    'BTY.6.8.1 Robotik Soruları...',
-                    { q: "Fiziksel programlamada LED yakmak veya ses çıkarmak hangi gruba girer?", options: ["A) Çıktı (Output)", "B) Girdi (Input)", "C) Depolama", "D) İnternet"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi bir girdi (sensor) birimidir?", options: ["A) Işık Sensörü (LDR) / Buton", "B) LED lamba", "C) Hoparlör", "D) Ekran"], correct: 0 },
-                    { q: "Robotik kodlamada da blok tabanlı diller (mBlock vb.) kullanılabilir mi?", options: ["A) Evet, sürükle bırak bloklarla robotlar kodlanabilir", "B) Hayır, sadece yazı yazılır", "C) Sadece matbu kağıda yazılır", "D) Hiçbir zaman kullanılmaz"], correct: 0 },
-                    { q: "Otomatik kapıların yaklaşan insanı algılayıp açılması hangi sistemle çalışır?", options: ["A) Mesafe Sensörü ve Mikrodenetleyici", "B) El ile çevirme", "C) İp sistemi", "D) Su basıncı"], correct: 0 },
-                    { q: "Fiziksel programlamada devre kurarken elektrik akımına dikkat etmek neden önemlidir?", options: ["A) Güvenlik ve devre elemanlarının yanmasını önlemek için", "B) Hızlanmak için", "C) İnternet için", "D) Ses çıkması için"], correct: 0 },
-                    { q: "Robotik uygulamalar en çok hangi alanlarda hayatımızı kolaylaştırır?", options: ["A) Sanayi, tıp, arama-kurtarma ve akıllı evler", "B) Sadece oyun", "C) Kağıt işleri", "D) Müzik dinleme"], correct: 0 },
-                    { q: "Mikrodenetleyiciye yazdığımız kodları göndermek için ne kullanılır?", options: ["A) USB kablosu", "B) Kulaklık", "C) Fare", "D) Ethernet"], correct: 0 }
-                ]
-            },
-            15: {
-                code: "BTY.6.9.1",
-                topic: "Yıl Sonu Proje Geliştirme (Web/Robotik)",
-                outcomeText: "BTY.6.9.1. 6. sınıf kazanımlarını birleştirerek kapsamlı bir proje tasarlayabilme\na) Özgün bir web veya kodlama projesi planlar.\nb) HTML/CSS veya blok tabanlı kodlama uygular.\nc) Projesini test eder ve sunar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.9.1. 6. Sınıf Yıl Sonu Projesi", body: "<p><strong>Süreç Bileşenleri:</strong> Proje planlama, kodlama (HTML/CSS veya Scratch) ve sunum.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Yıl Boyu Neler Yaptık?", body: "<p>Web tasarımı, tablolama ve kodlama becerilerimizi nasıl birleştirebiliriz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Gerçek Hayat Çözümü", body: "<p>Çevremizdeki bir probleme web sitesi veya oyunla çözüm üretme.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Proje Geliştirme Aşamaları", body: "<p>Tasarım, kodlama, hata ayıklama (debugging) ve test aşamaları.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Web Sitesi / Oyun Projesi", body: "<p>Öğrenciler kendi web sitelerini veya oyunlarını kodlar.</p>" },
-                    { stage: "ÖZET", title: "Proje Sunumu", body: "<p>Projelerin sınıfta sergilenmesi ve değerlendirilmesi.</p>" }
-                ],
-                quiz: [
-                    { q: "6. sınıf boyunca öğrendiğimiz web tasarımı, tablolama ve kodlama bilgilerini birleştirdiğimiz final çalışmasına ne denir?", options: ["A) Yıl Sonu Bitirme Projesi", "B) Çöp kutusu", "C) Donanım hatası", "D) Format"], correct: 0 },
-                    { q: "Bir web sitesi projesi geliştirirken hangi diller kullanılır?", options: ["A) HTML ve CSS", "B) Sadece Word", "C) Paint", "D) Excel"], correct: 0 },
-                    'BTY.6.9.1 Proje Soruları...',
-                    { q: "Projede yazılan kodların düzgün çalışıp çalışmadığını kontrol etme aşamasına ne denir?", options: ["A) Test Etme ve Hata Ayıklama (Debugging)", "B) Silme", "C) Kapatma", "D) Çıkış"], correct: 0 },
-                    { q: "Özgün bir web sitesi veya oyun tasarlarken ilk adım nedir?", options: ["A) Kağıt üzerinde taslak ve plan hazırlamak", "B) Bilgisayarı kapatmak", "C) Oyunu bitirmek", "D) Fişi çekmek"], correct: 0 },
-                    { q: "Hazırladığımız projeyi sunarken dikkat edilmesi gereken en önemli unsur nedir?", options: ["A) Projenin amacını ve işleyişini net bir şekilde aktarmak", "B) Hiç konuşmamak", "C) Ekranı karartmak", "D) Dosyayı silmek"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi 6. sınıf seviyesinde yapılabilecek bir bilişim projesidir?", options: ["A) Okul tanıtan kişisel web sitesi veya eğitici oyun", "B) Boş klasör", "C) Kırık klavye", "D) Kağıt afiş"], correct: 0 },
-                    { q: "Proje geliştirirken internetten alınan görseller için ne yapılmalıdır?", options: ["A) Telif kurallarına uyulup kaynak gösterilmelidir", "B) İzinsiz çalınmalıdır", "C) Silinmelidir", "D) Gizlenmelidir"], correct: 0 },
-                    { q: "Ekip çalışmasıyla yapılan projelerin en büyük avantajı nedir?", options: ["A) Farklı fikirlerin birleşip daha güzel bir iş ortaya çıkması", "B) Zaman kaybetmek", "C) Tartışmak", "D) İşin bitmemesi"], correct: 0 },
-                    { q: "Proje tamamlandığında elde edilen başarı neyle kutlanır?", options: ["A) Sınıf içi sergi ve sunum alkışlarıyla", "B) Bilgisayarı çöpe atarak", "C) Kabloları keserek", "D) Hiçbir şey yapmayarak"], correct: 0 }
-                ]
-            },
-            16: {
-                code: "BTY.6.10.1",
-                topic: "İleri Düzey Dijital Okuryazarlık",
-                outcomeText: "BTY.6.10.1. İleri düzey dijital okuryazarlık ve bilgi teyidi becerilerini kavrayabilme\na) Dijital medyada bilgi kirliliği ve sahte haberleri (fake news) ayırt eder.\nb) Çevrim içi kaynakların güvenilirliğini analiz eder.\nc) Medya okuryazarlığı ilkelerini uygular.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.10.1. Dijital Okuryazarlık", body: "<p><strong>Süreç Bileşenleri:</strong> Bilgi kirliliği, sahte haber tespiti ve medya okuryazarlığı.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Sosyal Medya Haberleri", body: "<p>Sosyal medyada gördüğünüz her habere inanıyor musunuz?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Teyit Mekanizmaları", body: "<p>Bir bilginin doğru olup olmadığını resmi kaynaklardan kontrol etme.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Sahte Haber (Fake News)", body: "<p>Çarpıtılmış görseller, tıklama tuzağı (clickbait) başlıklar incelenir.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Haber Teyit Etme", body: "<p>Öğrenciler örnek bir internet haberinin doğruluğunu araştırır.</p>" },
-                    { stage: "ÖZET", title: "Bilinçli Medya", body: "<p>Doğrulanmamış bilgileri paylaşmama sorumluluğu vurgulanır.</p>" }
-                ],
-                quiz: [
-                    { q: "İnternette ve sosyal medyada yayılan yanıltıcı, asılsız bilgilere ne denir?", options: ["A) Sahte Haber / Bilgi Kirliliği (Fake News)", "B) Resmi Belge", "C) Bilimsel Veri", "D) Kaynak kod"], correct: 0 },
-                    { q: "İnternette dikkat çekmek için abartılı ve yalan başlıklar atan haber türüne ne denir?", options: ["A) Tıklama Tuzağı (Clickbait)", "B) Antivirüs", "C) Tablolama", "D) Sunum"], correct: 0 },
-                    'BTY.6.10.1 Dijital Okuryazarlık Soruları...',
-                    { q: "Karşılaştığımız bir haberin doğru olup olmadığını anlamak için ilk ne yapmalıyız?", options: ["A) Resmi ve güvenilir haber kaynaklarından doğrulamak", "B) Hemen arkadaşlarımıza göndermek", "C) İnanıp unutmak", "D) Bilgisayarı kapatmak"], correct: 0 },
-                    { q: "Medya okuryazarlığı bize ne kazandırır?", options: ["A) Medya içeriklerini eleştirel bir gözle değerlendirme yeteneği", "B) Hızlı oyun oynamayı", "C) Bilgisayar tamir etmeyi", "D) Kod yazmayı"], correct: 0 },
-                    { q: "Manipüle edilmiş (üzerinde oynanmış) fotoğrafları tespit etmek için ne yapılabilir?", options: ["A) Tersine görsel arama (Google Images ile aratma)", "B) Resmi silmek", "C) Bilgisayara format atmak", "D) Ekranı kırmak"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi güvenilir bir bilgi kaynağının özelliğidir?", options: ["A) Yazarının, tarihinin ve dayandığı kanıtların olması", "B) Çok fazla reklam içermesi", "C) Korku ve öfke yayması", "D) Kaynaksız olması"], correct: 0 },
-                    { q: "Doğruluğumdan emin olmadığımız bir haberi sosyal medyada paylaşmak neye yol açar?", options: ["A) Toplumda yanlış bilgilerin ve paniğin yayılmasına", "B) İnternetin hızlanmasına", "C) Bilgisayarın güncellenmesine", "D) Hiçbir şeye"], correct: 0 },
-                    { q: "Dijital okuryazar bir birey interneti nasıl kullanır?", options: ["A) Sorgulayarak, araştırarak ve etik kurallara uyarak", "B) Sadece oyun oynayarak", "C) Her söylenene inanarak", "D) Bilgisayardan kaçarak"], correct: 0 },
-                    { q: "Bilgi kirliliği ile mücadelede en önemli silahımız nedir?", options: ["A) Eleştirel düşünme ve araştırma", "B) Gözleri kapatmak", "C) Ekranı kırmak", "D) Şifreyi değiştirmek"], correct: 0 }
-                ]
-            },
-            17: {
-                code: "BTY.6.11.1",
-                topic: "Geleceğin Teknolojileri ve Kariyer",
-                outcomeText: "BTY.6.11.1. Geleceğin teknolojileri ve bilişim alanındaki kariyer fırsatlarını kavrayabilme\na) Büyük veri, nesnelerin interneti (IoT) ve blokzincir kavramlarını tanır.\nb) Bilişim sektöründeki meslekleri araştırır.\nc) Geleceğin dünyasına yönelik teknolojik vizyon geliştirir.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.11.1. Gelecek ve Kariyer", body: "<p><strong>Süreç Bileşenleri:</strong> IoT, büyük veri, siber güvenlik ve bilişim meslekleri.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Nesnelerin İnterneti", body: "<p>Eşyaların internete bağlanması ne anlama geliyor?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Akıllı Evler", body: "<p>Uzaktan telefonla yönetilen kombi ve lambalar.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "IoT ve Büyük Veri (Big Data)", body: "<p>Nesnelerin interneti ve devasa veri havuzları açıklanır.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Geleceğin Mesleği Tasarımı", body: "<p>Öğrenciler gelecekte var olacak bir bilişim mesleği tasarlar.</p>" },
-                    { stage: "ÖZET", title: "Vizyon", body: "<p>Teknolojiyi tüketen değil üreten bireyler olma hedefi vurgulanır.</p>" }
-                ],
-                quiz: [
-                    { q: "Ev eşyalarının (buzdolabı, lamba, saat) internete bağlanarak birbiriyle konuşmasına ne denir?", options: ["A) Nesnelerin İnterneti (IoT - Internet of Things)", "B) Donanım", "C) İşletim Sistemi", "D) Klasör"], correct: 0 },
-                    { q: "Dünya genelinde üretilen devasa büyüklükteki veri yığınlarına ne ad verilir?", options: ["A) Büyük Veri (Big Data)", "B) Küçük Dosya", "C) Sıkıştırılmış klasör", "D) Metin belgesi"], correct: 0 },
-                    'BTY.6.11.1 Gelecek ve Kariyer Soruları...',
-                    { q: "Aşağıdakilerden hangisi bilişim sektöründeki mesleklerden biridir?", options: ["A) Yazılım Mühendisi / Siber Güvenlik Uzmanı", "B) Daktilo tamircisi", "C) Telgraf operatörü", "D) Kasetçi"], correct: 0 },
-                    { q: "Gelecekte siber güvenlik uzmanlarının önemi neden artacaktır?", options: ["A) Dijital verilerin ve sistemlerin korunması hayati önem taşıdığı için", "B) Bilgisayarlar eskidiği için", "C) İnternet kapandığı için", "D) Oyunlar bittiği için"], correct: 0 },
-                    { q: "Akıllı ev sistemlerinde evdeki cihazları uzaktan yönetmek ne ile sağlanır?", options: ["A) İnternet ve sensör teknolojileri (IoT)", "B) El pompası", "C) İp", "D) Kömür"], correct: 0 },
-                    { q: "Yapay zekâ ve robotik alanında çalışmak isteyen bir öğrenci hangi becerileri geliştirmelidir?", options: ["A) Algoritma, kodlama, matematik ve problem çözme", "B) Sadece resim çizme", "C) Koşma", "D) Uyuma"], correct: 0 },
-                    { q: "Teknolojiyi sadece oyun oynamak yerine üreterek kullanmak bize ne kazandırır?", options: ["A) Ülke ekonomisine ve teknolojik bağımsızlığımıza katkı", "B) Zaman kaybı", "C) Elektrik faturası", "D) Hiçbir şey"], correct: 0 },
-                    { q: "Geleceğin dünyasında yazılım bilmek neden her meslek için önemlidir?", options: ["A) Neredeyse tüm sektörler dijitalleştiği için", "B) Zorunlu ders olduğu için", "C) Sadece bilgisayarcılar için", "D) Eğlenceli olduğu için"], correct: 0 },
-                    { q: "Milli teknoloji hamlemizin temel felsefesi nedir?", options: ["A) Kendi teknolojimizi tasarlayıp üretmek", "B) Başka ülkelerden almak", "C) Teknolojiden kaçmak", "D) Hiçbir şey yapmamak"], correct: 0 }
-                ]
-            },
-            18: {
-                code: "BTY.6.12.1",
-                topic: "6. Sınıf Yıl Sonu Genel Tekrar ve Kapanış",
-                outcomeText: "BTY.6.12.1. 6. sınıf bilişim teknolojileri ve yazılım dersi kazanımlarını genel değerlendirme\na) Tüm dönem konularını gözden geçirir.\nb) Bilişim projelerini sergiler.\nc) Başarılı bir öğretim yılını tamamlama değerlendirmesi yapar.",
-                slides: [
-                    { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "BTY.6.12.1. 6. Sınıf Yıl Sonu Genel Tekrar", body: "<p><strong>Süreç Bileşenleri:</strong> Dönem sonu genel tekrarı, proje sergisi ve kapanış.</p>" },
-                    { stage: "ÖN DEĞERLENDİRME", title: "Yılın Bilançosu", body: "<p>6. sınıfta web tasarımı, tablolama ve robotik alanında neler başardık?</p>" },
-                    { stage: "BAĞLANTI NOKTASI", title: "Ortaokul Sonrası Bilişim", body: "<p>Öğrendiklerimizin lise ve günlük yaşamdaki kariyer basamakları.</p>" },
-                    { stage: "KEŞFETME & SUNUM", title: "Kapsamlı Final Testi", body: "<p>Tüm 6. sınıf ünitelerinden seçilen sorularla genel değerlendirme.</p>" },
-                    { stage: "UYGULAMA & ETKİNLİK", title: "Bilişim Şenliği ve Proje Sergisi", body: "<p>Yıl boyunca yapılan web siteleri ve oyunların sergilenmesi.</p>" },
-                    { stage: "ÖZET", title: "Tatil ve Başarı", body: "<p>Öğrencilere tebrikler ve iyi tatil dilekleri ile kapanış.</p>" }
-                ],
-                quiz: [
-                    { q: "6. sınıf bilişim teknolojileri ve yazılım dersinde öğrendiğimiz en önemli beceri hangisidir?", options: ["A) Web tasarımı, tablolama, kodlama ve dijital güvenlik", "B) Sadece film izlemek", "C) Kağıt katlamak", "D) Oyun oynamak"], correct: 0 },
-                    { q: "Web sayfalarının iskeletini hangi dil ile oluşturduk?", options: ["A) HTML", "B) Word", "C) Excel", "D) Paint"], correct: 0 },
-                    'BTY.6.12.1 Yıl Sonu Final Soruları...',
-                    { q: "Web sayfalarına renk ve stil kazandırmak için hangi dili kullandık?", options: ["A) CSS", "B) HTML", "C) USB", "D) RAM"], correct: 0 },
-                    { q: "Tablolama programlarında hesaplama yaparken formüllerin başına hangi işaret konur?", options: ["A) = (Eşittir)", "B) +", "C) ?", "D) *"], correct: 0 },
-                    { q: "Blok tabanlı kodlamada skoru tutmak için ne tanımladık?", options: ["A) Değişken", "B) Klasör", "C) Slayt", "D) Yazıcı"], correct: 0 },
-                    { q: "İnternette dosyalarımızı uzakta saklayan sisteme ne ad verilir?", options: ["A) Bulut Bilişim", "B) Disket", "C) Sabit Disk", "D) Monitör"], correct: 0 },
-                    { q: "Zararlı yazılımlardan korunmak için bilgisayara ne kurulmalıdır?", options: ["A) Antivirüs programı", "B) Oyun", "C) Film", "D) Müzik"], correct: 0 },
-                    { q: "Geleceğin teknolojileri arasında gösterilen ve eşyaların internete bağlanmasını sağlayan sistem nedir?", options: ["A) Nesnelerin İnterneti (IoT)", "B) Daktilo", "C) Kaset", "D) Tüplü TV"], correct: 0 },
-                    { q: "Bilişim teknolojileri dersini başarıyla tamamlayan bir öğrenci olarak geleceğe mesajınız ne olurdu?", options: ["A) Teknolojiyi tüketen değil, üreten ve geliştiren bir birey olmak", "B) Bilgisayarı bırakmak", "C) Kod yazmayı unutmak", "D) Hiçbir şey yapmamak"], correct: 0 }
-                ]
-            }
-        };
-
-        // Current Active State
-        let currentGrade = 5;
-        let currentWeekIndex = 0;
-        let currentSlideIndex = 0;
-
-        window.onload = function() {
-            initApp();
-        };
-
-        function initApp() {
-            displayCurrentDate();
-            populateWeekDropdown();
-            autoDetectCurrentWeek();
-            renderWeekContent();
+            doc.text(`Soru ${i}: Asagidakilerden hangisi "${plan.topic.substring(0, 30)}..." konusuyla ilgilidir?`, 20, yPos);
+            yPos += 7;
+            doc.text("A) Soru Cevabi A   B) Soru Cevabi B   C) Soru Cevabi C   D) Soru Cevabi D", 25, yPos);
+            yPos += 10;
         }
 
-        function displayCurrentDate() {
-            const today = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-            document.getElementById('currentDateDisplay').innerHTML = `📅 Bugün: <strong>${today.toLocaleDateString('tr-TR', options)}</strong>`;
-        }
-
-        function populateWeekDropdown() {
-            const select = document.getElementById('weekSelect');
-            select.innerHTML = '';
-            WEEKS_CALENDAR.forEach((w, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.textContent = w.name;
-                select.appendChild(opt);
-            });
-        }
-
-        function autoDetectCurrentWeek() {
-            const todayStr = new Date().toISOString().split('T');
-            let foundIndex = -1;
-
-            for (let i = 0; i < WEEKS_CALENDAR.length; i++) {
-                if (todayStr >= WEEKS_CALENDAR[i].start && todayStr <= WEEKS_CALENDAR[i].end) {
-                    foundIndex = i;
-                    break;
-                }
-            }
-
-            currentWeekIndex = (foundIndex !== -1) ? foundIndex : 0;
-            document.getElementById('weekSelect').value = currentWeekIndex;
-        }
-
-        function switchGrade(grade) {
-            currentGrade = grade;
+        const pageCount = doc.internal.getNumberOfPages();
+        for(let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
             
-            const btn5 = document.getElementById('btnGrade5');
-            const btn6 = document.getElementById('btnGrade6');
-
-            if (grade === 5) {
-                btn5.classList.add('active');
-                btn6.classList.remove('active');
-            } else {
-                btn6.classList.add('active');
-                btn5.classList.remove('active');
+            if(logoBase64) {
+                // Logoyu sayfa altına hizalama
+                doc.addImage(logoBase64, 'PNG', 95, 275, 20, 20);
             }
-
-            currentSlideIndex = 0;
-            renderWeekContent();
+            doc.setFontSize(12);
+            doc.setFont("courier", "bold");
+            doc.text("RAYILMAZAN", 105, 272, null, null, "center");
         }
 
-        function onWeekSelectChange(val) {
-            currentWeekIndex = parseInt(val);
-            currentSlideIndex = 0;
-            renderWeekContent();
-        }
+        doc.save(`Rayilmazan_Sinav_${currentGrade}_Sinif_Hafta_${currentWeek}.pdf`);
+    }
 
-        function changeWeek(delta) {
-            let newIndex = currentWeekIndex + delta;
-            if (newIndex >= 0 && newIndex < WEEKS_CALENDAR.length) {
-                currentWeekIndex = newIndex;
-                document.getElementById('weekSelect').value = currentWeekIndex;
-                currentSlideIndex = 0;
-                renderWeekContent();
-            }
-        }
-
-        function renderWeekContent() {
-            const calItem = WEEKS_CALENDAR[currentWeekIndex];
-            const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
-            const weekData = dataset[calItem.week];
-
-            // Print Header info
-            document.getElementById('printGradeTitle').textContent = `${currentGrade}. Sınıf`;
-
-            // Outcome card - VERBATIM FROM YILLIK PLAN
-            if (weekData) {
-                document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | ${weekData.code}`;
-                document.getElementById('outcomeText').innerHTML = `<strong>Konu:</strong> ${weekData.topic}\n<strong>Sınıf Defterine Yazılacak Metin (Yıllık Plandan Birebir):</strong>\n${weekData.outcomeText}`;
-                document.getElementById('printTopicTitle').textContent = `Hafta: ${calItem.name} | Konu: ${weekData.topic} (${weekData.code})`;
-            } else {
-                document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | Genel Uygulama`;
-                document.getElementById('outcomeText').textContent = `${calItem.name} için genel uygulama, uygulama projeleri ve pekiştirme çalışmaları yürütülmektedir.`;
-                document.getElementById('printTopicTitle').textContent = `Hafta: ${calItem.name} | Genel Uygulama Değerlendirmesi`;
-            }
-
-            // Slides
-            renderSlides(weekData);
-
-            // Exam Banner
-            const banner = document.getElementById('examBanner');
-            if (calItem.isExamUpcoming) {
-                banner.style.display = 'flex';
-            } else {
-                banner.style.display = 'none';
-            }
-
-            // Quiz Title
-            document.getElementById('quizTitleDisplay').textContent = `❓ Değerlendirme Soruları (En Az 10 Soru)`;
-
-            // Quiz
-            renderQuiz(weekData, calItem.week);
-        }
-
-        function renderSlides(weekData) {
-            const container = document.getElementById('slideContainer');
-            container.innerHTML = '';
-
-            const slides = (weekData && weekData.slides) ? weekData.slides : [
-                { stage: "ÖĞRENME ÇIKTILARI VE SÜREÇ BİLEŞENLERİ", title: "Genel Uygulama ve Pekiştirme", body: "<p>Bu hafta öğrenilen bilişim teknolojileri kazanımları uygulama projeleriyle pekiştirilir.</p>" }
-            ];
-
-            slides.forEach((s, idx) => {
-                const div = document.createElement('div');
-                div.className = `slide-content ${idx === currentSlideIndex ? 'active' : ''}`;
-                div.innerHTML = `
-                    <div class="slide-header">${s.stage}</div>
-                    <div class="slide-title">${s.title}</div>
-                    <div class="slide-body">${s.body}</div>
-                `;
-                container.appendChild(div);
-            });
-
-            updateSlideIndicator(slides.length);
-        }
-
-        function updateSlideIndicator(total) {
-            document.getElementById('slideIndicator').textContent = `Slayt ${currentSlideIndex + 1} / ${total}`;
-        }
-
-        function moveSlide(delta) {
-            const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
-            const calItem = WEEKS_CALENDAR[currentWeekIndex];
-            const weekData = dataset[calItem.week];
-            const slides = (weekData && weekData.slides) ? weekData.slides : [{ stage: "", title: "", body: "" }];
-
-            let newIndex = currentSlideIndex + delta;
-            if (newIndex >= 0 && newIndex < slides.length) {
-                currentSlideIndex = newIndex;
-                const allSlides = document.querySelectorAll('.slide-content');
-                allSlides.forEach((s, i) => {
-                    s.classList.toggle('active', i === currentSlideIndex);
-                });
-                updateSlideIndicator(slides.length);
-            }
-        }
-
-        function renderQuiz(weekData, weekNum) {
-            const container = document.getElementById('quizContainer');
-            container.innerHTML = '';
-
-            const fallbackQuestions = [
-                { q: "Öğrenilen bilişim teknolojileri kavramları günlük hayatta ne tür kolaylıklar sağlar?", options: ["A) İşleri hızlandırır ve kolaylaştırır", "B) İletişimi engeller", "C) Elektrik tüketimini düşürür", "D) Hiçbiri"], correct: 0 }
-            ];
-
-            const questions = (weekData && weekData.quiz && weekData.quiz.length >= 10) ? weekData.quiz : fallbackQuestions;
-
-            questions.forEach((item, qIdx) => {
-                // Handle any text-only separator items gracefully
-                if (typeof item === 'string') return;
-
-                const card = document.createElement('div');
-                card.className = 'question-card';
-                
-                let optionsHtml = '';
-                if (item.options && Array.isArray(item.options)) {
-                    item.options.forEach((opt, oIdx) => {
-                        optionsHtml += `
-                            <li class="option-item">
-                                <label class="option-label">
-                                    <input type="radio" name="q_${weekNum}_${qIdx}" value="${oIdx}" onclick="checkAnswer(${weekNum}, ${qIdx}, ${oIdx}, ${item.correct})">
-                                    ${opt}
-                                </label>
-                            </li>
-                        `;
-                    });
-                }
-
-                card.innerHTML = `
-                    <div class="question-title">Soru ${qIdx + 1}: ${item.q}</div>
-                    <ul class="options-list">${optionsHtml}</ul>
-                    <div class="result-box" id="res_${weekNum}_${qIdx}"></div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function checkAnswer(weekNum, qIdx, selected, correct) {
-            const resBox = document.getElementById(`res_${weekNum}_${qIdx}`);
-            if (selected === correct) {
-                resBox.innerHTML = `<span class="correct">✓ Tebrikler! Doğru cevap.</span>`;
-            } else {
-                resBox.innerHTML = `<span class="incorrect">✗ Yanlış cevap, tekrar deneyiniz.</span>`;
-            }
-        }
-
-        function generatePracticeExam() {
-            const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
-            let compiledQuestions = [];
-
-            Object.keys(dataset).forEach(wKey => {
-                if (dataset[wKey] && dataset[wKey].quiz) {
-                    dataset[wKey].quiz.forEach(q => {
-                        if (typeof q === 'object' && q.q) {
-                            compiledQuestions.push({ ...q, topic: dataset[wKey].topic });
-                        }
-                    });
-                }
-            });
-
-            while (compiledQuestions.length < 30) {
-                let copyQuestions = [...compiledQuestions];
-                compiledQuestions = compiledQuestions.concat(copyQuestions);
-            }
-
-            const examQuestions = compiledQuestions.slice(0, 30);
-
-            document.getElementById('printTopicTitle').textContent = `Özel Deneme Sınavı Kağıdı (${currentGrade}. Sınıf - Toplam ${examQuestions.length} Soru)`;
-            document.getElementById('quizTitleDisplay').textContent = `📝 ${currentGrade}. Sınıf Deneme Sınavı Soruları (${examQuestions.length} Soru - A4 Formatı)`;
-
-            const container = document.getElementById('quizContainer');
-            container.innerHTML = `
-                <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #7dd3fc;">
-                    <strong>🎓 ${currentGrade}. Sınıf Kapsamlı Deneme Sınavı Hazırlandı! (Toplam ${examQuestions.length} Soru)</strong>
-                    <p style="font-size: 0.85rem; margin-top: 4px;">İşlenen tüm konulardan derlenen ${examQuestions.length} soruluk deneme sınavını aşağıdan çözebilir veya "Test / Sınav Çıktısı Al" butonuna basarak A4 formatında yazdırabilirsiniz.</p>
-                </div>
-            `;
-
-            examQuestions.forEach((item, qIdx) => {
-                const card = document.createElement('div');
-                card.className = 'question-card';
-                
-                let optionsHtml = '';
-                if (item.options) {
-                    item.options.forEach((opt, oIdx) => {
-                        optionsHtml += `
-                            <li class="option-item">
-                                <label class="option-label">
-                                    <input type="radio" name="exam_q_${qIdx}" value="${oIdx}" onclick="checkExamAnswer(${qIdx}, ${oIdx}, ${item.correct})">
-                                    ${opt}
-                                </label>
-                            </li>
-                        `;
-                    });
-                }
-
-                card.innerHTML = `
-                    <div style="font-size:0.75rem; color:var(--primary); font-weight:700;">[Konu: ${item.topic}]</div>
-                    <div class="question-title">Soru ${qIdx + 1}: ${item.q}</div>
-                    <ul class="options-list">${optionsHtml}</ul>
-                    <div class="result-box" id="exam_res_${qIdx}"></div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function checkExamAnswer(qIdx, selected, correct) {
-            const resBox = document.getElementById(`exam_res_${qIdx}`);
-            if (selected === correct) {
-                resBox.innerHTML = `<span class="correct">✓ Doğru!</span>`;
-            } else {
-                resBox.innerHTML = `<span class="incorrect">✗ Yanlış cevap!</span>`;
-            }
-        }
-
-        function printTestSheet() {
-            window.print();
-        }
-    </script>
+    // Uygulama Başlatma
+    window.onload = () => {
+        initLogo();
+        calculateCurrentWeek();
+        renderData();
+    };
+</script>
 </body>
 </html>
