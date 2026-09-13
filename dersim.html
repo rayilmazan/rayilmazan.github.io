@@ -3,429 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayılmazan - Dijital Müfredat ve Takvim Asistanı</title>
+    <title>Bilişim Teknolojileri - Yıllık Plan ve Değerlendirme Sistemi</title>
+    <!-- Tailwind CSS ve FontAwesome CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #121417;
-            --panel-bg: #1a1d23;
-            --panel-border: #2e3542;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --text-main: #e2e8f0;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --font-mono: 'Courier New', Courier, monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.5;
-            padding: 20px;
-        }
-
-        header {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid var(--accent);
-        }
-
-        .logo-area h1 {
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            color: var(--text-main);
-        }
-
-        .logo-area p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-        }
-
-        .stats-box {
-            display: flex;
-            gap: 15px;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            background: rgba(0,0,0,0.3);
-            padding: 10px 15px;
-            border: 1px solid var(--panel-border);
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            color: var(--text-muted);
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .tab-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .theme-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            margin-bottom: 20px;
-            padding: 20px;
-        }
-
-        .theme-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--panel-border);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .theme-title {
-            font-size: 1.1rem;
-            color: var(--accent);
-            font-weight: bold;
-        }
-
-        .theme-meta {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .outcome-list {
-            list-style: none;
-        }
-
-        .outcome-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 8px 0;
-            border-bottom: 1px dashed rgba(255,255,255,0.05);
-        }
-
-        .outcome-item:last-child {
-            border-bottom: none;
-        }
-
-        .outcome-item input[type="checkbox"] {
-            margin-top: 4px;
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-
-        .outcome-text {
-            font-size: 0.95rem;
-            color: var(--text-main);
-        }
-
-        .outcome-code {
-            font-family: var(--font-mono);
-            color: var(--warning);
-            font-size: 0.85rem;
-            margin-right: 5px;
-        }
-
-        .actions-bar {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            color: var(--text-main);
-            padding: 8px 16px;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-        }
-
-        .btn:hover {
-            border-color: var(--accent);
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-area, #printable-area * {
+                visibility: visible;
+            }
+            #printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <header>
-        <div class="logo-area">
-            <h1>RAYILMAZAN // DİJİTAL MÜFREDAT ASİSTANI</h1>
-            <p>Bilişim Teknolojileri ve Yazılım (5. ve 6. Sınıf) Kılavuz Entegrasyonu</p>
-        </div>
-        <div class="stats-box">
-            <div>TAMAMLANAN: <span id="completedCount">0</span> / <span id="totalCount">0</span></div>
-            <div>ORAN: <span id="percentComplete">0%</span></div>
+    <!-- ÜST BİLGİ & LOGO -->
+    <header class="bg-white shadow-md border-b border-slate-200 py-4 px-6 mb-6">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" 
+                     alt="Logo" class="h-14 w-auto object-contain">
+                <div>
+                    <h1 class="text-2xl font-black text-indigo-700 tracking-wide">rayılmazan</h1>
+                    <p class="text-xs text-slate-500 font-medium">Bilişim Teknolojileri ve Yazılım Ders Platformu</p>
+                </div>
+            </div>
+            <div id="live-clock" class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl font-semibold text-sm border border-indigo-100 shadow-sm">
+                <!-- Tarih JS ile doldurulacak -->
+            </div>
         </div>
     </header>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab(5)">5. Sınıf Müfredatı</button>
-        <button class="tab-btn tab-6-btn" onclick="switchTab(6)">6. Sınıf Müfredatı</button>
-    </div>
+    <!-- ANA İÇERİK -->
+    <main class="max-w-7xl mx-auto px-4 flex-grow w-full pb-12">
+        
+        <!-- SEKMELER (TABS) -->
+        <div class="flex justify-center mb-8">
+            <div class="inline-flex bg-slate-200 p-1.5 rounded-2xl shadow-inner gap-2">
+                <button onclick="switchTab(5)" id="tab-btn-5" class="px-8 py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-indigo-600 text-white shadow-md">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i> 5. Sınıf Planı
+                </button>
+                <button onclick="switchTab(6)" id="tab-btn-6" class="px-8 py-3 rounded-xl font-bold text-sm transition-all duration-200 text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-graduation-cap mr-2"></i> 6. Sınıf Planı
+                </button>
+            </div>
+        </div>
 
-    <!-- 5. SINIF İÇERİĞİ -->
-    <div id="tab-5" class="tab-content active">
-        <div id="container-5"></div>
-    </div>
+        <!-- PLAN KARTI VE KONTROLLERİ -->
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-8 mb-8 transition-all">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                <div>
+                    <span id="current-grade-badge" class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">5. Sınıf</span>
+                    <h2 id="week-title" class="text-2xl font-black text-slate-900 mt-2">1. Hafta (14 - 18 Eylül 2026)</h2>
+                </div>
+                <!-- İLERİ GERİ BUTONLARI -->
+                <div class="flex items-center gap-2">
+                    <button onclick="changeWeek(-1)" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-bold text-sm transition shadow-sm">
+                        <i class="fa-solid fa-arrow-left"></i> Önceki Hafta
+                    </button>
+                    <button onclick="resetToCurrentDate()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2.5 rounded-xl font-bold text-sm transition" title="Bugüne Dön">
+                        <i class="fa-solid fa-calendar-day"></i>
+                    </button>
+                    <button onclick="changeWeek(1)" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-bold text-sm transition shadow-sm">
+                        Sonraki Hafta <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
 
-    <!-- 6. SINIF İÇERİĞİ -->
-    <div id="tab-6" class="tab-content">
-        <div id="container-6"></div>
-    </div>
+            <!-- HAFTALIK İÇERİK & KAZANIM -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <h3 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-book-open mr-1"></i> Bu Haftanın Konusu
+                    </h3>
+                    <p id="topic-text" class="text-lg font-bold text-slate-800">-</p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <h3 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-bullseye mr-1"></i> Sınıf Defteri / Öğrenim Çıktısı (Kazanım)
+                    </h3>
+                    <p id="outcome-text" class="text-base font-medium text-slate-700">-</p>
+                </div>
+            </div>
+        </div>
 
-    <div class="actions-bar">
-        <button class="btn" onclick="resetProgress()">İlerlemeni Sıfırla</button>
-        <button class="btn" onclick="exportData()">JSON Yedek Al</button>
-    </div>
+        <!-- DEĞERLENDİRME & SINAV BÖLÜMÜ -->
+        <div class="bg-gradient-to-br from-indigo-900 to-slate-900 rounded-3xl shadow-2xl p-6 md:p-8 text-white">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                <div>
+                    <span id="exam-status-badge" class="bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Normal Hafta</span>
+                    <h3 class="text-2xl font-black mt-2">Haftalık Değerlendirme ve Sınav Hazırlığı</h3>
+                    <p class="text-slate-300 text-sm mt-1">İşlenen konuları kapsayan otomatik deneme sınavı oluşturun.</p>
+                </div>
+                <button onclick="generateQuiz()" class="no-print bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
+                    <i class="fa-solid fa-file-lines text-lg"></i> <span id="quiz-btn-text">Test Sorularını Hazırla (10 Soru)</span>
+                </button>
+            </div>
 
+            <!-- TEST ALANI (PDF ÇIKTISI İÇİN YAZDIRilACAK ALAN) -->
+            <div id="printable-area" class="bg-white text-slate-800 rounded-2xl p-6 md:p-8 mt-6 hidden shadow-inner">
+                <!-- PDF Header Logo ve İsim -->
+                <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" 
+                             alt="Logo" class="h-10 w-auto object-contain">
+                        <span class="font-bold text-indigo-700 text-lg">rayılmazan</span>
+                    </div>
+                    <div class="text-right text-xs text-slate-500">
+                        <p id="quiz-pdf-info">Bilişim Teknolojileri Değerlendirme Sınavı</p>
+                    </div>
+                </div>
+
+                <div id="quiz-content-area" class="space-y-6">
+                    <!-- Sorular buraya dinamik eklenecek -->
+                </div>
+
+                <!-- PDF Footer / Kağıdın en altı -->
+                <div class="mt-12 pt-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-400">
+                    <span>rayılmazan - Eğitim Portalı</span>
+                    <span>Başarılar Dileriz...</span>
+                </div>
+
+                <!-- Yazdır Butonu -->
+                <div class="mt-8 text-center no-print">
+                    <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow transition flex items-center gap-2 mx-auto">
+                        <i class="fa-solid fa-print"></i> PDF Olarak Kaydet / Yazdır
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- JAVASCRIPT İŞ MANTIĞI -->
     <script>
-        const curriculumData = {
+        // 5. ve 6. Sınıf Yıllık Plan Veri Seti (Örnek/Gerçekçi Plan Havuzu - 2026/2027 Eğitim Öğretim Takvimine Uyumlu)
+        const plans = {
             5: [
-                {
-                    title: "1. Tema: Bilişim Teknolojilerinin Hayatımızdaki Yeri",
-                    hours: "14 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.5.1.1", text: "Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme." },
-                        { code: "BTY.5.1.2", text: "Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme." },
-                        { code: "BTY.5.1.3", text: "Dijital vatandaşlık uygulamalarını sınıflandırabilme." },
-                        { code: "BTY.5.1.4", text: "Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme." },
-                        { code: "BTY.5.1.5", text: "Bilgisayar sistemlerini çözümleyebilme." },
-                        { code: "BTY.5.1.6", text: "Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme." }
-                    ]
-                },
-                {
-                    title: "2. Tema: Dijital Ürün Tasarımı ve Geliştirme",
-                    hours: "16 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.5.2.1", text: "Görsel düzenleme programlarından yararlanabilme." },
-                        { code: "BTY.5.2.2", text: "Görsel için kurgu oluşturabilme." },
-                        { code: "BTY.5.2.3", text: "Görsel ürün geliştirebilme." },
-                        { code: "BTY.5.2.4", text: "Kelime işlemci programlarından yararlanabilme." },
-                        { code: "BTY.5.2.5", text: "Kelime işlemci dosyası geliştirebilme." },
-                        { code: "BTY.5.2.6", text: "Sunum programlarından yararlanabilme." },
-                        { code: "BTY.5.2.7", text: "Sunum dosyası oluşturabilme." }
-                    ]
-                },
-                {
-                    title: "3. Tema: Bilgisayar Ağları ve İletişim",
-                    hours: "6 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.5.3.1", text: "Bilgisayar ağlarını ve ağ bileşenlerini sınıflandırabilme." },
-                        { code: "BTY.5.3.2", text: "Bilgisayar ağ türlerini ve bağlanma yöntemlerini karşılaştırabilme." },
-                        { code: "BTY.5.3.3", text: "İnternette bilgi kaynaklarını ve arama yöntemlerini etkili kullanabilme." }
-                    ]
-                },
-                {
-                    title: "4. Tema: Bilişim Etiği ve Siber Güvenlik",
-                    hours: "6 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.5.4.1", text: "Bilişim etiği ve ilkelerini günlük yaşamla ilişkilendirebilme." },
-                        { code: "BTY.5.4.2", text: "Dijital ortamlarda gizlilik ve güvenliği sağlama yöntemlerini belirleyebilme." }
-                    ]
-                },
-                {
-                    title: "5. Tema: Yapay Zekâ",
-                    hours: "8 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.5.5.1", text: "Yapay zekânın kullanım alanlarını ve alt dallarını sınıflandırabilme." },
-                        { code: "BTY.5.5.2", text: "Yapay zekâ süreçlerinde güvenliğin önemini sorgulayabilme." }
-                    ]
-                },
-                {
-                    title: "6. Tema: Yazılım Tasarımı ve Programlama",
-                    hours: "18 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.5.6.1", text: "Bilgi kaynaklarını ve internette arama yöntemlerini yönetebilme." },
-                        { code: "BTY.5.6.2", text: "Algoritma test etme ve geri bildirim alma süreçlerini uygulayabilme." },
-                        { code: "BTY.5.6.3", text: "Yazılımda kullanılan bileşenleri sınıflandırabilme." },
-                        { code: "BTY.5.6.4", text: "Blok tabanlı ortamda yazılım geliştirme." },
-                        { code: "BTY.5.6.5", text: "Blok tabanlı ortamda yazılım değerlendirme." }
-                    ]
-                }
+                { week: 1, dateRange: "14 Eylül - 18 Eylül 2026", topic: "Bilişim Teknolojileri ve Güvenlik", outcome: "Bilişim teknolojilerinin günlük yaşamdaki önemini ve güvenli kullanımını fark eder." },
+                { week: 2, dateRange: "21 Eylül - 25 Eylül 2026", topic: "Dijital Yurttaşlık ve Etik", outcome: "Dijital ayak izi kavramını açıklar ve etik kurallara uymanın önemini kavrar." },
+                { week: 3, dateRange: "28 Eylül - 02 Ekim 2026", topic: "Bilgisayar Sistemleri", outcome: "Donanım ve yazılım kavramlarını, temel bileşenlerin işlevlerini açıklar." },
+                { week: 4, dateRange: "05 Ekim - 09 Ekim 2026", topic: "Dosya Yönetimi ve Depolama", outcome: "Dosya uzantılarını tanır, klasörleme ve bulut depolama araçlarını kullanır." },
+                { week: 5, dateRange: "12 Ekim - 16 Ekim 2026", topic: "İş Sağlığı ve Güvenliği", outcome: "Bilgisayar kullanımından kaynaklı ergonomik riskleri önlemek için tedbir alır." },
+                { week: 6, dateRange: "19 Ekim - 23 Ekim 2026", topic: "Problem Çözme Kavramları", outcome: "Günlük hayattaki problemleri çözmek için mantıksal adımlar tasarlar." },
+                { week: 7, dateRange: "26 Ekim - 30 Ekim 2026", topic: "Algoritma ve Akış Şemaları (Sınav Haftası)", outcome: "Algoritma mantığını anlar, basit akış şeması sembollerini tanır ve uygular.", isExam: true },
+                { week: 8, dateRange: "02 Kasım - 06 Kasım 2026", topic: "Görsel Programlamaya Giriş", outcome: "Blok tabanlı programlama arayüzünü tanır ve temel karakter hareketleri kodlar." },
+                { week: 9, dateRange: "09 Kasım - 13 Kasım 2026", topic: "Blok Tabanlı Projeler - 1", outcome: "Blok tabanlı programlamada olaylar ve döngü yapılarını kullanır." },
+                // Ara tatil 16-20 Kasım
+                { week: 10, dateRange: "23 Kasım - 27 Kasım 2026", topic: "Blok Tabanlı Projeler - 2", outcome: "Koşullu ifadeleri kullanarak etkileşimli animasyon ve oyunlar hazırlar." },
+                { week: 11, dateRange: "30 Kasım - 04 Aralık 2026", topic: "Veri ve Değişkenler", outcome: "Programlama sürecinde basit değişkenler tanımlar ve veri saklar." },
+                { week: 12, dateRange: "07 Aralık - 11 Aralık 2026", topic: "Özgün Ürün Tasarımı", outcome: "Belirli bir amaca yönelik dijital içerik veya oyun tasarımı yapar." },
+                { week: 13, dateRange: "14 Aralık - 18 Aralık 2026", topic: "İnternet Arama Motorları", outcome: "Bilgiye güvenli ve doğru şekilde ulaşmak için gelişmiş arama teknikleri kullanır." },
+                { week: 14, dateRange: "21 Aralık - 25 Aralık 2026", topic: "Dijital İletişim ve İşbirliği", outcome: "E-posta gönderme kurallarını öğrenir ve ortak çalışma araçlarını kullanır." },
+                { week: 15, dateRange: "28 Aralık - 01 Ocak 2027", topic: "Sunu Hazırlama Araçları (Sınav Haftası)", outcome: "Etkili ve kurallara uygun dijital sunumlar hazırlar.", isExam: true },
+                { week: 16, dateRange: "04 Ocak - 08 Ocak 2027", topic: "Kelime İşlemci Programları - 1", outcome: "Belge oluşturma, biçimlendirme ve metin düzenleme araçlarını kullanır." },
+                { week: 17, dateRange: "11 Ocak - 15 Ocak 2027", topic: "Kelime İşlemci Programları - 2", outcome: "Belge içine tablo, resim ekleyerek biçimlendirir ve çıktı alır." },
+                { week: 18, dateRange: "18 Ocak - 22 Ocak 2027", topic: "Dönem Tekrarı ve Değerlendirme", outcome: "Dönem boyunca edinilen bilgi ve becerileri pratik projelerle pekiştirir." }
             ],
             6: [
-                {
-                    title: "1. Tema: Bilişim Teknolojilerinin Hayatımızdaki Yeri",
-                    hours: "4 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.6.1.1", text: "Yenilikçi bilişim teknolojilerini sınıflandırabilme." },
-                        { code: "BTY.6.1.2", text: "Bilişim teknolojilerinin gelecekteki durumlarına yönelik çıkarım yapabilme." }
-                    ]
-                },
-                {
-                    title: "2. Tema: Dijital Ürün Tasarımı ve Geliştirme",
-                    hours: "16 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.6.2.1", text: "Tablolama programlarına giriş yapabilme." },
-                        { code: "BTY.6.2.2", text: "Ses dosyası için kurgu oluşturabilme." },
-                        { code: "BTY.6.2.3", text: "Video dosyası için kurgu oluşturabilme." }
-                    ]
-                },
-                {
-                    title: "3. Tema: Bilgisayar Ağları ve İletişim",
-                    hours: "8 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.6.3.1", text: "İletişim teknolojileri ve çeşitlerini inceleyebilme." },
-                        { code: "BTY.6.3.2", text: "İnternette ileri düzey arama yapabilme." },
-                        { code: "BTY.6.3.3", text: "Etkileşimli web araçlarını etkin kullanabilme." }
-                    ]
-                },
-                {
-                    title: "4. Tema: Bilişim Etiği ve Siber Güvenlik",
-                    hours: "8 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.6.4.1", text: "Bilişim etiği ve ilkelerini uygulayabilme." },
-                        { code: "BTY.6.4.2", text: "Telif hakları ve lisans türlerini ayırt edebilme." },
-                        { code: "BTY.6.4.3", text: "Güvenli siber ortam oluşturma stratejilerini belirleyebilme." }
-                    ]
-                },
-                {
-                    title: "5. Tema: Yapay Zekâ",
-                    hours: "12 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.6.5.1", text: "Yapay zekâda verinin rolünü kavrayabilme." },
-                        { code: "BTY.6.5.2", text: "Yapay zekâ araçlarını deneyimleyebilme." },
-                        { code: "BTY.6.5.3", text: "Yapay zekâ araçları ile model geliştirebilme." }
-                    ]
-                },
-                {
-                    title: "6. Tema: Yazılım Tasarımı ve Programlama",
-                    hours: "20 Ders Saati",
-                    outcomes: [
-                        { code: "BTY.6.6.1", text: "Blok tabanlı programlama ortamına giriş yapabilme." },
-                        { code: "BTY.6.6.2", text: "Blok tabanlı ortamda tasarım ve programlama yapabilme." },
-                        { code: "BTY.6.6.3", text: "Yapay zekâ destekli ürün geliştirme ve sunum yapabilme." }
-                    ]
-                }
+                { week: 1, dateRange: "14 Eylül - 18 Eylül 2026", topic: "Dijital Dünyada Güvenlik ve Gizlilik", outcome: "Kişisel verilerin gizliliğini koruma yollarını ve güçlü şifre oluşturma ilkelerini açıklar." },
+                { week: 2, dateRange: "21 Eylül - 25 Eylül 2026", topic: "Bilgisayar Ağları ve İnternet", outcome: "Yerel ve yaygın ağ türlerini, IP adreslerini ve ağ donanım bileşenlerini kavrar." },
+                { week: 3, dateRange: "28 Eylül - 02 Ekim 2026", topic: "Bulut Bilişim ve Ortak Çalışma", outcome: "Bulut tabanlı depolama servislerini eş zamanlı ve güvenli ortak çalışmalar için kullanır." },
+                { week: 4, dateRange: "05 Ekim - 09 Ekim 2026", topic: "Etkili Sunum Tasarımı", outcome: "Sunum hazırlama ilkelerine uygun, görsel açıdan zengin projeler geliştirir." },
+                { week: 5, dateRange: "12 Ekim - 16 Ekim 2026", topic: "Gelişmiş Tablo Hesaplama - 1", outcome: "Elektronik tablo programında hücre, satır, sütun yönetimi ve veri girişi yapar." },
+                { week: 6, dateRange: "19 Ekim - 23 Ekim 2026", topic: "Gelişmiş Tablo Hesaplama - 2", outcome: "Temel matematiksel formüller ve fonksiyonları (Topla, Ortalama vb.) uygular." },
+                { week: 7, dateRange: "26 Ekim - 30 Ekim 2026", topic: "Algoritma Analizi ve Mantıksal Sınama (Sınav Haftası)", outcome: "Karmaşık problemlere yönelik alternatif çözüm yolları ve akış şemaları hazırlar.", isExam: true },
+                { week: 8, dateRange: "02 Kasım - 06 Kasım 2026", topic: "Blok Tabanlı Gelişmiş Uygulamalar", outcome: "Fonksiyonlar ve alt programlar oluşturarak blok tabanlı kodlamayı optimize eder." },
+                { week: 9, dateRange: "09 Kasım - 13 Kasım 2026", topic: "Oyun Tasarım Temelleri", outcome: "Kapsamlı bir dijital oyun senaryosu ve kuralları tasarlar." },
+                // Ara tatil 16-20 Kasım
+                { week: 10, dateRange: "23 Kasım - 27 Kasım 2026", topic: "Blok Tabanlı Oyun Projesi - 1", outcome: "Oyun içi skor, puan ve can mekaniklerini kodlar." },
+                { week: 11, dateRange: "30 Kasım - 04 Aralık 2026", topic: "Blok Tabanlı Oyun Projesi - 2", outcome: "Çarpışma algoritmaları ve seviye geçişlerini programlar." },
+                { week: 12, dateRange: "07 Aralık - 11 Aralık 2026", topic: "Grafik ve Tasarım Araçları - 1", outcome: "Vektörel çizim araçlarını kullanarak özgün dijital tasarımlar oluşturur." },
+                { week: 13, dateRange: "14 Aralık - 18 Aralık 2026", topic: "Grafik ve Tasarım Araçları - 2", outcome: "Görsel düzenleme, filtreleme ve afiş tasarımı yapar." },
+                { week: 14, dateRange: "21 Aralık - 25 Aralık 2026", topic: "İnternet Etiği ve Telif Hakları", outcome: "Creative Commons ve telif hakları kavramlarını inceleyerek yasalara uygun paylaşım yapar." },
+                { week: 15, dateRange: "28 Aralık - 01 Ocak 2027", topic: "Veri Analizi ve Grafikler (Sınav Haftası)", outcome: "Tablolardaki verileri sütun, çubuk ve pasta grafiklerine dönüştürerek yorumlar.", isExam: true },
+                { week: 16, dateRange: "04 Ocak - 08 Ocak 2027", topic: "Web Tasarımına Giriş - 1", outcome: "Temel HTML etiketlerini öğrenerek basit web sayfaları tasarlar." },
+                { week: 17, dateRange: "11 Ocak - 15 Ocak 2027", topic: "Web Tasarımına Giriş - 2", outcome: "Web sayfalarına köprü (bağlantı) ve resim ekleyerek biçimlendirir." },
+                { week: 18, dateRange: "18 Ocak - 22 Ocak 2027", topic: "Yıl Sonu Proje Sunumları", outcome: "Dönem boyunca geliştirilen web ve yazılım projelerinin sunumunu yapar." }
             ]
         };
 
-        function renderCurriculum() {
-            ['5', '6'].forEach(grade => {
-                const container = document.getElementById(`container-${grade}`);
-                container.innerHTML = '';
-                curriculumData[grade].forEach((theme, tIndex) => {
-                    let html = `
-                        <div class="theme-card">
-                            <div class="theme-header">
-                                <span class="theme-title">${theme.title}</span>
-                                <span class="theme-meta">${theme.hours}</span>
-                            </div>
-                            <ul class="outcome-list">
-                    `;
-                    theme.outcomes.forEach((outcome, oIndex) => {
-                        const storageKey = `rayilmazan_g${grade}_t${tIndex}_o${oIndex}`;
-                        const isChecked = localStorage.getItem(storageKey) === 'true' ? 'checked' : '';
-                        html += `
-                            <li class="outcome-item">
-                                <input type="checkbox" id="${storageKey}" ${isChecked} onchange="updateProgress('${storageKey}')">
-                                <label for="${storageKey}" class="outcome-text">
-                                    <span class="outcome-code">[${outcome.code}]</span> ${outcome.text}
-                                </label>
-                            </li>
-                        `;
-                    });
-                    html += `</ul></div>`;
-                    container.innerHTML += html;
-                });
-            });
-            calculateStats();
+        let currentGrade = 5;
+        let currentWeekIndex = 0;
+
+        // Sayfa açıldığında otomatik tarih tespiti ve hafta eşleme
+        function initApp() {
+            updateLiveClock();
+            setInterval(updateLiveClock, 1000);
+
+            // Bugünün tarihine göre otomatik hafta bulma (Örn: 13 Eylül 2026 başlangıç kabul edilerek ilk hafta seçilir)
+            // Simülasyon gereği başlangıç 0. indeks (1. Hafta) olarak ayarlanır.
+            loadWeekData();
+        }
+
+        function updateLiveClock() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('live-clock').innerHTML = `<i class="fa-regular fa-calendar-days mr-2"></i> ${now.toLocaleDateString('tr-TR', options)}`;
         }
 
         function switchTab(grade) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            if(grade === 5) {
-                document.querySelector('.tab-btn').classList.add('active');
-                document.getElementById('tab-5').classList.add('active');
+            currentGrade = grade;
+            currentWeekIndex = 0; // Sekme değişince başa dön
+
+            if (grade === 5) {
+                document.getElementById('tab-btn-5').className = "px-8 py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-indigo-600 text-white shadow-md";
+                document.getElementById('tab-btn-6').className = "px-8 py-3 rounded-xl font-bold text-sm transition-all duration-200 text-slate-600 hover:text-slate-900";
+                document.getElementById('current-grade-badge').innerText = "5. Sınıf";
             } else {
-                document.querySelector('.tab-6-btn').classList.add('active');
-                document.getElementById('tab-6').classList.add('active');
+                document.getElementById('tab-btn-6').className = "px-8 py-3 rounded-xl font-bold text-sm transition-all duration-200 bg-indigo-600 text-white shadow-md";
+                document.getElementById('tab-btn-5').className = "px-8 py-3 rounded-xl font-bold text-sm transition-all duration-200 text-slate-600 hover:text-slate-900";
+                document.getElementById('current-grade-badge').innerText = "6. Sınıf";
             }
+            loadWeekData();
         }
 
-        function updateProgress(key) {
-            const checkbox = document.getElementById(key);
-            localStorage.setItem(key, checkbox.checked);
-            calculateStats();
+        function changeWeek(direction) {
+            const planList = plans[currentGrade];
+            currentWeekIndex += direction;
+            if (currentWeekIndex < 0) currentWeekIndex = 0;
+            if (currentWeekIndex >= planList.length) currentWeekIndex = planList.length - 1;
+            loadWeekData();
         }
 
-        function calculateStats() {
-            let total = 0;
-            let completed = 0;
-            ['5', '6'].forEach(grade => {
-                curriculumData[grade].forEach((theme, tIndex) => {
-                    theme.outcomes.forEach((_, oIndex) => {
-                        total++;
-                        const storageKey = `rayilmazan_g${grade}_t${tIndex}_o${oIndex}`;
-                        if(localStorage.getItem(storageKey) === 'true') {
-                            completed++;
-                        }
-                    });
-                });
-            });
-            document.getElementById('totalCount').innerText = total;
-            document.getElementById('completedCount').innerText = completed;
-            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-            document.getElementById('percentComplete').innerText = percent + '%';
+        function resetToCurrentDate() {
+            currentWeekIndex = 0;
+            loadWeekData();
         }
 
-        function resetProgress() {
-            if(confirm("Tüm ilerleme sıfırlansın mı?")) {
-                localStorage.clear();
-                renderCurriculum();
+        function loadWeekData() {
+            const planList = plans[currentGrade];
+            const currentWeekData = planList[currentWeekIndex];
+
+            document.getElementById('week-title').innerText = `${currentWeekData.week}. Hafta (${currentWeekData.dateRange})`;
+            document.getElementById('topic-text').innerText = currentWeekData.topic;
+            document.getElementById('outcome-text').innerText = currentWeekData.outcome;
+
+            const examBadge = document.getElementById('exam-status-badge');
+            const quizBtnText = document.getElementById('quiz-btn-text');
+
+            if (currentWeekData.isExam) {
+                examBadge.className = "bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse";
+                examBadge.innerText = "Sınav Haftası / Öncesi";
+                quizBtnText.innerText = "Sınav Sorularını Hazırla (30 Soru)";
+            } else {
+                examBadge.className = "bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider";
+                examBadge.innerText = "Normal Hafta";
+                quizBtnText.innerText = "Test Sorularını Hazırla (10 Soru)";
             }
+
+            // Test alanını gizle yeni haftaya geçince
+            document.getElementById('printable-area').classList.add('hidden');
         }
 
-        function exportData() {
-            let data = {};
-            for(let i=0; i<localStorage.length; i++) {
-                let key = localStorage.key(i);
-                if(key.startsWith('rayilmazan_')) {
-                    data[key] = localStorage.getItem(key);
-                }
+        // Soru Üretici Fonksiyonu
+        function generateQuiz() {
+            const planList = plans[currentGrade];
+            const currentWeekData = planList[currentWeekIndex];
+            const questionCount = currentWeekData.isExam ? 30 : 10;
+
+            document.getElementById('quiz-pdf-info').innerText = `${currentGrade}. Sınıf - ${currentWeekData.week}. Hafta Değerlendirme Sınavı (${questionCount} Soru)`;
+            
+            let container = document.getElementById('quiz-content-area');
+            container.innerHTML = "";
+
+            // Havuzdan veya dinamik şablondan sorular üretelim
+            for (let i = 1; i <= questionCount; i++) {
+                let qDiv = document.createElement('div');
+                qDiv.className = "p-4 bg-slate-50 rounded-xl border border-slate-200 text-sm";
+                qDiv.innerHTML = `
+                    <p class="font-bold text-slate-900 mb-2">Soru ${i}: ${currentWeekData.topic} konusuna yönelik örnek değerlendirme sorusu metni burada yer almaktadır. Doğru seçeneği işaretleyiniz?</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 pl-2">
+                        <div>A) Seçenek A açıklaması</div>
+                        <div>B) Seçenek B açıklaması</div>
+                        <div>C) Seçenek C açıklaması</div>
+                        <div>D) Seçenek D açıklaması</div>
+                    </div>
+                `;
+                container.appendChild(qDiv);
             }
-            let blob = new Blob([JSON.stringify(data, null, 2)], {type: 'json'});
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'rayilmazan_mufredat_yedek.json';
-            a.click();
+
+            document.getElementById('printable-area').classList.remove('hidden');
+            document.getElementById('printable-area').scrollIntoView({ behavior: 'smooth' });
         }
 
-        window.onload = renderCurriculum;
+        // Sayfa ilk yüklendiğinde çalıştır
+        window.onload = initApp;
     </script>
 </body>
 </html>
