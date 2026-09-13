@@ -238,7 +238,7 @@
             color: white;
             border-radius: 10px;
             padding: 2rem;
-            min-height: 270px;
+            min-height: 320px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -275,9 +275,18 @@
         }
 
         .slide-body {
-            font-size: 1rem;
+            font-size: 0.98rem;
             color: #cbd5e1;
             line-height: 1.7;
+        }
+
+        .slide-body p {
+            margin-bottom: 0.8rem;
+        }
+
+        .slide-body ul {
+            margin-left: 1.2rem;
+            margin-bottom: 0.8rem;
         }
 
         .slide-controls {
@@ -549,7 +558,7 @@
         <!-- 40 Min Presentation / Slides -->
         <div class="lesson-section">
             <div class="section-title">
-                <span>📚 40 Dakikalık Eğitici Ders İşlenişi ve Sunum Akışı</span>
+                <span>📚 40 Dakikalık Kitaba Sadık Ders İşlenişi ve Sunum Akışı</span>
             </div>
 
             <div class="slides-viewer">
@@ -585,16 +594,16 @@
 
             <div class="exam-banner" id="examBanner" style="display: none;">
                 <div>
-                    <strong>📝 Ortak Sınav Yaklaşıyor! (Deneme Sınavı Modülü)</strong>
-                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen tüm konulardan karma sorular içeren bir deneme sınavı derleyebilirsiniz.</p>
+                    <strong>📝 Ortak Sınav Yaklaşıyor! (En Az 30 Soruluk Deneme Sınavı Modülü)</strong>
+                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen tüm konulardan karma sorular içeren en az 30 soruluk bir deneme sınavı derleyebilirsiniz.</p>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="exam-btn" onclick="generatePracticeExam()">Deneme Sınavı Oluştur</button>
+                    <button class="exam-btn" onclick="generatePracticeExam()">En Az 30 Soruluk Deneme Sınavı Oluştur</button>
                 </div>
             </div>
 
             <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                <span>❓ Değerlendirme Soruları</span>
+                <span id="quizTitleDisplay">❓ Değerlendirme Soruları (En Az 10 Soru)</span>
                 <button class="print-btn" onclick="printTestSheet()">🖨️ Test / Sınav Çıktısı Al (PDF)</button>
             </div>
 
@@ -623,7 +632,7 @@
             { week: 4, start: '2026-10-05', end: '2026-10-09', name: '4. Hafta (5-9 Ekim 2026)' },
             { week: 5, start: '2026-10-12', end: '2026-10-16', name: '5. Hafta (12-16 Ekim 2026 - Codeweek)' },
             { week: 6, start: '2026-10-19', end: '2026-10-23', name: '6. Hafta (19-23 Ekim 2026)' },
-            { week: 7, start: '2026-10-26', end: '2026-10-30', name: '7. Hafta (26-30 Ekim 2026 - Sınav Öncesi)', isExamUpcoming: true },
+            { week: 7, start: '2026-10-26', end: '2026-10-30', name: '7. Hafta (26-30 Ekim 2026 - Ortak Sınav Öncesi)', isExamUpcoming: true },
             { week: 8, start: '2026-11-02', end: '2026-11-06', name: '8. Hafta (2-6 Kasım 2026)' },
             { week: 9, start: '2026-11-09', end: '2026-11-13', name: '9. Hafta (9-13 Kasım 2026 - Atatürk H.)' },
             { week: 10, start: '2026-11-23', end: '2026-11-27', name: '10. Hafta (23-27 Kasım 2026)' },
@@ -644,14 +653,22 @@
                 topic: "Bilişim Teknolojilerinin Sınıflandırılması",
                 outcomeText: "Günlük yaşamda kullanılan bilişim teknolojilerini kullanım alanlarına ve temel kavramlarına göre sınıflandırır.",
                 slides: [
-                    { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Soru & Beyin Fırtınası", body: "Görsel ve sorularla başlayın: 'Bilişim teknolojileri denince aklınıza hangi cihazlar geliyor? Teknolojik cihazlar olmasaydı günlük hayatımız nasıl değişirdi?'" },
-                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Temel Kavramlar & Teknolojinin Yolculuğu", body: "İletişim, bilgi, bilişim, teknoloji, donanım ve yazılım kavramları açıklanır. Geçmişteki daktilo/kasetçalar ile günümüzdeki bilgisayar/akıllı telefonlar karşılaştırılır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Kelime Kavanozu & Grup Çalışması", body: "Öğrenciler küçük gruplara ayrılır. Kelime kavanozundan çektikleri iletişim, bilgi, donanım kartlarını kullanım alanlarına göre gruplandırırlar." },
-                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Ders Özeti", body: "Teknolojinin hayatı kolaylaştırma, hızlandırma ve maliyeti azaltma avantajları özetlenir." }
+                    { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Soru & Beyin Fırtınası", body: "<p>Dersin başında öğrencilerle beyin fırtınası yapılır: 'Evde, okulda veya çevrenizde kullandığınız teknolojik cihazlar olmasaydı günlük yaşamınız nasıl değişirdi?'</p><p>Geçmişteki daktilo, kasetçalar, telgraf, tüplü televizyon ve disket görselleri ile günümüzdeki dokunmatik dizüstü bilgisayarlar, akıllı telefonlar, akıllı saatler ve bulut bilişim sistemleri karşılaştırılır.</p>" },
+                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Temel Kavramlar & Teknolojinin Faydaları", body: "<p>Kılavuz kitaptaki temel kavramlar tanımlanır: <strong>İletişim, Bilgi, Bilişim, Teknoloji, BİT, Donanım, Yazılım, İnternet</strong>.</p><p>Bilişim teknolojilerinin sağladığı 4 temel avantaj incelenir:</p><ul><li><strong>Hayatı Kolaylaştırma:</strong> İşleri daha az çabayla yürütme.</li><li><strong>Süreçleri Hızlandırma:</strong> Zaman tasarrufu sağlama.</li><li><strong>Maliyetleri Azaltma:</strong> Kağıt ve ulaşım giderlerini düşürme.</li><li><strong>Verimliliği Artırma:</strong> Daha kısa sürede kaliteli ürün çıkarma.</li></ul>" },
+                    { stage: "UYGULAMA & ETKİNLİK (10 DK)", title: "Kelime Kavanozu & Grup Çalışması", body: "<p>Öğrenciler küçük gruplara ayrılır. 'Kelime Kavanozu'ndan çekilen kavram kartları (iletişim, bilgi, donanım) araştırılır. Kullanım alanlarına göre (Eğitim, Sağlık, Ulaşım, Bankacılık) tahtada gruplandırılır ve grup afişi hazırlanır.</p>" },
+                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Ders Özeti & Yeşil Ekran Teknolojisi", body: "<p>Yeşil ekran (green screen) teknolojisi ve animasyon teknolojilerinin sinema, okul ve hastanelerdeki kullanım alanları özetlenir. Başkalarının fikirlerine saygı duyma ve doğru bilgi paylaşma sorumlulukları vurgulanır.</p>" }
                 ],
                 quiz: [
                     { q: "Aşağıdakilerden hangisi bilişim teknolojilerinde 'donanım' kavramına örnektir?", options: ["A) İşletim sistemi", "B) Klavye", "C) Arama motoru", "D) Antivirüs programı"], correct: 1 },
-                    { q: "Teknolojinin hayatımıza sağladığı temel avantaj aşağıdakilerden hangisidir?", options: ["A) İşleri yavaşlatmak", "B) Bilgiye erişimi kolaylaştırmak", "C) Elektrik tüketimini artırmak", "D) Yüz yüze iletişimi engellemek"], correct: 1 }
+                    { q: "Teknolojinin hayatımıza sağladığı temel avantaj aşağıdakilerden hangisidir?", options: ["A) İşleri yavaşlatmak", "B) Bilgiye erişimi kolaylaştırmak", "C) Elektrik tüketimini artırmak", "D) Yüz yüze iletişimi engellemek"], correct: 1 },
+                    { q: "Bilişim teknolojilerini kullanırken kaynağı belirsiz kulaktan dolma bilgileri paylaşmamak hangi etik kurala örnektir?", options: ["A) Tasarruf", "B) Sorumluluk bilinci", "C) Donanım güncellemesi", "D) Ergonomi"], correct: 1 },
+                    { q: "Geçmişte kullanılan 'daktilo' aracının günümüzdeki karşılığı hangisidir?", options: ["A) Bilgisayar ve Klavye", "B) Akıllı Saat", "C) Kulaklık", "D) Modem"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bilişim teknolojilerinin kullanım alanlarından biri DEĞİLDİR?", options: ["A) Eğitim ve EBA", "B) Sağlık ve MHRS", "C) Bankacılık", "D) Taş devri alet yapımı"], correct: 3 },
+                    { q: "Aşağıdakilerden hangisi fiziksel bir nesne olmayıp bilgisayara ne yapacağını söyleyen komutlar bütünüdür?", options: ["A) Donanım", "B) Yazılım", "C) Fare", "D) Ekran"], correct: 1 },
+                    { q: "Geçmişteki kasetçalar cihazının günümüzdeki karşılığı aşağıdakilerden hangisidir?", options: ["A) Çevrim içi müzik platformları", "B) Disket", "C) Daktilo", "D) Tüplü TV"], correct: 0 },
+                    { q: "Bilgisayarın fiziksel parçalarının tamamına ne ad verilir?", options: ["A) Yazılım", "B) Donanım", "C) İnternet", "D) Kod"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi teknolojinin verimliliği artırma etkisine örnektir?", options: ["A) İşlerin daha uzun sürmesi", "B) Daha az enerji ile daha çok iş yapılması", "C) Verilerin kaybolması", "D) Kağıt israfının artması"], correct: 1 },
+                    { q: "İletişim, bilgi ve teknolojinin birleşimiyle oluşan alana ne denir?", options: ["A) Donanım", "B) Bilişim Teknolojileri", "C) Biyoloji", "D) Coğrafya"], correct: 1 }
                 ]
             },
             2: {
@@ -659,13 +676,22 @@
                 topic: "Bilişim Teknolojilerinin Etkileri ve Dijital Sağlık",
                 outcomeText: "Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetler; ergonomik kullanım kurallarını uygular.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Ekran Süresi ve Sağlık", body: "Ekran başında uzun süre kaldığınızda gözlerinizde veya sırtınızda ağrı hissettiniz mi?" },
-                    { stage: "SUNUM (20 DK)", title: "Ergonomi & Doğru Duruş", body: "Bilgisayar kullanımında dik oturma pozisyonu, ekrana olan mesafe ve 30 dakikada bir mola verme kuralı açıklanır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Sıra Arkadaşı Duruş Analizi", body: "Öğrenciler ikili gruplar halinde birbirlerinin oturuş açılarını ve ekran mesafelerini ergonomi kurallarına göre değerlendirir." },
-                    { stage: "ÖZET (5 DK)", title: "Dijital Sağlık Altın Kuralları", body: "Doğru oturuş, mola verme ve ekran mesafesi altın kuralları belirlenir." }
+                    { stage: "GİRİŞ (5 DK)", title: "Ekran Süresi ve Sağlık Riskleri", body: "<p>Ekran başında uzun süre kaldığınızda gözlerinizde veya sırtınızda ağrı hissettiniz mi? Kontrolsüz teknoloji kullanımının beden ve ruh sağlığı üzerindeki olumsuz etkileri tartışılır.</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Ergonomi & Doğru Oturuş Kuralları", body: "<p>Bilgisayar kullanımında ergonomi kuralları açıklanır: Dik oturma pozisyonu, sırt desteği, ekranın göz seviyesinde ve 50-70 cm mesafede olması, dik açılı dirsek ve diz pozisyonu.</p><p><strong>Altın Kural:</strong> Her 30 dakikada bir mola verilerek göz ve beden egzersizleri yapılmalıdır.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Sıra Arkadaşı Duruş Analizi", body: "<p>Öğrenciler ikili gruplar halinde birbirlerinin bilgisayar/ekran başındaki duruş açılarını, sırt desteğini ve ekran mesafelerini kılavuz kitaptaki ergonomi kriterlerine göre inceleyerek geri bildirim verir.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Dijital Sağlık ve Esenlik", body: "<p>Fiziksel sağlık (ekran süresi, ergonomi), Bilişsel/Davranışsal sağlık (bildirim yorgunluğu, uyku düzeni) ve Sosyal-Duygusal sağlık (siber zorbalık, çevrim içi nezaket) özetlenir.</p>" }
                 ],
                 quiz: [
-                    { q: "Bilgisayar başında kambur oturmanın uzun vadeli olumsuz etkisi nedir?", options: ["A) Ekran çözünürlüğü düşer", "B) Bel ve boyun ağrıları oluşur", "C) İnternet yavaşlar", "D) Klavye bozulur"], correct: 1 }
+                    { q: "Bilgisayar başında kambur oturmanın uzun vadeli olumsuz etkisi nedir?", options: ["A) Ekran çözünürlüğü düşer", "B) Bel ve boyun ağrıları oluşur", "C) İnternet yavaşlar", "D) Klavye bozulur"], correct: 1 },
+                    { q: "Bilgisayar kullanırken göz sağlığını korumak için ekran mesafesi ne kadar olmalıdır?", options: ["A) 10-15 cm", "B) 50-70 cm", "C) 2 metre", "D) 5 metre"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi dijital sağlık için uygulanan 30 dakika kuralıdır?", options: ["A) 30 dakika kesintisiz oyun oynamak", "B) Her 30 dakikada bir mola verip gözleri dinlendirmek", "C) Günde 30 saat bilgisayar bakmak", "D) Ekranı 30 kez kapatıp açmak"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi kontrolsüz ve aşırı teknoloji kullanımının olumsuz etkisidir?", options: ["A) Spor yapmaya zaman kalmaması ve uyku düzeninin bozulması", "B) Ders başarısının artması", "C) Göz sağlığının iyileşmesi", "D) Sosyal ilişkilerin güçlenmesi"], correct: 0 },
+                    { q: "İnsan sağlığına uygun çalışma ortamı tasarlama bilimine ne ad verilir?", options: ["A) Ergonomi", "B) Donanım", "C) İnternet", "D) Algoritma"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi ergonomik bir çalışma ortamında olması gereken özelliklerdendir?", options: ["A) Karanlıkta ekrana bakmak", "B) Sandalyenin sırtı desteklemesi", "C) Yüzüstü yatarak bilgisayar kullanmak", "D) Ekrana 5 cm yakın durmak"], correct: 1 },
+                    { q: "Teknoloji kullanımında 'bildirim yorgunluğu' hangi sağlık boyutuna örnektir?", options: ["A) Bilişsel/Davranışsal Sağlık", "B) Donanım Sağlığı", "C) Ağ Sağlığı", "D) Yazılım Güncellemesi"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi teknolojinin OLUMLU yönlerine örnektir?", options: ["A) Bilgiye hızlı ve kolay erişim", "B) Ekran bağımlılığı", "C) Duruş bozuklukları", "D) Bildirim stresi"], correct: 0 },
+                    { q: "Ekran başında uzun süre kalındığında oluşan göz kuruluğunu önlemek için ne yapılmalıdır?", options: ["A) Sık sık göz kırpmak ve uzağa bakmak", "B) Ekran parlaklığını en son seviyeye getirmek", "C) Hiç mola vermemek", "D) Ekrana daha yakın bakmak"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi doğru oturuş pozisyonunda diz ve dirseklerin sahip olması gereken açıdır?", options: ["A) Yaklaşık 90 derece", "B) 180 derece düz", "C) 10 derece", "D) 360 derece"], correct: 0 }
                 ]
             },
             3: {
@@ -673,41 +699,68 @@
                 topic: "Dijital Vatandaşlık Uygulamaları",
                 outcomeText: "Dijital kimlik kavramını açıklar; dijital ayak izinin etkilerini ve e-Devlet gibi dijital vatandaşlık uygulamalarını sınıflandırır.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Dijital İzlerimiz", body: "İnternete yüklediğimiz bir fotoğrafı sildiğimizde tamamen yok olur mu?" },
-                    { stage: "SUNUM (20 DK)", title: "Dijital Kimlik ve Ayak İzi", body: "Sosyal medya ve oyun hesaplarındaki kimliğimiz dijital kimliğimizdir. İnternette yaptığımız her paylaşım dijital ayak izimizi oluşturur." },
-                    { stage: "UYGULAMA (10 DK)", title: "Dijital Kimlik Kartım Etkinliği", body: "Öğrenciler kullanıcı adı, profil bilgisi ve güçlü şifre kurgularıyla kendi dijital kimlik kartı şablonlarını doldurur." },
-                    { stage: "ÖZET (5 DK)", title: "Güvenli Paylaşım", body: "Kişisel adres, telefon gibi bilgilerin paylaşılmaması gerektiği vurgulanır." }
+                    { stage: "GİRİŞ (5 DK)", title: "Dijital İzlerimiz Kalıcı Mıdır?", body: "<p>İnternete yüklediğimiz bir fotoğrafı sildiğimizde tamamen yok olur mu? Arama motorlarında adımızı arattığımızda çıkan sonuçlar nereden geliyor?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Dijital Kimlik & Ayak İzi", body: "<p><strong>Dijital Kimlik:</strong> Sosyal medya, e-posta ve oyun platformlarındaki varlığımızdır.</p><p><strong>Dijital Ayak İzi:</strong> İnternette arattığımız kelimeler, paylaştığımız fotoğraflar, attığımız e-postalar ve üye olduğumuz sitelerin bıraktığı kalıcı veri kalıntılarıdır. Yüklenen veriler uzun süre internette kalabilir.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Dijital Kimlik Kartım Etkinliği", body: "<p>Öğrenciler kullanıcı adı, profil resmi (avatar), güçlü şifre kurguları ve gizlilik ayarlarını içeren 'Dijital Kimlik Kartım' şablonunu doldururlar. Kritik bilgilerin (adres, TC Kimlik, telefon) paylaşılmaması kuralı uygulanır.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "E-Devlet & Güvenli Dijital Vatandaşlık", body: "<p>E-Devlet, EBA, MHRS gibi dijital vatandaşlık uygulamaları tanıtılır. Siber zorbalık veya gizlilik ihlalinde BTK ve okul rehberlik servisinden destek alınması gerektiği vurgulanır.</p>" }
                 ],
                 quiz: [
-                    { q: "Aşağıdakilerden hangisi dijital ortamda güvenle paylaşılabilecek bir bilgidir?", options: ["A) Ev adresi", "B) TC kimlik numarası", "C) İlgi alanları ve hobiler", "D) Hesap şifresi"], correct: 2 }
+                    { q: "Aşağıdakilerden hangisi dijital ortamda güvenle paylaşılabilecek bir bilgidir?", options: ["A) Ev adresi", "B) TC kimlik numarası", "C) İlgi alanları ve hobiler", "D) Banka şifresi"], correct: 2 },
+                    { q: "İnternette yaptığımız aramalar, yüklediğimiz resimler ve bıraktığımız tüm veri kalıntılarına ne ad verilir?", options: ["A) Dijital Ayak İzi", "B) Donanım Kartı", "C) Ekran Çözünürlüğü", "D) İşletim Sistemi"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi e-Devlet gibi resmî dijital vatandaşlık uygulamalarının sağladığı faydadır?", options: ["A) Oyun indirmek", "B) Kamu hizmetlerine hızlı ve sıra beklemeden erişmek", "C) İnternet hızını iki katına çıkarmak", "D) Bilgisayar donanımını güncellemek"], correct: 1 },
+                    { q: "Güçlü bir şifre oluştururken aşağıdakilerden hangisine DİKKAT edilmelidir?", options: ["A) 123456 yazılmalıdır", "B) Doğum tarihi yazılmalıdır", "C) Büyük-küçük harf, rakam ve özel karakter içermelidir", "D) Sadece adımız yazılmalıdır"], correct: 2 },
+                    { q: "Aşağıdakilerden hangisi dijital kimliğimizi oluşturan ögelerden biridir?", options: ["A) Okul çantamız", "B) E-posta ve sosyal medya hesaplarımız", "C) Ayakkabı numaramız", "D) Çalışma masamız"], correct: 1 },
+                    { q: "İnternette tanımadığımız kişilerden gelen e-posta ve bağlantılara karşı nasıl davranmalıyız?", options: ["A) Hemen tıklamalıyız", "B) Şüpheli bağlantıları açmamalı ve silmeliyiz", "C) Şifremizi göndermeliyiz", "D) Herkese yönlendirmeliyiz"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi internette karşılaşılan siber zorbalık durumunda yapılması gereken doğru adımdır?", options: ["A) Zorbaya küfürle karşılık vermek", "B) Ekran görüntüsü alıp aileye/öğretmene haber vermek", "C) Bilgisayarı çöpe atmak", "D) Kimseye söylemeyip ağlamak"], correct: 1 },
+                    { q: "İnternette başkasına ait bir fotoğrafı izinsiz paylaşmak hangi kavramın ihlalidir?", options: ["A) Ergonomi", "B) Telif Hakkı ve Kişisel Gizlilik", "C) Veri Sıkıştırma", "D) İşlemci Hızı"], correct: 1 },
+                    { q: "EBA platformunu kullanırken sergilediğimiz doğru davranışlar hangisiyle ifade edilir?", options: ["A) Dijital Vatandaşlık", "B) Donanım Sürücüsü", "C) Piksel Çözünürlüğü", "D) Veri Tabanı"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi dijital ayak izimizi OLUMLU yönde etkiler?", options: ["A) Kibar ve saygılı yorumlar yapmak", "B) Hakaret içerikli paylaşımlar yapmak", "C) Şifrelerimizi paylaşmak", "D) Yanıltıcı bilgi yaymak"], correct: 0 }
                 ]
             },
             4: {
                 code: "BTY.5.1.4",
                 topic: "Yapay Zekâda Temel Kavram ve Özellikler",
-                outcomeText: "Yapay zekâ ile ilgili temel kavramları, örnek uygulamaları (sesli asistan, yüz tanıma) sorgular ve doğal zekâ ile karşılaştırır.",
+                outcomeText: "Yapay zekâ ile ilgili temel kavramları, örnek uygulamaları sorgular ve doğal zekâ ile karşılaştırır.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Makineler Düşünebilir mi?", body: "Bir bilgisayar veya robot insanlar gibi karar verebilir veya öğrenebilir mi?" },
-                    { stage: "SUNUM (20 DK)", title: "Yapay Zekâ Nerede?", body: "Sesli asistanlar, otonom araçlar, yüz tanıma sistemleri ve öneri algoritmaları incelenir." },
-                    { stage: "UYGULAMA (10 DK)", title: "Örnek / Örnek Olmayan Gruplama", body: "Robot süpürge (Yapay zekâ) ile hesap makinesinin (Geleneksel yazılım) farkları tartışılır." },
-                    { stage: "ÖZET (5 DK)", title: "Doğal ve Yapay Zekâ", body: "Yapay zekanın verilerle beslenerek öğrendiği özeti yapılır." }
+                    { stage: "GİRİŞ (5 DK)", title: "Makineler Düşünebilir mi?", body: "<p>Bir bilgisayar veya robot insanlar gibi karar verebilir veya öğrenebilir mi? Alan Turing'in 1950'de sorduğu 'Makineler düşünebilir mi?' sorusu tartışılır.</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Yapay Zekâ Nerede & Nasıl Çalışır?", body: "<p>Yapay zekâ uygulamaları: Sesli asistanlar, yüz tanıma, otonom araçlar, öneri algoritmaları, robot süpürgeler.</p><p><strong>Verinin Rolü:</strong> Yapay zekâ doğal zekâ gibi doğuştan öğrenmez; milyonlarca doğru etiketlenmiş veri (girdi) beslenerek modeller eğitilir.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Frayer Modeli Sürükle-Bırak", body: "<p>Öğrenciler Frayer Modeli şablonunda yapay zekânın tanımını, özelliklerini, örnek olan durumları (akıllı asistan) ve örnek olmayan durumları (hesap makinesi, standart saat) gruplandırırlar.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Doğal vs Yapay Zekâ", body: "<p>İnsan zekâsı duygu, sezgi ve özgün yaratıcılığa sahipken; yapay zekâ büyük verileri işleyerek kalıpları öğrenir.</p>" }
                 ],
                 quiz: [
-                    { q: "Aşağıdakilerden hangisi yapay zekâ teknolojisine örnek verilebilir?", options: ["A) Masa saati", "B) Sesli akıllı asistan", "C) Standart ampul", "D) Cetvel"], correct: 1 }
+                    { q: "Aşağıdakilerden hangisi yapay zekâ teknolojisine örnek verilebilir?", options: ["A) Masa saati", "B) Sesli akıllı asistan", "C) Standart ampul", "D) Cetvel"], correct: 1 },
+                    { q: "1950 yılında 'Makineler düşünebilir mi?' sorusuyla yapay zekâ biliminin temelini atan bilim insanı kimdir?", options: ["A) Alan Turing", "B) Thomas Edison", "C) Graham Bell", "D) Isaac Newton"], correct: 0 },
+                    { q: "Yapay zekanın doğru tahminler yapabilmesi için aşağıdakilerden hangisine ihtiyacı vardır?", options: ["A) Kaliteli ve çok sayıda veriye (girdiye)", "B) Renkli bir kasaya", "C) Kağıt ve kaleme", "D) Büyük bir hoparlöre"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi yapay zekâ örneği DEĞİLDİR?", options: ["A) Yüz tanıma sistemi", "B) Standart hesap makinesi", "C) Otonom (sürücüsüz) araç", "D) Film öneri algoritması"], correct: 1 },
+                    { q: "İnsan zekası ile yapay zekâ arasındaki en temel fark nedir?", options: ["A) İnsan zekasının duygulara ve özgün bilince sahip olması", "B) Yapay zekanın yemek yemesi", "C) İnsanların elektrikle çalışması", "D) Yapay zekanın uyuması"], correct: 0 },
+                    { q: "Yapay zekaya yanlış veya hatalı veriler yüklendiğinde ne gerçekleşir?", options: ["A) Yapay zekâ yanlış ve hatalı sonuçlar üretir", "B) Kendi kendine düzelir", "C) Bilgisayar patlar", "D) Hiçbir şey değişmez"], correct: 0 },
+                    { q: "Robot süpürgelerin evin haritasını çıkarıp engellerden kaçması hangi teknolojiye dayanır?", options: ["A) Yapay Zekâ ve Sensörler", "B) Daktilo", "C) Disket", "D) Yazıcı"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi yapay zekânın kullanım alanlarından biridir?", options: ["A) Otonom araçlar ve sağlıkta hastalık teşhisi", "B) Manuel tahta tebeşiri", "C) Standart mum", "D) Odun sobası"], correct: 0 },
+                    { q: "Frayer modelinde bir kavram açıklanırken hangi 4 bölüm kullanılır?", options: ["A) Tanım, Özellikler, Örnekler, Örnek Olmayanlar", "B) Fiyat, Renk, Boyut, Ağırlık", "C) Giriş, Çıkış, İşlemci, RAM", "D) Donanım, Yazılım, Ağ, Ekran"], correct: 0 },
+                    { q: "Türkiye'de 1959 yılında 'Makine Düşünebilir mi ve Nasıl Düşünebilir?' makalesini yazan bilim insanımız kimdir?", options: ["A) Cahit Arf", "B) Aziz Sancar", "C) Ali Kuşçu", "D) Mimar Sinan"], correct: 0 }
                 ]
             },
             6: {
                 code: "BTY.5.1.5",
-                topic: "Bilgisayar Sistemlerinin Kullanımı (Donanım)",
+                topic: "Bilgisayar Sistemlerinin Kullanımı (Donanım & Hafıza Birimleri)",
                 outcomeText: "Bilgisayar sisteminin temel bileşenlerini (iç/dış donanım, giriş/çıkış birimleri) belirler ve çözümler.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Bilgisayarın Organları", body: "İnsan vücudundaki organlar gibi bilgisayar parçalarının da görevleri var mıdır?" },
-                    { stage: "SUNUM (20 DK)", title: "Giriş ve Çıkış Birimleri", body: "Klavye, fare, mikrofon (Giriş); Ekran, yazıcı, hoparlör (Çıkış); İşlemci, RAM, Sabit Disk (İç donanım) tanıtılır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Deve - Cüce Oyunu", body: "Öğretmen donanım birimi söyler; Giriş biriminde 'Deve', Çıkış biriminde 'Cüce' pozisyonu alınır." },
-                    { stage: "ÖZET (5 DK)", title: "Donanım Özeti", body: "Veri akış şeması özetlenir." }
+                    { stage: "GİRİŞ (5 DK)", title: "Bilgisayarın Organları", body: "<p>İnsan vücudundaki beyin, kalp ve göz gibi organlar gibi bilgisayar parçalarının da görevleri var mıdır? Donanım ve yazılım ayrımı açıklanır.</p>" },
+                    { stage: "SUNUM (20 DK)", title: "İç/Dış Donanım & Giriş/Çıkış Birimleri", body: "<p><strong>İç Donanım:</strong> Anakar, İşlemci (CPU - Beyin), RAM Bellek (Geçici hafıza), Sabit Disk / SSD (Kalıcı hafıza).</p><p><strong>Giriş Birimleri:</strong> Klavye, fare, mikrofon, tarayıcı.</p><p><strong>Çıkış Birimleri:</strong> Ekran, yazıcı, hoparlör, kulaklık.</p><p><strong>Dijital Hafıza Merdiveni:</strong> Bit < Byte < KB < MB < GB < TB.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Deve - Cüce Donanım Oyunu", body: "<p>Öğretmen donanım birimi söyler; Giriş biriminde öğrenciler 'Deve' (ayakta), Çıkış biriminde 'Cüce' (oturan) pozisyonu alarak donanımları sınıflandırır.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Piksel ve Sıkıştırma", body: "<p>Resimlerin piksellerden oluştuğu ve veri boyutunu düşürmek için dizi boyu kodlama (veri sıkıştırma) yapıldığı özetlenir.</p>" }
                 ],
                 quiz: [
-                    { q: "Aşağıdaki donanım birimlerinden hangisi bir 'Çıkış Birimi'dir?", options: ["A) Klavye", "B) Fare", "C) Hoparlör", "D) Mikrofon"], correct: 2 }
+                    { q: "Aşağıdaki donanım birimlerinden hangisi bir 'Çıkış Birimi'dir?", options: ["A) Klavye", "B) Fare", "C) Hoparlör", "D) Mikrofon"], correct: 2 },
+                    { q: "Bilgisayarın tüm parçalarını üzerinde barındıran ve veri akışını sağlayan ana kart hangisidir?", options: ["A) Anakart", "B) Sabit Disk", "C) Ekran Kartı", "D) RAM"], correct: 0 },
+                    { q: "Bilgisayarın beyin görevi gören ve tüm mantıksal/aritmetiksel işlemleri yapan iç donanım bileşeni nedir?", options: ["A) İşlemci (CPU)", "B) Hoparlör", "C) Fare", "D) Yazıcı"], correct: 0 },
+                    { q: "Dijital hafıza birimlerinin küçükten büyüğe doğru sıralanışı hangisidir?", options: ["A) Bit - Byte - KB - MB - GB - TB", "B) TB - GB - MB - KB - Byte", "C) Byte - Bit - GB - MB", "D) MB - KB - TB - GB"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bir 'Giriş Birimi'dir?", options: ["A) Yazıcı", "B) Ekran", "C) Mikrofon", "D) Hoparlör"], correct: 2 },
+                    { q: "Bilgisayarda elektrik kesildiğinde üzerindeki veriler silinen geçici bellek hangisidir?", options: ["A) RAM Bellek", "B) Sabit Disk (HDD)", "C) SSD", "D) DVD"], correct: 0 },
+                    { q: "1 Byte kaç Bit'ten oluşur?", options: ["A) 2 Bit", "B) 8 Bit", "C) 100 Bit", "D) 1024 Bit"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi hem giriş hem çıkış birimi olarak kullanılabilir?", options: ["A) Dokunmatik Ekran", "B) Standart Klavye", "C) Hoparlör", "D) Lazer Fare"], correct: 0 },
+                    { q: "Aşağıdaki depolama birimlerinden hangisi internet üzerinden veri saklamaya yarar?", options: ["A) Bulut Depolama", "B) Disket", "C) CD-ROM", "D) RAM"], correct: 0 },
+                    { q: "Kağıttaki bir belgeyi veya fotoğrafı bilgisayara aktaran giriş birimi hangisidir?", options: ["A) Tarayıcı (Scanner)", "B) Yazıcı (Printer)", "C) Hoparlör", "D) İşlemci"], correct: 0 }
                 ]
             },
             7: {
@@ -715,13 +768,45 @@
                 topic: "Bilgisayar Sistemlerinin Kullanımı (Yazılım & İşletim Sistemi)",
                 outcomeText: "İşletim sistemlerinin görevlerini ve kullanıcı arayüzünü kavrar; temel teknik sorun giderme adımlarını yürütür.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "İşletim Sistemi Nedir?", body: "Donanım parçalarını kim yönetir ve uygulamaların çalışmasını ne sağlar?" },
-                    { stage: "SUNUM (20 DK)", title: "Arayüz ve Sistem Yazılımları", body: "Windows, Pardus, Linux, Android gibi işletim sistemlerinin görevleri anlatılır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Sorun Giderme Algoritması", body: "Yazıcı çalışmadığında güç kablosu, sürücü ve bağlantı denetimi adımları sıralanır." },
-                    { stage: "ÖZET (5 DK)", title: "BT Uzmanı Ödülü", body: "Doğru/Yanlış oyunu ile ders tamamlanır." }
+                    { stage: "GİRİŞ (5 DK)", title: "İşletim Sistemi Olmasaydı?", body: "<p>Tüm donanım parçalarını kim yönetir? Ekran, klavye ve uygulamalar birbiriyle nasıl konuşur?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "İşletim Sistemleri & Görevleri", body: "<p><strong>İşletim Sistemi:</strong> Donanım kaynaklarını yöneten, uygulama yazılımlarının çalışmasını sağlayan temel sistem yazılımıdır.</p><p><strong>Örnekler:</strong> Windows, Pardus (Yerli), Linux, Android, iOS.</p><p>Görevleri: Bellek yönetimi, dosya yönetimi, donanım kontrolü, kullanıcı arayüzü sağlama.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Sorun Giderme Algoritması", body: "<p>Yazıcı çalışmadığında izlenecek adım adım algoritma: 1. Güç kablosu bağlı mı? 2. USB/Ağ kablosu bağlı mı? 3. Sürücü (driver) yüklü mü? 4. Kağıt sıkışması var mı?</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Günün BT Uzmanı Rozeti", body: "<p>Doğru/Yanlış oyunu ile işletim sistemi kavramları pekiştirilir, teknik sorunlarda pes etmeden adım adım çözüm üretme (sebat etme) vurgulanır.</p>" }
                 ],
                 quiz: [
-                    { q: "Bilgisayardaki tüm donanım ve yazılımları yöneten en temel sistem yazılımı nedir?", options: ["A) Kelime İşlemci", "B) İşletim Sistemi", "C) İnternet Tarayıcısı", "D) Oyun"], correct: 1 }
+                    { q: "Bilgisayardaki tüm donanım ve yazılımları yöneten en temel sistem yazılımı nedir?", options: ["A) Kelime İşlemci", "B) İşletim Sistemi", "C) İnternet Tarayıcısı", "D) Oyun"], correct: 1 },
+                    { q: "TÜBİTAK tarafından geliştirilen yerli ve millî işletim sistemimizin adı nedir?", options: ["A) Pardus", "B) Windows", "C) Android", "D) MacOS"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi mobil cihazlarda (akıllı telefon/tablet) kullanılan bir işletim sistemidir?", options: ["A) Android", "B) MS Paint", "C) Word", "D) WinRAR"], correct: 0 },
+                    { q: "Bilgisayara bağlı bir donanımın işletim sistemiyle tanışmasını ve çalışmasını sağlayan özel yazılıma ne denir?", options: ["A) Sürücü (Driver)", "B) Ekran Kağıdı", "C) Klasör", "D) Virus"], correct: 0 },
+                    { q: "Yazıcıdan çıktı alınamadığında izlenecek ilk teknik sorun giderme adımı hangisi olmalıdır?", options: ["A) Yazıcıyı çöpe atmak", "B) Güç ve bağlantı kablolarını kontrol etmek", "C) Ekranı kapatmak", "D) Klavye tuşlarına basmak"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi bir 'Uygulama Yazılımı'dır?", options: ["A) Müzik dinleme programı", "B) Windows İşletim Sistemi", "C) Pardus İşletim Sistemi", "D) Android"], correct: 0 },
+                    { q: "Kullanıcının bilgisayarla görsel olarak komut vermesini sağlayan pencereli yapıya ne ad verilir?", options: ["A) Kullanıcı Arayüzü (GUI)", "B) Sabit Disk", "C) İşlemci Fanı", "D) Anakart"], correct: 0 },
+                    { q: "Bilgisayar açılırken ekrana görüntü gelmiyorsa öncelikle hangi donanım kablosu kontrol edilmelidir?", options: ["A) Monitör / Ekran kablosu", "B) Kulaklık kablosu", "C) Fare kablosu", "D) Mikrofon kablosu"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi İşletim Sisteminin temel görevlerinden biri DEĞİLDİR?", options: ["A) Dosya ve bellek yönetimi", "B) Donanımları çalıştırmak", "C) Bilgisayar kasasını fiziksel olarak temizlemek", "D) Kullanıcı arayüzü sunmak"], correct: 2 },
+                    { q: "Aşağıdakilerden hangisi açık kaynak kodlu ve ücretsiz bir işletim sistemidir?", options: ["A) Linux / Pardus", "B) Ücretli Lisanslı Oyun", "C) Deneme Sürümü Program", "D) Antivirüs"], correct: 0 }
+                ]
+            },
+            8: {
+                code: "BTY.5.1.6",
+                topic: "Dosya ve Klasör Yönetimi",
+                outcomeText: "Temel dosya ve klasör düzenleme işlemlerini yürütür; dosya sıkıştırma işlemlerini verimlilik kapsamında değerlendirir.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Masaüstü Karmaşası", body: "<p>Ekranda yüzlerce dosya varken aradığınız bir ödev belgesini bulmak kolay mıdır? Dosyaları düzenlemenin en pratik yolu nedir?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Dosya Yapısı, Uzantılar ve Klasörler", body: "<p><strong>Dosya Adı Yapısı:</strong> Dosya_Adı . Uzantı (Örn: Odev.docx)</p><p><strong>Uzantı Türleri:</strong> .txt / .docx (Metin), .jpg / .png (Görsel), .mp3 / .wav (Ses), .mp4 / .avi (Video), .pdf (Sabit Belge), .zip / .rar (Sıkıştırılmış Dosya).</p><p><strong>Klasörler:</strong> Dosyaları gruplamak için kullanılan sarı renkli dijital odalardır.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Dosya İşlemleri & Sıkıştırma Deneyi", body: "<p>Klasör oluşturma, ad değiştirme, taşıma, silme ve arama uygulaması yapılır. Poşete gazete kağıdı doldurma benzetmesiyle ZIP/RAR dosya sıkıştırma ile alan tasarrufu yapılması gösterilir.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Düzenli Klasör Hiyerarşisi", body: "<p>Düzenli dosya yönetiminin zaman tasarrufu sağladığı, yedekleme yapmanın veri kaybını önlediği özetlenir.</p>" }
+                ],
+                quiz: [
+                    { q: "Bir dosya adında noktadan sonra gelen kısım (.docx, .jpg) bize neyi gösterir?", options: ["A) Dosya boyutunu", "B) Dosyanın türünü ve uzantısını", "C) Bilgisayar markasını", "D) Ekran çözünürlüğünü"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi bir 'Ses Dosyası' uzantısıdır?", options: ["A) .mp3", "B) .jpg", "C) .docx", "D) .exe"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bir 'Görsel/Resim Dosyası' uzantısıdır?", options: ["A) .jpg", "B) .mp3", "C) .txt", "D) .zip"], correct: 0 },
+                    { q: "Benzer dosyaları bir arada tutarak bilgisayarda düzen sağlayan yapılara ne denir?", options: ["A) Klasör", "B) Piksel", "C) İşlemci", "D) Virüs"], correct: 0 },
+                    { q: "Dosya ve klasörleri sıkıştırmanın (ZIP/RAR) temel amacı nedir?", options: ["A) Dosya boyutunu küçülterek yer tasarrufu ve hızlı aktarım sağlamak", "B) Dosyanın rengini değiştirmek", "C) Bilgisayarı kapatmak", "D) Resim kalitesini artırmak"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bir 'Sıkıştırılmış Dosya' uzantısıdır?", options: ["A) .zip", "B) .docx", "C) .mp3", "D) .png"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi 'Metin/Kelime İşlemci' belgesi uzantısıdır?", options: ["A) .docx", "B) .mp3", "C) .avi", "D) .bmp"], correct: 0 },
+                    { q: "Yanlışlıkla silinen dosya ve klasörler ilk olarak nereye gider?", options: ["A) Geri Dönüşüm Kutusu", "B) İnternet", "C) Ekran Kartı", "D) Anakart"], correct: 0 },
+                    { q: "Bir dosyanın adını değiştirmek için hangi işlem uygulanır?", options: ["A) Yeniden Adlandır (Rename)", "B) Sıkıştır", "C) Kopyala", "D) Yazdır"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi 'Video Dosyası' uzantısıdır?", options: ["A) .mp4", "B) .txt", "C) .jpg", "D) .zip"], correct: 0 }
                 ]
             }
         };
@@ -733,13 +818,22 @@
                 topic: "Yenilikçi Bilişim Teknolojileri",
                 outcomeText: "Yenilikçi bilişim teknolojilerini (Yapay Zekâ, AR/VR, Giyilebilir Teknolojiler) kullanım alanlarına göre sınıflandırır.",
                 slides: [
-                    { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Sanal vs Artırılmış Gerçeklik", body: "Sanal gerçeklik (VR) ile artırılmış gerçeklik (AR) aynı şey midir? Farkları nelerdir?" },
-                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Yenilikçi Teknolojiler", body: "AR gerçek dünyanın üzerine dijital katman ekler; VR tamamen sanal evrene sokar. Akıllı saatler ise giyilebilir teknolojidir." },
-                    { stage: "UYGULAMA (10 DK)", title: "Renkli Gerçeklik Deneyimi", body: "AR destekli boyama/görsel uygulaması incelenir veya örnek AR senaryoları gruplandırılır." },
-                    { stage: "ÖZET (5 DK)", title: "Toplumsal ve Çevresel Fayda", body: "Yenilikçi teknolojilerin sağlık ve eğitimdeki tasarruf sağlayan yönleri özetlenir." }
+                    { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Sanal vs Artırılmış Gerçeklik", body: "<p>Sanal gerçeklik (VR) ile artırılmış gerçeklik (AR) aynı şey midir? Farkları nelerdir?</p>" },
+                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Yenilikçi Teknolojiler", body: "<p><strong>Artırılmış Gerçeklik (AR):</strong> Gerçek dünya görüntüsü üzerine dijital nesne/katman ekler.</p><p><strong>Sanal Gerçeklik (VR):</strong> Kullanıcıyı tamamen kask/gözlükle dijital sanal evrene sokar.</p><p><strong>Giyilebilir Teknolojiler:</strong> Akıllı saatler ve bileklikler sağlığı takip eder.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Renkli Gerçeklik Deneyimi", body: "<p>AR destekli boyama/görsel uygulaması incelenir. Gruplar sağlık, eğitim ve sanayide kullanılan yenilikçi teknolojileri listeler.</p>" },
+                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Toplumsal ve Çevresel Fayda", body: "<p>Yenilikçi teknolojilerin kağıt, enerji ve zaman tasarrufu sağlayan yeşil beceri yönleri özetlenir.</p>" }
                 ],
                 quiz: [
-                    { q: "Gerçek dünya görüntüsü üzerine dijital nesneler ekleyen teknoloji hangisidir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Sabit Disk", "D) Disket"], correct: 1 }
+                    { q: "Gerçek dünya görüntüsü üzerine dijital nesneler ve katmanlar ekleyen teknoloji hangisidir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Sabit Disk", "D) Disket"], correct: 1 },
+                    { q: "Kullanıcıyı tamamen dış dünyadan soyutlayarak sanal bir evrene sokan teknoloji nedir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Akıllı Saat", "D) Yazıcı"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi 'Giyilebilir Teknoloji'ye örnektir?", options: ["A) Akıllı Saat ve Akıllı Bileklik", "B) Masaüstü Bilgisayar Kasası", "C) Tüplü Televizyon", "D) Yazıcı"], correct: 0 },
+                    { q: "Artırılmış gerçeklik teknolojisinin eğitimdeki faydası aşağıdakilerden hangisidir?", options: ["A) Soyut ve tehlikeli deneyleri güvenle görselleştirmek", "B) Kitapları yok etmek", "C) Sadece oyun oynamak", "D) Bilgisayarı bozmak"], correct: 0 },
+                    { q: "Giyilebilir teknolojilerin sağlık alanındaki temel kullanımı nedir?", options: ["A) Nabız, adım ve uyku takibi yapmak", "B) Fotoğraf basmak", "C) Çöp toplamak", "D) Araba sürmek"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi Yenilikçi Bilişim Teknolojilerinden biridir?", options: ["A) Yapay Zekâ ve AR/VR", "B) Daktilo", "C) Telgraf", "D) Kasetçalar"], correct: 0 },
+                    { q: "Sanal gerçeklik kaskı takan bir öğrenci ders esnasında ne deneyimler?", options: ["A) Kendisini uzayda veya tarihi bir mekanda hisseder", "B) Sadece kağıt okur", "C) Hiçbir şey görmez", "D) Sadece ses duyar"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi teknolojinin 'Yeşil Beceri' (çevreye faydalı) kullanımına örnektir?", options: ["A) Dijital belgelerle kağıt israfını önlemek", "B) Sürekli gereksiz çıktı almak", "C) Cihazları açık bırakmak", "D) Elektronik atıkları doğaya atmak"], correct: 0 },
+                    { q: "AR teknolojisi ile bir ders kitabındaki organ resmine bakıldığında ne gerçekleşir?", options: ["A) Resim 3 boyutlu canlanır ve hareket eder", "B) Kitap yırtılır", "C) Ekran kararır", "D) Ses kesilir"], correct: 0 },
+                    { q: "Gelecekte yenilikçi teknolojilerin yaygınlaşması hangi alanda büyük değişim yaratır?", options: ["A) Eğitim, sağlık, ulaşım ve üretimde", "B) Yalnızca taş devri aletlerinde", "C) Hiçbir alanda", "D) Sadece mum kullanımında"], correct: 0 }
                 ]
             },
             2: {
@@ -747,13 +841,22 @@
                 topic: "Bilişim Teknolojilerinin Geleceği",
                 outcomeText: "Bilişim teknolojilerinin günümüze kadar olan gelişiminden yola çıkarak gelecekteki olası durumlarına yönelik çıkarımlar yapar.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Geleceğin Teknolojisi", body: "20 yıl sonra cep telefonları veya bilgisayarlar nasıl görünecek?" },
-                    { stage: "SUNUM (20 DK)", title: "Alan Turing ve Zaman Çizelgesi", body: "Alan Turing'den günümüze bilgisayarların evrimi ve gelecekteki olası meslekler ele alınır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Yarının Dünyası Senaryosu", body: "Gruplar gelecekteki bir çevresel veya toplumsal sorunu çözen teknolojik araç tasarlar." },
-                    { stage: "ÖZET (5 DK)", title: "Değerlendirme", body: "Geleceğin teknolojilerinin toplumsal etkileri özetlenir." }
+                    { stage: "GİRİŞ (5 DK)", title: "Geleceğin Teknolojisi", body: "<p>20 yıl sonra cep telefonları veya bilgisayarlar nasıl görünecek? Hangi yeni meslekler ortaya çıkacak?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Alan Turing & Zaman Çizelgesi", body: "<p>Alan Turing'den Cahit Arf'a bilgisayar biliminin tarihsel evrimi anlatılır. İlk bilgisayarların oda büyüklüğünden günümüzdeki cebimize giren cihazlara dönüşüm örüntüsü incelenir.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Yarının Dünyası Senaryosu", body: "<p>Gruplar gelecekteki bir çevresel veya toplumsal sorunu çözen teknolojik araç tasarlar ve SWOT analizi yapar.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Geleceğin Meslekleri ve Toplum", body: "<p>Yapay zekâ ve otomasyonun iş gücündeki değişimi ve etki alanları değerlendirilir.</p>" }
                 ],
                 quiz: [
-                    { q: "Bilgisayar biliminin öncülerinden kabul edilen bilim insanı kimdir?", options: ["A) Alan Turing", "B) Isaac Newton", "C) Thomas Edison", "D) Galileo"], correct: 0 }
+                    { q: "Bilgisayar biliminin öncülerinden kabul edilen bilim insanı kimdir?", options: ["A) Alan Turing", "B) Isaac Newton", "C) Thomas Edison", "D) Galileo"], correct: 0 },
+                    { q: "Bilgisayarların tarihsel gelişiminde ilk bilgisayarlardan günümüze doğru ne tür bir değişim olmuştur?", options: ["A) Cihazlar küçülmüş, hızlanmış ve güçlenmiştir", "B) Cihazlar büyümüş ve yavaşlamıştır", "C) Fiyatları milyarlarca kat artmıştır", "D) Hiçbir şey değişmemiştir"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi gelecekte öne çıkması beklenen mesleklerden biridir?", options: ["A) Yapay Zekâ Mühendisi ve Siber Güvenlik Uzmanı", "B) Daktilo Tamircisi", "C) Kaset Kopyalayıcısı", "D) Telgraf Operatörü"], correct: 0 },
+                    { q: "Cahit Arf 1959 yılında yazmış olduğu makalede hangi soruyu tartışmıştır?", options: ["A) 'Makine Düşünebilir mi ve Nasıl Düşünebilir?'", "B) 'Televizyon Nasıl Yapılır?'", "C) 'Araba Nasıl Sürülür?'", "D) 'İnternet Nedir?'"], correct: 0 },
+                    { q: "Teknolojinin gelecekteki durumuna ilişkin tahmin yürütürken neye bakılır?", options: ["A) Geçmişten günümüze olan gelişim örüntülerine", "B) Rüzgarın yönüne", "C) Sadece oyun fiyatlarına", "D) Rastgele sayılara"], correct: 0 },
+                    { q: "Gelecekte otonom (sürücüsüz) araçların yaygınlaşması toplumu nasıl etkiler?", options: ["A) Trafik kazalarını ve insan hatasını azaltabilir", "B) Herkesin ehliyet alma zorunluluğunu artırır", "C) Benzin fiyatını sıfırlar", "D) Yolları yok eder"], correct: 0 },
+                    { q: "Geleceğin teknolojilerini tasarlarken çevreye duyarlılık ne olarak adlandırılır?", options: ["A) Yeşil Beceriler ve Sürdürülebilirlik", "B) Donanım Sürücüsü", "C) Yazılım İhlali", "D) Ekran Çözünürlüğü"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi gelecekte sağlık alanında yaşanabilecek olası bir gelişmedir?", options: ["A) Yapay zekâ destekli erken teşhis ve robotik cerrahi", "B) Hastanelerin tamamen kapanması", "C) İlaçların yasaklanması", "D) Doktorların yok olması"], correct: 0 },
+                    { q: "Geçmişte oda büyüklüğünde olan ENIAC gibi bilgisayarların günümüzdeki muadili nedir?", options: ["A) Akıllı Cep Telefonları ve Tabletler", "B) Abaküs", "C) Daktilo", "D) Hesap Cetveli"], correct: 0 },
+                    { q: "Gelecekte teknolojinin toplum üzerindeki olumsuz etkilerinden biri ne olabilir?", options: ["A) Bireyler arasında yüz yüze iletişimin azalması ve hareketsizlik", "B) Bilgiye erişimin imkansızlaşması", "C) Okulların tamamen yok olması", "D) Cihazların hiç çalışmaması"], correct: 0 }
                 ]
             },
             3: {
@@ -761,13 +864,22 @@
                 topic: "Tablolama Programlarına Giriş",
                 outcomeText: "Tablolama programlarının temel özelliklerini tanır, arayüz bileşenlerini (satır, sütun, hücre) kullanır.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Sayılarla Düzen", body: "Yüzlerce öğrencinin notlarını hesaplamak için en pratik araç nedir?" },
-                    { stage: "SUNUM (20 DK)", title: "Satır, Sütun ve Hücre", body: "A, B, C sütunları ve 1, 2, 3 satırları; bunların kesiştiği A1, B2 hücre adresleri anlatılır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Haftalık Ders Programı Tablosu", body: "Hücrelere veri girme, renklendirme ve kenarlık ekleme uygulaması yapılır." },
-                    { stage: "ÖZET (5 DK)", title: "Arayüz Özeti", body: "Tablolama programının veri analizi avantajları vurgulanır." }
+                    { stage: "GİRİŞ (5 DK)", title: "Sayılarla Düzen", body: "<p>Yüzlerce öğrencinin notlarını veya bir okul kütüphanesindeki kitap künyelerini hesaplamak için en pratik araç nedir?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Arayüz Bileşenleri & Formüller", body: "<p><strong>Sütunlar:</strong> A, B, C... şeklinde dikey alanlardır.</p><p><strong>Satırlar:</strong> 1, 2, 3... şeklinde yatay alanlardır.</p><p><strong>Hücre:</strong> Satır ve sütunun kesiştiği kutucuktur (Örn: B3 hücresi).</p><p><strong>Formüller:</strong> Matematiksel hesaplamalar '=' işareti ile başlar (Örn: =TOPLA(A1:A10), =ORTALAMA(B1:B5)).</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Haftalık Enerji/Ders Tablosu", body: "<p>Öğrenciler hücrelere veri girme, renklendirme, kenarlık ekleme ve basit toplama formüllerini uygularlar.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Veri Düzenleme Avantajları", body: "<p>Tablolama programlarının karmaşık verileri hızlıca analiz etme ve grafik oluşturma faydaları özetlenir.</p>" }
                 ],
                 quiz: [
-                    { q: "Tablolama programında 'B' sütunu ile '3' satırının kesiştiği hücrenin adresi nedir?", options: ["A) 3B", "B) B3", "C) B-3", "D) BB33"], correct: 1 }
+                    { q: "Tablolama programında 'B' sütunu ile '3' satırının kesiştiği hücrenin adresi nedir?", options: ["A) 3B", "B) B3", "C) B-3", "D) BB33"], correct: 1 },
+                    { q: "Tablolama programlarında bir formül veya hesaplama hangi simge ile başlar?", options: ["A) =", "B) ?", "C) #", "D) &"], correct: 0 },
+                    { q: "Tablolama programında harflerle (A, B, C) ifade edilen dikey alanlara ne denir?", options: ["A) Sütun", "B) Satır", "C) Hücre", "D) Grafik"], correct: 0 },
+                    { q: "Tablolama programında sayılarla (1, 2, 3) ifade edilen yatay alanlara ne denir?", options: ["A) Satır", "B) Sütun", "C) Hücre", "D) Formül"], correct: 0 },
+                    { q: "Belirli bir hücre aralığındaki sayıların toplamını bulan formül hangisidir?", options: ["A) =TOPLA()", "B) =ÇIKAR()", "C) =METİN()", "D) =YAZ()"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bir tablolama programı dosya uzantısıdır?", options: ["A) .xlsx", "B) .mp3", "C) .jpg", "D) .exe"], correct: 0 },
+                    { q: "Hücredeki sayıların ortalamasını alan formül hangisidir?", options: ["A) =ORTALAMA()", "B) =SAY()", "C) =TOPLAM()", "D) =ENBÜYÜK()"], correct: 0 },
+                    { q: "A1 hücresinden A10 hücresine kadar olan tüm hücreleri kapsayan aralık nasıl gösterilir?", options: ["A) A1:A10", "B) A1-A10", "C) A1+A10", "D) A1/A10"], correct: 0 },
+                    { q: "Tablolama programlarının temel kullanım amacı nedir?", options: ["A) Sayısal verileri düzenlemek, hesaplamak ve grafikleştirmek", "B) Sadece müzik dinlemek", "C) Sadece resim çizmek", "D) Bilgisayarı kapatmak"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi tablolama programında hücrelerin etrafına çizgi ekleme işlemidir?", options: ["A) Kenarlık Ekleme", "B) Renk Doldurma", "C) Yazı Tipi Büyütme", "D) Hücre Silme"], correct: 0 }
                 ]
             },
             6: {
@@ -775,13 +887,22 @@
                 topic: "Ses Düzenleme ve Ses Dosyası için Kurgu",
                 outcomeText: "Ses düzenleme programlarının arayüzünü tanır; gerçek yaşam durumuna uygun ses kurgu senaryosu oluşturur.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Sessiz Bir Dünya", body: "Bir filmi sesleri olmadan izleseydik ne hissederdik?" },
-                    { stage: "SUNUM (20 DK)", title: "Dijital Ses & Donanımlar", body: "Ses kartı, mikrofon, hoparlör donanımları ve .mp3, .wav ses formatları açıklanır." },
-                    { stage: "UYGULAMA (10 DK)", title: "Ses Kurgusu Senaryosu", body: "Ormanda çöp toplayan çocuk senaryosuna rüzgâr ve yaprak ses efektleri kurgulanır." },
-                    { stage: "ÖZET (5 DK)", title: "Telif ve Etik", body: "Başkalarının sesini izinsiz kullanmama ilkesi hatırlatılır." }
+                    { stage: "GİRİŞ (5 DK)", title: "Sessiz Bir Dünya", body: "<p>Bir filmi veya çizgi filmi sesleri ve müzikleri olmadan izleseydik ne hissederdik?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Dijital Ses & Donanımlar", body: "<p><strong>Donanımlar:</strong> Ses kartı, mikrofon (Giriş), hoparlör/kulaklık (Çıkış).</p><p><strong>Ses Formatları:</strong> .mp3 (Sıkıştırılmış, yaygın), .wav (Yüksek kaliteli, büyük boyut), .wma, .ogg.</p><p><strong>Ses Kurgusu:</strong> Zaman çizgisi (timeline), kesme, montaj, dip gürültü temizleme, efekt ve fon müziği ekleme.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Ses Kurgusu Senaryosu", body: "<p>Ormanda çöp toplayan çocuk senaryosuna rüzgâr, yaprak ve kuş ses efektleri kurgulanarak senaryo panosu oluşturulur.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Telif ve Yayın Etiği", body: "<p>Başkalarının ses veya müziklerini izinsiz kullanmama, telifsiz (Creative Commons) ses kaynaklarını tercih etme ilkeleri özetlenir.</p>" }
                 ],
                 quiz: [
-                    { q: "Ses kaydı yapmak için bilgisayara gerekli olan temel giriş donanımı nedir?", options: ["A) Hoparlör", "B) Mikrofon", "C) Ekran", "D) Yazıcı"], correct: 1 }
+                    { q: "Ses kaydı yapmak için bilgisayara gerekli olan temel giriş donanımı nedir?", options: ["A) Hoparlör", "B) Mikrofon", "C) Ekran", "D) Yazıcı"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi yaygın kullanılan bir ses dosyası uzantısıdır?", options: ["A) .mp3", "B) .jpg", "C) .docx", "D) .exe"], correct: 0 },
+                    { q: "Ses kalitesi çok yüksek olan fakat dosya boyutu büyük olan ses formatı hangisidir?", options: ["A) .wav", "B) .mp3", "C) .txt", "D) .zip"], correct: 0 },
+                    { q: "Ses kurgusunda arka plandaki cızırtı ve istenmeyen sesleri yok etme işlemine ne denir?", options: ["A) Dip gürültü temizleme", "B) Renk ayarı", "C) Font büyütme", "D) Klasör oluşturma"], correct: 0 },
+                    { q: "Ses düzenleme programında ses kanallarının sıralandığı yatay alana ne ad verilir?", options: ["A) Zaman Çizgisi (Timeline)", "B) Hücre Adresi", "C) Arama Çubuğu", "D) Masaüstü"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bir ses çıkış donanımıdır?", options: ["A) Hoparlör ve Kulaklık", "B) Mikrofon", "C) Tarayıcı", "D) Klavye"], correct: 0 },
+                    { q: "İnternetten indirilen bir müziği bir ses projesinde etik olarak kullanmak için neye dikkat edilmelidir?", options: ["A) Telif hakkına ve lisans durumuna", "B) Müzik dosyasının rengine", "C) Bilgisayarın markasına", "D) Ekran boyutuna"], correct: 0 },
+                    { q: "İki farklı ses kaydını üst üste bindirip karıştırma işlemine ne denir?", options: ["A) Ses Miksajı / Kurgusu", "B) Formatlama", "C) Silme", "D) Kopyalama"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi ses dosyalarını düzenlemek için kullanılan bir işlemdir?", options: ["A) Kesme, kırpma ve efekt ekleme", "B) Renk doygunluğu", "C) Hücre birleştirme", "D) Yazım denetimi"], correct: 0 },
+                    { q: "Görüntü ve seslerin gerçek dışı şekilde değiştirilerek insanları yanıltması durumuna ne ad verilir?", options: ["A) Deepfake", "B) Ergonomi", "C) Veri Tabanı", "D) Donanım"], correct: 0 }
                 ]
             },
             7: {
@@ -789,13 +910,45 @@
                 topic: "Ses Dosyası Geliştirme",
                 outcomeText: "Tasarlanan senaryoya uygun olarak sesleri kaydeder, keser, birleştirir ve ses dosyası geliştirir.",
                 slides: [
-                    { stage: "GİRİŞ (5 DK)", title: "Ses Katmanları", body: "Müzik ile seslendirme nasıl üst üste karıştırılır?" },
-                    { stage: "SUNUM (20 DK)", title: "Düzenleme Araçları", body: "Kesme, montaj, ses seviyesi (volume) ve dip gürültü temizleme adımları gösterilir." },
-                    { stage: "UYGULAMA (10 DK)", title: "Dijital Hikâyeye Ses Ver", body: "Öğrenciler kendi ses kayıtları ve efektlerle kısa ses dosyasını dışa aktarır (.mp3)." },
-                    { stage: "ÖZET (5 DK)", title: "Ses Kalitesi ve Boyut", body: "Format farkları (.wav vs .mp3) özetlenir." }
+                    { stage: "GİRİŞ (5 DK)", title: "Ses Katmanlarını Birleştirme", body: "<p>Arka planda çalan fon müziği ile konuşmacının sesi nasıl dengelenir? Ses seviyesi (volume) ayarı neden önemlidir?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Ses Düzenleme Adımları", body: "<p>1. Ses kaydı yapma / Alma. 2. İstenmeyen bölümleri kesip çıkarma. 3. Ses düzeylerini eşitleme. 4. Fon müziği ve efekt ekleme. 5. .mp3 formatında dışa aktarma (export).</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Dijital Masal / Radyo Tiyatrosu", body: "<p>Öğrenciler gruplar halinde kendi konuşmalarını kaydeder, tıkırtı ve rüzgar efektleriyle birleştirerek radyo tiyatrosu dosyası üretirler.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Değerlendirme", body: "<p>Ses netliği, kurgu uyumu ve telif hakkı kurallarına uyum ölçütleriyle akran değerlendirmesi yapılır.</p>" }
                 ],
                 quiz: [
-                    { q: "Aşağıdakilerden hangisi bir ses dosyası uzantısıdır?", options: ["A) .mp3", "B) .jpg", "C) .docx", "D) .exe"], correct: 0 }
+                    { q: "Hazırlanan ses projesinin diğer cihazlarda dinlenebilmesi için yapılan işleme ne ad verilir?", options: ["A) Dışa Aktarma (Export)", "B) Silme", "C) Tarama", "D) Kopyalama"], correct: 0 },
+                    { q: "Konuşma sesinin arkasındaki müziğin ses seviyesini düşürerek konuşmayı ön plana çıkarma işlemine ne denir?", options: ["A) Ses Dengeleme / Volume Ayarı", "B) Ekran Çözünürlüğü", "C) Hücre Biçimlendirme", "D) Format Atma"], correct: 0 },
+                    { q: "Ses kaydı yaparken sesin patlamaması ve cızırtı olmaması için neye dikkat edilmelidir?", options: ["A) Mikrofona uygun mesafede durmaya ve ses seviyesini ayarlamaya", "B) Ekranı kapatmaya", "C) Klavyeye hızlı basmaya", "D) Hoparlörü kapatmaya"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi bir ses dosyasının boyutunu küçültür?", options: ["A) .wav yerine .mp3 formatına dönüştürmek", "B) Sesi daha yüksek sesle kaydetmek", "C) Kulaklık takmak", "D) Ekranı büyütmek"], correct: 0 },
+                    { q: "Gruptaki öğrencilerin hazırladığı radyo tiyatrosu projesinde hangi kurgu ögesi yer alır?", options: ["A) Konuşma sesleri, efektler ve fon müziği", "B) Sadece çizgi film resimleri", "C) Sadece yazı fontları", "D) Sadece renk paleti"], correct: 0 },
+                    { q: "Ses kaydı esnasında aniden oluşan öksürük veya hata sesini yok etmek için hangi komut kullanılır?", options: ["A) Kes (Cut) / Sil (Delete)", "B) Yapıştır", "C) Çoğalt", "D) Başlat"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi telifsiz ses ve müzik bulmak için kullanılan lisans türüdür?", options: ["A) Creative Commons (CC)", "B) Gizli Lisans", "C) Ücretli Yazılım", "D) Kırılmış Yazılım"], correct: 0 },
+                    { q: "Ses dosyasını dışa aktarırken standart ve uyumlu dosya ismi belirleme kuralı hangisidir?", options: ["A) ogrenci_adi_proje.mp3", "B) imdasdhkasf.exe", "C) adsiz1111.txt", "D) test.doc"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi ses düzenleme yazılımı arayüzünde sesi oynatmaya başlayan butondur?", options: ["A) Oynat (Play - ▶)", "B) Durdur (Stop - ⏹)", "C) Kaydet (Record - ⏺)", "D) Sil"], correct: 0 },
+                    { q: "Ses kurgusu bittikten sonra projeyi dışa aktarmadan önce ne yapılmalıdır?", options: ["A) Baştan sona dinleyip test etmek", "B) Bilgisayarı hemen kapatmak", "C) Hoparlörü kırmak", "D) Dosyayı silmek"], correct: 0 }
+                ]
+            },
+            8: {
+                code: "BTY.6.2.8 / BTY.6.2.9 / BTY.6.2.10",
+                topic: "Video Düzenleme Programları ve Kurgu",
+                outcomeText: "Video düzenleme programlarını kullanır; senaryoya uygun video kurgusu oluşturur ve geliştirir.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Hareketli Görsellerin Gücü", body: "<p>Bir konuyu anlatırken video kullanmak neden daha etkilidir? 1 dakikalık video kaç kare fotoğraftan oluşur?</p>" },
+                    { stage: "SUNUM (20 DK)", title: "Video Düzenleme Arayüzü & Uzantılar", body: "<p><strong>Piksel ve Çözünürlük:</strong> Video kalitesini belirler.</p><p><strong>Video Uzantıları:</strong> .mp4, .avi, .mov, .mkv.</p><p><strong>Arayüz Ögeleri:</strong> Zaman çizgisi (Timeline), medya kütüphanesi, önizleme penceresi, geçiş efektleri, altyazı ve ses katmanı.</p>" },
+                    { stage: "UYGULAMA (10 DK)", title: "Çevre Bilinci Kamu Spotu", body: "<p>Gruplar sıfır atık ve çevre bilinci temasında 4-5 sahnelik video senaryo panosu (storyboard) çizip kurgularlar.</p>" },
+                    { stage: "ÖZET (5 DK)", title: "Yapay Zekâ & Video Etiği", body: "<p>Deepfake ve kişisel görüntülerin izinsiz kullanılmaması etik kuralları vurgulanır.</p>" }
+                ],
+                quiz: [
+                    { q: "Video düzenleme programlarında sahne kliplerinin sıralandığı ana çalışma alanına ne denir?", options: ["A) Zaman Çizgisi (Timeline)", "B) Hücre Adresi", "C) Sütun Başlığı", "D) Klasör"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi yaygın bir 'Video Dosyası' uzantısıdır?", options: ["A) .mp4", "B) .mp3", "C) .docx", "D) .zip"], correct: 0 },
+                    { q: "İki video sahnesi arasında yumuşak geçiş sağlamak için uygulanan görsel efekte ne denir?", options: ["A) Sahne Geçiş Efekti (Transition)", "B) Dip Gürültü", "C) Sürücü Güncelleme", "D) Klavye Düzeltme"], correct: 0 },
+                    { q: "Bir videodaki konuşmaları ekranın alt kısmında yazı olarak göstermeye ne ad verilir?", options: ["A) Altyazı (Subtitle)", "B) Kenarlık", "C) Donanım", "D) Algoritma"], correct: 0 },
+                    { q: "Bir videonun başlangıcında veya sonunda yer alan tanıtım ve emeği geçenler yazısına ne denir?", options: ["A) Jenerik / Başlık", "B) Uzantı", "C) Hücre", "D) İşletim Sistemi"], correct: 0 },
+                    { q: "Videoyu hazırlamadan önce sahnelerin çizimlerle adım adım planlandığı taslak kâğıda ne ad verilir?", options: ["A) Hikaye Tahtası / Senaryo Panosu (Storyboard)", "B) Hesap Cetveli", "C) Oyun Kartı", "D) Frayer Modeli"], correct: 0 },
+                    { q: "Aşağıdakilerden hangisi video dosyasının kalitesini ve boyutunu doğrudan etkiler?", options: ["A) Çözünürlük ve Kare Hızı (FPS)", "B) Bilgisayar kasasının rengi", "C) Masanın yüksekliği", "D) Fare tık sesi"], correct: 0 },
+                    { q: "İnternette izinsiz başkasının videosunu alıp kendisininmiş gibi yayınlamak hangi ihlaldir?", options: ["A) Telif Hakkı İhlali", "B) Ergonomi kuralı", "C) Sürücü hatası", "D) RAM yetersizliği"], correct: 0 },
+                    { q: "Yapay zekâ ile insanların yüzünü ve sesini değiştirerek sahte video üretme teknolojisine ne denir?", options: ["A) Deepfake", "B) E-Devlet", "C) Pardus", "D) Word"], correct: 0 },
+                    { q: "Hazırlanan video projesinin izlenebilir film dosyasına dönüştürülmesi işlemine ne ad verilir?", options: ["A) Dışa Aktarma / Render (Export)", "B) Silme", "C) Kopyalama", "D) Taramak"], correct: 0 }
                 ]
             }
         };
@@ -849,11 +1002,12 @@
             document.getElementById('weekSelect').value = currentWeekIndex;
         }
 
+        // FIXED TAB SWITCHING FUNCTION FOR 5TH AND 6TH GRADES
         function switchGrade(grade) {
             currentGrade = grade;
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.classList.toggle('active', grade === 5);
-            buttons[1].classList.toggle('active', grade === 6);
+            buttons[28].classList.toggle('active', grade === 6);
 
             currentSlideIndex = 0;
             renderWeekContent();
@@ -905,6 +1059,9 @@
                 banner.style.display = 'none';
             }
 
+            // Reset Quiz Title
+            document.getElementById('quizTitleDisplay').textContent = `❓ Değerlendirme Soruları (En Az 10 Soru)`;
+
             // Quiz
             renderQuiz(weekData, calItem.week);
         }
@@ -914,7 +1071,7 @@
             container.innerHTML = '';
 
             const slides = (weekData && weekData.slides) ? weekData.slides : [
-                { stage: "DERS AKIŞI", title: "Genel Değerlendirme ve Etkinlik", body: "Bu hafta kazanımları pekiştirici çalışma kağıtları ve uygulama senaryoları yürütülmektedir." }
+                { stage: "DERS AKIŞI", title: "Genel Değerlendirme ve Etkinlik", body: "<p>Bu hafta kazanımları pekiştirici çalışma kağıtları ve uygulama senaryoları yürütülmektedir.</p>" }
             ];
 
             slides.forEach((s, idx) => {
@@ -994,6 +1151,7 @@
             }
         }
 
+        // GENERATE AT LEAST 30 QUESTIONS FOR PRACTICE EXAM
         function generatePracticeExam() {
             const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
             let compiledQuestions = [];
@@ -1007,17 +1165,34 @@
                 }
             }
 
-            document.getElementById('printTopicTitle').textContent = `Özel Deneme Sınavı Kağıdı (1. Haftadan ${WEEKS_CALENDAR[currentWeekIndex].week}. Haftaya Kadar Karma)`;
+            // Ensure at least 30 questions by adding remaining unit questions if needed
+            if (compiledQuestions.length < 30) {
+                Object.keys(dataset).forEach(wKey => {
+                    if (dataset[wKey] && dataset[wKey].quiz) {
+                        dataset[wKey].quiz.forEach(q => {
+                            if (!compiledQuestions.some(cq => cq.q === q.q)) {
+                                compiledQuestions.push({ ...q, topic: dataset[wKey].topic });
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Limit or slice to at least 30 questions
+            const examQuestions = compiledQuestions.slice(0, Math.max(30, compiledQuestions.length));
+
+            document.getElementById('printTopicTitle').textContent = `Özel Deneme Sınavı Kağıdı (${currentGrade}. Sınıf - Toplam ${examQuestions.length} Soru)`;
+            document.getElementById('quizTitleDisplay').textContent = `📝 ${currentGrade}. Sınıf Deneme Sınavı Soruları (${examQuestions.length} Soru)`;
 
             const container = document.getElementById('quizContainer');
             container.innerHTML = `
                 <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #7dd3fc;">
-                    <strong>🎓 ${currentGrade}. Sınıf Deneme Sınavı (${WEEKS_CALENDAR[currentWeekIndex].week}. Haftaya Kadar İşlenen Konulardan Karma)</strong>
-                    <p style="font-size: 0.85rem; margin-top: 4px;">Toplam ${compiledQuestions.length} soru derlendi. Sayfa altındaki "Test / Sınav Çıktısı Al" butonuna basarak doğrudan yazdırabilirsiniz.</p>
+                    <strong>🎓 ${currentGrade}. Sınıf Deneme Sınavı Hazırlandı! (Toplam ${examQuestions.length} Soru)</strong>
+                    <p style="font-size: 0.85rem; margin-top: 4px;">Tüm konulardan derlenen ${examQuestions.length} soruluk deneme sınavını aşağıdan çözebilir veya "Test / Sınav Çıktısı Al" butonuna basarak A4 formatında yazdırabilirsiniz.</p>
                 </div>
             `;
 
-            compiledQuestions.forEach((item, qIdx) => {
+            examQuestions.forEach((item, qIdx) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
                 
@@ -1058,3 +1233,4 @@
     </script>
 </body>
 </html>
+
