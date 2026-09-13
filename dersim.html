@@ -442,7 +442,8 @@
                 padding: 0;
             }
 
-            header, .grade-tabs, .week-nav, .lesson-section, .slide-controls, .exam-banner, footer, .print-btn, .result-box, input[type="radio"] {
+            /* SINIF DEFTERİ KARTI KISMI (.register-card) YAZDIRMA EKRANINDA GİZLENDİ */
+            header, .grade-tabs, .week-nav, .register-card, .lesson-section, .slide-controls, .exam-banner, footer, .print-btn, .result-box, input[type="radio"] {
                 display: none !important;
             }
 
@@ -511,10 +512,10 @@
     <header>
         <div class="header-container">
             <div class="brand-area">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="Logo" class="brand-logo">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="Logo" class="brand-logo">
                 <div class="logo-text">
                     <h1>Bilişim Teknolojileri ve Yazılım Dersi</h1>
-                    <p>Akıllı Ders Asistanı <span class="author-badge"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" style="height:16px;"> rayılmazan</span></p>
+                    <p>Akıllı Ders Asistanı <span class="author-badge"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan</span></p>
                 </div>
             </div>
             <div class="date-badge" id="currentDateDisplay">
@@ -544,7 +545,7 @@
             <button class="nav-btn" onclick="changeWeek(1)">Sonraki Hafta →</button>
         </div>
 
-        <!-- Class Register Outcome Card -->
+        <!-- Class Register Outcome Card (Web arayüzünde görünür, PDF çıktısında otomatik gizlenir) -->
         <div class="register-card">
             <div class="register-header">
                 <span class="register-tag">Sınıf Defterine Yazılacak Öğrenme Çıktısı (Yıllık Plandan Birebir)</span>
@@ -576,7 +577,7 @@
 
         <!-- Quiz & Exam Section -->
         <div class="quiz-section">
-            <!-- PRINTABLE HEADER SHEET (CORRECTED TITLE & LOGO NEXT TO AUTHOR) -->
+            <!-- PRINTABLE HEADER SHEET (PDF/YAZDIRMA EKRANINDA BAŞLIK VE YENİ LOGO) -->
             <div class="print-header-sheet">
                 <div>
                     <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h2>
@@ -584,7 +585,7 @@
                     <p style="font-size: 0.85rem; margin-top: 4px;" id="printTopicTitle">Konu: ...</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="Logo" style="height: 48px;">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="Logo" style="height: 48px;">
                     <span style="font-weight: 700; font-family: monospace; font-size: 1rem; color: #0f172a;">rayılmazan</span>
                 </div>
             </div>
@@ -618,7 +619,7 @@
                 <span>2026-2027 Eğitim-Öğretim Yılı</span>
                 <span>Bilişim Teknolojileri ve Yazılım Dersi</span>
                 <span style="display: flex; align-items: center; gap: 4px; font-weight: 700; font-family: monospace;">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" style="height:16px;"> rayılmazan
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan
                 </span>
             </div>
         </div>
@@ -627,7 +628,7 @@
     <footer>
         <p>Bilişim Teknolojileri ve Yazılım Dersi &copy; 2026-2027 | Hazırlayan: 
             <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 700; font-family: monospace; color: var(--primary);">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" style="height:16px;"> rayılmazan
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan
             </span>
         </p>
     </footer>
@@ -739,7 +740,7 @@
                 outcomeText: "BTY.6.1.2. Bilişim teknolojinin gelecekteki durumlarına yönelik çıkarım yapabilme\na) Bilişim teknolojilerinin günümüze kadar olan gelişiminden yola çıkarak varsayımlarda bulunur.\nb) Bilişim teknolojilerinin gelecekteki olası durumlarına yönelik örüntüleri listeler.\nc) Bilişim teknolojilerinin gelecekteki olası durumlarına yönelik karşılaştırmalar yapar.\nç) Bilişim teknolojilerinin olası gelişimlerinin toplum üzerindeki etkilerine ilişkin önermeler sunar.\nd) Bilişim teknolojilerinin olası gelişimlerinin toplum üzerindeki etkilerini değerlendirir.",
                 slides: [
                     { stage: "ÖN DEĞERLENDİRME (KİTAPTAN)", title: "Geleceğin Cihazları & Hayal Gücü", body: "<p><strong>Ders Başı Soruları:</strong></p><p>• Sizce 20 yıl sonra cep telefonları veya bilgisayarlar nasıl görünecek?</p><p>• Bugün kullandığınız bir cihaz 10 yıl sonra neleri farklı yapabilir?</p><p>• Gelecekte dersleri sınıfta mı yoksa tamamen sanal ortamlarda mı yapmayı tercih ederdiniz? Neden?</p>" },
-                    { stage: "BAĞLANTI NOKTASI (KİTAPTAN)", title: "Meslekler & Toplumsal Değişim", body: "<p><strong>Toplumsal Çıkarım Soruları:</strong></p><p>• Sizce teknoloji sayesinde gelecekte hangi meslekler ortadan kalkabilir, hangi yeni meslekler ortaya çıkabilir?</p><p>• Eğer evinizde akıllı bir robot olsa sizin için hangi işleri yapmasını isterdiniz?</p><p>• Geleceğin teknolojisi hem işimizi kolaylaştırıp hem de doğayı nasıl koruyabilir?</p>" },
+                    { stage: "BAĞLANTI NOKTASI (KİTAPTAN)", title: "Meslekler & Toplumsal Değişim", body: "<p><strong>Toplumsal Çıkarım Soruları:</strong></p><p>• Sizce teknoloji sayesinde gelecekte hangi meslekler ortadan kalkabilir, hangi yeni meslekler ortaya çıkabilir?</p><p>• Eğer evinizde akıllı bir robot olsa sizin için hangi işleri yapmasını isterdiniz?</p><p>• Geleceğin teknolojisi hem işimizi kolaylaştırıp hem de çevreyi nasıl koruyabilir?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Alan Turing & Zaman Çizelgesi", body: "<p>Alan Turing'den Cahit Arf'a bilgisayar biliminin tarihsel evrimi anlatılır. İlk bilgisayarların oda büyüklüğünden günümüzdeki cebimize giren cihazlara dönüşüm örüntüsü incelenir.</p>" },
                     { stage: "UYGULAMA (10 DK)", title: "Yarının Dünyası Senaryosu", body: "<p>Gruplar gelecekteki bir çevresel veya toplumsal sorunu çözen teknolojik araç tasarlar ve SWOT analizi yapar.</p>" },
                     { stage: "ÖZET (5 DK)", title: "Geleceğin Meslekleri ve Toplum", body: "<p>Yapay zekâ ve otomasyonun iş gücündeki değişimi ve etki alanları değerlendirilir.</p>" }
@@ -807,7 +808,6 @@
             document.getElementById('weekSelect').value = currentWeekIndex;
         }
 
-        // PERFECT TAB HIGHLIGHT FIX FOR 5TH AND 6TH GRADES
         function switchGrade(grade) {
             currentGrade = grade;
             
