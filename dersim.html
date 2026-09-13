@@ -3,63 +3,1058 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayılmazan - Mobil Müfredat Asistanı</title>
+    <title>Bilişim Teknolojileri ve Yazılım Ders Portalı | rayılmazan</title>
+
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 10px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 15px; cursor: pointer; border: none; background: #ddd; border-radius: 5px; font-weight: bold; }
-        .tab-btn.active { background: #16a085; color: white; }
-        .card { border-left: 5px solid #2c3e50; padding: 15px; background: #fff; margin-top: 10px; border-radius: 5px; }
-        .notebook { background: #fffde7; padding: 15px; border: 1px dashed #f39c12; margin-top: 10px; font-size: 14px; }
-        a { display: block; margin-top: 15px; padding: 15px; background: #2980b9; color: white; text-align: center; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --secondary: #0284c7;
+            --accent: #d97706;
+            --bg-gray: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #cbd5e1;
+            --success: #16a34a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a, var(--primary-dark));
+            color: white;
+            padding: 1.2rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-logo {
+            height: 55px;
+            width: auto;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .logo-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .author-badge {
+            font-size: 0.8rem;
+            color: #f1f5f9;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .date-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Grade Tabs */
+        .grade-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Navigation Bar */
+        .week-nav {
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .week-select-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        select {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            outline: none;
+            background: white;
+            font-weight: 600;
+        }
+
+        /* Register Card (Sınıf Defteri) */
+        .register-card {
+            background: linear-gradient(135deg, #ffffff, #f0f9ff);
+            border-left: 6px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            margin-bottom: 1.5rem;
+        }
+
+        .register-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-tag {
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .outcome-code {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+        }
+
+        .outcome-text {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-top: 0.4rem;
+        }
+
+        /* Presentation / Slides */
+        .lesson-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slides-viewer {
+            position: relative;
+            background: #0f172a;
+            color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            min-height: 270px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .slide-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .slide-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-header {
+            font-size: 0.85rem;
+            color: #38bdf8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .slide-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #f8fafc;
+        }
+
+        .slide-body {
+            font-size: 1rem;
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .slide-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #334155;
+        }
+
+        .slide-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .slide-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .slide-indicator {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* Quiz & Exam Section */
+        .quiz-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .exam-banner {
+            background: #fffbeeb0;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .exam-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+        }
+
+        .exam-btn:hover {
+            background-color: #b45309;
+        }
+
+        .print-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .print-btn:hover {
+            background-color: #15803d;
+        }
+
+        .question-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            background: #fff;
+        }
+
+        .question-title {
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            margin-bottom: 0.4rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .option-label:hover {
+            background: var(--bg-gray);
+        }
+
+        .result-box {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .correct { color: var(--success); }
+        .incorrect { color: #dc2626; }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .author-tag {
+            font-weight: 700;
+            color: var(--primary);
+            font-family: monospace;
+        }
+
+        /* PRINT STYLESHEET FOR EXAM & TEST WORKSHEETS */
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+            }
+
+            header, .grade-tabs, .week-nav, .lesson-section, .slide-controls, .exam-banner, footer, .print-btn, .result-box, input[type="radio"] {
+                display: none !important;
+            }
+
+            .main-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .quiz-section {
+                box-shadow: none;
+                padding: 0;
+            }
+
+            .print-header-sheet {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #000;
+                padding-bottom: 12px;
+                margin-bottom: 20px;
+            }
+
+            .print-header-sheet img {
+                height: 60px;
+            }
+
+            .print-info-fields {
+                display: flex !important;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                border: 1px solid #000;
+                padding: 8px 12px;
+                font-size: 0.9rem;
+            }
+
+            .question-card {
+                border: none;
+                border-bottom: 1px solid #ccc;
+                padding: 10px 0;
+                page-break-inside: avoid;
+            }
+
+            .option-label {
+                padding: 2px 0;
+            }
+
+            .option-label::before {
+                content: "◯ ";
+                font-size: 1.1rem;
+            }
+
+            .print-footer-signature {
+                display: flex !important;
+                justify-content: space-between;
+                margin-top: 30px;
+                font-size: 0.85rem;
+                border-top: 1px dotted #000;
+                padding-top: 8px;
+            }
+        }
+
+        .print-header-sheet, .print-info-fields, .print-footer-signature {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 style="text-align:center">Rayılmazan Asistan</h2>
-    <div class="tabs">
-        <button class="tab-btn active" onclick="loadData('5sınıf')">5. Sınıf</button>
-        <button class="tab-btn" onclick="loadData('6sınıf')">6. Sınıf</button>
-    </div>
+    <header>
+        <div class="header-container">
+            <div class="brand-area">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="Logo" class="brand-logo">
+                <div class="logo-text">
+                    <h1>Bilişim Teknolojileri ve Yazılım Portalı</h1>
+                    <p>MEB 2026-2027 Müfredatı & Akıllı Ders Asistanı <span class="author-badge">rayılmazan</span></p>
+                </div>
+            </div>
+            <div class="date-badge" id="currentDateDisplay">
+                Sistem Tarihi Yükleniyor...
+            </div>
+        </div>
+    </header>
 
-    <div id="display">
-        <h3 id="sinif-adi">5. Sınıf Planı</h3>
-        <div class="card">
-            <strong>Kazanım:</strong>
-            <p id="kazanim">-</p>
-            <strong>Defter Notu:</strong>
-            <div class="notebook" id="defter">-</div>
-            <a href="https://drive.google.com/drive/folders/1EwXFoHf1GRmBwMlm-HfQGVggpuKYcRpQ" target="_blank">📂 Drive Materyallerini Aç</a>
+    <div class="main-container">
+        <!-- Grade Tabs -->
+        <div class="grade-tabs">
+            <button class="tab-btn active" onclick="switchGrade(5)">5. Sınıf</button>
+            <button class="tab-btn" onclick="switchGrade(6)">6. Sınıf</button>
+        </div>
+
+        <!-- Week Navigation -->
+        <div class="week-nav">
+            <button class="nav-btn" onclick="changeWeek(-1)">← Önceki Hafta</button>
+            
+            <div class="week-select-group">
+                <label for="weekSelect"><strong>Eğitim Haftası:</strong></label>
+                <select id="weekSelect" onchange="onWeekSelectChange(this.value)">
+                    <!-- Options populated dynamically -->
+                </select>
+            </div>
+
+            <button class="nav-btn" onclick="changeWeek(1)">Sonraki Hafta →</button>
+        </div>
+
+        <!-- Class Register Outcome Card -->
+        <div class="register-card">
+            <div class="register-header">
+                <span class="register-tag">Sınıf Defteri Kazanım Metni</span>
+                <span class="outcome-code" id="outcomeCode">BTY.5.1.1</span>
+            </div>
+            <div class="outcome-text" id="outcomeText">
+                Yükleniyor...
+            </div>
+        </div>
+
+        <!-- 40 Min Presentation / Slides -->
+        <div class="lesson-section">
+            <div class="section-title">
+                <span>📚 40 Dakikalık Eğitici Ders İşlenişi ve Sunum Akışı</span>
+            </div>
+
+            <div class="slides-viewer">
+                <div id="slideContainer">
+                    <!-- Slides injected dynamically -->
+                </div>
+
+                <div class="slide-controls">
+                    <button class="slide-btn" onclick="moveSlide(-1)">◀ Önceki Slayt</button>
+                    <span class="slide-indicator" id="slideIndicator">Slayt 1 / 4</span>
+                    <button class="slide-btn" onclick="moveSlide(1)">Sonraki Slayt ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz & Exam Section -->
+        <div class="quiz-section">
+            <!-- PRINTABLE HEADER SHEET (FOR PAPER OUTPUT) -->
+            <div class="print-header-sheet">
+                <div>
+                    <h2>T.C. MİLLÎ EĞİTİM BAKANLIĞI</h2>
+                    <p><strong id="printGradeTitle">5. Sınıf</strong> Bilişim Teknolojileri ve Yazılım Dersi Çalışma / Sınav Kağıdı</p>
+                    <p style="font-size: 0.8rem; margin-top: 4px;" id="printTopicTitle">Konu: ...</p>
+                </div>
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="Logo">
+            </div>
+
+            <div class="print-info-fields">
+                <span><strong>Adı Soyadı:</strong> ....................................................</span>
+                <span><strong>Sınıfı / No:</strong> ............. / ........</span>
+                <span><strong>Puan:</strong> ..........</span>
+            </div>
+
+            <div class="exam-banner" id="examBanner" style="display: none;">
+                <div>
+                    <strong>📝 Ortak Sınav Yaklaşıyor! (Deneme Sınavı Modülü)</strong>
+                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen tüm konulardan karma sorular içeren bir deneme sınavı derleyebilirsiniz.</p>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="exam-btn" onclick="generatePracticeExam()">Deneme Sınavı Oluştur</button>
+                </div>
+            </div>
+
+            <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <span>❓ Değerlendirme Soruları</span>
+                <button class="print-btn" onclick="printTestSheet()">🖨️ Test / Sınav Çıktısı Al (PDF)</button>
+            </div>
+
+            <div id="quizContainer">
+                <!-- Quiz questions injected dynamically -->
+            </div>
+
+            <div class="print-footer-signature">
+                <span>2026-2027 Eğitim-Öğretim Yılı</span>
+                <span>Bilişim Teknolojileri ve Yazılım Ders Portalı</span>
+                <span class="author-tag">rayılmazan</span>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    const planVerisi = {
-        "5sınıf": { 
-            kazanim: "5.1.1.2. Bilişim teknolojilerinin günlük yaşamdaki önemi[span_2](start_span)[span_2](end_span).", 
-            defter: "Konu: Bilişim Teknolojileri\n- Bilişim: Bilginin işlenmesi sürecidir.\n- Donanım: Kasa, ekran, klavye, fare." 
-        },
-        "6sınıf": { 
-            kazanim: "6.5.1.1. Problem çözme süreci ve yaklaşımları[span_3](start_span)[span_3](end_span).", 
-            defter: "Konu: Problem Çözme\n- Problem: Çözülmesi gereken durumdur.\n- Algoritma: Adım adım çözüm yöntemidir." 
+    <footer>
+        <p>Bilişim Teknolojileri ve Yazılım Ders Portalı &copy; 2026-2027 | Hazırlayan: <span class="author-tag">rayılmazan</span></p>
+    </footer>
+
+    <script>
+        // MEB 2026-2027 Academic Calendar Weeks
+        const WEEKS_CALENDAR = [
+            { week: 1, start: '2026-09-14', end: '2026-09-18', name: '1. Hafta (14-18 Eylül 2026)' },
+            { week: 2, start: '2026-09-21', end: '2026-09-25', name: '2. Hafta (21-25 Eylül 2026)' },
+            { week: 3, start: '2026-09-28', end: '2026-10-02', name: '3. Hafta (28 Eylül - 2 Ekim 2026)' },
+            { week: 4, start: '2026-10-05', end: '2026-10-09', name: '4. Hafta (5-9 Ekim 2026)' },
+            { week: 5, start: '2026-10-12', end: '2026-10-16', name: '5. Hafta (12-16 Ekim 2026 - Codeweek)' },
+            { week: 6, start: '2026-10-19', end: '2026-10-23', name: '6. Hafta (19-23 Ekim 2026)' },
+            { week: 7, start: '2026-10-26', end: '2026-10-30', name: '7. Hafta (26-30 Ekim 2026 - Sınav Öncesi)', isExamUpcoming: true },
+            { week: 8, start: '2026-11-02', end: '2026-11-06', name: '8. Hafta (2-6 Kasım 2026)' },
+            { week: 9, start: '2026-11-09', end: '2026-11-13', name: '9. Hafta (9-13 Kasım 2026 - Atatürk H.)' },
+            { week: 10, start: '2026-11-23', end: '2026-11-27', name: '10. Hafta (23-27 Kasım 2026)' },
+            { week: 11, start: '2026-11-30', end: '2026-12-04', name: '11. Hafta (30 Kasım - 4 Aralık 2026)' },
+            { week: 12, start: '2026-12-07', end: '2026-12-11', name: '12. Hafta (7-11 Aralık 2026)' },
+            { week: 13, start: '2026-12-14', end: '2026-12-18', name: '13. Hafta (14-18 Aralık 2026 - Tutum H.)' },
+            { week: 14, start: '2026-12-21', end: '2026-12-25', name: '14. Hafta (21-25 Aralık 2026)' },
+            { week: 15, start: '2026-12-28', end: '2027-01-01', name: '15. Hafta (28 Aralık 2026 - 1 Ocak 2027)', isExamUpcoming: true },
+            { week: 16, start: '2027-01-04', end: '2027-01-08', name: '16. Hafta (4-8 Ocak 2027)' },
+            { week: 17, start: '2027-01-11', end: '2027-01-15', name: '17. Hafta (11-15 Ocak 2027)' },
+            { week: 18, start: '2027-01-18', end: '2027-01-22', name: '18. Hafta (18-22 Ocak 2027 - Dönem Sonu)' }
+        ];
+
+        // 5th Grade Curriculum
+        const DATA_GRADE5 = {
+            1: {
+                code: "BTY.5.1.1",
+                topic: "Bilişim Teknolojilerinin Sınıflandırılması",
+                outcomeText: "Günlük yaşamda kullanılan bilişim teknolojilerini kullanım alanlarına ve temel kavramlarına göre sınıflandırır.",
+                slides: [
+                    { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Soru & Beyin Fırtınası", body: "Görsel ve sorularla başlayın: 'Bilişim teknolojileri denince aklınıza hangi cihazlar geliyor? Teknolojik cihazlar olmasaydı günlük hayatımız nasıl değişirdi?'" },
+                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Temel Kavramlar & Teknolojinin Yolculuğu", body: "İletişim, bilgi, bilişim, teknoloji, donanım ve yazılım kavramları açıklanır. Geçmişteki daktilo/kasetçalar ile günümüzdeki bilgisayar/akıllı telefonlar karşılaştırılır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Kelime Kavanozu & Grup Çalışması", body: "Öğrenciler küçük gruplara ayrılır. Kelime kavanozundan çektikleri iletişim, bilgi, donanım kartlarını kullanım alanlarına göre gruplandırırlar." },
+                    { stage: "ÖZET & DEĞERLENDİRME (5 DK)", title: "Ders Özeti", body: "Teknolojinin hayatı kolaylaştırma, hızlandırma ve maliyeti azaltma avantajları özetlenir." }
+                ],
+                quiz: [
+                    { q: "Aşağıdakilerden hangisi bilişim teknolojilerinde 'donanım' kavramına örnektir?", options: ["A) İşletim sistemi", "B) Klavye", "C) Arama motoru", "D) Antivirüs programı"], correct: 1 },
+                    { q: "Teknolojinin hayatımıza sağladığı temel avantaj aşağıdakilerden hangisidir?", options: ["A) İşleri yavaşlatmak", "B) Bilgiye erişimi kolaylaştırmak", "C) Elektrik tüketimini artırmak", "D) Yüz yüze iletişimi engellemek"], correct: 1 }
+                ]
+            },
+            2: {
+                code: "BTY.5.1.2",
+                topic: "Bilişim Teknolojilerinin Etkileri ve Dijital Sağlık",
+                outcomeText: "Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetler; ergonomik kullanım kurallarını uygular.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Ekran Süresi ve Sağlık", body: "Ekran başında uzun süre kaldığınızda gözlerinizde veya sırtınızda ağrı hissettiniz mi?" },
+                    { stage: "SUNUM (20 DK)", title: "Ergonomi & Doğru Duruş", body: "Bilgisayar kullanımında dik oturma pozisyonu, ekrana olan mesafe ve 30 dakikada bir mola verme kuralı açıklanır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Sıra Arkadaşı Duruş Analizi", body: "Öğrenciler ikili gruplar halinde birbirlerinin oturuş açılarını ve ekran mesafelerini ergonomi kurallarına göre değerlendirir." },
+                    { stage: "ÖZET (5 DK)", title: "Dijital Sağlık Altın Kuralları", body: "Doğru oturuş, mola verme ve ekran mesafesi altın kuralları belirlenir." }
+                ],
+                quiz: [
+                    { q: "Bilgisayar başında kambur oturmanın uzun vadeli olumsuz etkisi nedir?", options: ["A) Ekran çözünürlüğü düşer", "B) Bel ve boyun ağrıları oluşur", "C) İnternet yavaşlar", "D) Klavye bozulur"], correct: 1 }
+                ]
+            },
+            3: {
+                code: "BTY.5.1.3",
+                topic: "Dijital Vatandaşlık Uygulamaları",
+                outcomeText: "Dijital kimlik kavramını açıklar; dijital ayak izinin etkilerini ve e-Devlet gibi dijital vatandaşlık uygulamalarını sınıflandırır.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Dijital İzlerimiz", body: "İnternete yüklediğimiz bir fotoğrafı sildiğimizde tamamen yok olur mu?" },
+                    { stage: "SUNUM (20 DK)", title: "Dijital Kimlik ve Ayak İzi", body: "Sosyal medya ve oyun hesaplarındaki kimliğimiz dijital kimliğimizdir. İnternette yaptığımız her paylaşım dijital ayak izimizi oluşturur." },
+                    { stage: "UYGULAMA (10 DK)", title: "Dijital Kimlik Kartım Etkinliği", body: "Öğrenciler kullanıcı adı, profil bilgisi ve güçlü şifre kurgularıyla kendi dijital kimlik kartı şablonlarını doldurur." },
+                    { stage: "ÖZET (5 DK)", title: "Güvenli Paylaşım", body: "Kişisel adres, telefon gibi bilgilerin paylaşılmaması gerektiği vurgulanır." }
+                ],
+                quiz: [
+                    { q: "Aşağıdakilerden hangisi dijital ortamda güvenle paylaşılabilecek bir bilgidir?", options: ["A) Ev adresi", "B) TC kimlik numarası", "C) İlgi alanları ve hobiler", "D) Hesap şifresi"], correct: 2 }
+                ]
+            },
+            4: {
+                code: "BTY.5.1.4",
+                topic: "Yapay Zekâda Temel Kavram ve Özellikler",
+                outcomeText: "Yapay zekâ ile ilgili temel kavramları, örnek uygulamaları (sesli asistan, yüz tanıma) sorgular ve doğal zekâ ile karşılaştırır.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Makineler Düşünebilir mi?", body: "Bir bilgisayar veya robot insanlar gibi karar verebilir veya öğrenebilir mi?" },
+                    { stage: "SUNUM (20 DK)", title: "Yapay Zekâ Nerede?", body: "Sesli asistanlar, otonom araçlar, yüz tanıma sistemleri ve öneri algoritmaları incelenir." },
+                    { stage: "UYGULAMA (10 DK)", title: "Örnek / Örnek Olmayan Gruplama", body: "Robot süpürge (Yapay zekâ) ile hesap makinesinin (Geleneksel yazılım) farkları tartışılır." },
+                    { stage: "ÖZET (5 DK)", title: "Doğal ve Yapay Zekâ", body: "Yapay zekanın verilerle beslenerek öğrendiği özeti yapılır." }
+                ],
+                quiz: [
+                    { q: "Aşağıdakilerden hangisi yapay zekâ teknolojisine örnek verilebilir?", options: ["A) Masa saati", "B) Sesli akıllı asistan", "C) Standart ampul", "D) Cetvel"], correct: 1 }
+                ]
+            },
+            6: {
+                code: "BTY.5.1.5",
+                topic: "Bilgisayar Sistemlerinin Kullanımı (Donanım)",
+                outcomeText: "Bilgisayar sisteminin temel bileşenlerini (iç/dış donanım, giriş/çıkış birimleri) belirler ve çözümler.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Bilgisayarın Organları", body: "İnsan vücudundaki organlar gibi bilgisayar parçalarının da görevleri var mıdır?" },
+                    { stage: "SUNUM (20 DK)", title: "Giriş ve Çıkış Birimleri", body: "Klavye, fare, mikrofon (Giriş); Ekran, yazıcı, hoparlör (Çıkış); İşlemci, RAM, Sabit Disk (İç donanım) tanıtılır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Deve - Cüce Oyunu", body: "Öğretmen donanım birimi söyler; Giriş biriminde 'Deve', Çıkış biriminde 'Cüce' pozisyonu alınır." },
+                    { stage: "ÖZET (5 DK)", title: "Donanım Özeti", body: "Veri akış şeması özetlenir." }
+                ],
+                quiz: [
+                    { q: "Aşağıdaki donanım birimlerinden hangisi bir 'Çıkış Birimi'dir?", options: ["A) Klavye", "B) Fare", "C) Hoparlör", "D) Mikrofon"], correct: 2 }
+                ]
+            },
+            7: {
+                code: "BTY.5.1.5",
+                topic: "Bilgisayar Sistemlerinin Kullanımı (Yazılım & İşletim Sistemi)",
+                outcomeText: "İşletim sistemlerinin görevlerini ve kullanıcı arayüzünü kavrar; temel teknik sorun giderme adımlarını yürütür.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "İşletim Sistemi Nedir?", body: "Donanım parçalarını kim yönetir ve uygulamaların çalışmasını ne sağlar?" },
+                    { stage: "SUNUM (20 DK)", title: "Arayüz ve Sistem Yazılımları", body: "Windows, Pardus, Linux, Android gibi işletim sistemlerinin görevleri anlatılır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Sorun Giderme Algoritması", body: "Yazıcı çalışmadığında güç kablosu, sürücü ve bağlantı denetimi adımları sıralanır." },
+                    { stage: "ÖZET (5 DK)", title: "BT Uzmanı Ödülü", body: "Doğru/Yanlış oyunu ile ders tamamlanır." }
+                ],
+                quiz: [
+                    { q: "Bilgisayardaki tüm donanım ve yazılımları yöneten en temel sistem yazılımı nedir?", options: ["A) Kelime İşlemci", "B) İşletim Sistemi", "C) İnternet Tarayıcısı", "D) Oyun"], correct: 1 }
+                ]
+            }
+        };
+
+        // 6th Grade Curriculum
+        const DATA_GRADE6 = {
+            1: {
+                code: "BTY.6.1.1",
+                topic: "Yenilikçi Bilişim Teknolojileri",
+                outcomeText: "Yenilikçi bilişim teknolojilerini (Yapay Zekâ, AR/VR, Giyilebilir Teknolojiler) kullanım alanlarına göre sınıflandırır.",
+                slides: [
+                    { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Sanal vs Artırılmış Gerçeklik", body: "Sanal gerçeklik (VR) ile artırılmış gerçeklik (AR) aynı şey midir? Farkları nelerdir?" },
+                    { stage: "KEŞFETME & SUNUM (20 DK)", title: "Yenilikçi Teknolojiler", body: "AR gerçek dünyanın üzerine dijital katman ekler; VR tamamen sanal evrene sokar. Akıllı saatler ise giyilebilir teknolojidir." },
+                    { stage: "UYGULAMA (10 DK)", title: "Renkli Gerçeklik Deneyimi", body: "AR destekli boyama/görsel uygulaması incelenir veya örnek AR senaryoları gruplandırılır." },
+                    { stage: "ÖZET (5 DK)", title: "Toplumsal ve Çevresel Fayda", body: "Yenilikçi teknolojilerin sağlık ve eğitimdeki tasarruf sağlayan yönleri özetlenir." }
+                ],
+                quiz: [
+                    { q: "Gerçek dünya görüntüsü üzerine dijital nesneler ekleyen teknoloji hangisidir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Sabit Disk", "D) Disket"], correct: 1 }
+                ]
+            },
+            2: {
+                code: "BTY.6.1.2",
+                topic: "Bilişim Teknolojilerinin Geleceği",
+                outcomeText: "Bilişim teknolojilerinin günümüze kadar olan gelişiminden yola çıkarak gelecekteki olası durumlarına yönelik çıkarımlar yapar.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Geleceğin Teknolojisi", body: "20 yıl sonra cep telefonları veya bilgisayarlar nasıl görünecek?" },
+                    { stage: "SUNUM (20 DK)", title: "Alan Turing ve Zaman Çizelgesi", body: "Alan Turing'den günümüze bilgisayarların evrimi ve gelecekteki olası meslekler ele alınır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Yarının Dünyası Senaryosu", body: "Gruplar gelecekteki bir çevresel veya toplumsal sorunu çözen teknolojik araç tasarlar." },
+                    { stage: "ÖZET (5 DK)", title: "Değerlendirme", body: "Geleceğin teknolojilerinin toplumsal etkileri özetlenir." }
+                ],
+                quiz: [
+                    { q: "Bilgisayar biliminin öncülerinden kabul edilen bilim insanı kimdir?", options: ["A) Alan Turing", "B) Isaac Newton", "C) Thomas Edison", "D) Galileo"], correct: 0 }
+                ]
+            },
+            3: {
+                code: "BTY.6.2.1",
+                topic: "Tablolama Programlarına Giriş",
+                outcomeText: "Tablolama programlarının temel özelliklerini tanır, arayüz bileşenlerini (satır, sütun, hücre) kullanır.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Sayılarla Düzen", body: "Yüzlerce öğrencinin notlarını hesaplamak için en pratik araç nedir?" },
+                    { stage: "SUNUM (20 DK)", title: "Satır, Sütun ve Hücre", body: "A, B, C sütunları ve 1, 2, 3 satırları; bunların kesiştiği A1, B2 hücre adresleri anlatılır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Haftalık Ders Programı Tablosu", body: "Hücrelere veri girme, renklendirme ve kenarlık ekleme uygulaması yapılır." },
+                    { stage: "ÖZET (5 DK)", title: "Arayüz Özeti", body: "Tablolama programının veri analizi avantajları vurgulanır." }
+                ],
+                quiz: [
+                    { q: "Tablolama programında 'B' sütunu ile '3' satırının kesiştiği hücrenin adresi nedir?", options: ["A) 3B", "B) B3", "C) B-3", "D) BB33"], correct: 1 }
+                ]
+            },
+            6: {
+                code: "BTY.6.2.5 / BTY.6.2.6",
+                topic: "Ses Düzenleme ve Ses Dosyası için Kurgu",
+                outcomeText: "Ses düzenleme programlarının arayüzünü tanır; gerçek yaşam durumuna uygun ses kurgu senaryosu oluşturur.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Sessiz Bir Dünya", body: "Bir filmi sesleri olmadan izleseydik ne hissederdik?" },
+                    { stage: "SUNUM (20 DK)", title: "Dijital Ses & Donanımlar", body: "Ses kartı, mikrofon, hoparlör donanımları ve .mp3, .wav ses formatları açıklanır." },
+                    { stage: "UYGULAMA (10 DK)", title: "Ses Kurgusu Senaryosu", body: "Ormanda çöp toplayan çocuk senaryosuna rüzgâr ve yaprak ses efektleri kurgulanır." },
+                    { stage: "ÖZET (5 DK)", title: "Telif ve Etik", body: "Başkalarının sesini izinsiz kullanmama ilkesi hatırlatılır." }
+                ],
+                quiz: [
+                    { q: "Ses kaydı yapmak için bilgisayara gerekli olan temel giriş donanımı nedir?", options: ["A) Hoparlör", "B) Mikrofon", "C) Ekran", "D) Yazıcı"], correct: 1 }
+                ]
+            },
+            7: {
+                code: "BTY.6.2.7",
+                topic: "Ses Dosyası Geliştirme",
+                outcomeText: "Tasarlanan senaryoya uygun olarak sesleri kaydeder, keser, birleştirir ve ses dosyası geliştirir.",
+                slides: [
+                    { stage: "GİRİŞ (5 DK)", title: "Ses Katmanları", body: "Müzik ile seslendirme nasıl üst üste karıştırılır?" },
+                    { stage: "SUNUM (20 DK)", title: "Düzenleme Araçları", body: "Kesme, montaj, ses seviyesi (volume) ve dip gürültü temizleme adımları gösterilir." },
+                    { stage: "UYGULAMA (10 DK)", title: "Dijital Hikâyeye Ses Ver", body: "Öğrenciler kendi ses kayıtları ve efektlerle kısa ses dosyasını dışa aktarır (.mp3)." },
+                    { stage: "ÖZET (5 DK)", title: "Ses Kalitesi ve Boyut", body: "Format farkları (.wav vs .mp3) özetlenir." }
+                ],
+                quiz: [
+                    { q: "Aşağıdakilerden hangisi bir ses dosyası uzantısıdır?", options: ["A) .mp3", "B) .jpg", "C) .docx", "D) .exe"], correct: 0 }
+                ]
+            }
+        };
+
+        // Current Active State
+        let currentGrade = 5;
+        let currentWeekIndex = 0;
+        let currentSlideIndex = 0;
+
+        window.onload = function() {
+            initApp();
+        };
+
+        function initApp() {
+            displayCurrentDate();
+            populateWeekDropdown();
+            autoDetectCurrentWeek();
+            renderWeekContent();
         }
-    };
 
-    function loadData(sinif) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        document.getElementById('sinif-adi').innerText = sinif === '5sınıf' ? "5. Sınıf Planı" : "6. Sınıf Planı";
-        document.getElementById('kazanim').innerText = planVerisi[sinif].kazanim;
-        document.getElementById('defter').innerText = planVerisi[sinif].defter;
-    }
-    
-    // Sayfa açıldığında varsayılanı yükle
-    loadData('5sınıf');
-</script>
+        function displayCurrentDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('currentDateDisplay').innerHTML = `📅 Bugün: <strong>${today.toLocaleDateString('tr-TR', options)}</strong>`;
+        }
 
+        function populateWeekDropdown() {
+            const select = document.getElementById('weekSelect');
+            select.innerHTML = '';
+            WEEKS_CALENDAR.forEach((w, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = w.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function autoDetectCurrentWeek() {
+            const todayStr = new Date().toISOString().split('T');
+            let foundIndex = -1;
+
+            for (let i = 0; i < WEEKS_CALENDAR.length; i++) {
+                if (todayStr >= WEEKS_CALENDAR[i].start && todayStr <= WEEKS_CALENDAR[i].end) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+
+            // Default to nearest or 0
+            currentWeekIndex = (foundIndex !== -1) ? foundIndex : 0;
+            document.getElementById('weekSelect').value = currentWeekIndex;
+        }
+
+        function switchGrade(grade) {
+            currentGrade = grade;
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.classList.toggle('active', grade === 5);
+            buttons[1].classList.toggle('active', grade === 6);
+
+            currentSlideIndex = 0;
+            renderWeekContent();
+        }
+
+        function onWeekSelectChange(val) {
+            currentWeekIndex = parseInt(val);
+            currentSlideIndex = 0;
+            renderWeekContent();
+        }
+
+        function changeWeek(delta) {
+            let newIndex = currentWeekIndex + delta;
+            if (newIndex >= 0 && newIndex < WEEKS_CALENDAR.length) {
+                currentWeekIndex = newIndex;
+                document.getElementById('weekSelect').value = currentWeekIndex;
+                currentSlideIndex = 0;
+                renderWeekContent();
+            }
+        }
+
+        function renderWeekContent() {
+            const calItem = WEEKS_CALENDAR[currentWeekIndex];
+            const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
+            const weekData = dataset[calItem.week];
+
+            // Print Header info
+            document.getElementById('printGradeTitle').textContent = `${currentGrade}. Sınıf`;
+
+            // Outcome card
+            if (weekData) {
+                document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | ${weekData.code}`;
+                document.getElementById('outcomeText').innerHTML = `<strong>Konu:</strong> ${weekData.topic}<br><strong>Sınıf Defteri Metni:</strong> ${weekData.outcomeText}`;
+                document.getElementById('printTopicTitle').textContent = `Hafta: ${calItem.name} | Konu: ${weekData.topic} (${weekData.code})`;
+            } else {
+                document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | Kodlama/Ağ Etkinliği`;
+                document.getElementById('outcomeText').textContent = `${calItem.name} için genel uygulama, proje ve pekiştirme çalışmaları yürütülmektedir.`;
+                document.getElementById('printTopicTitle').textContent = `Hafta: ${calItem.name} | Genel Uygulama Değerlendirmesi`;
+            }
+
+            // Slides
+            renderSlides(weekData);
+
+            // Exam Banner
+            const banner = document.getElementById('examBanner');
+            if (calItem.isExamUpcoming) {
+                banner.style.display = 'flex';
+            } else {
+                banner.style.display = 'none';
+            }
+
+            // Quiz
+            renderQuiz(weekData, calItem.week);
+        }
+
+        function renderSlides(weekData) {
+            const container = document.getElementById('slideContainer');
+            container.innerHTML = '';
+
+            const slides = (weekData && weekData.slides) ? weekData.slides : [
+                { stage: "DERS AKIŞI", title: "Genel Değerlendirme ve Etkinlik", body: "Bu hafta kazanımları pekiştirici çalışma kağıtları ve uygulama senaryoları yürütülmektedir." }
+            ];
+
+            slides.forEach((s, idx) => {
+                const div = document.createElement('div');
+                div.className = `slide-content ${idx === currentSlideIndex ? 'active' : ''}`;
+                div.innerHTML = `
+                    <div class="slide-header">${s.stage}</div>
+                    <div class="slide-title">${s.title}</div>
+                    <div class="slide-body">${s.body}</div>
+                `;
+                container.appendChild(div);
+            });
+
+            updateSlideIndicator(slides.length);
+        }
+
+        function updateSlideIndicator(total) {
+            document.getElementById('slideIndicator').textContent = `Slayt ${currentSlideIndex + 1} / ${total}`;
+        }
+
+        function moveSlide(delta) {
+            const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
+            const calItem = WEEKS_CALENDAR[currentWeekIndex];
+            const weekData = dataset[calItem.week];
+            const slides = (weekData && weekData.slides) ? weekData.slides : [{ stage: "", title: "", body: "" }];
+
+            let newIndex = currentSlideIndex + delta;
+            if (newIndex >= 0 && newIndex < slides.length) {
+                currentSlideIndex = newIndex;
+                const allSlides = document.querySelectorAll('.slide-content');
+                allSlides.forEach((s, i) => {
+                    s.classList.toggle('active', i === currentSlideIndex);
+                });
+                updateSlideIndicator(slides.length);
+            }
+        }
+
+        function renderQuiz(weekData, weekNum) {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            const questions = (weekData && weekData.quiz) ? weekData.quiz : [
+                { q: "Öğrenilen bilişim teknolojileri kavramları günlük hayatta ne tür kolaylıklar sağlar?", options: ["A) İşleri hızlandırır", "B) İletişimi güçlendirir", "C) Zaman tasarrufu sağlar", "D) Hepsi"], correct: 3 }
+            ];
+
+            questions.forEach((item, qIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                
+                let optionsHtml = '';
+                item.options.forEach((opt, oIdx) => {
+                    optionsHtml += `
+                        <li class="option-item">
+                            <label class="option-label">
+                                <input type="radio" name="q_${weekNum}_${qIdx}" value="${oIdx}" onclick="checkAnswer(${weekNum}, ${qIdx}, ${oIdx}, ${item.correct})">
+                                ${opt}
+                            </label>
+                        </li>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="question-title">Soru ${qIdx + 1}: ${item.q}</div>
+                    <ul class="options-list">${optionsHtml}</ul>
+                    <div class="result-box" id="res_${weekNum}_${qIdx}"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkAnswer(weekNum, qIdx, selected, correct) {
+            const resBox = document.getElementById(`res_${weekNum}_${qIdx}`);
+            if (selected === correct) {
+                resBox.innerHTML = `<span class="correct">✓ Tebrikler! Doğru cevap.</span>`;
+            } else {
+                resBox.innerHTML = `<span class="incorrect">✗ Yanlış cevap, tekrar deneyiniz.</span>`;
+            }
+        }
+
+        function generatePracticeExam() {
+            const dataset = (currentGrade === 5) ? DATA_GRADE5 : DATA_GRADE6;
+            let compiledQuestions = [];
+
+            // Compile all questions up to current week
+            for (let w = 1; w <= WEEKS_CALENDAR[currentWeekIndex].week; w++) {
+                if (dataset[w] && dataset[w].quiz) {
+                    dataset[w].quiz.forEach(q => {
+                        compiledQuestions.push({ ...q, topic: dataset[w].topic });
+                    });
+                }
+            }
+
+            document.getElementById('printTopicTitle').textContent = `Özel Deneme Sınavı Kağıdı (1. Haftadan ${WEEKS_CALENDAR[currentWeekIndex].week}. Haftaya Kadar Karma)`;
+
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = `
+                <div style="background: #e0f2fe; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #7dd3fc;">
+                    <strong>🎓 ${currentGrade}. Sınıf Deneme Sınavı (${WEEKS_CALENDAR[currentWeekIndex].week}. Haftaya Kadar İşlenen Konulardan Karma)</strong>
+                    <p style="font-size: 0.85rem; margin-top: 4px;">Toplam ${compiledQuestions.length} soru derlendi. Sayfa altındaki "Test / Sınav Çıktısı Al" butonuna basarak doğrudan yazdırabilirsiniz.</p>
+                </div>
+            `;
+
+            compiledQuestions.forEach((item, qIdx) => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+                
+                let optionsHtml = '';
+                item.options.forEach((opt, oIdx) => {
+                    optionsHtml += `
+                        <li class="option-item">
+                            <label class="option-label">
+                                <input type="radio" name="exam_q_${qIdx}" value="${oIdx}" onclick="checkExamAnswer(${qIdx}, ${oIdx}, ${item.correct})">
+                                ${opt}
+                            </label>
+                        </li>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div style="font-size:0.75rem; color:var(--primary); font-weight:700;">[Konu: ${item.topic}]</div>
+                    <div class="question-title">Soru ${qIdx + 1}: ${item.q}</div>
+                    <ul class="options-list">${optionsHtml}</ul>
+                    <div class="result-box" id="exam_res_${qIdx}"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkExamAnswer(qIdx, selected, correct) {
+            const resBox = document.getElementById(`exam_res_${qIdx}`);
+            if (selected === correct) {
+                resBox.innerHTML = `<span class="correct">✓ Doğru!</span>`;
+            } else {
+                resBox.innerHTML = `<span class="incorrect">✗ Yanlış cevap!</span>`;
+            }
+        }
+
+        function printTestSheet() {
+            window.print();
+        }
+    </script>
 </body>
 </html>
