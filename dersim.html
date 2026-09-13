@@ -208,9 +208,10 @@
         }
 
         .outcome-text {
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: var(--text-main);
             margin-top: 0.4rem;
+            white-space: pre-line;
         }
 
         /* Presentation / Slides */
@@ -430,7 +431,7 @@
             font-family: monospace;
         }
 
-        /* PRINT STYLESHEET FOR EXAM & TEST WORKSHEETS */
+        /* PRINT STYLESHEET FOR EXAM & TEST WORKSHEETS (NO MEB TEXT) */
         @media print {
             body {
                 background: white;
@@ -463,7 +464,7 @@
             }
 
             .print-header-sheet img {
-                height: 60px;
+                height: 55px;
             }
 
             .print-info-fields {
@@ -514,7 +515,7 @@
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="Logo" class="brand-logo">
                 <div class="logo-text">
                     <h1>Bilişim Teknolojileri ve Yazılım Portalı</h1>
-                    <p>MEB 2026-2027 Müfredatı & Akıllı Ders Asistanı <span class="author-badge">rayılmazan</span></p>
+                    <p>Akıllı Ders & Sınav Asistanı <span class="author-badge">rayılmazan</span></p>
                 </div>
             </div>
             <div class="date-badge" id="currentDateDisplay">
@@ -547,7 +548,7 @@
         <!-- Class Register Outcome Card -->
         <div class="register-card">
             <div class="register-header">
-                <span class="register-tag">Sınıf Defteri Kazanım Metni</span>
+                <span class="register-tag">Sınıf Defterine Yazılacak Öğrenme Çıktısı (Birebir Plandan)</span>
                 <span class="outcome-code" id="outcomeCode">BTY.5.1.1</span>
             </div>
             <div class="outcome-text" id="outcomeText">
@@ -576,11 +577,11 @@
 
         <!-- Quiz & Exam Section -->
         <div class="quiz-section">
-            <!-- PRINTABLE HEADER SHEET (FOR PAPER OUTPUT) -->
+            <!-- PRINTABLE HEADER SHEET (NO MEB TEXT - CUSTOM LOGO & BRANDING) -->
             <div class="print-header-sheet">
                 <div>
-                    <h2>T.C. MİLLÎ EĞİTİM BAKANLIĞI</h2>
-                    <p><strong id="printGradeTitle">5. Sınıf</strong> Bilişim Teknolojileri ve Yazılım Dersi Çalışma / Sınav Kağıdı</p>
+                    <h2 style="font-size: 1.2rem; font-weight: 700;">BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ PORTALI</h2>
+                    <p><strong id="printGradeTitle">5. Sınıf</strong> Çalışma / Sınav Kağıdı</p>
                     <p style="font-size: 0.8rem; margin-top: 4px;" id="printTopicTitle">Konu: ...</p>
                 </div>
                 <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj1-M4NRPHZ0Hk1kYGTLtH5_UhWf_wOhs2gx4GE6Os1MxKbmr_vZMs8fS5Q36X-eT8bK6DXGpLuS5HI1ym4Gt5CmAom8AfjUERieSTJ5pGqijLr_4dV5SjLWhcvTE3wqIppJmlzAcWEEiQQunaEmlrU2hIoxJ9BlSc_9HUA-FiRsgYqN0B7kTsFfJLx3MoT/s1600/kucuklogom.png" alt="Logo">
@@ -594,11 +595,11 @@
 
             <div class="exam-banner" id="examBanner" style="display: none;">
                 <div>
-                    <strong>📝 Ortak Sınav Yaklaşıyor! (En Az 30 Soruluk Deneme Sınavı Modülü)</strong>
-                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen tüm konulardan karma sorular içeren en az 30 soruluk bir deneme sınavı derleyebilirsiniz.</p>
+                    <strong>📝 Sınav Haftası Öncesi Karma Deneme Sınavı Modülü</strong>
+                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen konulardan karma en az 30 soruluk bir deneme sınavı hazırlayabilirsiniz.</p>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="exam-btn" onclick="generatePracticeExam()">En Az 30 Soruluk Deneme Sınavı Oluştur</button>
+                    <button class="exam-btn" onclick="generatePracticeExam()">Sınav Sorularını Hazırla (En Az 30 Soru)</button>
                 </div>
             </div>
 
@@ -646,12 +647,12 @@
             { week: 18, start: '2027-01-18', end: '2027-01-22', name: '18. Hafta (18-22 Ocak 2027 - Dönem Sonu)' }
         ];
 
-        // 5th Grade Curriculum
+        // 5th Grade Curriculum - VERBATIM OUTCOMES FROM YILLIK PLAN
         const DATA_GRADE5 = {
             1: {
                 code: "BTY.5.1.1",
                 topic: "Bilişim Teknolojilerinin Sınıflandırılması",
-                outcomeText: "Günlük yaşamda kullanılan bilişim teknolojilerini kullanım alanlarına ve temel kavramlarına göre sınıflandırır.",
+                outcomeText: "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme\na) Bilişim teknolojilerine ilişkin temel kavramları belirler.\nb) Geçmişten günümüze bilişim teknolojilerindeki benzerlikleri ve farklılıkları ilişkilendirir.\nc) Bilişim teknolojilerini kullanım alanlarına göre gruplandırır.",
                 slides: [
                     { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Soru & Beyin Fırtınası", body: "<p>Dersin başında öğrencilerle beyin fırtınası yapılır: 'Evde, okulda veya çevrenizde kullandığınız teknolojik cihazlar olmasaydı günlük yaşamınız nasıl değişirdi?'</p><p>Geçmişteki daktilo, kasetçalar, telgraf, tüplü televizyon ve disket görselleri ile günümüzdeki dokunmatik dizüstü bilgisayarlar, akıllı telefonlar, akıllı saatler ve bulut bilişim sistemleri karşılaştırılır.</p>" },
                     { stage: "KEŞFETME & SUNUM (20 DK)", title: "Temel Kavramlar & Teknolojinin Faydaları", body: "<p>Kılavuz kitaptaki temel kavramlar tanımlanır: <strong>İletişim, Bilgi, Bilişim, Teknoloji, BİT, Donanım, Yazılım, İnternet</strong>.</p><p>Bilişim teknolojilerinin sağladığı 4 temel avantaj incelenir:</p><ul><li><strong>Hayatı Kolaylaştırma:</strong> İşleri daha az çabayla yürütme.</li><li><strong>Süreçleri Hızlandırma:</strong> Zaman tasarrufu sağlama.</li><li><strong>Maliyetleri Azaltma:</strong> Kağıt ve ulaşım giderlerini düşürme.</li><li><strong>Verimliliği Artırma:</strong> Daha kısa sürede kaliteli ürün çıkarma.</li></ul>" },
@@ -674,7 +675,7 @@
             2: {
                 code: "BTY.5.1.2",
                 topic: "Bilişim Teknolojilerinin Etkileri ve Dijital Sağlık",
-                outcomeText: "Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetler; ergonomik kullanım kurallarını uygular.",
+                outcomeText: "BTY.5.1.2. Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme\na) Farklı bilişim teknolojilerinin olumlu ve olumsuz yönleri ile ilgili çözümleme yapar.\nb) Farklı bilişim teknolojilerinin kullanımına göre fiziksel güvenlik önlemleri ile ilgili sınıflandırma yapar.\nc) Bilişim teknolojilerini kullanmanın beden ve ruh sağlığı üzerindeki etkilerini kendi cümleleriyle ifade eder.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Ekran Süresi ve Sağlık Riskleri", body: "<p>Ekran başında uzun süre kaldığınızda gözlerinizde veya sırtınızda ağrı hissettiniz mi? Kontrolsüz teknoloji kullanımının beden ve ruh sağlığı üzerindeki olumsuz etkileri tartışılır.</p>" },
                     { stage: "SUNUM (20 DK)", title: "Ergonomi & Doğru Oturuş Kuralları", body: "<p>Bilgisayar kullanımında ergonomi kuralları açıklanır: Dik oturma pozisyonu, sırt desteği, ekranın göz seviyesinde ve 50-70 cm mesafede olması, dik açılı dirsek ve diz pozisyonu.</p><p><strong>Altın Kural:</strong> Her 30 dakikada bir mola verilerek göz ve beden egzersizleri yapılmalıdır.</p>" },
@@ -697,7 +698,7 @@
             3: {
                 code: "BTY.5.1.3",
                 topic: "Dijital Vatandaşlık Uygulamaları",
-                outcomeText: "Dijital kimlik kavramını açıklar; dijital ayak izinin etkilerini ve e-Devlet gibi dijital vatandaşlık uygulamalarını sınıflandırır.",
+                outcomeText: "BTY.5.1.3. Dijital vatandaşlık uygulamalarını sınıflandırabilme\na) Dijital kimlik kavramını belirler.\nb) Dijital ayak izinin etkilerini bilişim teknolojilerinin kullanım alanları ile ilişkilendirir.\nc) Dijital vatandaşlık uygulamalarını kullanım alanlarına göre gruplandırır.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Dijital İzlerimiz Kalıcı Mıdır?", body: "<p>İnternete yüklediğimiz bir fotoğrafı sildiğimizde tamamen yok olur mu? Arama motorlarında adımızı arattığımızda çıkan sonuçlar nereden geliyor?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Dijital Kimlik & Ayak İzi", body: "<p><strong>Dijital Kimlik:</strong> Sosyal medya, e-posta ve oyun platformlarındaki varlığımızdır.</p><p><strong>Dijital Ayak İzi:</strong> İnternette arattığımız kelimeler, paylaştığımız fotoğraflar, attığımız e-postalar ve üye olduğumuz sitelerin bıraktığı kalıcı veri kalıntılarıdır. Yüklenen veriler uzun süre internette kalabilir.</p>" },
@@ -720,7 +721,7 @@
             4: {
                 code: "BTY.5.1.4",
                 topic: "Yapay Zekâda Temel Kavram ve Özellikler",
-                outcomeText: "Yapay zekâ ile ilgili temel kavramları, örnek uygulamaları sorgular ve doğal zekâ ile karşılaştırır.",
+                outcomeText: "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme\na) Yapay zeka ile ilgili temel kavram ve özelliklere ilişkin merak ettiği konuları tanımlar.\nb) Yapay zekâ ile ilgili temel kavram ve özellikleri hakkında sorular sorar.\nc) Yapay zekâ ile ilgili temel kavram ve özellikleri hakkında bilgi toplar.\nç) Yapay zekâ ile ilgili temel kavram ve özellikleri hakkında toplanan bilgilerin doğruluğunu değerlendirir.\nd) Yapay zekânın olası etkilerine ilişkin topladığı bilgiler üzerinden çıkarım yapar.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Makineler Düşünebilir mi?", body: "<p>Bir bilgisayar veya robot insanlar gibi karar verebilir veya öğrenebilir mi? Alan Turing'in 1950'de sorduğu 'Makineler düşünebilir mi?' sorusu tartışılır.</p>" },
                     { stage: "SUNUM (20 DK)", title: "Yapay Zekâ Nerede & Nasıl Çalışır?", body: "<p>Yapay zekâ uygulamaları: Sesli asistanlar, yüz tanıma, otonom araçlar, öneri algoritmaları, robot süpürgeler.</p><p><strong>Verinin Rolü:</strong> Yapay zekâ doğal zekâ gibi doğuştan öğrenmez; milyonlarca doğru etiketlenmiş veri (girdi) beslenerek modeller eğitilir.</p>" },
@@ -743,10 +744,10 @@
             6: {
                 code: "BTY.5.1.5",
                 topic: "Bilgisayar Sistemlerinin Kullanımı (Donanım & Hafıza Birimleri)",
-                outcomeText: "Bilgisayar sisteminin temel bileşenlerini (iç/dış donanım, giriş/çıkış birimleri) belirler ve çözümler.",
+                outcomeText: "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme\na) Bilgisayar sistemlerinin temel bileşenlerini belirler.\nb) Bilgisayar sistemlerinin temel bileşenleri arasındaki ilişkileri belirler. (Donanım konusu ele alınır.)",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Bilgisayarın Organları", body: "<p>İnsan vücudundaki beyin, kalp ve göz gibi organlar gibi bilgisayar parçalarının da görevleri var mıdır? Donanım ve yazılım ayrımı açıklanır.</p>" },
-                    { stage: "SUNUM (20 DK)", title: "İç/Dış Donanım & Giriş/Çıkış Birimleri", body: "<p><strong>İç Donanım:</strong> Anakar, İşlemci (CPU - Beyin), RAM Bellek (Geçici hafıza), Sabit Disk / SSD (Kalıcı hafıza).</p><p><strong>Giriş Birimleri:</strong> Klavye, fare, mikrofon, tarayıcı.</p><p><strong>Çıkış Birimleri:</strong> Ekran, yazıcı, hoparlör, kulaklık.</p><p><strong>Dijital Hafıza Merdiveni:</strong> Bit < Byte < KB < MB < GB < TB.</p>" },
+                    { stage: "SUNUM (20 DK)", title: "İç/Dış Donanım & Giriş/Çıkış Birimleri", body: "<p><strong>İç Donanım:</strong> Anakart, İşlemci (CPU - Beyin), RAM Bellek (Geçici hafıza), Sabit Disk / SSD (Kalıcı hafıza).</p><p><strong>Giriş Birimleri:</strong> Klavye, fare, mikrofon, tarayıcı.</p><p><strong>Çıkış Birimleri:</strong> Ekran, yazıcı, hoparlör, kulaklık.</p><p><strong>Dijital Hafıza Merdiveni:</strong> Bit < Byte < KB < MB < GB < TB.</p>" },
                     { stage: "UYGULAMA (10 DK)", title: "Deve - Cüce Donanım Oyunu", body: "<p>Öğretmen donanım birimi söyler; Giriş biriminde öğrenciler 'Deve' (ayakta), Çıkış biriminde 'Cüce' (oturan) pozisyonu alarak donanımları sınıflandırır.</p>" },
                     { stage: "ÖZET (5 DK)", title: "Piksel ve Sıkıştırma", body: "<p>Resimlerin piksellerden oluştuğu ve veri boyutunu düşürmek için dizi boyu kodlama (veri sıkıştırma) yapıldığı özetlenir.</p>" }
                 ],
@@ -766,7 +767,7 @@
             7: {
                 code: "BTY.5.1.5",
                 topic: "Bilgisayar Sistemlerinin Kullanımı (Yazılım & İşletim Sistemi)",
-                outcomeText: "İşletim sistemlerinin görevlerini ve kullanıcı arayüzünü kavrar; temel teknik sorun giderme adımlarını yürütür.",
+                outcomeText: "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme\na) Bilgisayar sistemlerinin temel bileşenlerini belirler.\nb) Bilgisayar sistemlerinin temel bileşenleri arasındaki ilişkileri belirler. (Yazılım konusu ele alınır.)",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "İşletim Sistemi Olmasaydı?", body: "<p>Tüm donanım parçalarını kim yönetir? Ekran, klavye ve uygulamalar birbiriyle nasıl konuşur?</p>" },
                     { stage: "SUNUM (20 DK)", title: "İşletim Sistemleri & Görevleri", body: "<p><strong>İşletim Sistemi:</strong> Donanım kaynaklarını yöneten, uygulama yazılımlarının çalışmasını sağlayan temel sistem yazılımıdır.</p><p><strong>Örnekler:</strong> Windows, Pardus (Yerli), Linux, Android, iOS.</p><p>Görevleri: Bellek yönetimi, dosya yönetimi, donanım kontrolü, kullanıcı arayüzü sağlama.</p>" },
@@ -789,7 +790,7 @@
             8: {
                 code: "BTY.5.1.6",
                 topic: "Dosya ve Klasör Yönetimi",
-                outcomeText: "Temel dosya ve klasör düzenleme işlemlerini yürütür; dosya sıkıştırma işlemlerini verimlilik kapsamında değerlendirir.",
+                outcomeText: "BTY.5.1.6. Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme\na) Temel dosya ve klasör düzenleme işlemlerini belirler.\nb) Temel dosya ve klasör düzenleme işlemlerini kullanır.\nc) Dosya ve klasör sıkıştırma işlemlerini verimlilik kapsamında değerlendirir.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Masaüstü Karmaşası", body: "<p>Ekranda yüzlerce dosya varken aradığınız bir ödev belgesini bulmak kolay mıdır? Dosyaları düzenlemenin en pratik yolu nedir?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Dosya Yapısı, Uzantılar ve Klasörler", body: "<p><strong>Dosya Adı Yapısı:</strong> Dosya_Adı . Uzantı (Örn: Odev.docx)</p><p><strong>Uzantı Türleri:</strong> .txt / .docx (Metin), .jpg / .png (Görsel), .mp3 / .wav (Ses), .mp4 / .avi (Video), .pdf (Sabit Belge), .zip / .rar (Sıkıştırılmış Dosya).</p><p><strong>Klasörler:</strong> Dosyaları gruplamak için kullanılan sarı renkli dijital odalardır.</p>" },
@@ -811,12 +812,12 @@
             }
         };
 
-        // 6th Grade Curriculum
+        // 6th Grade Curriculum - VERBATIM OUTCOMES FROM YILLIK PLAN
         const DATA_GRADE6 = {
             1: {
                 code: "BTY.6.1.1",
                 topic: "Yenilikçi Bilişim Teknolojileri",
-                outcomeText: "Yenilikçi bilişim teknolojilerini (Yapay Zekâ, AR/VR, Giyilebilir Teknolojiler) kullanım alanlarına göre sınıflandırır.",
+                outcomeText: "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme\na) Yenilikçi bilişim teknolojilerine ilişkin kavramları belirler.\nb) Yenilikçi teknolojileri, bilişim teknolojilerinin günlük hayatı kolaylaştırmadaki rolüyle ilişkilendirir.\nc) Yenilikçi bilişim teknolojilerini kullanım alanlarına göre gruplandırır.",
                 slides: [
                     { stage: "GİRİŞ & DİKKAT ÇEKME (5 DK)", title: "Sanal vs Artırılmış Gerçeklik", body: "<p>Sanal gerçeklik (VR) ile artırılmış gerçeklik (AR) aynı şey midir? Farkları nelerdir?</p>" },
                     { stage: "KEŞFETME & SUNUM (20 DK)", title: "Yenilikçi Teknolojiler", body: "<p><strong>Artırılmış Gerçeklik (AR):</strong> Gerçek dünya görüntüsü üzerine dijital nesne/katman ekler.</p><p><strong>Sanal Gerçeklik (VR):</strong> Kullanıcıyı tamamen kask/gözlükle dijital sanal evrene sokar.</p><p><strong>Giyilebilir Teknolojiler:</strong> Akıllı saatler ve bileklikler sağlığı takip eder.</p>" },
@@ -839,7 +840,7 @@
             2: {
                 code: "BTY.6.1.2",
                 topic: "Bilişim Teknolojilerinin Geleceği",
-                outcomeText: "Bilişim teknolojilerinin günümüze kadar olan gelişiminden yola çıkarak gelecekteki olası durumlarına yönelik çıkarımlar yapar.",
+                outcomeText: "BTY.6.1.2. Bilişim teknolojinin gelecekteki durumlarına yönelik çıkarım yapabilme\na) Bilişim teknolojilerinin günümüze kadar olan gelişiminden yola çıkarak varsayımlarda bulunur.\nb) Bilişim teknolojilerinin gelecekteki olası durumlarına yönelik örüntüleri listeler.\nc) Bilişim teknolojilerinin gelecekteki olası durumlarına yönelik karşılaştırmalar yapar.\nç) Bilişim teknolojilerinin olası gelişimlerinin toplum üzerindeki etkilerine ilişkin önermeler sunar.\nd) Bilişim teknolojilerinin olası gelişimlerinin toplum üzerindeki etkilerini değerlendirir.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Geleceğin Teknolojisi", body: "<p>20 yıl sonra cep telefonları veya bilgisayarlar nasıl görünecek? Hangi yeni meslekler ortaya çıkacak?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Alan Turing & Zaman Çizelgesi", body: "<p>Alan Turing'den Cahit Arf'a bilgisayar biliminin tarihsel evrimi anlatılır. İlk bilgisayarların oda büyüklüğünden günümüzdeki cebimize giren cihazlara dönüşüm örüntüsü incelenir.</p>" },
@@ -862,7 +863,7 @@
             3: {
                 code: "BTY.6.2.1",
                 topic: "Tablolama Programlarına Giriş",
-                outcomeText: "Tablolama programlarının temel özelliklerini tanır, arayüz bileşenlerini (satır, sütun, hücre) kullanır.",
+                outcomeText: "BTY.6.2.1. Tablolama programlarından yararlanabilme\na) Tablolama programlarının temel özelliklerini tanır.\nb) Uygun tablolama programını belirler.\nc) Belirlenen tablolama programının arayüz özelliklerini kullanır.\nç) Kullanılan tablolama programını kullanım alanları/verimliliği açısından değerlendirir.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Sayılarla Düzen", body: "<p>Yüzlerce öğrencinin notlarını veya bir okul kütüphanesindeki kitap künyelerini hesaplamak için en pratik araç nedir?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Arayüz Bileşenleri & Formüller", body: "<p><strong>Sütunlar:</strong> A, B, C... şeklinde dikey alanlardır.</p><p><strong>Satırlar:</strong> 1, 2, 3... şeklinde yatay alanlardır.</p><p><strong>Hücre:</strong> Satır ve sütunun kesiştiği kutucuktur (Örn: B3 hücresi).</p><p><strong>Formüller:</strong> Matematiksel hesaplamalar '=' işareti ile başlar (Örn: =TOPLA(A1:A10), =ORTALAMA(B1:B5)).</p>" },
@@ -885,7 +886,7 @@
             6: {
                 code: "BTY.6.2.5 / BTY.6.2.6",
                 topic: "Ses Düzenleme ve Ses Dosyası için Kurgu",
-                outcomeText: "Ses düzenleme programlarının arayüzünü tanır; gerçek yaşam durumuna uygun ses kurgu senaryosu oluşturur.",
+                outcomeText: "BTY.6.2.5. Ses düzenleme programlarından yararlanabilme\na) Ses düzenleme programlarının temel özelliklerini tanır.\nb) Uygun ses düzenleme programını belirler.\nc) Belirlenen ses düzenleme programının arayüz özelliklerini kullanır.\nç) Kullanılan ses düzenleme programını kullanım alanları/verimliliği açısından değerlendirir.\nBTY.6.2.6. Ses dosyası için kurgu oluşturabilme\na) Ses dosyası hazırlanacak gerçek hayat problemini belirler.\nb) Ses dosyası hazırlama sürecinde kullanılacak hikâye/senaryo unsurlarını belirler.\nc) Belirlenen unsurları kapsayan hikâye/senaryo oluşturur.\nç) Hikâyeyi/senaryoyu bütünlük/kullanışlılık açısından değerlendirir.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Sessiz Bir Dünya", body: "<p>Bir filmi veya çizgi filmi sesleri ve müzikleri olmadan izleseydik ne hissederdik?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Dijital Ses & Donanımlar", body: "<p><strong>Donanımlar:</strong> Ses kartı, mikrofon (Giriş), hoparlör/kulaklık (Çıkış).</p><p><strong>Ses Formatları:</strong> .mp3 (Sıkıştırılmış, yaygın), .wav (Yüksek kaliteli, büyük boyut), .wma, .ogg.</p><p><strong>Ses Kurgusu:</strong> Zaman çizgisi (timeline), kesme, montaj, dip gürültü temizleme, efekt ve fon müziği ekleme.</p>" },
@@ -908,7 +909,7 @@
             7: {
                 code: "BTY.6.2.7",
                 topic: "Ses Dosyası Geliştirme",
-                outcomeText: "Tasarlanan senaryoya uygun olarak sesleri kaydeder, keser, birleştirir ve ses dosyası geliştirir.",
+                outcomeText: "BTY.6.2.7. Ses dosyası geliştirebilme\na) Tasarlanan hikâye/senaryo unsurlarından uyumlu bir ses dosyası oluşturur.\nb) Oluşturulan sesi belirlenen ölçütler açısından değerlendirir.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Ses Katmanlarını Birleştirme", body: "<p>Arka planda çalan fon müziği ile konuşmacının sesi nasıl dengelenir? Ses seviyesi (volume) ayarı neden önemlidir?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Ses Düzenleme Adımları", body: "<p>1. Ses kaydı yapma / Alma. 2. İstenmeyen bölümleri kesip çıkarma. 3. Ses düzeylerini eşitleme. 4. Fon müziği ve efekt ekleme. 5. .mp3 formatında dışa aktarma (export).</p>" },
@@ -931,7 +932,7 @@
             8: {
                 code: "BTY.6.2.8 / BTY.6.2.9 / BTY.6.2.10",
                 topic: "Video Düzenleme Programları ve Kurgu",
-                outcomeText: "Video düzenleme programlarını kullanır; senaryoya uygun video kurgusu oluşturur ve geliştirir.",
+                outcomeText: "BTY.6.2.8. Video düzenleme programlarından yararlanabilme\na) Video düzenleme programlarının temel özelliklerini tanır.\nb) Uygun video düzenleme programını belirler.\nc) Belirlenen video düzenleme programının arayüz özelliklerini kullanır.\nç) Kullanılan video düzenleme programını kullanım alanları/verimliliği açısından değerlendirir.\nBTY.6.2.9. Video dosyası için kurgu oluşturabilme\na) Video dosyası hazırlanacak gerçek hayat problemini belirler.\nb) Video dosyası hazırlama sürecinde kullanılacak hikâye/senaryo unsurlarını belirler.\nc) Belirlenen unsurları kapsayan hikâye/senaryo oluşturur.\nç) Hikâyeyi/senaryoyu bütünlük/kullanışlılık açısından değerlendirir.\nBTY.6.2.10. Video dosyası geliştirebilme\na) Tasarlanan hikâye/senaryo unsurlarından uyumlu bir video dosyası oluşturur.\nb) Oluşturulan videoyu belirlenen ölçütler açısından değerlendirir.",
                 slides: [
                     { stage: "GİRİŞ (5 DK)", title: "Hareketli Görsellerin Gücü", body: "<p>Bir konuyu anlatırken video kullanmak neden daha etkilidir? 1 dakikalık video kaç kare fotoğraftan oluşur?</p>" },
                     { stage: "SUNUM (20 DK)", title: "Video Düzenleme Arayüzü & Uzantılar", body: "<p><strong>Piksel ve Çözünürlük:</strong> Video kalitesini belirler.</p><p><strong>Video Uzantıları:</strong> .mp4, .avi, .mov, .mkv.</p><p><strong>Arayüz Ögeleri:</strong> Zaman çizgisi (Timeline), medya kütüphanesi, önizleme penceresi, geçiş efektleri, altyazı ve ses katmanı.</p>" },
@@ -1002,12 +1003,14 @@
             document.getElementById('weekSelect').value = currentWeekIndex;
         }
 
-        // FIXED TAB SWITCHING FUNCTION FOR 5TH AND 6TH GRADES
+        // FULLY FIXED TAB SWITCHING FUNCTION
         function switchGrade(grade) {
             currentGrade = grade;
             const buttons = document.querySelectorAll('.tab-btn');
-            buttons.classList.toggle('active', grade === 5);
-            buttons[28].classList.toggle('active', grade === 6);
+            if (buttons.length >= 2) {
+                buttons.classList.toggle('active', grade === 5);
+                buttons[5].classList.toggle('active', grade === 6);
+            }
 
             currentSlideIndex = 0;
             renderWeekContent();
@@ -1037,13 +1040,13 @@
             // Print Header info
             document.getElementById('printGradeTitle').textContent = `${currentGrade}. Sınıf`;
 
-            // Outcome card
+            // Outcome card - VERBATIM FROM YILLIK PLAN
             if (weekData) {
                 document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | ${weekData.code}`;
-                document.getElementById('outcomeText').innerHTML = `<strong>Konu:</strong> ${weekData.topic}<br><strong>Sınıf Defteri Metni:</strong> ${weekData.outcomeText}`;
+                document.getElementById('outcomeText').innerHTML = `<strong>Konu:</strong> ${weekData.topic}\n<strong>Sınıf Defterine Yazılacak Metin (Yıllık Plandan Birebir):</strong>\n${weekData.outcomeText}`;
                 document.getElementById('printTopicTitle').textContent = `Hafta: ${calItem.name} | Konu: ${weekData.topic} (${weekData.code})`;
             } else {
-                document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | Kodlama/Ağ Etkinliği`;
+                document.getElementById('outcomeCode').textContent = `${currentGrade}. Sınıf | Genel Uygulama`;
                 document.getElementById('outcomeText').textContent = `${calItem.name} için genel uygulama, proje ve pekiştirme çalışmaları yürütülmektedir.`;
                 document.getElementById('printTopicTitle').textContent = `Hafta: ${calItem.name} | Genel Uygulama Değerlendirmesi`;
             }
@@ -1178,7 +1181,6 @@
                 });
             }
 
-            // Limit or slice to at least 30 questions
             const examQuestions = compiledQuestions.slice(0, Math.max(30, compiledQuestions.length));
 
             document.getElementById('printTopicTitle').textContent = `Özel Deneme Sınavı Kağıdı (${currentGrade}. Sınıf - Toplam ${examQuestions.length} Soru)`;
@@ -1233,4 +1235,3 @@
     </script>
 </body>
 </html>
-
