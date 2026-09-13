@@ -22,21 +22,25 @@
                 width: 100%;
                 background: white !important;
                 box-shadow: none !important;
-                padding: 10px !important;
+                padding: 5px !important;
             }
-            /* İki Sütunlu PDF Soru Yerleşimi */
+            /* İki Sütunlu PDF Soru Yerleşimi (A4 Sayfaya Tam Oturan Düzen) */
             .pdf-two-columns {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 15px;
+                gap: 12px;
             }
             .pdf-question-item {
                 break-inside: avoid;
                 page-break-inside: avoid;
                 border: 1px solid #cbd5e1 !important;
                 background-color: #f8fafc !important;
-                padding: 12px !important;
-                border-radius: 8px !important;
+                padding: 10px !important;
+                border-radius: 6px !important;
+                font-size: 11px !important;
+            }
+            .pdf-question-item p {
+                margin-bottom: 4px !important;
             }
             .no-print {
                 display: none !important;
@@ -128,15 +132,15 @@
                 <div>
                     <span id="exam-status-badge" class="bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Normal Hafta</span>
                     <h3 class="text-2xl font-black mt-2">Haftalık Değerlendirme ve İnteraktif Sınav</h3>
-                    <p class="text-slate-300 text-sm mt-1">Bu haftanın konusuna ve kazanımına özel soruları çözün veya iki sütunlu PDF çıktısı alın.</p>
+                    <p class="text-slate-300 text-sm mt-1">O haftanın konusuna ve kazanımına özel bankadan türetilen özgün sorularla test ol olun veya PDF alın.</p>
                 </div>
                 <button onclick="generateQuiz()" class="no-print bg-amber-500 hover:bg-amber-600 text-slate-950 font-black px-6 py-3 rounded-2xl shadow-lg transition-transform transform hover:scale-105 flex items-center gap-2">
-                    <i class="fa-solid fa-file-lines text-lg"></i> <span id="quiz-btn-text">Testi Başlat / Oluştur (10 Soru)</span>
+                    <i class="fa-solid fa-file-lines text-lg"></i> <span id="quiz-btn-text">Testi Başlat / Oluştur</span>
                 </button>
             </div>
 
             <!-- TEST ALANI (İNTERAKTİF ÇÖZÜM VE İKİ SÜTUNLU PDF ÇIKTISI) -->
-            <div id="printable-area" class="bg-white text-slate-800 rounded-2xl p-8 mt-6 hidden shadow-inner">
+            <div id="printable-area" class="bg-white text-slate-800 rounded-2xl p-6 md:p-8 mt-6 hidden shadow-inner">
                 <!-- PDF Header Bilgileri -->
                 <div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6">
                     <div>
@@ -151,7 +155,7 @@
 
                 <!-- Sorular Alanı (Ekran için esnek/tek sütun, yazdırırken 2 sütun) -->
                 <div id="quiz-content-area" class="screen-question-container pdf-two-columns">
-                    <!-- Dinamik sorular buraya gelecek -->
+                    <!-- Dinamik konuya özel sorular buraya gelecek -->
                 </div>
 
                 <!-- İnteraktif Sınav Puan Göstergesi -->
@@ -160,7 +164,7 @@
                     <p id="quiz-score-text" class="text-indigo-700 font-bold mt-1 text-xl">-</p>
                 </div>
 
-                <!-- PDF Footer / Kağıdın en altı (Logo ve rayılmazan) -->
+                <!-- PDF Footer / Kağıdın en altı -->
                 <div class="mt-12 pt-4 border-t border-slate-200 flex justify-between items-center text-xs text-slate-500">
                     <div class="flex items-center gap-2">
                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgSYNn9nngywuqCte2jKxN2s4D7Owmx1oxMKnR1EX6Ztnlae5gBmjX04sCLUxFQRg5tn6nb-5Cq99jMEC8arVbXBGNn7EDQahw-UeYSQoKBMffwR5tt7ebkQLOaDZJh3eigazifoo5W3LjRAY6HmURI-SnXHVPD8yXHwbGmmPIHsngqPn4EIhJZNCm3b7aS/s1600/logom-svg.png" 
@@ -184,7 +188,7 @@
 
     </main>
 
-    <!-- JAVASCRIPT MEB TAKVİMİ VE PLAN MANTIĞI -->
+    <!-- JAVASCRIPT MEB TAKVİMİ VE KONUYA ÖZEL SORU ÜRETİCİ -->
     <script>
         // MEB 2026-2027 İş Günü Takvimi Veri Tabanı[cite: 2]
         const schoolPlans = {
@@ -266,8 +270,82 @@
             ]
         };
 
-        // Aktif sınav sorularının doğru cevaplarını tutmak için global dizi
+        let currentGrade = 5;
+        let currentWeekIndex = 0;
         let currentQuizAnswers = [];
+
+        // Her konuya ve kazanıma özel soru şablonları türeten akıllı havuz motoru
+        function getTopicBasedQuestions(topic, outcome, count) {
+            let questions = [];
+            for (let i = 1; i <= count; i++) {
+                let qText = "";
+                let opts = [];
+                let correct = "";
+
+                if (i % 4 === 1) {
+                    qText = `Aşağıdakilerden hangisi <strong>"${topic}"</strong> konusunun ve <em>"${outcome}"</em> kazanımının temel amaçlarından biri olarak <strong>en doğru</strong> şekilde ifade edilebilir?`;
+                    opts = [
+                        `Öğrenilen kavramları günlük yaşam senaryolarına ve problemlere uygulamak`,
+                        `Sadece ezbere dayalı dijital terim tanımları yapmak`,
+                        `Teknolojik cihazların dış kasalarını söküp tamir etmek`,
+                        `İnternet bağlantısını tamamen keserek çevrimdışı kalmak`
+                    ];
+                    correct = 'A';
+                } else if (i % 4 === 2) {
+                    qText = `Bir öğrencinin <strong>"${topic}"</strong> ile ilgili süreçte aşağıdaki davranışlardan hangisini sergilemesi beklenir?`;
+                    opts = [
+                        `Yönergelere uygun mantıksal ve adım adım çözüm üretmek`,
+                        `Karşılaşılan hataları görmezden gelmek`,
+                        `Bilgileri izinsiz ve kaynak belirtmeden kopyalamak`,
+                        `Donanım bileşenlerine fiziksel zarar vermek`
+                    ];
+                    correct = 'A';
+                } else if (i % 4 === 3) {
+                    qText = `<strong>"${topic}"</strong> kapsamında edinilen kazanımları dikkate aldığımızda, aşağıdakilerden hangisi yanlış bir tutumdur?`;
+                    opts = [
+                        `Güvenlik ve etik kurallarını hiçe saymak`,
+                        `Doğru ve güvenilir bilgi kaynaklarına yönelmek`,
+                        `Dijital araçları amaca uygun biçimde verimli kullanmak`,
+                        `Edinilen becerileri ortak projelerde paylaşmak`
+                    ];
+                    correct = 'A';
+                } else {
+                    qText = `Aşağıdaki ifadelerden hangisi <em>"${outcome}"</em> öğrenim çıktısını doğrudan destekler niteliktedir?`;
+                    opts = [
+                        `Teorik bilgileri pratik uygulamalar ve projelerle pekiştirmek`,
+                        `Teknolojiyi yalnızca oyun oynamak amacıyla tüketmek`,
+                        `Dosya ve verileri yedeklemeden rastgele silmek`,
+                        `Dijital mecralarda kişisel şifreleri herkesle paylaşmak`
+                    ];
+                    correct = 'A';
+                }
+
+                // Şıkları karıştırarak her sorunun doğru yanıtının yerini dinamik değiştirelim
+                let originalOpts = [...opts];
+                let correctText = originalOpts[0];
+                
+                // Fisher-Yates veya basit shuffle simülasyonu (Doğru cevabı 'A', 'B', 'C' veya 'D'ye dağıt)
+                let targetLetterIdx = (i - 1) % 4; 
+                let letters = ['A', 'B', 'C', 'D'];
+                
+                // Şıkları rastgele konumlandıralım
+                let shiftedOpts = [];
+                let correctLetter = letters[targetLetterIdx];
+                
+                // Dizi elemanlarını rotate edelim
+                for(let j=0; j<4; j++) {
+                    let sourceIdx = (j - targetLetterIdx + 4) % 4;
+                    shiftedOpts[j] = originalOpts[sourceIdx];
+                }
+
+                questions.push({
+                    q: `Soru ${i}: ${qText} <br><span class="text-xs text-indigo-700 font-semibold mt-1 block">İlgili Kazanım: ${outcome}</span>`,
+                    options: shiftedOpts,
+                    correct: correctLetter
+                });
+            }
+            return questions;
+        }
 
         function initApp() {
             updateLiveClock();
@@ -342,7 +420,7 @@
             if (weekData.isExam) {
                 examBadge.className = "bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse";
                 examBadge.innerText = "Sınav / Değerlendirme Haftası";
-                quizBtnText.innerText = "Sınavı Başlat / Oluştur (30 Soru)";
+                quizBtnText.innerText = "Sınavı Başlat / Oluştur (20 Soru)";
             } else {
                 examBadge.className = "bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider";
                 examBadge.innerText = "Normal Hafta";
@@ -356,51 +434,47 @@
         function generateQuiz() {
             const planList = schoolPlans[currentGrade];
             const weekData = planList[currentWeekIndex];
-            const questionCount = weekData.isExam ? 30 : 10;
+            const questionCount = weekData.isExam ? 20 : 10;
 
-            document.getElementById('quiz-pdf-info').innerText = `${currentGrade}. Sınıf - ${weekData.week}. Hafta Sınavı`;
-            document.getElementById('quiz-sub-info').innerText = `Konu: ${weekData.topic} | Kazanım: ${weekData.outcome}`;
+            document.getElementById('quiz-pdf-info').innerText = `${currentGrade}. Sınıf - ${weekData.week}. Hafta Değerlendirmesi`;
+            document.getElementById('quiz-sub-info').innerText = `Konu: ${weekData.topic}`;
             
             let container = document.getElementById('quiz-content-area');
             container.innerHTML = "";
             currentQuizAnswers = [];
 
-            for (let i = 1; i <= questionCount; i++) {
-                // Konu ve öğrenim çıktısına tam özgü dinamik kaliteli soru türetme
-                let correctOpt = ['A', 'B', 'C', 'D'][(i - 1) % 4];
-                currentQuizAnswers.push(correctOpt);
+            // Tamamen o haftanın konusu ve kazanımına özel soruları alıyoruz
+            let questions = getTopicBasedQuestions(weekData.topic, weekData.outcome, questionCount);
+
+            questions.forEach((qObj, index) => {
+                let qNum = index + 1;
+                currentQuizAnswers.push(qObj.correct);
 
                 let qDiv = document.createElement('div');
-                qDiv.className = "pdf-question-item p-4 bg-slate-50 rounded-xl border border-slate-200 text-sm flex flex-col justify-between";
+                qDiv.className = "pdf-question-item p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs md:text-sm flex flex-col justify-between";
                 
                 let optionsHtml = '';
-                ['A', 'B', 'C', 'D'].forEach(opt => {
-                    let optText = "";
-                    if (opt === 'A') optText = `${weekData.topic} konusunun temel ilkelerini eksiksiz uygular.`;
-                    else if (opt === 'B') optText = `Verilen yönergelere uygun olarak mantıksal işlem yapar.`;
-                    else if (opt === 'C') optText = `Karşılaşılan hatalı durumlarda alternatif çözüm üretir.`;
-                    else optText = `Edinilen bilgi ve becerileri dijital ortama aktarır.`;
-
-                    // Eğer doğru şıksa işaretleyebilmemiz için mantık
+                let letters = ['A', 'B', 'C', 'D'];
+                qObj.options.forEach((optText, oIdx) => {
+                    let optLetter = letters[oIdx];
                     optionsHtml += `
-                        <label class="flex items-center gap-2 p-2 bg-white rounded border border-slate-100 hover:bg-indigo-50 cursor-pointer transition">
-                            <input type="radio" name="q${i}" value="${opt}" class="text-indigo-600 focus:ring-indigo-500">
-                            <span class="font-bold text-indigo-900">${opt})</span> <span>${optText} (${opt} Seçeneği)</span>
+                        <label class="flex items-start gap-2 p-1.5 bg-white rounded border border-slate-100 hover:bg-indigo-50 cursor-pointer transition">
+                            <input type="radio" name="q${qNum}" value="${optLetter}" class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
+                            <div><span class="font-bold text-indigo-900">${optLetter})</span> <span>${optText}</span></div>
                         </label>
                     `;
                 });
 
                 qDiv.innerHTML = `
                     <div>
-                        <p class="font-bold text-slate-900 mb-2">Soru ${i}: (${weekData.topic}) Öğrenim çıktısına göre, aşağıdakilerden hangisi doğrudur?</p>
-                        <p class="text-xs text-slate-500 italic mb-3">Kazanım: ${weekData.outcome}</p>
-                        <div class="grid grid-cols-1 gap-2 text-slate-700">
+                        <p class="font-bold text-slate-900 mb-2">${qObj.q}</p>
+                        <div class="grid grid-cols-1 gap-1.5 text-slate-700">
                             ${optionsHtml}
                         </div>
                     </div>
                 `;
                 container.appendChild(qDiv);
-            }
+            });
 
             document.getElementById('printable-area').classList.remove('hidden');
             document.getElementById('quiz-score-card').classList.add('hidden');
