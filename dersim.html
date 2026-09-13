@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilişim Teknolojileri ve Yazılım Dersi | rayılmazan</title>
+    <title>Bilişim Teknolojileri ve Yazılım Dersi</title>
 
     <style>
         :root {
@@ -56,15 +56,6 @@
             gap: 1rem;
         }
 
-        .brand-logo {
-            height: 50px;
-            width: auto;
-            background: white;
-            padding: 3px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-
         .logo-text h1 {
             font-size: 1.35rem;
             font-weight: 700;
@@ -74,22 +65,6 @@
         .logo-text p {
             font-size: 0.85rem;
             color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .author-badge {
-            font-size: 0.85rem;
-            color: #f1f5f9;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .date-badge {
@@ -451,10 +426,6 @@
                 width: 100%;
             }
 
-            .brand-logo {
-                height: 42px;
-            }
-
             .logo-text h1 {
                 font-size: 1.15rem;
             }
@@ -570,7 +541,7 @@
             }
 
             .option-label {
-                padding: 0.7rem 0.5rem; /* Touch friendly on mobile */
+                padding: 0.7rem 0.5rem;
                 font-size: 0.9rem;
             }
         }
@@ -599,9 +570,7 @@
             }
 
             .print-header-sheet {
-                display: flex !important;
-                justify-content: space-between;
-                align-items: center;
+                display: block !important;
                 border-bottom: 2px solid #000;
                 padding-bottom: 12px;
                 margin-bottom: 20px;
@@ -652,10 +621,9 @@
     <header>
         <div class="header-container">
             <div class="brand-area">
-                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="Logo" class="brand-logo">
                 <div class="logo-text">
                     <h1>Bilişim Teknolojileri ve Yazılım Dersi</h1>
-                    <p>Akıllı Ders Asistanı <span class="author-badge"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" style="height:16px;"> rayılmazan</span></p>
+                    <p>Akıllı Ders Asistanı</p>
                 </div>
             </div>
             <div class="date-badge" id="currentDateDisplay">
@@ -717,17 +685,11 @@
 
         <!-- Quiz & Exam Section -->
         <div class="quiz-section">
-            <!-- PRINTABLE HEADER SHEET (NO MEB TEXT) -->
+            <!-- PRINTABLE HEADER SHEET (ÜST LOGO VE İSİM KALDIRILDI) -->
             <div class="print-header-sheet">
-                <div>
-                    <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h2>
-                    <p><strong id="printGradeTitle">5. Sınıf</strong> Çalışma ve Değerlendirme Kağıdı</p>
-                    <p style="font-size: 0.85rem; margin-top: 4px;" id="printTopicTitle">Konu: ...</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgjuHHeW2yGyioXYs_tbqTZPycZepELdRoSkw27u-5c-JNkKfVEJeJc5IfjjthORoWO8SH0q-0SsBPnpqavqVOxo2YGQux-vvs-eX7tET6xCTFicTu7knKLQU87HmmHeVtV-JgHp4IUGa7X2C6VqqeDq_VxMo9i_RW7NVW9D0Zj-Jx9mG12-thiClb2z4AA/s1600/buyuklogom.png" alt="Logo" style="height: 48px;">
-                    <span style="font-weight: 700; font-family: monospace; font-size: 1rem; color: #0f172a;">rayılmazan</span>
-                </div>
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">BİLİŞİM TEKNOLOJİLERİ VE YAZILIM DERSİ</h2>
+                <p><strong id="printGradeTitle">5. Sınıf</strong> Çalışma ve Değerlendirme Kağıdı</p>
+                <p style="font-size: 0.85rem; margin-top: 4px;" id="printTopicTitle">Konu: ...</p>
             </div>
 
             <div class="print-info-fields">
@@ -739,15 +701,15 @@
             <div class="exam-banner" id="examBanner" style="display: none;">
                 <div>
                     <strong>📝 Sınav Haftası Öncesi Karma Deneme Sınavı Modülü</strong>
-                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen konulardan karma en az 30 soruluk bir deneme sınavı hazırlayabilirsiniz.</p>
+                    <p style="font-size: 0.85rem; color: #78350f;">Bu haftaya kadar işlenen konulardan karma deneme sınavı hazırlayabilirsiniz.</p>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="exam-btn" onclick="generatePracticeExam()">Sınav Sorularını Hazırla (En Az 30 Soru)</button>
+                    <button class="exam-btn" onclick="generatePracticeExam()">Sınav Sorularını Hazırla</button>
                 </div>
             </div>
 
             <div class="section-title" style="justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-                <span id="quizTitleDisplay">❓ Değerlendirme Soruları (En Az 10 Soru)</span>
+                <span id="quizTitleDisplay">❓ Değerlendirme Soruları</span>
                 <button class="print-btn" onclick="printTestSheet()">🖨️ Test / Sınav Çıktısı Al (PDF)</button>
             </div>
 
@@ -848,7 +810,7 @@
             }
         };
 
-        // 6th Grade Curriculum
+        // 6th Grade Curriculum (Balanced Option Distribution Across A, B, C, D)
         const DATA_GRADE6 = {
             1: {
                 code: "BTY.6.1.1",
@@ -863,15 +825,15 @@
                 ],
                 quiz: [
                     { q: "Gerçek dünya görüntüsü üzerine dijital nesneler ve katmanlar ekleyen teknoloji hangisidir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Sabit Disk", "D) Disket"], correct: 1 },
-                    { q: "Kullanıcıyı tamamen dış dünyadan soyutlayarak sanal bir evrene sokan teknoloji nedir?", options: ["A) Sanal Gerçeklik (VR)", "B) Artırılmış Gerçeklik (AR)", "C) Akıllı Saat", "D) Yazıcı"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi 'Giyilebilir Teknoloji'ye örnektir?", options: ["A) Akıllı Saat ve Akıllı Bileklik", "B) Masaüstü Bilgisayar Kasası", "C) Tüplü Televizyon", "D) Yazıcı"], correct: 0 },
+                    { q: "Kullanıcıyı tamamen dış dünyadan soyutlayarak sanal bir evrene sokan teknoloji nedir?", options: ["A) Sabit Disk", "B) Akıllı Saat", "C) Sanal Gerçeklik (VR)", "D) Artırılmış Gerçeklik (AR)"], correct: 2 },
+                    { q: "Aşağıdakilerden hangisi 'Giyilebilir Teknoloji'ye örnektir?", options: ["A) Masaüstü Bilgisayar Kasası", "B) Tüplü Televizyon", "C) Yazıcı", "D) Akıllı Saat ve Akıllı Bileklik"], correct: 3 },
                     { q: "Artırılmış gerçeklik teknolojisinin eğitimdeki faydası aşağıdakilerden hangisidir?", options: ["A) Soyut ve tehlikeli deneyleri güvenle görselleştirmek", "B) Kitapları yok etmek", "C) Sadece oyun oynamak", "D) Bilgisayarı bozmak"], correct: 0 },
-                    { q: "Giyilebilir teknolojilerin sağlık alanındaki temel kullanımı nedir?", options: ["A) Nabız, adım ve uyku takibi yapmak", "B) Fotoğraf basmak", "C) Çöp toplamak", "D) Araba sürmek"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi Yenilikçi Bilişim Teknolojilerinden biridir?", options: ["A) Yapay Zekâ ve AR/VR", "B) Daktilo", "C) Telgraf", "D) Kasetçalar"], correct: 0 },
+                    { q: "Giyilebilir teknolojilerin sağlık alanındaki temel kullanımı nedir?", options: ["A) Fotoğraf basmak", "B) Nabız, adım ve uyku takibi yapmak", "C) Çöp toplamak", "D) Araba sürmek"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi Yenilikçi Bilişim Teknolojilerinden biridir?", options: ["A) Daktilo", "B) Telgraf", "C) Yapay Zekâ ve AR/VR", "D) Kasetçalar"], correct: 2 },
                     { q: "Sanal gerçeklik kaskı takan bir öğrenci ders esnasında ne deneyimler?", options: ["A) Kendisini uzayda veya tarihi bir mekanda hisseder", "B) Sadece kağıt okur", "C) Hiçbir şey görmez", "D) Sadece ses duyar"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi teknolojinin 'Yeşil Beceri' (çevreye faydalı) kullanımına örnektir?", options: ["A) Dijital belgelerle kağıt israfını önlemek", "B) Sürekli gereksiz çıktı almak", "C) Cihazları açık bırakmak", "D) Elektronik atıkları doğaya atmak"], correct: 0 },
-                    { q: "AR teknolojisi ile bir ders kitabındaki organ resmine bakıldığında ne gerçekleşir?", options: ["A) Resim 3 boyutlu canlanır ve hareket eder", "B) Kitap yırtılır", "C) Ekran kararır", "D) Ses kesilir"], correct: 0 },
-                    { q: "Gelecekte yenilikçi teknolojilerin yaygınlaşması hangi alanda büyük değişim yaratır?", options: ["A) Eğitim, sağlık, ulaşım ve üretimde", "B) Yalnızca taş devri aletlerinde", "C) Hiçbir alanda", "D) Sadece mum kullanımında"], correct: 0 }
+                    { q: "Aşağıdakilerden hangisi teknolojinin 'Yeşil Beceri' (çevreye faydalı) kullanımına örnektir?", options: ["A) Sürekli gereksiz çıktı almak", "B) Dijital belgelerle kağıt israfını önlemek", "C) Cihazları açık bırakmak", "D) Elektronik atıkları doğaya atmak"], correct: 1 },
+                    { q: "AR teknolojisi ile bir ders kitabındaki organ resmine bakıldığında ne gerçekleşir?", options: ["A) Kitap yırtılır", "B) Ekran kararır", "C) Resim 3 boyutlu canlanır ve hareket eder", "D) Ses kesilir"], correct: 2 },
+                    { q: "Gelecekte yenilikçi teknolojilerin yaygınlaşması hangi alanda büyük değişim yaratır?", options: ["A) Yalnızca taş devri aletlerinde", "B) Hiçbir alanda", "C) Sadece mum kullanımında", "D) Eğitim, sağlık, ulaşım ve üretimde"], correct: 3 }
                 ]
             },
             2: {
@@ -887,15 +849,15 @@
                 ],
                 quiz: [
                     { q: "Bilgisayar biliminin öncülerinden kabul edilen bilim insanı kimdir?", options: ["A) Alan Turing", "B) Isaac Newton", "C) Thomas Edison", "D) Galileo"], correct: 0 },
-                    { q: "Bilgisayarların tarihsel gelişiminde ilk bilgisayarlardan günümüze doğru ne tür bir değişim olmuştur?", options: ["A) Cihazlar küçülmüş, hızlanmış ve güçlenmiştir", "B) Cihazlar büyümüş ve yavaşlamıştır", "C) Fiyatları milyarlarca kat artmıştır", "D) Hiçbir şey değişmemiştir"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi gelecekte öne çıkması beklenen mesleklerden biridir?", options: ["A) Yapay Zekâ Mühendisi ve Siber Güvenlik Uzmanı", "B) Daktilo Tamircisi", "C) Kaset Kopyalayıcısı", "D) Telgraf Operatörü"], correct: 0 },
-                    { q: "Cahit Arf 1959 yılında yazmış olduğu makalede hangi soruyu tartışmıştır?", options: ["A) 'Makine Düşünebilir mi ve Nasıl Düşünebilir?'", "B) 'Televizyon Nasıl Yapılır?'", "C) 'Araba Nasıl Sürülür?'", "D) 'İnternet Nedir?'"], correct: 0 },
+                    { q: "Bilgisayarların tarihsel gelişiminde ilk bilgisayarlardan günümüze doğru ne tür bir değişim olmuştur?", options: ["A) Cihazlar büyümüş ve yavaşlamıştır", "B) Cihazlar küçülmüş, hızlanmış ve güçlenmiştir", "C) Fiyatları milyarlarca kat artmıştır", "D) Hiçbir şey değişmemiştir"], correct: 1 },
+                    { q: "Aşağıdakilerden hangisi gelecekte öne çıkması beklenen mesleklerden biridir?", options: ["A) Daktilo Tamircisi", "B) Kaset Kopyalayıcısı", "C) Yapay Zekâ Mühendisi ve Siber Güvenlik Uzmanı", "D) Telgraf Operatörü"], correct: 2 },
+                    { q: "Cahit Arf 1959 yılında yazmış olduğu makalede hangi soruyu tartışmıştır?", options: ["A) 'Televizyon Nasıl Yapılır?'", "B) 'Araba Nasıl Sürülür?'", "C) 'İnternet Nedir?'", "D) 'Makine Düşünebilir mi ve Nasıl Düşünebilir?'"], correct: 3 },
                     { q: "Teknolojinin gelecekteki durumuna ilişkin tahmin yürütürken neye bakılır?", options: ["A) Geçmişten günümüze olan gelişim örüntülerine", "B) Rüzgarın yönüne", "C) Sadece oyun fiyatlarına", "D) Rastgele sayılara"], correct: 0 },
-                    { q: "Gelecekte otonom (sürücüsüz) araçların yaygınlaşması toplumu nasıl etkiler?", options: ["A) Trafik kazalarını ve insan hatasını azaltabilir", "B) Herkesin ehliyet alma zorunluluğunu artırır", "C) Benzin fiyatını sıfırlar", "D) Yolları yok eder"], correct: 0 },
-                    { q: "Geleceğin teknolojilerini tasarlarken çevreye duyarlılık ne olarak adlandırılır?", options: ["A) Yeşil Beceriler ve Sürdürülebilirlik", "B) Donanım Sürücüsü", "C) Yazılım İhlali", "D) Ekran Çözünürlüğü"], correct: 0 },
-                    { q: "Aşağıdakilerden hangisi gelecekte sağlık alanında yaşanabilecek olası bir gelişmedir?", options: ["A) Yapay zekâ destekli erken teşhis ve robotik cerrahi", "B) Hastanelerin tamamen kapanması", "C) İlaçların yasaklanması", "D) Doktorların yok olması"], correct: 0 },
+                    { q: "Gelecekte otonom (sürücüsüz) araçların yaygınlaşması toplumu nasıl etkiler?", options: ["A) Herkesin ehliyet alma zorunluluğunu artırır", "B) Trafik kazalarını ve insan hatasını azaltabilir", "C) Benzin fiyatını sıfırlar", "D) Yolları yok eder"], correct: 1 },
+                    { q: "Geleceğin teknolojilerini tasarlarken çevreye duyarlılık ne olarak adlandırılır?", options: ["A) Donanım Sürücüsü", "B) Yazılım İhlali", "C) Yeşil Beceriler ve Sürdürülebilirlik", "D) Ekran Çözünürlüğü"], correct: 2 },
+                    { q: "Aşağıdakilerden hangisi gelecekte sağlık alanında yaşanabilecek olası bir gelişmedir?", options: ["A) Hastanelerin tamamen kapanması", "B) İlaçların yasaklanması", "C) Doktorların yok olması", "D) Yapay zekâ destekli erken teşhis ve robotik cerrahi"], correct: 3 },
                     { q: "Geçmişte oda büyüklüğünde olan ENIAC gibi bilgisayarların günümüzdeki muadili nedir?", options: ["A) Akıllı Cep Telefonları ve Tabletler", "B) Abaküs", "C) Daktilo", "D) Hesap Cetveli"], correct: 0 },
-                    { q: "Gelecekte teknolojinin toplum üzerindeki olumsuz etkilerinden biri ne olabilir?", options: ["A) Bireyler arasında yüz yüze iletişimin azalması ve hareketsizlik", "B) Bilgiye erişimin imkansızlaşması", "C) Okulların tamamen yok olması", "D) Cihazların hiç çalışmaması"], correct: 0 }
+                    { q: "Gelecekte teknolojinin toplum üzerindeki olumsuz etkilerinden biri ne olabilir?", options: ["A) Bilgiye erişimin imkansızlaşması", "B) Bireyler arasında yüz yüze iletişimin azalması ve hareketsizlik", "C) Okulların tamamen yok olması", "D) Cihazların hiç çalışmaması"], correct: 1 }
                 ]
             }
         };
@@ -1013,7 +975,7 @@
             }
 
             // Reset Quiz Title
-            document.getElementById('quizTitleDisplay').textContent = `❓ Değerlendirme Soruları (En Az 10 Soru)`;
+            document.getElementById('quizTitleDisplay').textContent = `❓ Değerlendirme Soruları`;
 
             // Quiz
             renderQuiz(weekData, calItem.week);
@@ -1116,7 +1078,7 @@
                 }
             }
 
-            if (compiledQuestions.length < 30) {
+            if (compiledQuestions.length < 20) {
                 Object.keys(dataset).forEach(wKey => {
                     if (dataset[wKey] && dataset[wKey].quiz) {
                         dataset[wKey].quiz.forEach(q => {
@@ -1128,7 +1090,7 @@
                 });
             }
 
-            const examQuestions = compiledQuestions.slice(0, Math.max(30, compiledQuestions.length));
+            const examQuestions = compiledQuestions.slice(0, Math.max(20, compiledQuestions.length));
 
             document.getElementById('printTopicTitle').textContent = `Özel Deneme Sınavı Kağıdı (${currentGrade}. Sınıf - Toplam ${examQuestions.length} Soru)`;
             document.getElementById('quizTitleDisplay').textContent = `📝 ${currentGrade}. Sınıf Deneme Sınavı Soruları (${examQuestions.length} Soru)`;
