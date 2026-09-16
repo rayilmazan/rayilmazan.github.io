@@ -188,20 +188,27 @@
         </div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label>Öğretmen Masası / Tahta Konumu</label>
+          <select id="teacherPos" class="form-select">
+            <option value="center">Ön - Orta</option>
+            <option value="left">Ön - Sol</option>
+            <option value="right">Ön - Sağ</option>
+          </select>
+        </div>
+      </div>
+
       <div class="form-group">
-        <label>Öğretmen Masası / Tahta Konumu</label>
-        <select id="teacherPos" class="form-select">
-          <option value="center">Ön - Orta</option>
-          <option value="left">Ön - Sol</option>
-          <option value="right">Ön - Sağ</option>
-        </select>
+        <label>Sınıf Rehber Öğretmeni</label>
+        <input type="text" id="teacherName" class="form-input" value="Ramazan YILMAZ">
       </div>
 
       <div class="section-title">2. Kullanım Bilgisi</div>
       <div class="instruction-box">
         💡 <strong>Nasıl Kullanılır?</strong><br>
-        Sağ taraftaki planda her sırada 2 öğrenci koltuğu bulunur (Her sırada 3 adet ikili masa, toplam 6 öğrenci).<br><br>
-        İsim eklemek veya değiştirmek için doğrudan plan üzerindeki <strong>koltuğa tıklayın</strong>. Silmek için pencereyi boş bırakıp tamam deyin.
+        Sınıf düzeni 3 kolon ve 6 sıradan oluşmaktadır (Her masa 2 kişiliktir).<br><br>
+        Öğrenci eklemek veya değiştirmek için doğrudan plan üzerindeki <strong>koltuğa tıklayın</strong>. Silmek için pencereyi boş bırakıp tamam deyin.
       </div>
 
       <button class="btn-submit" id="btnDownloadPDF">
@@ -226,18 +233,17 @@
     const canvas = document.getElementById('seatingCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 3 Sırada 6'şar öğrenci (3 Kolonda İkili Masalar x 3 Derinlik Sırası = Toplam 18 Masa / 36 Koltuk)
-    // Her masada 2 koltuk var: seat1, seat2
-    const rowsCount = 3; // Derinlemesine 3 sıra
-    const colsCount = 3; // Enlemesine 3 kolon ikili masa (Her sırada 6 öğrenci)
+    // 6 Sıra x 3 Kolon (İkili Masalar) = Toplam 18 Masa / 36 Koltuk
+    const rowsCount = 6; // Derinlemesine 6 sıra
+    const colsCount = 3; // Enlemesine 3 kolon ikili masa
 
-    // Koltuk verilerini saklayan dizi (36 elemanlı)
+    // Koltuk verilerini saklayan obje
     let seatsData = {};
 
-    // Koltukların tıklama alanlarını saklamak için
+    // Koltukların tıklama alanlarını saklamak için dizi
     let clickableSeats = [];
 
-    const inputs = ['className', 'doorPos', 'teacherPos'].map(id => document.getElementById(id));
+    const inputs = ['className', 'doorPos', 'teacherPos', 'teacherName'].map(id => document.getElementById(id));
     const btnDownloadPDF = document.getElementById('btnDownloadPDF');
 
     inputs.forEach(input => {
@@ -291,15 +297,15 @@
 
       // Başlık
       ctx.fillStyle = "#0f172a";
-      ctx.font = "bold 45px 'Segoe UI', Arial, sans-serif";
+      ctx.font = "bold 42px 'Segoe UI', Arial, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(document.getElementById('className').value.toUpperCase(), w / 2, 110);
+      ctx.fillText(document.getElementById('className').value.toUpperCase(), w / 2, 95);
 
       ctx.fillStyle = "#64748b";
-      ctx.font = "24px 'Segoe UI', Arial, sans-serif";
-      ctx.fillText("SINIF OTURMA PLANI", w / 2, 145);
+      ctx.font = "22px 'Segoe UI', Arial, sans-serif";
+      ctx.fillText("SINIF OTURMA PLANI", w / 2, 125);
 
-      // Kapı
+      // Kapı Çizimi
       const doorPos = document.getElementById('doorPos').value;
       ctx.fillStyle = "#f1f5f9";
       ctx.strokeStyle = "#64748b";
@@ -318,43 +324,44 @@
 
       // Tahta ve Öğretmen Masası
       const teacherPos = document.getElementById('teacherPos').value;
-      let boardX = w / 2 - 300;
-      let boardW = 600;
+      let boardX = w / 2 - 250;
+      let boardW = 500;
       
       ctx.fillStyle = "#065f46";
-      ctx.fillRect(boardX, 180, boardW, 35);
+      ctx.fillRect(boardX, 150, boardW, 30);
       ctx.strokeStyle = "#047857";
       ctx.lineWidth = 3;
-      ctx.strokeRect(boardX, 180, boardW, 35);
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 18px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("YAZI TAHTASI", w / 2, 204);
-
-      let deskX = w / 2 - 100;
-      if (teacherPos === 'left') deskX = 200;
-      if (teacherPos === 'right') deskX = w - 400;
-
-      ctx.fillStyle = "#b45309";
-      ctx.fillRect(deskX, 235, 200, 50);
-      ctx.strokeStyle = "#92400e";
-      ctx.strokeRect(deskX, 235, 200, 50);
+      ctx.strokeRect(boardX, 150, boardW, 30);
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 16px sans-serif";
-      ctx.fillText("ÖĞRETMEN MASASI", deskX + 100, 266);
+      ctx.textAlign = "center";
+      ctx.fillText("YAZI TAHTASI", w / 2, 171);
 
-      // Sıra Düzeni Hesaplamaları
-      const startY = 340;
-      const totalAreaH = h - startY - 80;
+      let deskX = w / 2 - 90;
+      if (teacherPos === 'left') deskX = 180;
+      if (teacherPos === 'right') deskX = w - 360;
+
+      ctx.fillStyle = "#b45309";
+      ctx.fillRect(deskX, 195, 180, 42);
+      ctx.strokeStyle = "#92400e";
+      ctx.strokeRect(deskX, 195, 180, 42);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 15px sans-serif";
+      ctx.fillText("ÖĞRETMEN MASASI", deskX + 90, 221);
+
+      // 6 Sıralı Masalar için Alan Hesaplaması
+      const startY = 265;
+      const endY = h - 110; // Alt öğretmen yazısı için yer bırakıldı
+      const totalAreaH = endY - startY;
       const rowH = totalAreaH / rowsCount;
       
-      const totalAreaW = w - 300;
+      const totalAreaW = w - 260;
       const colW = totalAreaW / colsCount;
 
       for (let r = 0; r < rowsCount; r++) {
         for (let c = 0; c < colsCount; c++) {
-          const deskBlockX = 150 + (c * colW) + (colW - 280) / 2;
-          const deskBlockY = startY + (r * rowH) + (rowH - 120) / 2;
+          const deskBlockX = 130 + (c * colW) + (colW - 250) / 2;
+          const deskBlockY = startY + (r * rowH) + (rowH - 65) / 2;
 
           const seat1Id = `seat_${r}_${c}_1`;
           const seat2Id = `seat_${r}_${c}_2`;
@@ -363,12 +370,19 @@
           drawDoubleDesk(deskBlockX, deskBlockY, seat1Id, seat2Id);
         }
       }
+
+      // En Altta Sınıf Rehber Öğretmeni Yazısı
+      const teacherNameVal = document.getElementById('teacherName').value.trim();
+      ctx.fillStyle = "#1e293b";
+      ctx.font = "bold 24px 'Segoe UI', Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`Sınıf Rehber Öğretmeni: ${teacherNameVal}`, w / 2, h - 55);
     }
 
     function drawDoubleDesk(x, y, id1, id2) {
-      const seatW = 130;
-      const seatH = 90;
-      const gap = 20;
+      const seatW = 120;
+      const seatH = 65;
+      const gap = 10;
 
       const name1 = seatsData[id1] || "";
       const name2 = seatsData[id2] || "";
@@ -395,10 +409,10 @@
       ctx.strokeRect(x, y, w, h);
 
       ctx.fillStyle = textCol;
-      ctx.font = name ? "bold 16px 'Segoe UI', Arial, sans-serif" : "italic 14px 'Segoe UI', Arial, sans-serif";
+      ctx.font = name ? "bold 14px 'Segoe UI', Arial, sans-serif" : "italic 13px 'Segoe UI', Arial, sans-serif";
       ctx.textAlign = "center";
       
-      wrapText(ctx, name || "+ İsim Ekle", x + w / 2, y + 40, w - 10, 20);
+      wrapText(ctx, name || "+ İsim Ekle", x + w / 2, y + 28, w - 8, 16);
     }
 
     function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
