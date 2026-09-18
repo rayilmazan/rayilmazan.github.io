@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haftalık Ders Programı ve Öğrenme Çıktıları</title>
+    <title>Ders Programı ve Öğrenme Çıktıları</title>
     <style>
         :root {
             --primary-color: #1e293b;
@@ -15,7 +15,7 @@
             --text-color: #0f172a;
             --border-color: #e2e8f0;
             --empty-color: #94a3b8;
-            --highlight-row-bg: #e8f5e9; /* Fosforlu satır rengi */
+            --highlight-row-bg: #e8f5e9;
         }
 
         body {
@@ -47,11 +47,17 @@
             gap: 10px;
         }
 
+        .nav-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .nav-btn {
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
@@ -65,11 +71,14 @@
 
         .today-btn {
             background-color: #64748b;
-            margin-left: 8px;
+        }
+
+        .toggle-view-btn {
+            background-color: #0d9488;
         }
 
         .week-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--primary-color);
             text-align: center;
@@ -136,13 +145,8 @@
             border-top: 4px solid var(--secondary-color);
         }
 
-        .outcome-card.grade-5 {
-            border-top-color: #0284c7;
-        }
-
-        .outcome-card.grade-6 {
-            border-top-color: #9333ea;
-        }
+        .outcome-card.grade-5 { border-top-color: #0284c7; }
+        .outcome-card.grade-6 { border-top-color: #9333ea; }
 
         .outcome-card h3 {
             margin-top: 0;
@@ -191,7 +195,6 @@
             border-top: 1px solid var(--border-color);
         }
 
-        /* Dondurulan Sabit Kolon (Ders & Saat) */
         .sticky-col {
             position: sticky;
             left: 0;
@@ -225,7 +228,7 @@
             color: var(--primary-color);
         }
 
-        /* Aktif Satır Vurgusu (Fosfor Etkisi) */
+        /* Aktif Satır Vurgusu */
         tr.active-row td {
             background-color: var(--highlight-row-bg) !important;
         }
@@ -235,7 +238,7 @@
             border-left: 4px solid var(--accent-color);
         }
 
-        /* Aktif Hücre (Şu anki ders) */
+        /* Aktif Hücre */
         .active-cell {
             background-color: #bbf7d0 !important;
             border: 2px solid var(--accent-color) !important;
@@ -262,13 +265,14 @@
 
 <div class="container">
     <header>
-        <div>
-            <button class="nav-btn" onclick="changeWeek(-1)">&larr; Önceki Hafta</button>
+        <div class="nav-group">
+            <button class="nav-btn" onclick="changeWeek(-1)">&larr; Önceki</button>
             <button class="nav-btn today-btn" onclick="goToToday()">Bugün</button>
+            <button class="nav-btn" onclick="changeWeek(1)">Sonraki &rarr;</button>
         </div>
         <div class="week-title" id="weekTitle">Yükleniyor...</div>
         <div>
-            <button class="nav-btn" onclick="changeWeek(1)">Sonraki Hafta &rarr;</button>
+            <button class="nav-btn toggle-view-btn" id="toggleViewBtn" onclick="toggleViewMode()">📅 Tüm Haftayı Göster</button>
         </div>
     </header>
 
@@ -290,15 +294,7 @@
 
     <div class="table-responsive">
         <table>
-            <thead>
-                <tr>
-                    <th class="sticky-col">Ders & Saat</th>
-                    <th id="th-1">Pazartesi</th>
-                    <th id="th-2">Salı</th>
-                    <th id="th-3">Çarşamba</th>
-                    <th id="th-4">Perşembe</th>
-                    <th id="th-5">Cuma</th>
-                </tr>
+            <thead id="scheduleHeader">
             </thead>
             <tbody id="scheduleBody">
             </tbody>
@@ -307,303 +303,46 @@
 </div>
 
 <script>
+const dayNames = ["", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"];
+
 const learningOutcomes = [
-  {
-    "hafta": 1,
-    "tarih": "14-18 Eylül",
-    "start": "2026-09-14",
-    "end": "2026-09-18",
-    "grade5": "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme",
-    "grade6": "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme"
-  },
-  {
-    "hafta": 2,
-    "tarih": "21-25 Eylül",
-    "start": "2026-09-21",
-    "end": "2026-09-25",
-    "grade5": "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme \nBTY.5.1.2. Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme",
-    "grade6": "BTY.6.1.2. Bilişim teknolojinin gelecekteki durumlarına yönelik çıkarım yapabilme"
-  },
-  {
-    "hafta": 3,
-    "tarih": "28 Eylül -2 Ekim",
-    "start": "2026-09-28",
-    "end": "2026-10-02",
-    "grade5": "BTY.5.1.3. Dijital vatandaşlık uygulamalarını sınıflandırabilme",
-    "grade6": "BTY.6.2.1. Tablolama programlarından yararlanabilme"
-  },
-  {
-    "hafta": 4,
-    "tarih": "5-9 Ekim",
-    "start": "2026-10-05",
-    "end": "2026-10-09",
-    "grade5": "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme",
-    "grade6": "BTY.6.2.2. Tablolama programlarının kullanımına yönelik problemleri belirleyebilme\n\nBTY.6.2.3. Tablolama dosyasında kullanılacak verileri toplayabilme ve düzenleyebilme\n\nBTY.6.2.4. Tablolama programları kullanarak bulgulara ulaşabilme"
-  },
-  {
-    "hafta": 5,
-    "tarih": "12-16 Ekim",
-    "start": "2026-10-12",
-    "end": "2026-10-16",
-    "grade5": "Codeweek 2026",
-    "grade6": "Codeweek 2026"
-  },
-  {
-    "hafta": 6,
-    "tarih": "19-23 Ekim",
-    "start": "2026-10-19",
-    "end": "2026-10-23",
-    "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme",
-    "grade6": "BTY.6.2.5. Ses düzenleme programlarından yararlanabilme\n\nBTY.6.2.6. Ses dosyası için kurgu oluşturabilme"
-  },
-  {
-    "hafta": 7,
-    "tarih": "26-30 Ekim",
-    "start": "2026-10-26",
-    "end": "2026-10-30",
-    "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme",
-    "grade6": "BTY.6.2.7. Ses dosyası geliştirebilme"
-  },
-  {
-    "hafta": 8,
-    "tarih": "2-6 Kasım",
-    "start": "2026-11-02",
-    "end": "2026-11-06",
-    "grade5": "BTY.5.1.6. Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme",
-    "grade6": "BTY.6.2.8. Video düzenleme programlarından yararlanabilme\n\nBTY.6.2.9. Video dosyası için kurgu oluşturabilme"
-  },
-  {
-    "hafta": 9,
-    "tarih": "9-13 Kasım",
-    "start": "2026-11-09",
-    "end": "2026-11-13",
-    "grade5": "BTY.5.2.1 Görsel düzenleme programlarından yararlanabilme\nBTY.5.2.2 Görsel için kurgu oluşturabilme",
-    "grade6": "BTY.6.2.10. Video dosyası geliştirebilme"
-  },
-  {
-    "hafta": 10,
-    "tarih": "23-27 Kasım",
-    "start": "2026-11-23",
-    "end": "2026-11-27",
-    "grade5": "BTY.5.2.2 Görsel için kurgu oluşturabilme\nBTY.5.2.3 Görsel dosyası geliştirebilme",
-    "grade6": "BTY.6.2.10. Video dosyası geliştirebilme\n\nBTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme"
-  },
-  {
-    "hafta": 11,
-    "tarih": "30 Kasım -4 Aralık",
-    "start": "2026-11-30",
-    "end": "2026-12-04",
-    "grade5": "BTY.5.2.4 Kelime işlemci programlarından yararlanabilme",
-    "grade6": "BTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme\n\n\nBTY.6.3.2. İletişim teknolojilerini sınıflandırabilme"
-  },
-  {
-    "hafta": 12,
-    "tarih": "7-11 Aralık",
-    "start": "2026-12-07",
-    "end": "2026-12-11",
-    "grade5": "BTY.5.2.5 Kelime işlemci dosyası geliştirebilme",
-    "grade6": "BTY.6.3.3. İletişim teknolojileri ile çalışabilme\n\nBTY.6.4.1. Bilişim etiği kapsamında güvenlik önlemlerini yönetebilme"
-  },
-  {
-    "hafta": 13,
-    "tarih": "14-18 Aralık",
-    "start": "2026-12-14",
-    "end": "2026-12-18",
-    "grade5": "BTY.5.2.6 Sunum programlarından yararlanabilme",
-    "grade6": "BTY.6.4.2.Telif hakkı kavramını sorgulayabilme\n\nBTY.6.4.3. Siber ortamda güvenlik önlemlerini yönetebilme"
-  },
-  {
-    "hafta": 14,
-    "tarih": "21-25 Aralık",
-    "start": "2026-12-21",
-    "end": "2026-12-25",
-    "grade5": "BTY.5.2.7 Sunum dosyası geliştirebilme",
-    "grade6": "BTY.6.4.4.Kullanım haklarına göre lisans türlerini karşılaştırabilme\n\nBTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme"
-  },
-  {
-    "hafta": 15,
-    "tarih": "28 Aralık -1 Ocak",
-    "start": "2026-12-28",
-    "end": "2027-01-01",
-    "grade5": "BTY.5.3.1. Bilgisayar ağları ve bileşenlerini sorgulayabilme",
-    "grade6": "BTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme"
-  },
-  {
-    "hafta": 16,
-    "tarih": "4-8 Ocak",
-    "start": "2027-01-04",
-    "end": "2027-01-08",
-    "grade5": "BTY.5.3.2. Bilgisayar ağları ve bağlanma yöntemlerini sınıflandırabilme",
-    "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme"
-  },
-  {
-    "hafta": 17,
-    "tarih": "11-15 Ocak",
-    "start": "2027-01-11",
-    "end": "2027-01-15",
-    "grade5": "BTY.5.3.3. İnternet ile amacına uygun olarak çalışabilme",
-    "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme\n\nBTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme"
-  },
-  {
-    "hafta": 18,
-    "tarih": "18-22 Ocak",
-    "start": "2027-01-18",
-    "end": "2027-01-22",
-    "grade5": "Dönem sonu değerlendirme ve paylaşım",
-    "grade6": "Dönem sonu değerlendirme ve paylaşım"
-  },
-  {
-    "hafta": 19,
-    "tarih": "8-12 Şubat",
-    "start": "2027-02-08",
-    "end": "2027-02-12",
-    "grade5": "BTY.5.4.1. Bilişim etiği kural ve ilkelerini yorumlayabilme",
-    "grade6": "BTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme"
-  },
-  {
-    "hafta": 20,
-    "tarih": "15-19 Şubat",
-    "start": "2027-02-15",
-    "end": "2027-02-19",
-    "grade5": "BTY.5.4.2. Dijital ortamlarda gizlilik ve güvenlik önlemlerini yönetebilme",
-    "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden\nyararlanabilme"
-  },
-  {
-    "hafta": 21,
-    "tarih": "22-26 Şubat",
-    "start": "2027-02-22",
-    "end": "2027-02-26",
-    "grade5": "BTY.5.5.1. Yapay zekâ uygulamalarını sınıflandırabilme",
-    "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden\nyararlanabilme"
-  },
-  {
-    "hafta": 22,
-    "tarih": "1-5 Mart",
-    "start": "2027-03-01",
-    "end": "2027-03-05",
-    "grade5": "BTY.5.5.1. Yapay zekâ uygulamalarını sınıflandırabilme",
-    "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden\nyararlanabilme"
-  },
-  {
-    "hafta": 23,
-    "tarih": "15-19 Mart",
-    "start": "2027-03-15",
-    "end": "2027-03-19",
-    "grade5": "BTY.5.5.2. Yapay zekâya ilişkin etik ve güvenlik/gizlilik önlemlerini yönetebilme",
-    "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme"
-  },
-  {
-    "hafta": 24,
-    "tarih": "22-26 Mart",
-    "start": "2027-03-22",
-    "end": "2027-03-26",
-    "grade5": "BTY.5.5.2. Yapay zekâya ilişkin etik ve güvenlik/gizlilik önlemlerini yönetebilme",
-    "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme"
-  },
-  {
-    "hafta": 25,
-    "tarih": "29 Mart -2 Nisan",
-    "start": "2027-03-29",
-    "end": "2027-04-02",
-    "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme",
-    "grade6": ""
-  },
-  {
-    "hafta": 26,
-    "tarih": "5-9 Nisan",
-    "start": "2027-04-05",
-    "end": "2027-04-09",
-    "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme",
-    "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme"
-  },
-  {
-    "hafta": 27,
-    "tarih": "12-16 Nisan",
-    "start": "2027-04-12",
-    "end": "2027-04-16",
-    "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme",
-    "grade6": ""
-  },
-  {
-    "hafta": 28,
-    "tarih": "19-23 Nisan",
-    "start": "2027-04-19",
-    "end": "2027-04-23",
-    "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme",
-    "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme"
-  },
-  {
-    "hafta": 29,
-    "tarih": "26-30 Nisan",
-    "start": "2027-04-26",
-    "end": "2027-04-30",
-    "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme",
-    "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme\n\nBTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 30,
-    "tarih": "3-7 Mayıs",
-    "start": "2027-05-03",
-    "end": "2027-05-07",
-    "grade5": "OKUL TEMELLİ PLAN Bilişim Haftası",
-    "grade6": "OKUL TEMELLİ PLAN Bilişim Haftası"
-  },
-  {
-    "hafta": 31,
-    "tarih": "10-14 Mayıs",
-    "start": "2027-05-10",
-    "end": "2027-05-14",
-    "grade5": "BTY.5.6.3. Yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme",
-    "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 32,
-    "tarih": "20-21 Mayıs",
-    "start": "2027-05-20",
-    "end": "2027-05-21",
-    "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme",
-    "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 33,
-    "tarih": "24-28 Mayıs",
-    "start": "2027-05-24",
-    "end": "2027-05-28",
-    "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme",
-    "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 34,
-    "tarih": "31 Mayıs -4 Haziran",
-    "start": "2027-05-31",
-    "end": "2027-06-04",
-    "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme",
-    "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 35,
-    "tarih": "7-11 Haziran",
-    "start": "2027-06-07",
-    "end": "2027-06-11",
-    "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme",
-    "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 36,
-    "tarih": "14-18 Haziran",
-    "start": "2027-06-14",
-    "end": "2027-06-18",
-    "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme",
-    "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme"
-  },
-  {
-    "hafta": 37,
-    "tarih": "21-25 Haziran",
-    "start": "2027-06-21",
-    "end": "2027-06-25",
-    "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme",
-    "grade6": "Dijital ürünlerin paylaşımı ve yıl sonu değerlendirmesi"
-  }
+  { "hafta": 1, "tarih": "14-18 Eylül", "start": "2026-09-14", "end": "2026-09-18", "grade5": "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme", "grade6": "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme" },
+  { "hafta": 2, "tarih": "21-25 Eylül", "start": "2026-09-21", "end": "2026-09-25", "grade5": "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme \nBTY.5.1.2. Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme", "grade6": "BTY.6.1.2. Bilişim teknolojinin gelecekteki durumlarına yönelik çıkarım yapabilme" },
+  { "hafta": 3, "tarih": "28 Eylül -2 Ekim", "start": "2026-09-28", "end": "2026-10-02", "grade5": "BTY.5.1.3. Dijital vatandaşlık uygulamalarını sınıflandırabilme", "grade6": "BTY.6.2.1. Tablolama programlarından yararlanabilme" },
+  { "hafta": 4, "tarih": "5-9 Ekim", "start": "2026-10-05", "end": "2026-10-09", "grade5": "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme", "grade6": "BTY.6.2.2. Tablolama programlarının kullanımına yönelik problemleri belirleyebilme\n\nBTY.6.2.3. Tablolama dosyasında kullanılacak verileri toplayabilme ve düzenleyebilme\n\nBTY.6.2.4. Tablolama programları kullanarak bulgulara ulaşabilme" },
+  { "hafta": 5, "tarih": "12-16 Ekim", "start": "2026-10-12", "end": "2026-10-16", "grade5": "Codeweek 2026", "grade6": "Codeweek 2026" },
+  { "hafta": 6, "tarih": "19-23 Ekim", "start": "2026-10-19", "end": "2026-10-23", "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", "grade6": "BTY.6.2.5. Ses düzenleme programlarından yararlanabilme\n\nBTY.6.2.6. Ses dosyası için kurgu oluşturabilme" },
+  { "hafta": 7, "tarih": "26-30 Ekim", "start": "2026-10-26", "end": "2026-10-30", "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", "grade6": "BTY.6.2.7. Ses dosyası geliştirebilme" },
+  { "hafta": 8, "tarih": "2-6 Kasım", "start": "2026-11-02", "end": "2026-11-06", "grade5": "BTY.5.1.6. Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme", "grade6": "BTY.6.2.8. Video düzenleme programlarından yararlanabilme\n\nBTY.6.2.9. Video dosyası için kurgu oluşturabilme" },
+  { "hafta": 9, "tarih": "9-13 Kasım", "start": "2026-11-09", "end": "2026-11-13", "grade5": "BTY.5.2.1 Görsel düzenleme programlarından yararlanabilme\nBTY.5.2.2 Görsel için kurgu oluşturabilme", "grade6": "BTY.6.2.10. Video dosyası geliştirebilme" },
+  { "hafta": 10, "tarih": "23-27 Kasım", "start": "2026-11-23", "end": "2026-11-27", "grade5": "BTY.5.2.2 Görsel için kurgu oluşturabilme\nBTY.5.2.3 Görsel dosyası geliştirebilme", "grade6": "BTY.6.2.10. Video dosyası geliştirebilme\n\nBTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme" },
+  { "hafta": 11, "tarih": "30 Kasım -4 Aralık", "start": "2026-11-30", "end": "2026-12-04", "grade5": "BTY.5.2.4 Kelime işlemci programlarından yararlanabilme", "grade6": "BTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme\n\n\nBTY.6.3.2. İletişim teknolojilerini sınıflandırabilme" },
+  { "hafta": 12, "tarih": "7-11 Aralık", "start": "2026-12-07", "end": "2026-12-11", "grade5": "BTY.5.2.5 Kelime işlemci dosyası geliştirebilme", "grade6": "BTY.6.3.3. İletişim teknolojileri ile çalışabilme\n\nBTY.6.4.1. Bilişim etiği kapsamında güvenlik önlemlerini yönetebilme" },
+  { "hafta": 13, "tarih": "14-18 Aralık", "start": "2026-12-14", "end": "2026-12-18", "grade5": "BTY.5.2.6 Sunum programlarından yararlanabilme", "grade6": "BTY.6.4.2.Telif hakkı kavramını sorgulayabilme\n\nBTY.6.4.3. Siber ortamda güvenlik önlemlerini yönetebilme" },
+  { "hafta": 14, "tarih": "21-25 Aralık", "start": "2026-12-21", "end": "2026-12-25", "grade5": "BTY.5.2.7 Sunum dosyası geliştirebilme", "grade6": "BTY.6.4.4.Kullanım haklarına göre lisans türlerini karşılaştırabilme\n\nBTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme" },
+  { "hafta": 15, "tarih": "28 Aralık -1 Ocak", "start": "2026-12-28", "end": "2027-01-01", "grade5": "BTY.5.3.1. Bilgisayar ağları ve bileşenlerini sorgulayabilme", "grade6": "BTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme" },
+  { "hafta": 16, "tarih": "4-8 Ocak", "start": "2027-01-04", "end": "2027-01-08", "grade5": "BTY.5.3.2. Bilgisayar ağları ve bağlanma yöntemlerini sınıflandırabilme", "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme" },
+  { "hafta": 17, "tarih": "11-15 Ocak", "start": "2027-01-11", "end": "2027-01-15", "grade5": "BTY.5.3.3. İnternet ile amacına uygun olarak çalışabilme", "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme\n\nBTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme" },
+  { "hafta": 18, "tarih": "18-22 Ocak", "start": "2027-01-18", "end": "2027-01-22", "grade5": "Dönem sonu değerlendirme ve paylaşım", "grade6": "Dönem sonu değerlendirme ve paylaşım" },
+  { "hafta": 19, "tarih": "8-12 Şubat", "start": "2027-02-08", "end": "2027-02-12", "grade5": "BTY.5.4.1. Bilişim etiği kural ve ilkelerini yorumlayabilme", "grade6": "BTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme" },
+  { "hafta": 20, "tarih": "15-19 Şubat", "start": "2027-02-15", "end": "2027-02-19", "grade5": "BTY.5.4.2. Dijital ortamlarda gizlilik ve güvenlik önlemlerini yönetebilme", "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme" },
+  { "hafta": 21, "tarih": "22-26 Şubat", "start": "2027-02-22", "end": "2027-02-26", "grade5": "BTY.5.5.1. Yapay zekâ uygulamalarını sınıflandırabilme", "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme" },
+  { "hafta": 22, "tarih": "1-5 Mart", "start": "2027-03-01", "end": "2027-03-05", "grade5": "BTY.5.5.1. Yapay zekâ uygulamalarını sınıflandırabilme", "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme" },
+  { "hafta": 23, "tarih": "15-19 Mart", "start": "2027-03-15", "end": "2027-03-19", "grade5": "BTY.5.5.2. Yapay zekâya ilişkin etik ve güvenlik/gizlilik önlemlerini yönetebilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme" },
+  { "hafta": 24, "tarih": "22-26 Mart", "start": "2027-03-22", "end": "2027-03-26", "grade5": "BTY.5.5.2. Yapay zekâya ilişkin etik ve güvenlik/gizlilik önlemlerini yönetebilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme" },
+  { "hafta": 25, "tarih": "29 Mart -2 Nisan", "start": "2027-03-29", "end": "2027-04-02", "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme", "grade6": "" },
+  { "hafta": 26, "tarih": "5-9 Nisan", "start": "2027-04-05", "end": "2027-04-09", "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme" },
+  { "hafta": 27, "tarih": "12-16 Nisan", "start": "2027-04-12", "end": "2027-04-16", "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme", "grade6": "" },
+  { "hafta": 28, "tarih": "19-23 Nisan", "start": "2027-04-19", "end": "2027-04-23", "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme" },
+  { "hafta": 29, "tarih": "26-30 Nisan", "start": "2027-04-26", "end": "2027-04-30", "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme\n\nBTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 30, "tarih": "3-7 Mayıs", "start": "2027-05-03", "end": "2027-05-07", "grade5": "OKUL TEMELLİ PLAN Bilişim Haftası", "grade6": "OKUL TEMELLİ PLAN Bilişim Haftası" },
+  { "hafta": 31, "tarih": "10-14 Mayıs", "start": "2027-05-10", "end": "2027-05-14", "grade5": "BTY.5.6.3. Yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 32, "tarih": "20-21 Mayıs", "start": "2027-05-20", "end": "2027-05-21", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 33, "tarih": "24-28 Mayıs", "start": "2027-05-24", "end": "2027-05-28", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 34, "tarih": "31 Mayıs -4 Haziran", "start": "2027-05-31", "end": "2027-06-04", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 35, "tarih": "7-11 Haziran", "start": "2027-06-07", "end": "2027-06-11", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 36, "tarih": "14-18 Haziran", "start": "2027-06-14", "end": "2027-06-18", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 37, "tarih": "21-25 Haziran", "start": "2027-06-21", "end": "2027-06-25", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "Dijital ürünlerin paylaşımı ve yıl sonu değerlendirmesi" }
 ];
 
 const times = [
@@ -626,6 +365,7 @@ const schedule = {
 };
 
 let currentDate = new Date();
+let isFullWeekView = false; // İlk açılışta sadece gün gösterimi
 
 function getMonday(d) {
     const date = new Date(d);
@@ -657,6 +397,17 @@ function goToToday() {
     render();
 }
 
+function toggleViewMode() {
+    isFullWeekView = !isFullWeekView;
+    const btn = document.getElementById('toggleViewBtn');
+    if (isFullWeekView) {
+        btn.innerText = "📅 Sadece Bugünü Göster";
+    } else {
+        btn.innerText = "📅 Tüm Haftayı Göster";
+    }
+    render();
+}
+
 function timeToSeconds(timeStr) {
     const [h, m] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60;
@@ -680,25 +431,27 @@ function render() {
 
     const isCurrentWeek = (todayStr >= mondayStr && todayStr <= fridayStr);
 
-    let activeOutcome = learningOutcomes.find(o => {
-        return (o.start <= fridayStr && o.end >= mondayStr);
-    });
+    let currentDayIndex = currentDate.getDay();
+    if (currentDayIndex === 0 || currentDayIndex === 6) {
+        currentDayIndex = 1; // Hafta sonu ise Pazartesi gösterilir
+    }
+
+    let activeOutcome = learningOutcomes.find(o => (o.start <= fridayStr && o.end >= mondayStr));
 
     if (activeOutcome) {
-        document.getElementById('weekTitle').innerText = `${activeOutcome.hafta}. Hafta (${formatDisplayDate(monday)} - ${formatDisplayDate(friday)})`;
-        document.getElementById('outcomeGrade5').innerText = activeOutcome.grade5 || "Bu hafta için içerik tanımlanmamış.";
-        document.getElementById('outcomeGrade6').innerText = activeOutcome.grade6 || "Bu hafta için içerik tanımlanmamış.";
+        const prefix = isFullWeekView ? `${activeOutcome.hafta}. Hafta` : `${dayNames[currentDayIndex]} Günlük Program`;
+        document.getElementById('weekTitle').innerText = `${prefix} (${formatDisplayDate(monday)} - ${formatDisplayDate(friday)})`;
+        document.getElementById('outcomeGrade5').innerText = activeOutcome.grade5 || "İçerik tanımlanmamış.";
+        document.getElementById('outcomeGrade6').innerText = activeOutcome.grade6 || "İçerik tanımlanmamış.";
     } else {
         document.getElementById('weekTitle').innerText = `${formatDisplayDate(monday)} - ${formatDisplayDate(friday)}`;
-        document.getElementById('outcomeGrade5').innerText = "Bu hafta için tanımlanmış 5. sınıf öğrenme çıktısı bulunmamaktadır.";
-        document.getElementById('outcomeGrade6').innerText = "Bu hafta için tanımlanmış 6. sınıf öğrenme çıktısı bulunmamaktadır.";
+        document.getElementById('outcomeGrade5').innerText = "Tanımlı içerik yok.";
+        document.getElementById('outcomeGrade6').innerText = "Tanımlı içerik yok.";
     }
 
     const currentDay = now.getDay();
-    const currentHours = String(now.getHours()).padStart(2, '0');
-    const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+    const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const currentSeconds = String(now.getSeconds()).padStart(2, '0');
-    const currentTimeStr = `${currentHours}:${currentMinutes}`;
     const nowInSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 
     document.getElementById('clockText').innerText = `${now.toLocaleDateString('tr-TR')} ${currentTimeStr}:${currentSeconds}`;
@@ -751,34 +504,41 @@ function render() {
         statusText.innerHTML = "🏠 Bugünkü Dersler Tamamlandı";
     }
 
-    for (let d = 1; d <= 5; d++) {
-        const th = document.getElementById(`th-${d}`);
-        if (isCurrentWeek && currentDay === d) {
-            th.classList.add('active-day-header');
-        } else {
-            th.classList.remove('active-day-header');
+    // Başlık ve Kolon Yapılandırması
+    const thead = document.getElementById('scheduleHeader');
+    let headerHTML = '<tr><th class="sticky-col">Ders & Saat</th>';
+
+    if (isFullWeekView) {
+        for (let d = 1; d <= 5; d++) {
+            const activeClass = (isCurrentWeek && currentDay === d) ? 'class="active-day-header"' : '';
+            headerHTML += `<th ${activeClass}>${dayNames[d]}</th>`;
         }
+    } else {
+        const activeClass = (isCurrentWeek && currentDay === currentDayIndex) ? 'class="active-day-header"' : '';
+        headerHTML += `<th ${activeClass}>${dayNames[currentDayIndex]}</th>`;
     }
+    headerHTML += '</tr>';
+    thead.innerHTML = headerHTML;
 
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
 
     times.forEach(t => {
         const tr = document.createElement('tr');
-        
-        // Mevcut hafta ve dersteysek tüm satırı işaretle
         const isCurrentPeriodActive = isCurrentWeek && activePeriod === t.id;
+
         if (isCurrentPeriodActive) {
             tr.classList.add('active-row');
         }
 
-        // Birleştirilmiş ve Sabit Kolon
         const tdHeader = document.createElement('td');
         tdHeader.className = "sticky-col";
         tdHeader.innerHTML = `<strong>${t.id}. Ders</strong><span class="time-subtext">${t.start} - ${t.end}</span>`;
         tr.appendChild(tdHeader);
 
-        for (let day = 1; day <= 5; day++) {
+        const daysToRender = isFullWeekView ? [1, 2, 3, 4, 5] : [currentDayIndex];
+
+        daysToRender.forEach(day => {
             const td = document.createElement('td');
             const lesson = schedule[day]?.[t.id];
 
@@ -795,7 +555,7 @@ function render() {
             }
 
             tr.appendChild(td);
-        }
+        });
 
         tbody.appendChild(tr);
     });
