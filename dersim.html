@@ -93,6 +93,17 @@
             font-weight: 600;
         }
 
+        .countdown-badge {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-left: 8px;
+            font-family: monospace;
+        }
+
         .status-active {
             border-left-color: var(--accent-color);
             background-color: #f0fdf4;
@@ -155,17 +166,20 @@
             background-color: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             text-align: center;
         }
 
         th, td {
             padding: 12px 10px;
-            border: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
             font-size: 0.95rem;
         }
 
@@ -173,14 +187,31 @@
             background-color: #f1f5f9;
             color: var(--primary-color);
             font-weight: 700;
+            border-top: 1px solid var(--border-color);
         }
 
-        .time-col {
-            background-color: #f8fafc;
-            font-weight: 600;
-            color: #64748b;
-            font-size: 0.85rem;
+        /* Dondurulan Sabit Kolon (Ders & Saat) */
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background-color: #f8fafc !important;
+            border-left: 1px solid var(--border-color);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
             white-space: nowrap;
+        }
+
+        th.sticky-col {
+            z-index: 11;
+            background-color: #f1f5f9 !important;
+        }
+
+        .time-subtext {
+            display: block;
+            font-size: 0.78rem;
+            color: #64748b;
+            font-weight: normal;
+            margin-top: 2px;
         }
 
         .empty-slot {
@@ -249,8 +280,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Ders</th>
-                    <th>Saat</th>
+                    <th class="sticky-col">Ders & Saat</th>
                     <th id="th-1">Pazartesi</th>
                     <th id="th-2">Salı</th>
                     <th id="th-3">Çarşamba</th>
@@ -615,6 +645,17 @@ function goToToday() {
     render();
 }
 
+function timeToSeconds(timeStr) {
+    const [h, m] = timeStr.split(':').map(Number);
+    return h * 3600 + m * 60;
+}
+
+function formatCountdown(totalSeconds) {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
 function render() {
     const monday = getMonday(currentDate);
     const friday = new Date(monday);
@@ -644,9 +685,11 @@ function render() {
     const currentDay = now.getDay();
     const currentHours = String(now.getHours()).padStart(2, '0');
     const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+    const currentSeconds = String(now.getSeconds()).padStart(2, '0');
     const currentTimeStr = `${currentHours}:${currentMinutes}`;
+    const nowInSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
 
-    document.getElementById('clockText').innerText = `${now.toLocaleDateString('tr-TR')} ${currentTimeStr}`;
+    document.getElementById('clockText').innerText = `${now.toLocaleDateString('tr-TR')} ${currentTimeStr}:${currentSeconds}`;
 
     const statusCard = document.getElementById('statusCard');
     const statusText = document.getElementById('statusText');
@@ -655,19 +698,26 @@ function render() {
     let activePeriod = null;
     let isBreak = false;
     let nextLesson = "";
+    let remainingSeconds = 0;
 
     if (currentDay >= 1 && currentDay <= 5) {
         for (let i = 0; i < times.length; i++) {
             const p = times[i];
-            if (currentTimeStr >= p.start && currentTimeStr <= p.end) {
+            const pStartSec = timeToSeconds(p.start);
+            const pEndSec = timeToSeconds(p.end);
+
+            if (nowInSeconds >= pStartSec && nowInSeconds <= pEndSec) {
                 activePeriod = p.id;
+                remainingSeconds = pEndSec - nowInSeconds;
                 break;
             }
             if (i < times.length - 1) {
                 const nextP = times[i+1];
-                if (currentTimeStr > p.end && currentTimeStr < nextP.start) {
+                const nextStartSec = timeToSeconds(nextP.start);
+                if (nowInSeconds > pEndSec && nowInSeconds < nextStartSec) {
                     isBreak = true;
                     nextLesson = schedule[currentDay]?.[nextP.id] || "Boş";
+                    remainingSeconds = nextStartSec - nowInSeconds;
                     break;
                 }
             }
@@ -675,18 +725,18 @@ function render() {
     }
 
     if (currentDay === 0 || currentDay === 6) {
-        statusText.innerText = "🏖️ Hafta Sonu - İyi Tatiller!";
+        statusText.innerHTML = "🏖️ Hafta Sonu - İyi Tatiller!";
     } else if (activePeriod !== null) {
         const currentLesson = schedule[currentDay]?.[activePeriod] || "Boş Ders";
-        statusText.innerText = `🔔 Şu An: ${activePeriod}. Ders (${times[activePeriod-1].start}-${times[activePeriod-1].end}) — ${currentLesson}`;
+        statusText.innerHTML = `🔔 Şu An: ${activePeriod}. Ders (${times[activePeriod-1].start}-${times[activePeriod-1].end}) — ${currentLesson} <span class="countdown-badge">⏳ Bitişe: ${formatCountdown(remainingSeconds)}</span>`;
         statusCard.classList.add('status-active');
     } else if (isBreak) {
-        statusText.innerText = `☕ Şu An: Tenefüs (Sonraki Ders: ${nextLesson})`;
+        statusText.innerHTML = `☕ Şu An: Tenefüs (Sonraki Ders: ${nextLesson}) <span class="countdown-badge">⏳ Derse: ${formatCountdown(remainingSeconds)}</span>`;
         statusCard.classList.add('status-break');
     } else if (currentTimeStr < "08:30") {
-        statusText.innerText = "🌅 Dersler Henüz Başlamadı (İlk ders 08:30)";
+        statusText.innerHTML = "🌅 Dersler Henüz Başlamadı (İlk ders 08:30)";
     } else {
-        statusText.innerText = "🏠 Bugünkü Dersler Tamamlandı";
+        statusText.innerHTML = "🏠 Bugünkü Dersler Tamamlandı";
     }
 
     for (let d = 1; d <= 5; d++) {
@@ -704,15 +754,11 @@ function render() {
     times.forEach(t => {
         const tr = document.createElement('tr');
         
-        const tdNo = document.createElement('td');
-        tdNo.innerText = `${t.id}. Ders`;
-        tdNo.style.fontWeight = "bold";
-        tr.appendChild(tdNo);
-
-        const tdTime = document.createElement('td');
-        tdTime.className = "time-col";
-        tdTime.innerText = `${t.start} - ${t.end}`;
-        tr.appendChild(tdTime);
+        // Birleştirilmiş ve Sabit Kolon
+        const tdHeader = document.createElement('td');
+        tdHeader.className = "sticky-col";
+        tdHeader.innerHTML = `<strong>${t.id}. Ders</strong><span class="time-subtext">${t.start} - ${t.end}</span>`;
+        tr.appendChild(tdHeader);
 
         for (let day = 1; day <= 5; day++) {
             const td = document.createElement('td');
@@ -738,7 +784,8 @@ function render() {
 }
 
 render();
-setInterval(render, 30000);
+// Saniyelik sayaç güncellemesi için interval 1000ms yapıldı
+setInterval(render, 1000);
 </script>
 
 </body>
