@@ -15,6 +15,7 @@
             --text-color: #0f172a;
             --border-color: #e2e8f0;
             --empty-color: #94a3b8;
+            --highlight-row-bg: #e8f5e9; /* Fosforlu satır rengi */
         }
 
         body {
@@ -195,7 +196,7 @@
             position: sticky;
             left: 0;
             z-index: 10;
-            background-color: #f8fafc !important;
+            background-color: #f8fafc;
             border-left: 1px solid var(--border-color);
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
             white-space: nowrap;
@@ -224,8 +225,19 @@
             color: var(--primary-color);
         }
 
+        /* Aktif Satır Vurgusu (Fosfor Etkisi) */
+        tr.active-row td {
+            background-color: var(--highlight-row-bg) !important;
+        }
+
+        tr.active-row td.sticky-col {
+            background-color: #d1fae5 !important;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* Aktif Hücre (Şu anki ders) */
         .active-cell {
-            background-color: #dcfce7 !important;
+            background-color: #bbf7d0 !important;
             border: 2px solid var(--accent-color) !important;
             color: #14532d !important;
             font-weight: bold;
@@ -754,6 +766,12 @@ function render() {
     times.forEach(t => {
         const tr = document.createElement('tr');
         
+        // Mevcut hafta ve dersteysek tüm satırı işaretle
+        const isCurrentPeriodActive = isCurrentWeek && activePeriod === t.id;
+        if (isCurrentPeriodActive) {
+            tr.classList.add('active-row');
+        }
+
         // Birleştirilmiş ve Sabit Kolon
         const tdHeader = document.createElement('td');
         tdHeader.className = "sticky-col";
@@ -772,7 +790,7 @@ function render() {
                 td.className = "empty-slot";
             }
 
-            if (isCurrentWeek && currentDay === day && activePeriod === t.id) {
+            if (isCurrentPeriodActive && currentDay === day) {
                 td.classList.add('active-cell');
             }
 
@@ -784,7 +802,6 @@ function render() {
 }
 
 render();
-// Saniyelik sayaç güncellemesi için interval 1000ms yapıldı
 setInterval(render, 1000);
 </script>
 
