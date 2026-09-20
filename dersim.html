@@ -228,7 +228,6 @@
             color: var(--primary-color);
         }
 
-        /* Aktif Satır Vurgusu (Fosfor Etkisi) */
         tr.active-row td {
             background-color: var(--highlight-row-bg) !important;
         }
@@ -238,7 +237,6 @@
             border-left: 4px solid var(--accent-color);
         }
 
-        /* Aktif Hücre */
         .active-cell {
             background-color: #bbf7d0 !important;
             border: 2px solid var(--accent-color) !important;
@@ -345,7 +343,7 @@ const learningOutcomes = [
   { "hafta": 37, "tarih": "21-25 Haziran", "start": "2027-06-21", "end": "2027-06-25", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "Dijital ürünlerin paylaşımı ve yıl sonu değerlendirmesi" }
 ];
 
-// Okul 7 saat olarak güncellendi
+// Fotoğraftaki resmi ders saatleri
 const times = [
     { id: 1, start: "08:30", end: "09:10" },
     { id: 2, start: "09:30", end: "10:10" },
@@ -353,19 +351,22 @@ const times = [
     { id: 4, start: "11:10", end: "11:50" },
     { id: 5, start: "12:30", end: "13:10" },
     { id: 6, start: "13:20", end: "14:00" },
-    { id: 7, start: "14:10", end: "14:50" }
+    { id: 7, start: "14:10", end: "14:50" },
+    { id: 8, start: "15:00", end: "15:40" },
+    { id: 9, start: "15:50", end: "16:30" }
 ];
 
+// Güncellenen ders programı (1: Pazartesi, 2: Salı, 3: Çarşamba, 4: Perşembe, 5: Cuma)
 const schedule = {
-    1: { 1: "6-D BLŞM", 2: "6-B BLŞM", 3: "5-A BLŞM", 4: "6-A BLŞM", 5: "6-C BLŞM", 6: "5-B BLŞM" },
+    1: { 1: "6-D KL.TR", 2: "5-B BLŞM", 3: "5-B RVY", 4: "6-A BLŞM", 5: "6-C BLŞM", 7: "6-D BLŞM" },
     2: {},
-    3: { 2: "5-B BLŞM", 3: "5-C BLŞM", 4: "6-A BLŞM", 5: "5-B RVY", 6: "5-D BLŞM", 7: "6-D KL.TR" },
+    3: { 1: "5-A BLŞM", 2: "6-B BLŞM", 3: "5-B BLŞM", 4: "5-C BLŞM", 5: "5-D BLŞM", 6: "6-D BLŞM", 7: "6-D KL.TR" },
     4: {},
-    5: { 1: "5-C BLŞM", 2: "6-C BLŞM", 3: "6-D BLŞM", 4: "6-D KL.TR", 5: "6-B BLŞM", 6: "5-D BLŞM", 7: "5-A BLŞM" }
+    5: { 1: "6-A BLŞM", 2: "5-A BLŞM", 3: "6-B BLŞM", 4: "5-D BLŞM", 5: "6-C BLŞM", 7: "5-C BLŞM" }
 };
 
 let currentDate = new Date();
-let isFullWeekView = false; // İlk açılışta sadece gün gösterimi
+let isFullWeekView = false;
 
 function getMonday(d) {
     const date = new Date(d);
@@ -433,7 +434,7 @@ function render() {
 
     let currentDayIndex = currentDate.getDay();
     if (currentDayIndex === 0 || currentDayIndex === 6) {
-        currentDayIndex = 1; // Hafta sonu ise Pazartesi gösterilir
+        currentDayIndex = 1;
     }
 
     let activeOutcome = learningOutcomes.find(o => (o.start <= fridayStr && o.end >= mondayStr));
@@ -504,7 +505,6 @@ function render() {
         statusText.innerHTML = "🏠 Bugünkü Dersler Tamamlandı";
     }
 
-    // Başlık Yapılandırması
     const thead = document.getElementById('scheduleHeader');
     let headerHTML = '<tr><th class="sticky-col">Ders & Saat</th>';
 
@@ -520,7 +520,6 @@ function render() {
     headerHTML += '</tr>';
     thead.innerHTML = headerHTML;
 
-    // Gövde Yapılandırması
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
 
