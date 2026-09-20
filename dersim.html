@@ -343,6 +343,7 @@ const learningOutcomes = [
   { "hafta": 37, "tarih": "21-25 Haziran", "start": "2027-06-21", "end": "2027-06-25", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "Dijital ürünlerin paylaşımı ve yıl sonu değerlendirmesi" }
 ];
 
+// Toplam 7 saat
 const times = [
     { id: 1, start: "08:30", end: "09:10" },
     { id: 2, start: "09:30", end: "10:10" },
@@ -353,13 +354,13 @@ const times = [
     { id: 7, start: "14:10", end: "14:50" }
 ];
 
-// Güncellenmiş 7 saatlik ders programı
+// Güncellenen ders programı
 const schedule = {
-    1: { 1: "6-D KL.TR", 2: "5-B RVY", 3: "6-C BLŞM", 5: "6-A BLŞM", 6: "6-B BLŞM", 7: "6-D BLŞM" },
+    1: { 1: "6-A BLŞM", 2: "5-B BLŞM", 5: "6-D BLŞM", 6: "6-D KL.TR", 7: "6-C BLŞM" },
     2: {},
-    3: { 1: "6-B BLŞM", 2: "5-D BLŞM", 3: "6-D BLŞM", 4: "5-B BLŞM", 6: "5-A BLŞM", 7: "5-C BLŞM" },
+    3: { 1: "5-C BLŞM", 2: "5-A BLŞM", 3: "6-D KL.TR", 4: "5-B RVY", 5: "5-D BLŞM", 6: "6-B BLŞM", 7: "6-C BLŞM" },
     4: {},
-    5: { 1: "6-D KL.TR", 2: "5-A BLŞM", 3: "6-C BLŞM", 4: "5-D BLŞM", 5: "5-B BLŞM", 6: "5-C BLŞM", 7: "6-A BLŞM" }
+    5: { 1: "6-A BLŞM", 2: "5-A BLŞM", 3: "6-B BLŞM", 4: "6-D BLŞM", 5: "5-C BLŞM", 6: "5-D BLŞM", 7: "5-B BLŞM" }
 };
 
 let currentDate = new Date();
@@ -494,7 +495,7 @@ function render() {
         statusText.innerHTML = `🔔 Şu An: ${activePeriod}. Ders (${times[activePeriod-1].start}-${times[activePeriod-1].end}) — ${currentLesson} <span class="countdown-badge">⏳ Bitişe: ${formatCountdown(remainingSeconds)}</span>`;
         statusCard.classList.add('status-active');
     } else if (isBreak) {
-        statusText.innerHTML = `☕ Şu An: Teneffüs (Sonraki Ders: ${nextLesson}) <span class="countdown-badge">⏳ Derse: ${formatCountdown(remainingSeconds)}</span>`;
+        statusText.innerHTML = `☕ Şu An: Tenefüs (Sonraki Ders: ${nextLesson}) <span class="countdown-badge">⏳ Derse: ${formatCountdown(remainingSeconds)}</span>`;
         statusCard.classList.add('status-break');
     } else if (currentTimeStr < "08:30") {
         statusText.innerHTML = "🌅 Dersler Henüz Başlamadı (İlk ders 08:30)";
