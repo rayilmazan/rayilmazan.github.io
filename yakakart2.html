@@ -385,49 +385,59 @@
       const w = canvas.width;
       const h = canvas.height;
 
-      // Arka plan rengi (Kırık beyaz / açık gri)
-      ctx.fillStyle = "#F1F5F9";
+      // Temel zemin rengi
+      ctx.fillStyle = "#E2E8F0";
       ctx.fillRect(0, 0, w, h);
 
-      // DAHA YOĞUN ARKA PLAN DESENİ (Greeble / Teknoloji Grid Dokusu)
+      // ÜST DÜZEY YOĞUN TEKNOLOJİK / ENDÜSTRİYEL ARKA PLAN DOKUSU (Greeble / Circuit Pattern)
       const pCanvas = document.createElement('canvas');
-      pCanvas.width = 24;
-      pCanvas.height = 24;
+      pCanvas.width = 30;
+      pCanvas.height = 30;
       const pCtx = pCanvas.getContext('2d');
       
-      // Yoğun nokta matrisi
-      pCtx.fillStyle = "#cbd5e1";
-      pCtx.beginPath(); pCtx.arc(12, 12, 1.8, 0, Math.PI * 2); pCtx.fill();
-      pCtx.beginPath(); pCtx.arc(0, 0, 1.2, 0, Math.PI * 2); pCtx.fill();
-      pCtx.beginPath(); pCtx.arc(24, 0, 1.2, 0, Math.PI * 2); pCtx.fill();
-      pCtx.beginPath(); pCtx.arc(0, 24, 1.2, 0, Math.PI * 2); pCtx.fill();
-      pCtx.beginPath(); pCtx.arc(24, 24, 1.2, 0, Math.PI * 2); pCtx.fill();
+      // Arka plan temel tonu
+      pCtx.fillStyle = "#E2E8F0";
+      pCtx.fillRect(0, 0, 30, 30);
 
-      // Çapraz çizgiler ekleyerek yoğunluğu artırıyoruz
-      pCtx.strokeStyle = "rgba(148, 163, 184, 0.35)"; 
-      pCtx.lineWidth = 1; 
-      pCtx.beginPath(); pCtx.moveTo(0, 24); pCtx.lineTo(24, 0); pCtx.stroke();
-      pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(24, 24); pCtx.stroke();
+      // Yoğun teknolojik devre çizgileri ve mini kare/nokta detayları
+      pCtx.strokeStyle = "#CBD5E1";
+      pCtx.lineWidth = 1.2;
+      pCtx.beginPath();
+      pCtx.moveTo(0, 15); pCtx.lineTo(30, 15);
+      pCtx.moveTo(15, 0); pCtx.lineTo(15, 30);
+      pCtx.stroke();
+
+      // Köşe tech bağlantı noktaları
+      pCtx.fillStyle = "#94A3B8";
+      pCtx.fillRect(13, 13, 4, 4);
+
+      // Çapraz ince taramalar
+      pCtx.strokeStyle = "rgba(148, 163, 184, 0.4)";
+      pCtx.lineWidth = 0.8;
+      pCtx.beginPath();
+      pCtx.moveTo(0, 0); pCtx.lineTo(30, 30);
+      pCtx.moveTo(30, 0); pCtx.lineTo(0, 30);
+      pCtx.stroke();
 
       const pattern = ctx.createPattern(pCanvas, 'repeat');
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, w, h);
 
-      // ÜST RENKLİ ŞERİT
-      const topBarHeight = 45;
+      // BÜYÜTÜLMÜŞ VE AŞAĞI UZATILMIŞ ÜST RENKLİ ŞERİT
+      const topBarHeight = 75;
       ctx.fillStyle = config.color;
       ctx.fillRect(0, 0, w, topBarHeight);
 
-      // İKİ YANDA DELİK SİMGELERİ (Sol ve sağ üst köşelerde klips slotları)
+      // KORDON DELİK / KLİPS SLOTLARI (Büyütülen üst bandın tam ortasına yerleştirildi)
       ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(40, 10, 36, 22); // Sol delik
-      ctx.strokeRect(w - 76, 10, 36, 22); // Sağ delik
+      ctx.lineWidth = 3.5;
+      ctx.strokeRect(40, 26, 42, 24); // Sol delik
+      ctx.strokeRect(w - 82, 26, 42, 24); // Sağ delik
 
-      // MEB Logosu Çizimi (En-boy oranı korunarak dikeyde tam ortalandı)
+      // MEB Logosu Çizimi (En-boy oranı korunarak dikeyde ortalandı, üst bant ile çakışması önlendi)
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
-        const logoMaxWidth = 260;
-        const logoMaxHeight = 260;
+        const logoMaxWidth = 250;
+        const logoMaxHeight = 250;
         const imgRatio = mebLogoImg.naturalWidth / mebLogoImg.naturalHeight;
         
         let drawW = logoMaxWidth;
@@ -444,7 +454,7 @@
         const usableHeight = usableBottom - usableTop;
 
         const logoX = (w - drawW) / 2;
-        const logoY = usableTop + (usableHeight - drawH) / 2 - 25;
+        const logoY = usableTop + (usableHeight - drawH) / 2 - 15;
         
         ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
@@ -453,8 +463,8 @@
       const nameText = trUpper(inputName.value || "RAMAZAN YILMAZ");
       const subText = trUpper(inputSub.value || "BİLGİSAYAR VE ÖĞRETİM TEKNOLOJİLERİ");
 
-      drawWrappedText(ctx, nameText, w / 2, 495, w - 50, 40, "#000000", "bold", 2);
-      drawWrappedText(ctx, subText, w / 2, 575, w - 60, 26, config.color, "bold", 2);
+      drawWrappedText(ctx, nameText, w / 2, 500, w - 50, 40, "#000000", "bold", 2);
+      drawWrappedText(ctx, subText, w / 2, 580, w - 60, 26, config.color, "bold", 2);
 
       // ALT RENKLİ ŞERİT
       const barHeight = 170;
