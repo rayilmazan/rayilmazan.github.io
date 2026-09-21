@@ -385,25 +385,35 @@
       const w = canvas.width;
       const h = canvas.height;
 
-      // Arka plan rengi (Süt beyaz yerine çok hafif premium gri/kırık beyaz ton)
-      ctx.fillStyle = "#F8FAFC";
+      // Arka plan rengi (Kırık beyaz / açık gri)
+      ctx.fillStyle = "#F1F5F9";
       ctx.fillRect(0, 0, w, h);
 
-      // Zarif arka plan doku deseni (Greeble / Tech Grid)
+      // DAHA YOĞUN ARKA PLAN DESENİ (Greeble / Teknoloji Grid Dokusu)
       const pCanvas = document.createElement('canvas');
-      pCanvas.width = 40;
-      pCanvas.height = 40;
+      pCanvas.width = 24;
+      pCanvas.height = 24;
       const pCtx = pCanvas.getContext('2d');
-      pCtx.fillStyle = "#e2e8f0";
-      pCtx.beginPath(); pCtx.arc(20, 20, 1.2, 0, Math.PI * 2); pCtx.fill();
-      pCtx.strokeStyle = "rgba(226, 232, 240, 0.5)"; 
-      pCtx.lineWidth = 1; pCtx.beginPath(); pCtx.moveTo(0, 40); pCtx.lineTo(40, 0); pCtx.stroke();
+      
+      // Yoğun nokta matrisi
+      pCtx.fillStyle = "#cbd5e1";
+      pCtx.beginPath(); pCtx.arc(12, 12, 1.8, 0, Math.PI * 2); pCtx.fill();
+      pCtx.beginPath(); pCtx.arc(0, 0, 1.2, 0, Math.PI * 2); pCtx.fill();
+      pCtx.beginPath(); pCtx.arc(24, 0, 1.2, 0, Math.PI * 2); pCtx.fill();
+      pCtx.beginPath(); pCtx.arc(0, 24, 1.2, 0, Math.PI * 2); pCtx.fill();
+      pCtx.beginPath(); pCtx.arc(24, 24, 1.2, 0, Math.PI * 2); pCtx.fill();
+
+      // Çapraz çizgiler ekleyerek yoğunluğu artırıyoruz
+      pCtx.strokeStyle = "rgba(148, 163, 184, 0.35)"; 
+      pCtx.lineWidth = 1; 
+      pCtx.beginPath(); pCtx.moveTo(0, 24); pCtx.lineTo(24, 0); pCtx.stroke();
+      pCtx.beginPath(); pCtx.moveTo(0, 0); pCtx.lineTo(24, 24); pCtx.stroke();
 
       const pattern = ctx.createPattern(pCanvas, 'repeat');
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, w, h);
 
-      // ÜST RENKLİ ŞERİT (Üst kenarda ince şerit)
+      // ÜST RENKLİ ŞERİT
       const topBarHeight = 45;
       ctx.fillStyle = config.color;
       ctx.fillRect(0, 0, w, topBarHeight);
@@ -414,7 +424,7 @@
       ctx.strokeRect(40, 10, 36, 22); // Sol delik
       ctx.strokeRect(w - 76, 10, 36, 22); // Sağ delik
 
-      // MEB Logosu Çizimi (En-boy oranı korunarak dikeyde tam ortaya hizalandı)
+      // MEB Logosu Çizimi (En-boy oranı korunarak dikeyde tam ortalandı)
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
         const logoMaxWidth = 260;
         const logoMaxHeight = 260;
@@ -428,14 +438,13 @@
           drawW = logoMaxHeight * imgRatio;
         }
 
-        // Üst bant ile alt bant arasında dikeyde mükemmel orta nokta hesaplaması
         const usableTop = topBarHeight;
         const barHeight = 170;
         const usableBottom = h - barHeight;
         const usableHeight = usableBottom - usableTop;
 
         const logoX = (w - drawW) / 2;
-        const logoY = usableTop + (usableHeight - drawH) / 2 - 25; // İsim alanına göre hafifçe yukarı denge ayarı
+        const logoY = usableTop + (usableHeight - drawH) / 2 - 25;
         
         ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
