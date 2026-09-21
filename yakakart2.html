@@ -402,7 +402,7 @@
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, w, h);
 
-      // ÜST RENKLİ ŞERİT (Logonun üzerine gelmeyecek şekilde ince üst bant)
+      // ÜST RENKLİ ŞERİT (Üst kenarda ince şerit)
       const topBarHeight = 45;
       ctx.fillStyle = config.color;
       ctx.fillRect(0, 0, w, topBarHeight);
@@ -413,13 +413,24 @@
       ctx.strokeRect(40, 10, 36, 22); // Sol delik
       ctx.strokeRect(w - 76, 10, 36, 22); // Sağ delik
 
-      // MEB Logosu Çizimi (Tam ortada)
-      const logoSize = 270;
-      const logoX = (w - logoSize) / 2;
-      const logoY = 85;
-      
+      // MEB Logosu Çizimi (En-boy oranı korunarak orantılı ve tam yuvarlak/kare çizim)
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
-        ctx.drawImage(mebLogoImg, logoX, logoY, logoSize, logoSize);
+        const logoMaxWidth = 270;
+        const logoMaxHeight = 270;
+        const imgRatio = mebLogoImg.naturalWidth / mebLogoImg.naturalHeight;
+        
+        let drawW = logoMaxWidth;
+        let drawH = logoMaxWidth / imgRatio;
+        
+        if (drawH > logoMaxHeight) {
+          drawH = logoMaxHeight;
+          drawW = logoMaxHeight * imgRatio;
+        }
+
+        const logoX = (w - drawW) / 2;
+        const logoY = 70 + (logoMaxHeight - drawH) / 2;
+        
+        ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
 
       // Ad Soyad ve Alt Bilgi (Türkçe karakter destekli büyük harf)
