@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ID_GEN_UNIT // Yaka Kartı Jeneratörü</title>
+  <title>rayılmazan yaka kartı üreticisi</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
@@ -198,7 +197,7 @@
 <body>
 
   <header>
-    <h1>⚙️ ID_GEN_UNIT</h1>
+    <h1>⚙️ rayılmazan yaka kartı üreticisi</h1>
     <span class="sub-info">A4 YATAY • 8 KART • ÇİFT SAYFA PDF</span>
   </header>
 
@@ -232,7 +231,7 @@
 
       <div class="form-group" id="groupSub">
         <label for="inputSub">Alt Bilgi (Branş / Görev / Unvan)</label>
-        <input type="text" id="inputSub" class="form-input" value="Bilgisayar Ve Öğretim Teknolojileri">
+        <input type="text" id="inputSub" class="form-input" value="Bilgisayar ve Öğretim Teknolojileri">
       </div>
 
       <button class="btn-submit" id="btnDownloadPDF">
@@ -274,7 +273,7 @@
     // 8 Kişilik Veri Hafızası
     const persons = Array.from({length: 8}, (_, i) => ({
       name: 'Ramazan YILMAZ',
-      sub: 'Bilgisayar Ve Öğretim Teknolojileri'
+      sub: 'Bilgisayar ve Öğretim Teknolojileri'
     }));
     let activePersonIndex = 0;
 
@@ -324,6 +323,13 @@
         renderCard();
       });
     });
+
+    // Türkçe Karakter Dönüşümü (I/İ, Ç, Ğ, Ö, Ş, Ü uyumlu)
+    function trUpper(text) {
+      if (!text) return "";
+      const map = { 'i': 'İ', 'ı': 'I', 'ç': 'Ç', 'ğ': 'Ğ', 'ö': 'Ö', 'ş': 'Ş', 'ü': 'Ü', 'û': 'Û', 'â': 'Â', 'î': 'Î' };
+      return text.toString().split('').map(char => map[char] || char.toUpperCase()).join('');
+    }
 
     // Metin Sarmalama ve Ortalama
     function drawWrappedText(ctx, text, x, y, maxWidth, initialFontSize, fontColor, fontWeight = "bold", maxLines = 3) {
@@ -382,6 +388,7 @@
       ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, w, h);
 
+      // Arka plan desen
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 30;
       pCanvas.height = 30;
@@ -395,24 +402,34 @@
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, w, h);
 
-      // Üst delik simgeleri (kordon klipsi için)
-      ctx.strokeStyle = "#94a3b8";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(w / 2 - 50, 20, 100, 25);
+      // ÜST RENKLİ ŞERİT (Logonun üzerine gelmeyecek şekilde ince üst bant)
+      const topBarHeight = 45;
+      ctx.fillStyle = config.color;
+      ctx.fillRect(0, 0, w, topBarHeight);
 
-      // MEB Logosu Çizimi (Okul ismi kalktığı için logo üstte merkeze konumlandırıldı)
-      const logoSize = 300;
+      // İKİ YANDA DELİK SİMGELERİ (Sol ve sağ üst köşelerde klips slotları)
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 10, 36, 22); // Sol delik
+      ctx.strokeRect(w - 76, 10, 36, 22); // Sağ delik
+
+      // MEB Logosu Çizimi (Tam ortada)
+      const logoSize = 270;
       const logoX = (w - logoSize) / 2;
-      const logoY = 70;
+      const logoY = 85;
+      
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
         ctx.drawImage(mebLogoImg, logoX, logoY, logoSize, logoSize);
       }
 
-      // Ad Soyad ve Alt Bilgi Alanı
-      drawWrappedText(ctx, inputName.value.toUpperCase() || "ADI SOYADI", w / 2, 490, w - 50, 40, "#000000", "bold", 2);
-      drawWrappedText(ctx, inputSub.value.toUpperCase() || "ALT BİLGİ", w / 2, 570, w - 60, 28, config.color, "bold", 2);
+      // Ad Soyad ve Alt Bilgi (Türkçe karakter destekli büyük harf)
+      const nameText = trUpper(inputName.value || "RAMAZAN YILMAZ");
+      const subText = trUpper(inputSub.value || "BİLGİSAYAR VE ÖĞRETİM TEKNOLOJİLERİ");
 
-      // Alt Renkli Şerit
+      drawWrappedText(ctx, nameText, w / 2, 490, w - 50, 40, "#000000", "bold", 2);
+      drawWrappedText(ctx, subText, w / 2, 570, w - 60, 26, config.color, "bold", 2);
+
+      // ALT RENKLİ ŞERİT
       const barHeight = 170;
       const barY = h - barHeight;
 
