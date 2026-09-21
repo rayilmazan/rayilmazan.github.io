@@ -1,1 +1,508 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ID_GEN_UNIT // Yaka Kartı Jeneratörü</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #121415;
+      --panel-bg: #1e2226;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border: #475569;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(90deg, #1a1d21, #121415);
+      padding: 16px 24px;
+      border-bottom: 2px solid var(--border);
+      border-bottom-color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    header h1 { font-size: 1.25rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 8px; text-transform: uppercase; font-family: monospace; letter-spacing: 1px; }
+    header .sub-info { font-size: 0.85rem; color: var(--text-muted); font-family: monospace; }
+
+    .app-container {
+      display: flex;
+      flex: 1;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .app-container { flex-direction: column; }
+    }
+
+    .controls-panel, .preview-panel {
+      background: var(--panel-bg);
+      border: 1px solid #334155;
+      border-top: 2px solid #64748b;
+      border-left: 2px solid #64748b;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
+      border-radius: 4px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    
+    .controls-panel::before, .preview-panel::before {
+      content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: #0f172a; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2);
+    }
+    .controls-panel::after, .preview-panel::after {
+      content: ''; position: absolute; bottom: 6px; left: 6px; width: 6px; height: 6px; border-radius: 50%; background: #0f172a; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.2);
+    }
+
+    .controls-panel { flex: 1; }
+    .preview-panel { flex: 1; align-items: center; justify-content: center; }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+      font-family: monospace;
+    }
+
+    .template-grid, .person-grid {
+      display: grid;
+      gap: 8px;
+    }
+    
+    .template-grid { grid-template-columns: repeat(2, 1fr); }
+    .person-grid { grid-template-columns: repeat(4, 1fr); margin-bottom: 5px; }
+
+    .btn-grid-item {
+      background: #0f141a;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      font-family: monospace;
+    }
+
+    .btn-grid-item:hover { border-color: var(--text-muted); }
+
+    .btn-grid-item.active {
+      border-color: var(--accent);
+      background: #451a03;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(217, 119, 6, 0.3);
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; font-family: monospace; }
+    
+    .form-input {
+      background: #0f141a;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--accent); }
+
+    .btn-submit {
+      background: var(--accent);
+      color: white;
+      border: 1px solid #f59e0b;
+      padding: 14px;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+      font-family: monospace;
+      text-transform: uppercase;
+      box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+    }
+    .btn-submit:hover { background: var(--accent-hover); }
+
+    .card-preview-container {
+      width: 330px;
+      height: 465px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cardCanvas { width: 100%; height: 100%; }
+
+    .badge-info-tag {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--accent);
+      background: rgba(217, 119, 6, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid rgba(217, 119, 6, 0.2);
+      font-family: monospace;
+    }
+
+    .sys-footer {
+      text-align: right;
+      padding: 10px 24px;
+      font-family: monospace;
+      color: #475569;
+      font-size: 0.85rem;
+      border-top: 1px solid #1f2937;
+      background: #0f141a;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⚙️ ID_GEN_UNIT</h1>
+    <span class="sub-info">A4 YATAY • 8 KART • ÇİFT SAYFA PDF</span>
+  </header>
+
+  <div class="app-container">
+    
+    <!-- SOL KONTROL PANELİ -->
+    <div class="controls-panel">
+      
+      <div class="section-title">1. Şablon Modeli</div>
+      <div class="template-grid">
+        <button class="btn-grid-item template-btn active" data-template="ogretmen">Öğretmen</button>
+        <button class="btn-grid-item template-btn" data-template="nobetci_ogretmen">Nöbetçi Öğretmen</button>
+      </div>
+
+      <div class="section-title" style="margin-top:10px;">2. Kişi Yönetimi (A4'e 8 Kişi)</div>
+      <div class="person-grid" id="personGrid">
+        <button class="btn-grid-item person-btn active" data-index="0">T-01</button>
+        <button class="btn-grid-item person-btn" data-index="1">T-02</button>
+        <button class="btn-grid-item person-btn" data-index="2">T-03</button>
+        <button class="btn-grid-item person-btn" data-index="3">T-04</button>
+        <button class="btn-grid-item person-btn" data-index="4">T-05</button>
+        <button class="btn-grid-item person-btn" data-index="5">T-06</button>
+        <button class="btn-grid-item person-btn" data-index="6">T-07</button>
+        <button class="btn-grid-item person-btn" data-index="7">T-08</button>
+      </div>
+
+      <div class="form-group" id="groupName">
+        <label for="inputName">Adı Soyadı</label>
+        <input type="text" id="inputName" class="form-input" value="Ramazan YILMAZ">
+      </div>
+
+      <div class="form-group" id="groupSub">
+        <label for="inputSub">Alt Bilgi (Branş / Görev / Unvan)</label>
+        <input type="text" id="inputSub" class="form-input" value="Bilgisayar Ve Öğretim Teknolojileri">
+      </div>
+
+      <button class="btn-submit" id="btnDownloadPDF">
+        📄 ÇOKLU PDF İNDİR (2 SAYFA)
+      </button>
+    </div>
+
+    <!-- SAĞ ÖNİZLEME PANELİ -->
+    <div class="preview-panel">
+      <div class="section-title" style="margin-bottom: 15px; width: 100%; text-align: center;">Canlı Kart Önizlemesi</div>
+      <div class="card-preview-container">
+        <canvas id="cardCanvas" width="600" height="850"></canvas>
+      </div>
+      <div class="badge-info-tag">✂️ PDF Çıktısında 8 Kişi Tek A4'e Sığdırılır</div>
+    </div>
+
+  </div>
+
+  <div class="sys-footer">
+    system ops: rayılmazan
+  </div>
+
+  <script>
+    const TEMPLATES = {
+      ogretmen: { title: "ÖĞRETMEN", color: "#06B6D4" },
+      nobetci_ogretmen: { title: "NÖBETÇİ ÖĞRETMEN", color: "#EF4444" }
+    };
+
+    let activeTemplate = "ogretmen";
+    
+    // MEB Logosu Yükleme
+    const mebLogoImg = new Image();
+    mebLogoImg.crossOrigin = "anonymous";
+    mebLogoImg.src = "https://raw.githubusercontent.com/rayilmazan/rayilmazan.github.io/refs/heads/main/meblogo.png";
+    mebLogoImg.onload = () => {
+      renderCard();
+    };
+
+    // 8 Kişilik Veri Hafızası
+    const persons = Array.from({length: 8}, (_, i) => ({
+      name: 'Ramazan YILMAZ',
+      sub: 'Bilgisayar Ve Öğretim Teknolojileri'
+    }));
+    let activePersonIndex = 0;
+
+    const canvas = document.getElementById('cardCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    const inputName = document.getElementById('inputName');
+    const inputSub = document.getElementById('inputSub');
+    const btnDownloadPDF = document.getElementById('btnDownloadPDF');
+
+    // Şablon Değiştirme
+    document.querySelectorAll('.template-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTemplate = btn.dataset.template;
+        renderCard();
+      });
+    });
+
+    // Kişi Sekmesi Değiştirme
+    document.querySelectorAll('.person-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        activePersonIndex = parseInt(e.target.dataset.index);
+        
+        document.querySelectorAll('.person-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        const p = persons[activePersonIndex];
+        inputName.value = p.name;
+        inputSub.value = p.sub;
+        
+        renderCard();
+      });
+    });
+
+    // Inputları Veritabanına kaydetme
+    const saveState = () => {
+      const p = persons[activePersonIndex];
+      p.name = inputName.value;
+      p.sub = inputSub.value;
+    };
+
+    [inputName, inputSub].forEach(el => {
+      el.addEventListener('input', () => {
+        saveState();
+        renderCard();
+      });
+    });
+
+    // Metin Sarmalama ve Ortalama
+    function drawWrappedText(ctx, text, x, y, maxWidth, initialFontSize, fontColor, fontWeight = "bold", maxLines = 3) {
+      text = text.trim();
+      if (!text) return;
+
+      let fontSize = initialFontSize;
+      ctx.fillStyle = fontColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      let lines = [];
+      
+      while (fontSize >= 12) {
+        ctx.font = `${fontWeight} ${fontSize}px Arial, sans-serif`;
+        const words = text.split(/\s+/);
+        lines = [];
+        let currentLine = words[0] || "";
+
+        for (let i = 1; i < words.length; i++) {
+          const testLine = currentLine + " " + words[i];
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth) {
+            lines.push(currentLine);
+            currentLine = words[i];
+          } else {
+            currentLine = testLine;
+          }
+        }
+        if (currentLine) lines.push(currentLine);
+
+        if (lines.length <= maxLines) {
+          const allFit = lines.every(l => ctx.measureText(l).width <= maxWidth);
+          if (allFit) break;
+        }
+        fontSize -= 2;
+      }
+
+      const lineHeight = fontSize * 1.2;
+      const totalHeight = lines.length * lineHeight;
+      const startY = y - (totalHeight / 2) + (lineHeight / 2);
+
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x, startY + (index * lineHeight));
+      });
+
+      ctx.textBaseline = "alphabetic";
+    }
+
+    // Kart Çizimi
+    function renderCard() {
+      const config = TEMPLATES[activeTemplate];
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, w, h);
+
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 30;
+      pCanvas.height = 30;
+      const pCtx = pCanvas.getContext('2d');
+      pCtx.fillStyle = "#cbd5e1";
+      pCtx.beginPath(); pCtx.arc(15, 15, 1.5, 0, Math.PI * 2); pCtx.fill();
+      pCtx.strokeStyle = "rgba(203, 213, 225, 0.4)"; 
+      pCtx.lineWidth = 1; pCtx.beginPath(); pCtx.moveTo(0, 30); pCtx.lineTo(30, 0); pCtx.stroke();
+
+      const pattern = ctx.createPattern(pCanvas, 'repeat');
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, w, h);
+
+      // Üst delik simgeleri (kordon klipsi için)
+      ctx.strokeStyle = "#94a3b8";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(w / 2 - 50, 20, 100, 25);
+
+      // MEB Logosu Çizimi (Okul ismi kalktığı için logo üstte merkeze konumlandırıldı)
+      const logoSize = 300;
+      const logoX = (w - logoSize) / 2;
+      const logoY = 70;
+      if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
+        ctx.drawImage(mebLogoImg, logoX, logoY, logoSize, logoSize);
+      }
+
+      // Ad Soyad ve Alt Bilgi Alanı
+      drawWrappedText(ctx, inputName.value.toUpperCase() || "ADI SOYADI", w / 2, 490, w - 50, 40, "#000000", "bold", 2);
+      drawWrappedText(ctx, inputSub.value.toUpperCase() || "ALT BİLGİ", w / 2, 570, w - 60, 28, config.color, "bold", 2);
+
+      // Alt Renkli Şerit
+      const barHeight = 170;
+      const barY = h - barHeight;
+
+      ctx.fillStyle = config.color;
+      ctx.fillRect(0, barY, w, barHeight);
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "900 58px Arial, sans-serif";
+      ctx.textAlign = "center";
+
+      const titleParts = config.title.split(" ");
+      if (titleParts.length > 1) {
+        ctx.fillText(titleParts[0], w / 2, barY + 65);
+        ctx.fillText(titleParts[1], w / 2, barY + 135);
+      } else {
+        ctx.fillText(config.title, w / 2, barY + 105);
+      }
+    }
+
+    // PDF İndirme (A4 Yatay, Çift Sayfa Mantığı)
+    btnDownloadPDF.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('l', 'mm', 'a4');
+
+      const cardW = 63;
+      const cardH = 92;
+      const cols = 4;
+      const rows = 2;
+      const gapX = 6;
+      const gapY = 7;
+      const startX = (297 - (cols * cardW + (cols - 1) * gapX)) / 2;
+      const startY = (210 - (rows * cardH + (rows - 1) * gapY)) / 2;
+
+      const drawPageWithTemplate = (templateKey, isBackPage = false) => {
+        const tempActive = activeTemplate;
+        activeTemplate = templateKey;
+
+        for (let i = 0; i < 8; i++) {
+          const r = Math.floor(i / 4);
+          const c = i % 4;
+          const x = startX + c * (cardW + gapX);
+          const y = startY + r * (cardH + gapY);
+
+          let personIndex = i;
+          if (isBackPage) {
+            const mirroredC = 3 - c;
+            personIndex = r * 4 + mirroredC;
+          }
+
+          const p = persons[personIndex];
+          inputName.value = p.name || "";
+          inputSub.value = p.sub || "";
+
+          renderCard();
+          
+          const cardImgData = canvas.toDataURL('image/jpeg', 0.95);
+          pdf.addImage(cardImgData, 'JPEG', x, y, cardW, cardH);
+
+          // Kesim çizgileri
+          pdf.setDrawColor(160, 160, 160);
+          pdf.setLineWidth(0.2);
+          const markLen = 3;
+          pdf.line(x - markLen, y, x, y);
+          pdf.line(x, y - markLen, x, y);
+          pdf.line(x + cardW, y, x + cardW + markLen, y);
+          pdf.line(x + cardW, y - markLen, x + cardW, y);
+          pdf.line(x - markLen, y + cardH, x, y + cardH);
+          pdf.line(x, y + cardH, x, y + cardH + markLen);
+          pdf.line(x + cardW, y + cardH, x + cardW + markLen, y + cardH);
+          pdf.line(x + cardW, y + cardH, x + cardW, y + cardH + markLen);
+        }
+
+        activeTemplate = tempActive;
+      };
+
+      // 1. Sayfa: ÖN YÜZ (Öğretmen)
+      drawPageWithTemplate('ogretmen', false);
+      // 2. Sayfa: ARKA YÜZ (Nöbetçi Öğretmen - Arkalı Önlü hizalama için aynalanmış)
+      pdf.addPage();
+      drawPageWithTemplate('nobetci_ogretmen', true);
+
+      const cp = persons[activePersonIndex];
+      inputName.value = cp.name;
+      inputSub.value = cp.sub;
+      renderCard();
+
+      pdf.save(`yaka_kartlari_A4.pdf`);
+    });
+
+    document.querySelector('.template-btn[data-template="ogretmen"]').click();
+  </script>
+</body>
+</html>
