@@ -389,17 +389,15 @@
       ctx.fillStyle = "#E2E8F0";
       ctx.fillRect(0, 0, w, h);
 
-      // ÜST DÜZEY YOĞUN TEKNOLOJİK / ENDÜSTRİYEL ARKA PLAN DOKUSU (Greeble / Circuit Pattern)
+      // Yoğun teknolojik / endüstriyel arka plan dokusu
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 30;
       pCanvas.height = 30;
       const pCtx = pCanvas.getContext('2d');
       
-      // Arka plan temel tonu
       pCtx.fillStyle = "#E2E8F0";
       pCtx.fillRect(0, 0, 30, 30);
 
-      // Yoğun teknolojik devre çizgileri ve mini kare/nokta detayları
       pCtx.strokeStyle = "#CBD5E1";
       pCtx.lineWidth = 1.2;
       pCtx.beginPath();
@@ -407,11 +405,9 @@
       pCtx.moveTo(15, 0); pCtx.lineTo(15, 30);
       pCtx.stroke();
 
-      // Köşe tech bağlantı noktaları
       pCtx.fillStyle = "#94A3B8";
       pCtx.fillRect(13, 13, 4, 4);
 
-      // Çapraz ince taramalar
       pCtx.strokeStyle = "rgba(148, 163, 184, 0.4)";
       pCtx.lineWidth = 0.8;
       pCtx.beginPath();
@@ -423,38 +419,27 @@
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, w, h);
 
-      // BÜYÜTÜLMÜŞ VE AŞAĞI UZATILMIŞ ÜST RENKLİ ŞERİT
+      // ÜST RENKLİ ŞERİT (Büyütülmüş)
       const topBarHeight = 75;
       ctx.fillStyle = config.color;
       ctx.fillRect(0, 0, w, topBarHeight);
 
-      // KORDON DELİK / KLİPS SLOTLARI (Büyütülen üst bandın tam ortasına yerleştirildi)
+      // KORDON DELİK / KLİPS SLOTLARI
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 3.5;
       ctx.strokeRect(40, 26, 42, 24); // Sol delik
       ctx.strokeRect(w - 82, 26, 42, 24); // Sağ delik
 
-      // MEB Logosu Çizimi (En-boy oranı korunarak dikeyde ortalandı, üst bant ile çakışması önlendi)
+      // MEB Logosu Çizimi (Kırmızı/Renkli bandın hemen altında, üst boşluk dengelenmiş konum)
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
-        const logoMaxWidth = 250;
-        const logoMaxHeight = 250;
+        const logoSize = 250;
         const imgRatio = mebLogoImg.naturalWidth / mebLogoImg.naturalHeight;
         
-        let drawW = logoMaxWidth;
-        let drawH = logoMaxWidth / imgRatio;
+        let drawW = logoSize;
+        let drawH = logoSize / imgRatio;
         
-        if (drawH > logoMaxHeight) {
-          drawH = logoMaxHeight;
-          drawW = logoMaxHeight * imgRatio;
-        }
-
-        const usableTop = topBarHeight;
-        const barHeight = 170;
-        const usableBottom = h - barHeight;
-        const usableHeight = usableBottom - usableTop;
-
         const logoX = (w - drawW) / 2;
-        const logoY = usableTop + (usableHeight - drawH) / 2 - 15;
+        const logoY = topBarHeight + 25; // Bandın hemen altından başlar
         
         ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
