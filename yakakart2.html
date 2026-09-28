@@ -161,8 +161,8 @@
     .btn-submit:hover { background: var(--accent-hover); }
 
     .card-preview-container {
-      width: 330px;
-      height: 465px;
+      width: 300px;
+      height: 424px;
       background: #fff;
       border-radius: 8px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.8);
@@ -198,7 +198,7 @@
 
   <header>
     <h1>⚙️ rayılmazan yaka kartı üreticisi</h1>
-    <span class="sub-info">A4 YATAY • 8 KART • ÇİFT SAYFA PDF</span>
+    <span class="sub-info">A4 DİKEY • 4 KART • ÇİFT SAYFA PDF</span>
   </header>
 
   <div class="app-container">
@@ -212,16 +212,12 @@
         <button class="btn-grid-item template-btn" data-template="nobetci_ogretmen">Nöbetçi Öğretmen</button>
       </div>
 
-      <div class="section-title" style="margin-top:10px;">2. Kişi Yönetimi (A4'e 8 Kişi)</div>
+      <div class="section-title" style="margin-top:10px;">2. Kişi Yönetimi (A4'e 4 Kişi)</div>
       <div class="person-grid" id="personGrid">
         <button class="btn-grid-item person-btn active" data-index="0">T-01</button>
         <button class="btn-grid-item person-btn" data-index="1">T-02</button>
         <button class="btn-grid-item person-btn" data-index="2">T-03</button>
         <button class="btn-grid-item person-btn" data-index="3">T-04</button>
-        <button class="btn-grid-item person-btn" data-index="4">T-05</button>
-        <button class="btn-grid-item person-btn" data-index="5">T-06</button>
-        <button class="btn-grid-item person-btn" data-index="6">T-07</button>
-        <button class="btn-grid-item person-btn" data-index="7">T-08</button>
       </div>
 
       <div class="form-group" id="groupName">
@@ -245,7 +241,7 @@
       <div class="card-preview-container">
         <canvas id="cardCanvas" width="600" height="850"></canvas>
       </div>
-      <div class="badge-info-tag">✂️ PDF Çıktısında 8 Kişi Tek A4'e Sığdırılır</div>
+      <div class="badge-info-tag">✂️ PDF Çıktısında 4 Kişi Tek A4 Dikey Sayfaya Sığdırılır</div>
     </div>
 
   </div>
@@ -270,8 +266,8 @@
       renderCard();
     };
 
-    // 8 Kişilik Veri Hafızası
-    const persons = Array.from({length: 8}, (_, i) => ({
+    // 4 Kişilik Veri Hafızası
+    const persons = Array.from({length: 4}, (_, i) => ({
       name: 'Ramazan YILMAZ',
       sub: 'Bilgisayar ve Öğretim Teknolojileri'
     }));
@@ -430,7 +426,7 @@
       ctx.strokeRect(40, 26, 42, 24); // Sol delik
       ctx.strokeRect(w - 82, 26, 42, 24); // Sağ delik
 
-      // MEB Logosu Çizimi (Kırmızı/Renkli bandın hemen altında, üst boşluk dengelenmiş konum)
+      // MEB Logosu Çizimi
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
         const logoSize = 250;
         const imgRatio = mebLogoImg.naturalWidth / mebLogoImg.naturalHeight;
@@ -439,12 +435,12 @@
         let drawH = logoSize / imgRatio;
         
         const logoX = (w - drawW) / 2;
-        const logoY = topBarHeight + 25; // Bandın hemen altından başlar
+        const logoY = topBarHeight + 25;
         
         ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
 
-      // Ad Soyad ve Alt Bilgi (Türkçe karakter destekli büyük harf)
+      // Ad Soyad ve Alt Bilgi
       const nameText = trUpper(inputName.value || "RAMAZAN YILMAZ");
       const subText = trUpper(inputSub.value || "BİLGİSAYAR VE ÖĞRETİM TEKNOLOJİLERİ");
 
@@ -471,34 +467,34 @@
       }
     }
 
-    // PDF İndirme (A4 Yatay, Çift Sayfa Mantığı)
+    // PDF İndirme (A4 Dikey, 2x2 Grid)
     btnDownloadPDF.addEventListener('click', () => {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('l', 'mm', 'a4');
+      const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' -> Portrait (Dikey)
 
-      const cardW = 63;
-      const cardH = 92;
-      const cols = 4;
+      const cardW = 85;
+      const cardH = 125;
+      const cols = 2;
       const rows = 2;
-      const gapX = 6;
-      const gapY = 7;
-      const startX = (297 - (cols * cardW + (cols - 1) * gapX)) / 2;
-      const startY = (210 - (rows * cardH + (rows - 1) * gapY)) / 2;
+      const gapX = 10;
+      const gapY = 10;
+      const startX = (210 - (cols * cardW + (cols - 1) * gapX)) / 2;
+      const startY = (297 - (rows * cardH + (rows - 1) * gapY)) / 2;
 
       const drawPageWithTemplate = (templateKey, isBackPage = false) => {
         const tempActive = activeTemplate;
         activeTemplate = templateKey;
 
-        for (let i = 0; i < 8; i++) {
-          const r = Math.floor(i / 4);
-          const c = i % 4;
+        for (let i = 0; i < 4; i++) {
+          const r = Math.floor(i / 2);
+          const c = i % 2;
           const x = startX + c * (cardW + gapX);
           const y = startY + r * (cardH + gapY);
 
           let personIndex = i;
           if (isBackPage) {
-            const mirroredC = 3 - c;
-            personIndex = r * 4 + mirroredC;
+            const mirroredC = 1 - c;
+            personIndex = r * 2 + mirroredC;
           }
 
           const p = persons[personIndex];
@@ -538,7 +534,7 @@
       inputSub.value = cp.sub;
       renderCard();
 
-      pdf.save(`yaka_kartlari_A4.pdf`);
+      pdf.save(`yaka_kartlari_A4_dikey.pdf`);
     });
 
     document.querySelector('.template-btn[data-template="ogretmen"]').click();
