@@ -370,7 +370,7 @@
       lines.forEach((line, index) => {
         const lineY = startY + (index * lineHeight);
         
-        // Yazının arkasına netlik kazandıran ince beyaz/kontur efekti (stroke)
+        // Yazının arkasına netlik kazandıran ince beyaz kontur (stroke) efekti
         ctx.lineWidth = 3;
         ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
         ctx.strokeText(line, x, lineY);
@@ -434,13 +434,24 @@
       ctx.strokeRect(40, 26, 42, 24); // Sol delik
       ctx.strokeRect(w - 82, 26, 42, 24); // Sağ delik
 
-      // MEB Logosu Çizimi (Oranlar sabit tutularak tam kare/daire formunda)
+      // MEB Logosu Çizimi (Oransal bozulmayı önlemek için gerçek aspect ratio hesabı)
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
-        const logoSize = 250; // Genişlik ve yükseklik eşit tutularak tam yuvarlak/orantılı kalması sağlandı
-        const logoX = (w - logoSize) / 2;
+        const maxWidth = 250;
+        const maxHeight = 250;
+        const imgRatio = mebLogoImg.naturalWidth / mebLogoImg.naturalHeight;
+        
+        let drawW = maxWidth;
+        let drawH = maxWidth / imgRatio;
+        
+        if (drawH > maxHeight) {
+          drawH = maxHeight;
+          drawW = maxHeight * imgRatio;
+        }
+        
+        const logoX = (w - drawW) / 2;
         const logoY = topBarHeight + 25;
         
-        ctx.drawImage(mebLogoImg, logoX, logoY, logoSize, logoSize);
+        ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
 
       // Ad Soyad ve Alt Bilgi (Strok/Kontur desteğiyle belirginleştirildi)
@@ -458,7 +469,7 @@
       ctx.fillRect(0, barY, w, barHeight);
 
       ctx.fillStyle = "#FFFFFF";
-      // Yazı boyutu biraz daha büyütüldü (58px -> 66px)
+      // Öğretmen / Nöbetçi öğretmen yazıları büyütüldü
       ctx.font = "900 66px Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
