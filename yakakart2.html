@@ -327,13 +327,12 @@
       return text.toString().split('').map(char => map[char] || char.toUpperCase()).join('');
     }
 
-    // Metin Sarmalama ve Ortalama
+    // Metin Sarmalama ve Konturlu (Strokeli) Okunabilirlik Efekti
     function drawWrappedText(ctx, text, x, y, maxWidth, initialFontSize, fontColor, fontWeight = "bold", maxLines = 3) {
       text = text.trim();
       if (!text) return;
 
       let fontSize = initialFontSize;
-      ctx.fillStyle = fontColor;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
@@ -369,7 +368,16 @@
       const startY = y - (totalHeight / 2) + (lineHeight / 2);
 
       lines.forEach((line, index) => {
-        ctx.fillText(line, x, startY + (index * lineHeight));
+        const lineY = startY + (index * lineHeight);
+        
+        // Yazının arkasına netlik kazandıran ince beyaz/kontur efekti (stroke)
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.strokeText(line, x, lineY);
+
+        // Ana Metin Rengi
+        ctx.fillStyle = fontColor;
+        ctx.fillText(line, x, lineY);
       });
 
       ctx.textBaseline = "alphabetic";
@@ -415,7 +423,7 @@
       ctx.fillStyle = pattern;
       ctx.fillRect(0, 0, w, h);
 
-      // ÜST RENKLİ ŞERİT (Büyütülmüş)
+      // ÜST RENKLİ ŞERİT
       const topBarHeight = 75;
       ctx.fillStyle = config.color;
       ctx.fillRect(0, 0, w, topBarHeight);
@@ -426,21 +434,16 @@
       ctx.strokeRect(40, 26, 42, 24); // Sol delik
       ctx.strokeRect(w - 82, 26, 42, 24); // Sağ delik
 
-      // MEB Logosu Çizimi
+      // MEB Logosu Çizimi (Oranlar sabit tutularak tam kare/daire formunda)
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
-        const logoSize = 250;
-        const imgRatio = mebLogoImg.naturalWidth / mebLogoImg.naturalHeight;
-        
-        let drawW = logoSize;
-        let drawH = logoSize / imgRatio;
-        
-        const logoX = (w - drawW) / 2;
+        const logoSize = 250; // Genişlik ve yükseklik eşit tutularak tam yuvarlak/orantılı kalması sağlandı
+        const logoX = (w - logoSize) / 2;
         const logoY = topBarHeight + 25;
         
-        ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
+        ctx.drawImage(mebLogoImg, logoX, logoY, logoSize, logoSize);
       }
 
-      // Ad Soyad ve Alt Bilgi
+      // Ad Soyad ve Alt Bilgi (Strok/Kontur desteğiyle belirginleştirildi)
       const nameText = trUpper(inputName.value || "RAMAZAN YILMAZ");
       const subText = trUpper(inputSub.value || "BİLGİSAYAR VE ÖĞRETİM TEKNOLOJİLERİ");
 
@@ -455,22 +458,25 @@
       ctx.fillRect(0, barY, w, barHeight);
 
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = "900 58px Arial, sans-serif";
+      // Yazı boyutu biraz daha büyütüldü (58px -> 66px)
+      ctx.font = "900 66px Arial, sans-serif";
       ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
       const titleParts = config.title.split(" ");
       if (titleParts.length > 1) {
-        ctx.fillText(titleParts[0], w / 2, barY + 65);
-        ctx.fillText(titleParts[1], w / 2, barY + 135);
+        ctx.fillText(titleParts[0], w / 2, barY + 52);
+        ctx.fillText(titleParts[1], w / 2, barY + 122);
       } else {
-        ctx.fillText(config.title, w / 2, barY + 105);
+        ctx.fillText(config.title, w / 2, barY + 85);
       }
+      ctx.textBaseline = "alphabetic";
     }
 
     // PDF İndirme (A4 Dikey, 2x2 Grid)
     btnDownloadPDF.addEventListener('click', () => {
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' -> Portrait (Dikey)
+      const pdf = new jsPDF('p', 'mm', 'a4');
 
       const cardW = 85;
       const cardH = 125;
@@ -525,7 +531,7 @@
 
       // 1. Sayfa: ÖN YÜZ (Öğretmen)
       drawPageWithTemplate('ogretmen', false);
-      // 2. Sayfa: ARKA YÜZ (Nöbetçi Öğretmen - Arkalı Önlü hizalama için aynalanmış)
+      // 2. Sayfa: ARKA YÜZ (Nöbetçi Öğretmen)
       pdf.addPage();
       drawPageWithTemplate('nobetci_ogretmen', true);
 
