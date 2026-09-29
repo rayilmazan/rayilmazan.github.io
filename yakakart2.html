@@ -327,8 +327,8 @@
       return text.toString().split('').map(char => map[char] || char.toUpperCase()).join('');
     }
 
-    // Metin Sarmalama ve Konturlu (Strokeli) Okunabilirlik Efekti
-    function drawWrappedText(ctx, text, x, y, maxWidth, initialFontSize, fontColor, fontWeight = "bold", maxLines = 3) {
+    // Metin Sarmalama ve Arkasında Kuşak Çizen Fonksiyon
+    function drawWrappedTextWithRibbon(ctx, text, x, y, maxWidth, initialFontSize, textColor, ribbonBgColor, fontWeight = "bold", maxLines = 3) {
       text = text.trim();
       if (!text) return;
 
@@ -363,27 +363,54 @@
         fontSize -= 2;
       }
 
-      const lineHeight = fontSize * 1.2;
+      const lineHeight = fontSize * 1.25;
       const totalHeight = lines.length * lineHeight;
       const startY = y - (totalHeight / 2) + (lineHeight / 2);
 
+      // En geniş satırı hesaplayarak şeridin (kuşağın) genişliğini belirleyelim
+      let maxLineWidth = 0;
+      lines.forEach(line => {
+        const mWidth = ctx.measureText(line).width;
+        if (mWidth > maxLineWidth) maxLineWidth = mWidth;
+      });
+
+      // Kuşak boyutları ve tasarımı
+      const ribbonPaddingX = 35;
+      const ribbonPaddingY = 14;
+      const ribbonW = maxLineWidth + (ribbonPaddingX * 2);
+      const ribbonH = totalHeight + (ribbonPaddingY * 2);
+      const ribbonX = x - (ribbonW / 2);
+      const ribbonY = y - (totalHeight / 2) - ribbonPaddingY;
+
+      // Kuşak Arka Plan Çizimi (Yarı saydam şık bant efekti)
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 4;
+      
+      ctx.fillStyle = ribbonBgColor;
+      ctx.beginPath();
+      ctx.roundRect(ribbonX, ribbonY, ribbonW, ribbonH, 8);
+      ctx.fill();
+      ctx.restore();
+
+      // Kuşak kenar çizgisi (Border)
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(ribbonX, ribbonY, ribbonW, ribbonH, 8);
+      ctx.stroke();
+
+      // Metinlerin Çizimi
       lines.forEach((line, index) => {
         const lineY = startY + (index * lineHeight);
-        
-        // Yazının arkasına netlik kazandıran ince beyaz kontur (stroke) efekti
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
-        ctx.strokeText(line, x, lineY);
-
-        // Ana Metin Rengi
-        ctx.fillStyle = fontColor;
+        ctx.fillStyle = textColor;
         ctx.fillText(line, x, lineY);
       });
 
       ctx.textBaseline = "alphabetic";
     }
 
-    // Kart Çizimi
     function renderCard() {
       const config = TEMPLATES[activeTemplate];
       const w = canvas.width;
@@ -434,7 +461,7 @@
       ctx.strokeRect(40, 26, 42, 24); // Sol delik
       ctx.strokeRect(w - 82, 26, 42, 24); // Sağ delik
 
-      // MEB Logosu Çizimi (Oransal bozulmayı önlemek için gerçek aspect ratio hesabı)
+      // MEB Logosu Çizimi
       if (mebLogoImg.complete && mebLogoImg.naturalWidth !== 0) {
         const maxWidth = 250;
         const maxHeight = 250;
@@ -454,12 +481,15 @@
         ctx.drawImage(mebLogoImg, logoX, logoY, drawW, drawH);
       }
 
-      // Ad Soyad ve Alt Bilgi (Strok/Kontur desteğiyle belirginleştirildi)
+      // Ad Soyad ve Alt Bilgi Kuşakları
       const nameText = trUpper(inputName.value || "RAMAZAN YILMAZ");
       const subText = trUpper(inputSub.value || "BİLGİSAYAR VE ÖĞRETİM TEKNOLOJİLERİ");
 
-      drawWrappedText(ctx, nameText, w / 2, 500, w - 50, 40, "#000000", "bold", 2);
-      drawWrappedText(ctx, subText, w / 2, 580, w - 60, 26, config.color, "bold", 2);
+      // Ad Soyad Arkası: Saf Beyaz / Şık Arka Plan Kuşağı
+      drawWrappedTextWithRibbon(ctx, nameText, w / 2, 500, w - 50, 38, "#1e293b", "rgba(255, 255, 255, 0.95)", "bold", 2);
+      
+      // Branş/Alt Bilgi Arkası: Şablon Renk Tonlu Veya Şeffaf Koyu Kuşak
+      drawWrappedTextWithRibbon(ctx, subText, w / 2, 595, w - 60, 24, "#ffffff", "rgba(15, 23, 42, 0.88)", "bold", 2);
 
       // ALT RENKLİ ŞERİT
       const barHeight = 170;
@@ -469,7 +499,6 @@
       ctx.fillRect(0, barY, w, barHeight);
 
       ctx.fillStyle = "#FFFFFF";
-      // Öğretmen / Nöbetçi öğretmen yazıları büyütüldü
       ctx.font = "900 66px Arial, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
