@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilişim Teknolojileri 5. Sınıf Sınav ve Soru Bankası Yönetim Sistemi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#0ea5e9',
+                        accent: '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-lg print:hidden">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-2 md:mb-0">
+                <i class="fa-solid fa-laptop-code text-3xl text-amber-300"></i>
+                <div>
+                    <h1 class="text-xl font-bold">Bilişim Teknolojileri 5. Sınıf</h1>
+                    <p class="text-xs text-indigo-200">Gelişmiş İnteraktif Sınav ve Soru Bankası</p>
+                </div>
+            </div>
+            <div class="flex space-x-2 flex-wrap gap-2">
+                <button onclick="switchTab('generator')" id="btn-generator" class="px-4 py-2 bg-indigo-700 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition shadow-inner">
+                    <i class="fa-solid fa-plus-circle mr-1"></i> Soru Hazırla
+                </button>
+                <button onclick="switchTab('exam')" id="btn-exam" class="px-4 py-2 bg-indigo-800/60 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition">
+                    <i class="fa-solid fa-file-lines mr-1"></i> Yazılı Kağıdı (<span id="exam-count">0</span>)
+                </button>
+                <button onclick="switchTab('interactive-test')" id="btn-interactive" class="px-4 py-2 bg-indigo-800/60 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition">
+                    <i class="fa-solid fa-gamepad mr-1"></i> Öğrenci Test Modu
+                </button>
+                <button onclick="switchTab('analytics')" id="btn-analytics" class="px-4 py-2 bg-indigo-800/60 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition">
+                    <i class="fa-solid fa-chart-pie mr-1"></i> Ünite Analizi
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Sidebar: Templates & Question Editor -->
+        <div id="left-sidebar" class="lg:col-span-1 space-y-6 print:hidden">
+            
+            <!-- Quick Templates Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <h2 class="text-lg font-bold text-slate-700 mb-3 flex items-center">
+                    <i class="fa-solid fa-sliders text-indigo-600 mr-2"></i> MEB Kazanım Şablonları
+                </h2>
+                <p class="text-xs text-slate-500 mb-4">Müfredata uygun hazır senaryoları anında ekleyin:</p>
+                <div class="space-y-2">
+                    <button onclick="loadTemplate('dijital')" class="w-full text-left px-3 py-2.5 rounded-xl border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 text-sm font-medium transition flex items-center justify-between group">
+                        <span class="flex items-center"><i class="fa-solid fa-shield-halved text-indigo-500 mr-2"></i> Dijital Yurttaşlık & Güvenlik</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-indigo-600"></i>
+                    </button>
+                    <button onclick="loadTemplate('bilgisayar')" class="w-full text-left px-3 py-2.5 rounded-xl border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 text-sm font-medium transition flex items-center justify-between group">
+                        <span class="flex items-center"><i class="fa-solid fa-microchip text-sky-500 mr-2"></i> Donanım ve Yazılım</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-indigo-600"></i>
+                    </button>
+                    <button onclick="loadTemplate('algoritma')" class="w-full text-left px-3 py-2.5 rounded-xl border border-slate-100 hover:border-indigo-300 hover:bg-indigo-50/50 text-sm font-medium transition flex items-center justify-between group">
+                        <span class="flex items-center"><i class="fa-solid fa-project-diagram text-amber-500 mr-2"></i> Algoritma ve Akış Mantığı</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-slate-400 group-hover:text-indigo-600"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Form Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <h2 class="text-lg font-bold text-slate-700 mb-3 flex items-center">
+                    <i class="fa-solid fa-pen-to-square text-indigo-600 mr-2"></i> Soru Oluştur / Düzenle
+                </h2>
+                
+                <form id="question-form" onsubmit="saveQuestion(event)" class="space-y-4">
+                    <input type="hidden" id="edit-index" value="-1">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Ünite / Kategori</label>
+                        <select id="q-unit" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Dijital Yurttaşlık ve Güvenlik">Dijital Yurttaşlık ve Güvenlik</option>
+                            <option value="Bilgisayar Sistemleri">Bilgisayar Sistemleri (Donanım & Yazılım)</option>
+                            <option value="İşletim Sistemleri ve Dosyalama">İşletim Sistemleri ve Dosyalama</option>
+                            <option value="Temel Algoritma ve Mantık">Temel Algoritma ve Mantık</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Soru Tipi</label>
+                            <select id="q-type" onchange="toggleQuestionType()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="multiple">Çoktan Seçmeli</option>
+                                <option value="truefalse">Doğru / Yanlış</option>
+                                <option value="classic">Klasik Açık Uçlu</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Zorluk</label>
+                            <select id="q-difficulty" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="Kolay">Kolay</option>
+                                <option value="Orta" selected>Orta</option>
+                                <option value="Zor">Zor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Soru Metni</label>
+                        <textarea id="q-text" rows="3" required placeholder="Günlük hayattan senaryo veya kavram sorusu..." class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+
+                    <!-- Multiple Choice Container -->
+                    <div id="options-container" class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Şıklar (Doğru şıkkı seçin)</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct-choice" value="0" checked class="text-indigo-600 focus:ring-indigo-500">
+                            <input type="text" placeholder="A Şıkkı" id="opt-0" class="flex-grow px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct-choice" value="1" class="text-indigo-600 focus:ring-indigo-500">
+                            <input type="text" placeholder="B Şıkkı" id="opt-1" class="flex-grow px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct-choice" value="2" class="text-indigo-600 focus:ring-indigo-500">
+                            <input type="text" placeholder="C Şıkkı" id="opt-2" class="flex-grow px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="correct-choice" value="3" class="text-indigo-600 focus:ring-indigo-500">
+                            <input type="text" placeholder="D Şıkkı" id="opt-3" class="flex-grow px-3 py-1.5 rounded-lg border border-slate-200 text-sm">
+                        </div>
+                    </div>
+
+                    <!-- True/False Container -->
+                    <div id="tf-container" class="hidden space-y-2">
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Doğru Cevap</label>
+                        <select id="tf-answer" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                            <option value="True">Doğru</option>
+                            <option value="False">Yanlış</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Puan Değeri</label>
+                        <input type="number" id="q-points" value="25" min="5" max="100" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm">
+                    </div>
+
+                    <div class="flex space-x-2 pt-2">
+                        <button type="submit" class="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow-sm">
+                            <i class="fa-solid fa-save mr-1"></i> Soruyu Kaydet
+                        </button>
+                        <button type="button" onclick="resetForm()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm transition">
+                            Temizle
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+
+        <div id="right-content-area" class="lg:col-span-2 space-y-6 w-full">
+            
+            <!-- Tab 1: Question Bank Manager -->
+            <div id="tab-generator" class="space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-700">Soru Havuzu Yönetimi</h2>
+                        <p class="text-xs text-slate-500">Mevcut sorularınızı listeleyin, düzenleyin veya dışa aktarın.</p>
+                    </div>
+                    <div class="flex space-x-2 flex-wrap gap-2">
+                        <button onclick="loadSampleBank()" class="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-xl text-xs font-semibold transition border border-emerald-200">
+                            <i class="fa-solid fa-wand-magic-sparkles mr-1">Cihaz / Standart Havuz</i>
+                        </button>
+                        <button onclick="clearBank()" class="px-3 py-2 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl text-xs font-semibold transition border border-rose-200">
+                            <i class="fa-solid fa-trash mr-1"></i> Tümünü Sil
+                        </button>
+                    </div>
+                </div>
+
+                <div id="question-list" class="space-y-4">
+                    <!-- Injected questions list -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Exam Paper Preview -->
+            <div id="tab-exam" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-700">Resmi Sınav Kağıdı Önizlemesi</h2>
+                        <p class="text-xs text-slate-500">Yazıcıdan doğrudan çıktı alabilir veya PDF olarak kaydedebilirsiniz.</p>
+                    </div>
+                    <button onclick="window.print()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        <i class="fa-solid fa-print mr-1"></i> Sınav Kağıdını Yazdır
+                    </button>
+                </div>
+
+                <!-- Printable Paper Container -->
+                <div id="printable-exam" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-6">
+                    <div class="border-b-2 border-slate-800 pb-4 text-center space-y-1">
+                        <h3 class="text-lg font-bold uppercase tracking-wide">T.C. MİLLÎ EĞİTİM BAKANLIĞI</h3>
+                        <h4 class="text-md font-semibold text-slate-700">Bilişim Teknolojileri ve Yazılım Dersi 5. Sınıf Sınav Kağıdı</h4>
+                        <div class="flex justify-between items-center text-xs font-medium text-slate-600 pt-3 px-4">
+                            <span>Adı Soyadı: ....................................................</span>
+                            <span>Sınıf/No: 5 / .......  [<span id="exam-total-points-header">100</span> Puan]</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-slate-600">
+                        <p class="font-bold mb-1">Sınav Yönergesi:</p>
+                        <p>Bu yazılı sınav toplam <span id="exam-total-q">0</span> sorudan oluşmaktadır. Süre 40 dakikadır. Başarılar dileriz!</p>
+                    </div>
+
+                    <div id="exam-questions-container" class="space-y-6">
+                        <!-- Exam questions injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Interactive Student Test Mode -->
+            <div id="tab-interactive-test" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-700">İnteraktif Öğrenci Sınav Simülasyonu</h2>
+                        <p class="text-xs text-slate-500">Soruları dijital ortamda çözün ve anında karne notunuzu görün.</p>
+                    </div>
+                    <button onclick="startInteractiveQuiz()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition shadow-sm">
+                        <i class="fa-solid fa-play mr-1"></i> Testi Yeniden Başlat
+                    </button>
+                </div>
+
+                <div id="quiz-container" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                    <!-- Dynamic interactive test questions -->
+                </div>
+            </div>
+
+            <!-- Tab 4: Analytics and Distribution -->
+            <div id="tab-analytics" class="hidden space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                    <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                        <i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> Soru Havuzu Ünite Dağılımı ve İstatistikler
+                    </h2>
+                    <p class="text-xs text-slate-500">Mevcut soruların MEB müfredat ünitelerine göre dağılım analizi:</p>
+                    
+                    <div id="analytics-content" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 text-sm z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">İşlem başarıyla gerçekleştirildi.</span>
+    </div>
+
+    <script>
+        let questions = [
+            {
+                unit: "Dijital Yurttaşlık ve Güvenlik",
+                type: "multiple",
+                difficulty: "Orta",
+                text: "İnternette oyun oynarken tanımadığımız birisi kişisel bilgilerinizi (ev adresi, okul adı vb.) sorarsa ilk ne yapmalıyız?",
+                options: ["Hemen bilgileri yazıp göndermeliyiz", "Bilgileri vermeden ailemize veya öğretmenimize haber vermeliyiz", "Şifremizi de verip arkadaş olmalıyız", "Hiçbir şey olmamış gibi devam etmeliyiz"],
+                correct: 1,
+                points: 25
+            },
+            {
+                unit: "Bilgisayar Sistemleri",
+                type: "multiple",
+                difficulty: "Kolay",
+                text: "Aşağıdakilerden hangisi bir bilgisayarın 'Donanım' (Hardware) elemanıdır?",
+                options: ["İşletim Sistemi", "Klavye", "İnternet Tarayıcısı", "Paint Çizim Programı"],
+                correct: 1,
+                points: 25
+            },
+            {
+                unit: "Temel Algoritma ve Mantık",
+                type: "truefalse",
+                difficulty: "Orta",
+                text: "Algoritma, bir problemin çözümü için takip edilen mantıksal ve sıralı adımlardır.",
+                options: ["True"],
+                correct: "True",
+                points: 25
+            },
+            {
+                unit: "İşletim Sistemleri ve Dosyalama",
+                type: "multiple",
+                difficulty: "Orta",
+                text: "Bilgisayarda hazırladığımız bir resmi ileride kolayca bulabilmek için nereye kaydederiz?",
+                options: ["Çöp Kutusuna", "İşlemciye", "Klasöre ve Sabit Diske", "Monitöre"],
+                correct: 2,
+                points: 25
+            }
+        ];
+
+        window.onload = function() {
+            renderQuestionBank();
+            updateExamPreview();
+        };
+
+        function switchTab(tab) {
+            const genBtn = document.getElementById('btn-generator');
+            const examBtn = document.getElementById('btn-exam');
+            const interactiveBtn = document.getElementById('btn-interactive');
+            const analyticsBtn = document.getElementById('btn-analytics');
+            
+            const genTab = document.getElementById('tab-generator');
+            const examTab = document.getElementById('tab-exam');
+            const interactiveTab = document.getElementById('tab-interactive-test');
+            const analyticsTab = document.getElementById('tab-analytics');
+            
+            const leftSidebar = document.getElementById('left-sidebar');
+            const rightContent = document.getElementById('right-content-area');
+
+            [genBtn, examBtn, interactiveBtn, analyticsBtn].forEach(b => {
+                b.className = "px-4 py-2 bg-indigo-800/60 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition";
+            });
+            [genTab, examTab, interactiveTab, analyticsTab].forEach(t => t.classList.add('hidden'));
+
+            if (tab === 'generator') {
+                genBtn.className = "px-4 py-2 bg-indigo-700 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition shadow-inner";
+                genTab.classList.remove('hidden');
+                leftSidebar.classList.remove('hidden');
+                rightContent.className = "lg:col-span-2 space-y-6 w-full";
+            } else if (tab === 'exam') {
+                examBtn.className = "px-4 py-2 bg-indigo-700 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition shadow-inner";
+                examTab.classList.remove('hidden');
+                leftSidebar.classList.add('hidden');
+                rightContent.className = "lg:col-span-3 space-y-6 w-full";
+                updateExamPreview();
+            } else if (tab === 'interactive-test') {
+                interactiveBtn.className = "px-4 py-2 bg-indigo-700 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition shadow-inner";
+                interactiveTab.classList.remove('hidden');
+                leftSidebar.classList.add('hidden');
+                rightContent.className = "lg:col-span-3 space-y-6 w-full";
+                startInteractiveQuiz();
+            } else if (tab === 'analytics') {
+                analyticsBtn.className = "px-4 py-2 bg-indigo-700 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition shadow-inner";
+                analyticsTab.classList.remove('hidden');
+                leftSidebar.classList.add('hidden');
+                rightContent.className = "lg:col-span-3 space-y-6 w-full";
+                renderAnalytics();
+            }
+        }
+
+        function toggleQuestionType() {
+            const type = document.getElementById('q-type').value;
+            const optContainer = document.getElementById('options-container');
+            const tfContainer = document.getElementById('tf-container');
+
+            if (type === 'multiple') {
+                optContainer.classList.remove('hidden');
+                tfContainer.classList.add('hidden');
+            } else if (type === 'truefalse') {
+                optContainer.classList.add('hidden');
+                tfContainer.classList.remove('hidden');
+            } else {
+                optContainer.classList.add('hidden');
+                tfContainer.classList.add('hidden');
+            }
+        }
+
+        function saveQuestion(e) {
+            e.preventDefault();
+            const editIdx = parseInt(document.getElementById('edit-index').value);
+            const unit = document.getElementById('q-unit').value;
+            const type = document.getElementById('q-type').value;
+            const difficulty = document.getElementById('q-difficulty').value;
+            const text = document.getElementById('q-text').value;
+            const points = parseInt(document.getElementById('q-points').value);
+
+            let options = [];
+            let correct = 0;
+
+            if (type === 'multiple') {
+                options = [
+                    document.getElementById('opt-0').value,
+                    document.getElementById('opt-1').value,
+                    document.getElementById('opt-2').value,
+                    document.getElementById('opt-3').value
+                ];
+                const radios = document.getElementsByName('correct-choice');
+                for (let i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) correct = i;
+                }
+            } else if (type === 'truefalse') {
+                correct = document.getElementById('tf-answer').value;
+            }
+
+            const newQ = { unit, type, difficulty, text, options, correct, points };
+
+            if (editIdx === -1) {
+                questions.push(newQ);
+                showToast("Yeni soru eklendi!");
+            } else {
+                questions[editIdx] = newQ;
+                document.getElementById('edit-index').value = "-1";
+                showToast("Soru güncellendi!");
+            }
+
+            resetForm();
+            renderQuestionBank();
+            updateExamPreview();
+        }
+
+        function resetForm() {
+            document.getElementById('question-form').reset();
+            document.getElementById('edit-index').value = "-1";
+            document.getElementById('q-type').value = "multiple";
+            toggleQuestionType();
+        }
+
+        function renderQuestionBank() {
+            const container = document.getElementById('question-list');
+            document.getElementById('exam-count').innerText = questions.length;
+            
+            if (questions.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center text-slate-400">
+                        <i class="fa-solid fa-folder-open text-4xl mb-2 text-slate-300"></i>
+                        <p class="text-sm">Havuzda soru bulunmuyor.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            questions.forEach((q, idx) => {
+                let badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                if (q.unit.includes('Bilgisayar')) badgeColor = 'bg-sky-50 text-sky-700 border-sky-200';
+                if (q.unit.includes('Algoritma')) badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+
+                let diffColor = 'bg-slate-100 text-slate-700';
+                if (q.difficulty === 'Kolay') diffColor = 'bg-emerald-50 text-emerald-700';
+                if (q.difficulty === 'Zor') diffColor = 'bg-rose-50 text-rose-700';
+
+                html += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs px-2.5 py-1 rounded-full font-semibold border ${badgeColor}">${q.unit}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-md font-bold ${diffColor}">${q.difficulty}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">${q.points} Puan</span>
+                                <button onclick="editQuestion(${idx})" class="text-slate-400 hover:text-indigo-600 p-1 transition"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteQuestion(${idx})" class="text-slate-400 hover:text-rose-600 p-1 transition"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <p class="text-sm font-medium text-slate-800"><span class="font-bold text-indigo-600">Soru ${idx + 1}:</span> ${q.text}</p>
+                `;
+
+                if (q.type === 'multiple') {
+                    html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-600 pt-1">`;
+                    const letters = ['A', 'B', 'C', 'D'];
+                    q.options.forEach((opt, oIdx) => {
+                        const isCorrect = oIdx === q.correct;
+                        const style = isCorrect ? 'bg-emerald-50 border-emerald-300 font-semibold text-emerald-800' : 'bg-slate-50 border-slate-100';
+                        html += `<div class="p-2 rounded-xl border ${style}"><b>${letters[oIdx]})</b> ${opt}</div>`;
+                    });
+                    html += `</div>`;
+                } else if (q.type === 'truefalse') {
+                    html += `<div class="text-xs text-slate-600 font-medium pt-1">Doğru Cevap: <span class="text-emerald-700 font-bold">${q.correct === 'True' ? 'Doğru (D)' : 'Yanlış (Y)'}</span></div>`;
+                } else {
+                    html += `<div class="text-xs text-slate-500 italic pt-1">Klasik Açık Uçlu Soru</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function editQuestion(idx) {
+            const q = questions[idx];
+            document.getElementById('edit-index').value = idx;
+            document.getElementById('q-unit').value = q.unit;
+            document.getElementById('q-type').value = q.type;
+            document.getElementById('q-difficulty').value = q.difficulty || 'Orta';
+            document.getElementById('q-text').value = q.text;
+            document.getElementById('q-points').value = q.points;
+            toggleQuestionType();
+
+            if (q.type === 'multiple') {
+                for (let i = 0; i < 4; i++) {
+                    document.getElementById(`opt-${i}`).value = q.options[i] || '';
+                }
+                const radios = document.getElementsByName('correct-choice');
+                if (radios[q.correct]) radios[q.correct].checked = true;
+            } else if (q.type === 'truefalse') {
+                document.getElementById('tf-answer').value = q.correct;
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast("Soru düzenleniyor.");
+        }
+
+        function deleteQuestion(idx) {
+            if (confirm("Bu soruyu silmek istiyor musunuz?")) {
+                questions.splice(idx, 1);
+                renderQuestionBank();
+                updateExamPreview();
+                showToast("Soru silindi.");
+            }
+        }
+
+        function clearBank() {
+            if (confirm("Tüm soruları silmek istediğinize emin misiniz?")) {
+                questions = [];
+                renderQuestionBank();
+                updateExamPreview();
+                showToast("Havuz temizlendi.");
+            }
+        }
+
+        function loadTemplate(key) {
+            if (key === 'dijital') {
+                questions.push({
+                    unit: "Dijital Yurttaşlık ve Güvenlik",
+                    type: "multiple",
+                    difficulty: "Orta",
+                    text: "Güçlü bir parolada aşağıdakilerden hangisi bulunmalıdır?",
+                    options: ["Sadece ardışık sayılar (12345)", "Adımız ve doğum tarihimiz", "Büyük-küçük harf, rakam ve semboller", "En fazla 3 karakter"],
+                    correct: 2,
+                    points: 25
+                });
+            } else if (key === 'bilgisayar') {
+                questions.push({
+                    unit: "Bilgisayar Sistemleri",
+                    type: "multiple",
+                    difficulty: "Kolay",
+                    text: "Aşağıdakilerden hangisi bir 'Çıkış Birimi' (Output) örneğidir?",
+                    options: ["Hoparlör", "Fare", "Klavye", "Tarayıcı (Scanner)"],
+                    correct: 0,
+                    points: 25
+                });
+            } else if (key === 'algoritma') {
+                questions.push({
+                    unit: "Temel Algoritma ve Mantık",
+                    type: "multiple",
+                    difficulty: "Zor",
+                    text: "Çay demleme algoritmasında 'Çaydanlığa su koymak' adımından hemen sonra ne yapılmalıdır?",
+                    options: ["Çayı bardaklara doldurmak", "Ocağın altını yakıp suyu kaynatmak", "Masayı toplamak", "Misafirleri uğurlamak"],
+                    correct: 1,
+                    points: 25
+                });
+            }
+            renderQuestionBank();
+            updateExamPreview();
+            showToast("Şablon soru eklendi!");
+        }
+
+        function loadSampleBank() {
+            questions = [
+                {
+                    unit: "Dijital Yurttaşlık ve Güvenlik",
+                    type: "multiple",
+                    difficulty: "Orta",
+                    text: "Bilgisayar başında uzun süre otururken göz sağlığımız için ne yapmalıyız?",
+                    options: ["Ekranı çok yakından izlemeliyiz", "Düzenli aralıklarla gözlerimizi dinlendirmeliyiz", "Işıkları tamamen kapatmalıyız", "Parlaklığı en yüksekte tutmalıyız"],
+                    correct: 1,
+                    points: 25
+                },
+                {
+                    unit: "Bilgisayar Sistemleri",
+                    type: "multiple",
+                    difficulty: "Kolay",
+                    text: "Bilgisayarda verilerin kalıcı olarak saklandığı birim hangisidir?",
+                    options: ["RAM Bellek", "Sabit Disk (HDD / SSD)", "İşlemci", "Ekran"],
+                    correct: 1,
+                    points: 25
+                },
+                {
+                    unit: "İşletim Sistemleri ve Dosyalama",
+                    type: "truefalse",
+                    difficulty: "Kolay",
+                    text: "Bilgisayardan sildiğimiz dosyalar ilk olarak 'Geri Dönüşüm Kutusu'na gider.",
+                    options: ["True"],
+                    correct: "True",
+                    points: 25
+                },
+                {
+                    unit: "Temel Algoritma ve Mantık",
+                    type: "multiple",
+                    difficulty: "Orta",
+                    text: "Sabah uyanıp el yüz yıkayıp kahvaltı yapmak bilgisayar bilimlerinde neyi ifade eder?",
+                    options: ["Algoritma adım sırasını", "Yazılım hatasını", "Donanım arızasını", "İşletim sistemi çökmesini"],
+                    correct: 0,
+                    points: 25
+                }
+            ];
+            renderQuestionBank();
+            updateExamPreview();
+            showToast("Standart havuz yüklendi.");
+        }
+
+        function updateExamPreview() {
+            const container = document.getElementById('exam-questions-container');
+            document.getElementById('exam-total-q').innerText = questions.length;
+            
+            let totalPts = questions.reduce((acc, q) => acc + (q.points || 0), 0);
+            document.getElementById('exam-total-points-header').innerText = totalPts;
+
+            if (questions.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-400 text-sm py-6">Sınav kağıdı için soru bulunmuyor.</p>`;
+                return;
+            }
+
+            let html = '';
+            questions.forEach((q, idx) => {
+                html += `
+                    <div class="space-y-2 border-b border-slate-100 pb-4">
+                        <div class="flex justify-between items-start font-semibold text-sm text-slate-800">
+                            <span>Soru ${idx + 1}. (${q.points} Puan) - <span class="text-xs font-normal text-slate-500">${q.unit}</span></span>
+                        </div>
+                        <p class="text-sm text-slate-700">${q.text}</p>
+                `;
+
+                if (q.type === 'multiple') {
+                    html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pl-4 pt-1 text-sm text-slate-700">`;
+                    const letters = ['A', 'B', 'C', 'D'];
+                    q.options.forEach((opt, oIdx) => {
+                        html += `<div><b>${letters[oIdx]})</b> ${opt}</div>`;
+                    });
+                    html += `</div>`;
+                } else if (q.type === 'truefalse') {
+                    html += `<div class="pl-4 pt-1 text-sm text-slate-700 flex space-x-6"><span>( &nbsp; ) <b>Doğru</b></span><span>( &nbsp; ) <b>Yanlış</b></span></div>`;
+                } else {
+                    html += `<div class="h-16 border border-dashed border-slate-300 rounded-xl mt-2 bg-slate-50/50"></div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function startInteractiveQuiz() {
+            const container = document.getElementById('quiz-container');
+            if (questions.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-400 text-sm py-6">Çözülecek soru bulunmuyor.</p>`;
+                return;
+            }
+
+            let html = `<form id="student-quiz-form" onsubmit="evaluateQuiz(event)" class="space-y-6">`;
+            questions.forEach((q, qIdx) => {
+                html += `
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-bold text-slate-500">
+                            <span>Soru ${qIdx + 1} (${q.points} Puan)</span>
+                            <span class="text-indigo-600">${q.unit}</span>
+                        </div>
+                        <p class="text-sm font-semibold text-slate-800">${q.text}</p>
+                `;
+
+                if (q.type === 'multiple') {
+                    html += `<div class="space-y-2 pt-2">`;
+                    const letters = ['A', 'B', 'C', 'D'];
+                    q.options.forEach((opt, oIdx) => {
+                        html += `
+                            <label class="flex items-center space-x-3 p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50/50 cursor-pointer text-sm transition">
+                                <input type="radio" name="q_${qIdx}" value="${oIdx}" class="text-indigo-600 focus:ring-indigo-500" required>
+                                <span><b>${letters[oIdx]})</b> ${opt}</span>
+                            </label>
+                        `;
+                    });
+                    html += `</div>`;
+                } else if (q.type === 'truefalse') {
+                    html += `
+                        <div class="flex space-x-4 pt-2">
+                            <label class="flex items-center space-x-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 cursor-pointer text-sm">
+                                <input type="radio" name="q_${qIdx}" value="True" class="text-indigo-600" required>
+                                <span>Doğru</span>
+                            </label>
+                            <label class="flex items-center space-x-2 px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50 cursor-pointer text-sm">
+                                <input type="radio" name="q_${qIdx}" value="False" class="text-indigo-600" required>
+                                <span>Yanlış</span>
+                            </label>
+                        </div>
+                    `;
+                } else {
+                    html += `<textarea name="q_${qIdx}" rows="2" placeholder="Cevabınızı buraya yazın..." class="w-full p-2.5 rounded-xl border border-slate-200 text-sm bg-white" required></textarea>`;
+                }
+
+                html += `</div>`;
+            });
+
+            html += `
+                <div class="text-center pt-4">
+                    <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow-md">
+                        <i class="fa-solid fa-square-check mr-2"></i> Cevapları Kontrol Et
+                    </button>
+                </div>
+            </form>
+            <div id="quiz-result" class="hidden"></div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function evaluateQuiz(e) {
+            e.preventDefault();
+            let totalScore = 0;
+            let maxScore = 0;
+            let feedbackHtml = `<div class="p-6 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-3 text-center">
+                <h3 class="text-xl font-bold text-indigo-900">Sınav Sonucunuz</h3>`;
+
+            questions.forEach((q, qIdx) => {
+                maxScore += q.points;
+                const radios = document.querySelectorAll(`[name="q_${qIdx}"]`);
+                let userAns = null;
+                
+                if (q.type === 'classic') {
+                    userAns = document.querySelector(`textarea[name="q_${qIdx}"]`).value;
+                    totalScore += q.points; 
+                } else {
+                    radios.forEach(r => {
+                        if (r.checked) userAns = r.value;
+                    });
+                    if (q.type === 'multiple' && parseInt(userAns) === q.correct) {
+                        totalScore += q.points;
+                    } else if (q.type === 'truefalse' && userAns === q.correct) {
+                        totalScore += q.points;
+                    }
+                }
+            });
+
+            feedbackHtml += `
+                <p class="text-3xl font-extrabold text-indigo-600">${totalScore} / ${maxScore} Puan</p>
+                <p class="text-xs text-indigo-700">Harika iş! Bilişim teknolojileri ve yazılım temellerini başarıyla tamamladın.</p>
+                <button onclick="startInteractiveQuiz()" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition">Tekrar Çöz</button>
+            </div>`;
+
+            const resDiv = document.getElementById('quiz-result');
+            resDiv.innerHTML = feedbackHtml;
+            resDiv.classList.remove('hidden');
+            resDiv.scrollIntoView({ behavior: 'smooth' });
+            showToast("Test değerlendirildi!");
+        }
+
+        function renderAnalytics() {
+            const container = document.getElementById('analytics-content');
+            let counts = {};
+            questions.forEach(q => {
+                counts[q.unit] = (counts[q.unit] || 0) + 1;
+            });
+
+            let html = '';
+            for (let unit in counts) {
+                html += `
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+                        <h4 class="font-bold text-sm text-slate-700">${unit}</h4>
+                        <p class="text-2xl font-black text-indigo-600">${counts[unit]} <span class="text-xs font-normal text-slate-500">Soru</span></p>
+                    </div>
+                `;
+            }
+            if (Object.keys(counts).length === 0) {
+                html = `<p class="text-sm text-slate-400">Analiz edilecek soru bulunmuyor.</p>`;
+            }
+            container.innerHTML = html;
+        }
