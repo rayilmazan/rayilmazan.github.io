@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -19,12 +18,8 @@
             --highlight-row-bg: #e8f5e9;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -36,41 +31,53 @@
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
 
+        header {
+            background-color: var(--card-bg);
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .week-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
         .status-card {
             background-color: var(--card-bg);
             border-left: 4px solid var(--secondary-color);
-            padding: 4px 8px;
+            padding: 8px 12px;
             border-radius: 6px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 0.85rem;
         }
 
         .status-text {
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         .countdown-badge {
             display: inline-block;
             background-color: var(--primary-color);
             color: #fff;
-            padding: 1px 5px;
+            padding: 2px 6px;
             border-radius: 4px;
             font-weight: bold;
-            margin-left: 4px;
-            font-family: monospace;
             font-size: 0.75rem;
+            font-family: monospace;
         }
 
         .status-active {
@@ -83,11 +90,52 @@
             background-color: #fffbeb;
         }
 
+        .outcomes-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .outcomes-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .outcome-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 8px 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid var(--secondary-color);
+            font-size: 0.82rem;
+        }
+
+        .outcome-card.grade-5 { border-top-color: #0284c7; }
+        .outcome-card.grade-6 { border-top-color: #9333ea; }
+
+        .outcome-card h3 {
+            margin: 0 0 4px 0;
+            font-size: 0.88rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .outcome-content {
+            line-height: 1.3;
+            color: #334155;
+            white-space: pre-line;
+            max-height: 45px;
+            overflow-y: auto;
+        }
+
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             background-color: var(--card-bg);
-            border-radius: 6px;
+            border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
@@ -99,11 +147,10 @@
         }
 
         th, td {
-            padding: 4px 2px;
+            padding: 5px 6px;
             border-right: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
             font-size: 0.8rem;
-            line-height: 1.15;
         }
 
         th {
@@ -111,7 +158,6 @@
             color: var(--primary-color);
             font-weight: 700;
             border-top: 1px solid var(--border-color);
-            padding: 4px 2px;
         }
 
         .sticky-col {
@@ -120,8 +166,7 @@
             z-index: 10;
             background-color: #f8fafc;
             border-left: 1px solid var(--border-color);
-            width: 65px;
-            min-width: 65px;
+            white-space: nowrap;
         }
 
         th.sticky-col {
@@ -131,17 +176,19 @@
 
         .time-subtext {
             display: block;
-            font-size: 0.65rem;
+            font-size: 0.68rem;
             color: #64748b;
             font-weight: normal;
+            margin-top: 1px;
         }
 
         .empty-slot {
             color: var(--empty-color);
+            font-style: italic;
         }
 
         .lesson-slot {
-            font-weight: 700;
+            font-weight: 600;
             color: var(--primary-color);
         }
 
@@ -156,7 +203,7 @@
 
         .active-cell {
             background-color: #bbf7d0 !important;
-            border: 2px solid var(--accent-color) !important;
+            border: 1.5px solid var(--accent-color) !important;
             color: #14532d !important;
             font-weight: bold;
         }
@@ -164,9 +211,10 @@
         .active-cell::after {
             content: "● ŞU AN";
             display: block;
-            font-size: 0.5rem;
+            font-size: 0.58rem;
             color: var(--accent-color);
             font-weight: bold;
+            margin-top: 1px;
         }
 
         .active-day-header {
@@ -174,21 +222,22 @@
             color: #0369a1 !important;
         }
 
-        header {
+        /* Bottom Control Panel */
+        .bottom-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--card-bg);
-            padding: 6px 10px;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 8px 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 6px;
         }
 
         .nav-group {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             align-items: center;
         }
 
@@ -196,15 +245,16 @@
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
+            transition: all 0.2s;
         }
 
-        .nav-btn:active {
-            opacity: 0.8;
+        .nav-btn:hover {
+            opacity: 0.9;
         }
 
         .today-btn {
@@ -214,82 +264,42 @@
         .toggle-view-btn {
             background-color: #0d9488;
         }
-
-        .week-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-align: center;
-            width: 100%;
-            order: -1;
-        }
-
-        @media(min-width: 500px) {
-            .week-title {
-                width: auto;
-                order: 0;
-            }
-        }
-
-        .outcomes-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-
-        @media (max-width: 480px) {
-            .outcomes-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .outcome-card {
-            background-color: var(--card-bg);
-            border-radius: 6px;
-            padding: 6px 8px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            border-top: 2px solid var(--secondary-color);
-        }
-
-        .outcome-card.grade-5 { border-top-color: #0284c7; }
-        .outcome-card.grade-6 { border-top-color: #9333ea; }
-
-        .outcome-card h3 {
-            margin: 0 0 2px 0;
-            font-size: 0.78rem;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .outcome-content {
-            font-size: 0.72rem;
-            line-height: 1.25;
-            color: #334155;
-            white-space: pre-line;
-            max-height: 48px;
-            overflow-y: auto;
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <header>
+        <div class="week-title" id="weekTitle">Yükleniyor...</div>
+    </header>
+
     <div class="status-card" id="statusCard">
-        <div class="status-text" id="statusText">Yükleniyor...</div>
-        <div id="clockText" style="font-weight: bold; color: var(--secondary-color); font-size: 0.78rem;"></div>
+        <div class="status-text" id="statusText">Sistem Saati Yükleniyor...</div>
+        <div id="clockText" style="font-weight: bold; color: var(--secondary-color); font-size: 0.8rem;"></div>
+    </div>
+
+    <div class="outcomes-container">
+        <div class="outcome-card grade-5">
+            <h3>📘 5. Sınıf Çıktı</h3>
+            <div class="outcome-content" id="outcomeGrade5">-</div>
+        </div>
+        <div class="outcome-card grade-6">
+            <h3>📙 6. Sınıf Çıktı</h3>
+            <div class="outcome-content" id="outcomeGrade6">-</div>
+        </div>
     </div>
 
     <div class="table-responsive">
         <table>
-            <thead id="scheduleHeader"></thead>
-            <tbody id="scheduleBody"></tbody>
+            <thead id="scheduleHeader">
+            </thead>
+            <tbody id="scheduleBody">
+            </tbody>
         </table>
     </div>
 
-    <header>
-        <div class="week-title" id="weekTitle">Yükleniyor...</div>
+    <!-- Üstteki butonlar alt tarafa minimal tasarlandı -->
+    <div class="bottom-controls">
         <div class="nav-group">
             <button class="nav-btn" onclick="changeWeek(-1)">&larr; Önceki</button>
             <button class="nav-btn today-btn" onclick="goToToday()">Bugün</button>
@@ -297,17 +307,6 @@
         </div>
         <div>
             <button class="nav-btn toggle-view-btn" id="toggleViewBtn" onclick="toggleViewMode()">📅 Tüm Hafta</button>
-        </div>
-    </header>
-
-    <div class="outcomes-container">
-        <div class="outcome-card grade-5">
-            <h3>📘 5. Sınıf Çıktısı</h3>
-            <div class="outcome-content" id="outcomeGrade5">-</div>
-        </div>
-        <div class="outcome-card grade-6">
-            <h3>📙 6. Sınıf Çıktısı</h3>
-            <div class="outcome-content" id="outcomeGrade6">-</div>
         </div>
     </div>
 </div>
@@ -319,20 +318,20 @@ const learningOutcomes = [
   { "hafta": 1, "tarih": "14-18 Eylül", "start": "2026-09-14", "end": "2026-09-18", "grade5": "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme", "grade6": "BTY.6.1.1. Yenilikçi bilişim teknolojilerini sınıflandırabilme" },
   { "hafta": 2, "tarih": "21-25 Eylül", "start": "2026-09-21", "end": "2026-09-25", "grade5": "BTY.5.1.1. Günlük yaşamda kullanılan bilişim teknolojilerini sınıflandırabilme \nBTY.5.1.2. Bilişim teknolojilerinin birey ve toplum üzerindeki etkilerini özetleyebilme", "grade6": "BTY.6.1.2. Bilişim teknolojinin gelecekteki durumlarına yönelik çıkarım yapabilme" },
   { "hafta": 3, "tarih": "28 Eylül -2 Ekim", "start": "2026-09-28", "end": "2026-10-02", "grade5": "BTY.5.1.3. Dijital vatandaşlık uygulamalarını sınıflandırabilme", "grade6": "BTY.6.2.1. Tablolama programlarından yararlanabilme" },
-  { "hafta": 4, "tarih": "5-9 Ekim", "start": "2026-10-05", "end": "2026-10-09", "grade5": "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme", "grade6": "BTY.6.2.2. Tablolama programlarının kullanımına yönelik problemleri belirleyebilme\nBTY.6.2.3. Tablolama dosyasında kullanılacak verileri toplayabilme\nBTY.6.2.4. Tablolama programları kullanarak bulgulara ulaşabilme" },
+  { "hafta": 4, "tarih": "5-9 Ekim", "start": "2026-10-05", "end": "2026-10-09", "grade5": "BTY.5.1.4. Yapay zekâ ile ilgili temel kavramları ve özellikleri sorgulayabilme", "grade6": "BTY.6.2.2. Tablolama programlarının kullanımına yönelik problemleri belirleyebilme\n\nBTY.6.2.3. Tablolama dosyasında kullanılacak verileri toplayabilme ve düzenleyebilme\n\nBTY.6.2.4. Tablolama programları kullanarak bulgulara ulaşabilme" },
   { "hafta": 5, "tarih": "12-16 Ekim", "start": "2026-10-12", "end": "2026-10-16", "grade5": "Codeweek 2026", "grade6": "Codeweek 2026" },
-  { "hafta": 6, "tarih": "19-23 Ekim", "start": "2026-10-19", "end": "2026-10-23", "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", "grade6": "BTY.6.2.5. Ses düzenleme programlarından yararlanabilme\nBTY.6.2.6. Ses dosyası için kurgu oluşturabilme" },
+  { "hafta": 6, "tarih": "19-23 Ekim", "start": "2026-10-19", "end": "2026-10-23", "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", "grade6": "BTY.6.2.5. Ses düzenleme programlarından yararlanabilme\n\nBTY.6.2.6. Ses dosyası için kurgu oluşturabilme" },
   { "hafta": 7, "tarih": "26-30 Ekim", "start": "2026-10-26", "end": "2026-10-30", "grade5": "BTY.5.1.5. Bilgisayar sistemlerini çözümleyebilme", "grade6": "BTY.6.2.7. Ses dosyası geliştirebilme" },
-  { "hafta": 8, "tarih": "2-6 Kasım", "start": "2026-11-02", "end": "2026-11-06", "grade5": "BTY.5.1.6. Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme", "grade6": "BTY.6.2.8. Video düzenleme programlarından yararlanabilme\nBTY.6.2.9. Video dosyası için kurgu oluşturabilme" },
+  { "hafta": 8, "tarih": "2-6 Kasım", "start": "2026-11-02", "end": "2026-11-06", "grade5": "BTY.5.1.6. Dosya ve klasör yönetimi ile ilgili temel işlemlerle çalışabilme", "grade6": "BTY.6.2.8. Video düzenleme programlarından yararlanabilme\n\nBTY.6.2.9. Video dosyası için kurgu oluşturabilme" },
   { "hafta": 9, "tarih": "9-13 Kasım", "start": "2026-11-09", "end": "2026-11-13", "grade5": "BTY.5.2.1 Görsel düzenleme programlarından yararlanabilme\nBTY.5.2.2 Görsel için kurgu oluşturabilme", "grade6": "BTY.6.2.10. Video dosyası geliştirebilme" },
-  { "hafta": 10, "tarih": "23-27 Kasım", "start": "2026-11-23", "end": "2026-11-27", "grade5": "BTY.5.2.2 Görsel için kurgu oluşturabilme\nBTY.5.2.3 Görsel dosyası geliştirebilme", "grade6": "BTY.6.2.10. Video dosyası geliştirebilme\nBTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme" },
-  { "hafta": 11, "tarih": "30 Kasım -4 Aralık", "start": "2026-11-30", "end": "2026-12-04", "grade5": "BTY.5.2.4 Kelime işlemci programlarından yararlanabilme", "grade6": "BTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme\nBTY.6.3.2. İletişim teknolojilerini sınıflandırabilme" },
-  { "hafta": 12, "tarih": "7-11 Aralık", "start": "2026-12-07", "end": "2026-12-11", "grade5": "BTY.5.2.5 Kelime işlemci dosyası geliştirebilme", "grade6": "BTY.6.3.3. İletişim teknolojileri ile çalışabilme\nBTY.6.4.1. Bilişim etiği kapsamında güvenlik önlemlerini yönetebilme" },
-  { "hafta": 13, "tarih": "14-18 Aralık", "start": "2026-12-14", "end": "2026-12-18", "grade5": "BTY.5.2.6 Sunum programlarından yararlanabilme", "grade6": "BTY.6.4.2.Telif hakkı kavramını sorgulayabilme\nBTY.6.4.3. Siber ortamda güvenlik önlemlerini yönetebilme" },
-  { "hafta": 14, "tarih": "21-25 Aralık", "start": "2026-12-21", "end": "2026-12-25", "grade5": "BTY.5.2.7 Sunum dosyası geliştirebilme", "grade6": "BTY.6.4.4.Kullanım haklarına göre lisans türlerini karşılaştırabilme\nBTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme" },
+  { "hafta": 10, "tarih": "23-27 Kasım", "start": "2026-11-23", "end": "2026-11-27", "grade5": "BTY.5.2.2 Görsel için kurgu oluşturabilme\nBTY.5.2.3 Görsel dosyası geliştirebilme", "grade6": "BTY.6.2.10. Video dosyası geliştirebilme\n\nBTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme" },
+  { "hafta": 11, "tarih": "30 Kasım -4 Aralık", "start": "2026-11-30", "end": "2026-12-04", "grade5": "BTY.5.2.4 Kelime işlemci programlarından yararlanabilme", "grade6": "BTY.6.3.1. İnternet ile amacına uygun olarak çalışabilme\n\n\nBTY.6.3.2. İletişim teknolojilerini sınıflandırabilme" },
+  { "hafta": 12, "tarih": "7-11 Aralık", "start": "2026-12-07", "end": "2026-12-11", "grade5": "BTY.5.2.5 Kelime işlemci dosyası geliştirebilme", "grade6": "BTY.6.3.3. İletişim teknolojileri ile çalışabilme\n\nBTY.6.4.1. Bilişim etiği kapsamında güvenlik önlemlerini yönetebilme" },
+  { "hafta": 13, "tarih": "14-18 Aralık", "start": "2026-12-14", "end": "2026-12-18", "grade5": "BTY.5.2.6 Sunum programlarından yararlanabilme", "grade6": "BTY.6.4.2.Telif hakkı kavramını sorgulayabilme\n\nBTY.6.4.3. Siber ortamda güvenlik önlemlerini yönetebilme" },
+  { "hafta": 14, "tarih": "21-25 Aralık", "start": "2026-12-21", "end": "2026-12-25", "grade5": "BTY.5.2.7 Sunum dosyası geliştirebilme", "grade6": "BTY.6.4.4.Kullanım haklarına göre lisans türlerini karşılaştırabilme\n\nBTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme" },
   { "hafta": 15, "tarih": "28 Aralık -1 Ocak", "start": "2026-12-28", "end": "2027-01-01", "grade5": "BTY.5.3.1. Bilgisayar ağları ve bileşenlerini sorgulayabilme", "grade6": "BTY.6.5.1. Yapay zekâ girdileri hakkında bilgi toplayabilme" },
   { "hafta": 16, "tarih": "4-8 Ocak", "start": "2027-01-04", "end": "2027-01-08", "grade5": "BTY.5.3.2. Bilgisayar ağları ve bağlanma yöntemlerini sınıflandırabilme", "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme" },
-  { "hafta": 17, "tarih": "11-15 Ocak", "start": "2027-01-11", "end": "2027-01-15", "grade5": "BTY.5.3.3. İnternet ile amacına uygun olarak çalışabilme", "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme\nBTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme" },
+  { "hafta": 17, "tarih": "11-15 Ocak", "start": "2027-01-11", "end": "2027-01-15", "grade5": "BTY.5.3.3. İnternet ile amacına uygun olarak çalışabilme", "grade6": "BTY.6.5.2. Yapay zekâ araç ve teknolojileri ile çalışabilme\n\nBTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme" },
   { "hafta": 18, "tarih": "18-22 Ocak", "start": "2027-01-18", "end": "2027-01-22", "grade5": "Dönem sonu değerlendirme ve paylaşım", "grade6": "Dönem sonu değerlendirme ve paylaşım" },
   { "hafta": 19, "tarih": "8-12 Şubat", "start": "2027-02-08", "end": "2027-02-12", "grade5": "BTY.5.4.1. Bilişim etiği kural ve ilkelerini yorumlayabilme", "grade6": "BTY.6.5.3. Yapay zekâ araç ve teknolojileri ile model geliştirebilme" },
   { "hafta": 20, "tarih": "15-19 Şubat", "start": "2027-02-15", "end": "2027-02-19", "grade5": "BTY.5.4.2. Dijital ortamlarda gizlilik ve güvenlik önlemlerini yönetebilme", "grade6": "BTY.6.6.1. Blok tabanlı ortamda yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme" },
@@ -344,7 +343,7 @@ const learningOutcomes = [
   { "hafta": 26, "tarih": "5-9 Nisan", "start": "2027-04-05", "end": "2027-04-09", "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme" },
   { "hafta": 27, "tarih": "12-16 Nisan", "start": "2027-04-12", "end": "2027-04-16", "grade5": "BTY.5.6.1. Problem çözümü için algoritmik düşünebilme", "grade6": "" },
   { "hafta": 28, "tarih": "19-23 Nisan", "start": "2027-04-19", "end": "2027-04-23", "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme" },
-  { "hafta": 29, "tarih": "26-30 Nisan", "start": "2027-04-26", "end": "2027-04-30", "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme\nBTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
+  { "hafta": 29, "tarih": "26-30 Nisan", "start": "2027-04-26", "end": "2027-04-30", "grade5": "BTY.5.6.2. Algoritma oluşturmada test edebilme-hata ayıklayabilme", "grade6": "BTY.6.6.2. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme\n\nBTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
   { "hafta": 30, "tarih": "3-7 Mayıs", "start": "2027-05-03", "end": "2027-05-07", "grade5": "OKUL TEMELLİ PLAN Bilişim Haftası", "grade6": "OKUL TEMELLİ PLAN Bilişim Haftası" },
   { "hafta": 31, "tarih": "10-14 Mayıs", "start": "2027-05-10", "end": "2027-05-14", "grade5": "BTY.5.6.3. Yazılım geliştirme sürecinde kullanılan bileşenlerden yararlanabilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
   { "hafta": 32, "tarih": "20-21 Mayıs", "start": "2027-05-20", "end": "2027-05-21", "grade5": "BTY.5.6.4. Blok tabanlı ortamda yazılım geliştirme sürecini yönetebilme", "grade6": "BTY.6.6.3. Blok tabanlı ortamda yapay zekâ destekli ürün ortaya koyabilme" },
@@ -410,7 +409,7 @@ function toggleViewMode() {
     isFullWeekView = !isFullWeekView;
     const btn = document.getElementById('toggleViewBtn');
     if (isFullWeekView) {
-        btn.innerText = "📅 Sadece Bugün";
+        btn.innerText = "📅 Tek Gün";
     } else {
         btn.innerText = "📅 Tüm Hafta";
     }
@@ -502,10 +501,10 @@ function render() {
         statusText.innerHTML = "🏖️ Hafta Sonu";
     } else if (activePeriod !== null) {
         const currentLesson = schedule[currentDay]?.[activePeriod] || "Boş";
-        statusText.innerHTML = `🔔 ${activePeriod}.D (${times[activePeriod-1].start}) — ${currentLesson} <span class="countdown-badge">⏳ ${formatCountdown(remainingSeconds)}</span>`;
+        statusText.innerHTML = `🔔 ${activePeriod}. Ders: ${currentLesson} <span class="countdown-badge">⏳ Bitiş: ${formatCountdown(remainingSeconds)}</span>`;
         statusCard.classList.add('status-active');
     } else if (isBreak) {
-        statusText.innerHTML = `☕ Teneffüs (Sonraki: ${nextLesson}) <span class="countdown-badge">⏳ ${formatCountdown(remainingSeconds)}</span>`;
+        statusText.innerHTML = `☕ Teneffüs (Sonraki: ${nextLesson}) <span class="countdown-badge">⏳ Ders: ${formatCountdown(remainingSeconds)}</span>`;
         statusCard.classList.add('status-break');
     } else if (currentTimeStr < "08:30") {
         statusText.innerHTML = "🌅 Dersler Başlamadı";
@@ -519,6 +518,7 @@ function render() {
     if (isFullWeekView) {
         for (let d = 1; d <= 5; d++) {
             const activeClass = (isCurrentWeek && currentDay === d) ? 'class="active-day-header"' : '';
+            // Gün isimlerini mobilde daha kısa göstermek isterseniz burayı kısaltabilirsiniz
             headerHTML += `<th ${activeClass}>${dayNames[d].substring(0,3)}</th>`;
         }
     } else {
