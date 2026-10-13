@@ -18,31 +18,34 @@
             --highlight-row-bg: #e8f5e9;
         }
 
-        body {
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 8px;
+            box-sizing: border-box;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         .container {
             width: 100%;
             max-width: 1100px;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
 
         header {
             background-color: var(--card-bg);
             padding: 8px 12px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             text-align: center;
+            flex-shrink: 0;
         }
 
         .week-title {
@@ -63,6 +66,7 @@
             flex-wrap: wrap;
             gap: 6px;
             font-size: 0.85rem;
+            flex-shrink: 0;
         }
 
         .status-text {
@@ -94,6 +98,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 6px;
+            flex-shrink: 0;
         }
 
         @media (max-width: 768px) {
@@ -127,30 +132,41 @@
             line-height: 1.3;
             color: #334155;
             white-space: pre-line;
-            max-height: 45px;
+            max-height: 40px;
             overflow-y: auto;
         }
 
         .table-responsive {
             width: 100%;
+            flex: 1;
             overflow-x: auto;
+            overflow-y: auto;
             background-color: var(--card-bg);
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
         }
 
         table {
             width: 100%;
+            height: 100%;
             border-collapse: separate;
             border-spacing: 0;
             text-align: center;
+            min-width: 450px; /* Haftalık görünümde yana kaydırma için minimum genişlik */
+        }
+
+        tbody tr {
+            height: calc(100% / 7);
         }
 
         th, td {
-            padding: 5px 6px;
+            padding: 8px 10px;
             border-right: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            vertical-align: middle;
         }
 
         th {
@@ -158,6 +174,9 @@
             color: var(--primary-color);
             font-weight: 700;
             border-top: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 12;
         }
 
         .sticky-col {
@@ -167,16 +186,17 @@
             background-color: #f8fafc;
             border-left: 1px solid var(--border-color);
             white-space: nowrap;
+            min-width: 80px;
         }
 
         th.sticky-col {
-            z-index: 11;
+            z-index: 13;
             background-color: #f1f5f9 !important;
         }
 
         .time-subtext {
             display: block;
-            font-size: 0.68rem;
+            font-size: 0.7rem;
             color: #64748b;
             font-weight: normal;
             margin-top: 1px;
@@ -211,7 +231,7 @@
         .active-cell::after {
             content: "● ŞU AN";
             display: block;
-            font-size: 0.58rem;
+            font-size: 0.6rem;
             color: var(--accent-color);
             font-weight: bold;
             margin-top: 1px;
@@ -233,6 +253,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             flex-wrap: wrap;
             gap: 6px;
+            flex-shrink: 0;
         }
 
         .nav-group {
@@ -298,7 +319,6 @@
         </table>
     </div>
 
-    <!-- Üstteki butonlar alt tarafa minimal tasarlandı -->
     <div class="bottom-controls">
         <div class="nav-group">
             <button class="nav-btn" onclick="changeWeek(-1)">&larr; Önceki</button>
@@ -518,8 +538,7 @@ function render() {
     if (isFullWeekView) {
         for (let d = 1; d <= 5; d++) {
             const activeClass = (isCurrentWeek && currentDay === d) ? 'class="active-day-header"' : '';
-            // Gün isimlerini mobilde daha kısa göstermek isterseniz burayı kısaltabilirsiniz
-            headerHTML += `<th ${activeClass}>${dayNames[d].substring(0,3)}</th>`;
+            headerHTML += `<th ${activeClass}>${dayNames[d]}</th>`;
         }
     } else {
         const activeClass = (isCurrentWeek && currentDay === currentDayIndex) ? 'class="active-day-header"' : '';
@@ -541,7 +560,7 @@ function render() {
 
         const tdHeader = document.createElement('td');
         tdHeader.className = "sticky-col";
-        tdHeader.innerHTML = `<strong>${t.id}.D</strong><span class="time-subtext">${t.start}</span>`;
+        tdHeader.innerHTML = `<strong>${t.id}.D</strong><span class="time-subtext">${t.start} - ${t.end}</span>`;
         tr.appendChild(tdHeader);
 
         const daysToRender = isFullWeekView ? [1, 2, 3, 4, 5] : [currentDayIndex];
