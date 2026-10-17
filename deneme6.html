@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilişim Teknolojileri ve Yazılım 6. Sınıf Deneme Sınavı</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #c0392b;
+            --bg-color: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+        .hidden {
+            display: none !important;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .question-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .options label {
+            display: block;
+            padding: 8px 12px;
+            background: #f1f2f6;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-weight: normal;
+            transition: background 0.2s;
+        }
+        .options label:hover {
+            background: #dfe4ea;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        .result-box {
+            text-align: center;
+            padding: 20px;
+            background: #eaf2f8;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .result-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .review-item {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--danger-color);
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- GİRİŞ EKRANI -->
+    <div id="login-screen">
+        <h1>Bilişim Teknolojileri ve Yazılım</h1>
+        <h2>6. Sınıf Hazırlık Deneme Sınavı</h2>
+        <p style="text-align: center; color: #666;">Toplam 30 soru bulunmaktadır (Açık uçlu ve çoktan seçmeli sorular karışık olarak gelecektir).</p>
+        <div class="form-group" style="margin-top: 30px;">
+            <label for="student-name">Adınız ve Soyadınız:</label>
+            <input type="text" id="student-name" placeholder="Adınızı ve soyadınızı giriniz..." required>
+        </div>
+        <button onclick="startQuiz()">Sınava Başla</button>
+    </div>
+
+    <!-- SINAV EKRANI -->
+    <div id="quiz-screen" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            <span id="display-student" style="font-weight: bold; color: var(--primary-color);"></span>
+            <span style="color: #e74c3c; font-weight: bold;">Süre: Serbest</span>
+        </div>
+        <div id="questions-container"></div>
+        <button onclick="submitQuiz()" style="background-color: var(--success-color); margin-top: 20px;">Sınavı Bitir ve Puanı Gör</button>
+    </div>
+
+    <!-- SONUÇ EKRANI -->
+    <div id="result-screen" class="hidden">
+        <h1>Sınav Sonucu</h1>
+        <div class="result-box">
+            <p>Öğrenci: <span id="res-name" style="font-weight: bold;"></span></p>
+            <div class="result-score">Puanınız: <span id="res-score">0</span> / 100</div>
+            <p>Doğru Sayısı: <span id="res-correct" style="color: var(--success-color); font-weight: bold;"></span> | Yanlış/Eksik Sayısı: <span id="res-wrong" style="color: var(--danger-color); font-weight: bold;"></span></p>
+        </div>
+        <h2>Yanlış Yaptığınız Sorular</h2>
+        <div id="review-container"></div>
+        <button onclick="restartQuiz()" style="background-color: var(--primary-color); margin-top: 20px;">Tekrar Sınava Gir</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // --- 10 YAZILI / AÇIK UÇLU SORU (6. Sınıf) ---[cite: 12, 13]
+        { id: 1, type: 'text', q: "Tablolama programı LibreOffice Calc da formül ilk hangi karakterle başlar?", keywords: ["="], sampleAnswer: "=" },
+        { id: 2, type: 'text', q: "Giyilebilir teknolojilere iki tane örnek veriniz.", keywords: ["sağ", "gözlük", "saat", "akıllı"], sampleAnswer: "Akıllı Saatler, Akıllı Gözlükler" },
+        { id: 3, type: 'text', q: "Dijital görüntüleri oluşturan, renkli ya da siyah-beyaz olabilen ve görüntünün en küçük birimi olarak adlandırılan kavram nedir?", keywords: ["piksel", "pixel"], sampleAnswer: "Piksel (Pixel)" },
+        { id: 4, type: 'text', q: "Dijital verilerin internet üzerinden uzaktaki sanal sunucu havuzlarında saklanmasını sağlayan teknolojinin adı nedir?", keywords: ["bulut depolama"], sampleAnswer: "Bulut depolama teknolojisi" },
+        { id: 5, type: 'text', q: "Teknolojinin olumsuz yönlerine iki örnek veriniz.", keywords: ["yalnızlık", "hareketsiz", "sağlık", "bağımlılık"], sampleAnswer: "Bireyleri yalnızlığa sürükleyebilir, Hareketsiz yaşam ve sağlık sorunları" },
+        { id: 6, type: 'text', q: "Yenilenebilir enerjilere iki örnek veriniz.", keywords: ["güneş", "rüzgar", "rüzgâr", "jeotermal", "hidroelektrik"], sampleAnswer: "Güneş Enerjisi, Rüzgar Enerjisi" },
+        { id: 7, type: 'text', q: "Tablolama programlarında sütun ve satırların kesiştiği yere ne denir?", keywords: ["hücre"], sampleAnswer: "Hücre" },
+        { id: 8, type: 'text', q: "Başkasının sesini veya internetten bulduğunuz bir müziği kullanırken hangi etik ve telif konularını göz önünde bulundurmalısınız?", keywords: ["izin", "kaynak", "sahip"], sampleAnswer: "Sahibinden izin alınmalı ve kaynak belirtilmelidir." },
+        { id: 9, type: 'text', q: "Ses dosyasının uzantılarına üç örnek veriniz.", keywords: ["mp3", "wav", "wma"], sampleAnswer: "mp3, wav, wma" },
+        { id: 10, type: 'text', q: "Yandaki görselde verilen dosya uzantıları (.xlsx, .ods, .csv) hangi programlarla açılabilir?", keywords: ["tablolama"], sampleAnswer: "Tablolama programları" },
+
+        // --- 20 ÇOKTAN SEÇMELİ TEST SORUSU (6. Sınıf) ---[cite: 9, 10, 11]
+        { id: 11, type: 'mc', q: "Gerçek dünya ortamının bilgisayar tarafından üretilen dijital görsel, ses ve grafiklerle eş zamanlı olarak zenginleştirilmesi ile oluşan teknolojiye ne ad verilir?", options: ["A) Bilişim Teknolojileri", "B) Sanal Gerçeklik (VR)", "C) Artırılmış Gerçeklik (AR)", "D) Bulut Teknolojisi"], answer: 2, sampleAnswer: "C) Artırılmış Gerçeklik (AR)" },
+        { id: 12, type: 'mc', q: "Aşağıda verilen durumlardan hangisi Artırılmış Gerçeklik (AR) teknolojisine örnek olamaz?", options: ["A) Kameradan alınan gerçek görüntü üzerine dijital nesne ekleme", "B) Tamamen sanal bir gözlük takılarak dış dünyanın tamamen kapatılması", "C) Mobilya uygulamasıyla koltuğu evde canlı görme", "D) Canlı kamera görüntüsüyle yapı üzerine bilgi yansıtma"], answer: 1, sampleAnswer: "B) Tamamen sanal bir gözlük takılarak dış dünyanın tamamen kapatılması (Sanal Gerçeklik örneğidir)." },
+        { id: 13, type: 'mc', q: "Artırılmış Gerçeklik (AR) teknolojisi ilk defa hangi alanda/araçta kullanılmıştır?", options: ["A) Tablet", "B) Akıllı Telefon", "C) Helikopter (Askeri Havacılık HUD)", "D) Oyun Konsolu"], answer: 2, sampleAnswer: "C) Helikopter (Askeri havacılık baş üstü göstergeleri)" },
+        { id: 14, type: 'mc', q: "Mobilya mağazası uygulamasıyla koltuğun salonunuzda nasıl duracağını kamerayla canlı görmeniz AR'ın hangi amacına örnektir?", options: ["A) Tamamen yapay oyun dünyası kurma", "B) Şifreli veri iletme", "C) Dijital nesneleri gerçek ortama ölçekli şekilde yerleştirme", "D) Veri yedekleme"], answer: 2, sampleAnswer: "C) Dijital nesneleri gerçek ortama ölçekli şekilde yerleştirme." },
+        { id: 15, type: 'mc', q: "Sanal Gerçeklik (VR) nedir?", options: ["A) Gerçek dünyanın sesle zenginleştirilmesi", "B) Özel gözlüklerle gerçek dünyayı kapatıp kullanıcıyı %100 yapay dijital ortamda hissettiren teknoloji", "C) Mobil internet hızını artıran sistem", "D) Gerçek görüntü üstüne nesne koyma"], answer: 1, sampleAnswer: "B) Özel gözlüklerle gerçek dünyayı tamamen kapatıp kullanıcıyı %100 yapay dijital bir ortamda hissettiren teknolojidir." },
+        { id: 16, type: 'mc', q: "Artırılmış Gerçeklik (AR) ile Sanal Gerçeklik (VR) arasındaki en temel fark nedir?", options: ["A) AR bilgisayarda, VR mobilde olur", "B) AR gerçek dünyaya dijital öğeler ekler, VR kullanıcıyı tamamen yapay ortama aktarır", "C) VR internet istemez, AR ister", "D) AR sadece 2 boyutludur"], answer: 1, sampleAnswer: "B) Artırılmış Gerçeklik (AR) teknolojisinin gerçek dünyaya dijital öğeler eklemesi, Sanal Gerçeklik (VR) teknolojisinin ise kullanıcıyı tamamen yapay bir ortama aktarması." },
+        { id: 17, type: 'mc', q: "Bir mimarın tasarladığı binayı henüz inşa edilmeden müşterisine 360 derece sanki içindeymiş gibi gezdirmesi hangi teknolojidir?", options: ["A) Artırılmış Gerçeklik (AR)", "B) Sanal Gerçeklik (VR)", "C) Yapay Zekâ (AI)", "D) Nesnelerin İnterneti (IoT)"], answer: 1, sampleAnswer: "B) Sanal Gerçeklik (VR)" },
+        { id: 18, type: 'mc', q: "Aşağıdaki iletişim araçlarından hangisi farklı zamanlı (asenkron) iletişime bir örnektir?", options: ["A) Anlık sohbet uygulamaları", "B) E-posta (Elektronik posta) gönderimi", "C) Telefonla sesli görüşme", "D) Canlı görüntülü ders yayını"], answer: 1, sampleAnswer: "B) E-posta (Elektronik posta) gönderimi." },
+        { id: 19, type: 'mc', q: "AR ve VR teknolojileri ile ilgili ifadelerden hangileri doğrudur? (I. VR'da gerçek dünya görülmez, II. AR'da fiziksel çevre ve dijital nesneler bir aradadır, III. Amaç algı sistemini desteklemektir)", options: ["A) Yalnız I", "B) I ve II", "C) II ve III", "D) Hepsi"], answer: 3, sampleAnswer: "D) Hepsi" },
+        { id: 20, type: 'mc', q: "Turan'ın yapay zekâ tabanlı arama asistanlarını kullanması verimlilik açısından en çok hangi avantajı sağlar?", options: ["A) Taranan yüzlerce kaynağı saniyeler içinde sentezleyip özetleyerek zaman tasarrufu sağlar", "B) Ekran parlaklığını artırır", "C) İnternet faturasını ücretsiz yapar", "D) Yazıcı mürekkebini korur"], answer: 0, sampleAnswer: "A) Taranan yüzlerce kaynağı saniyeler içinde sentezleyip özetleyerek zaman tasarrufu sağlar." },
+        { id: 21, type: 'mc', q: "Okulundaki e-Okul sisteminin siber saldırı sonucu çökmesi ve öğretmenlerin not girememesi bilgi güvenliğinin hangi bileşenini ihlal eder?", options: ["A) Gizlilik", "B) Erişilebilirlik", "C) Bütünlük", "D) Lisanslama"], answer: 1, sampleAnswer: "B) Erişilebilirlik" },
+        { id: 22, type: 'mc', q: "Teknolojinin tarihsel gelişim trendi göz önüne alındığında, gelecekteki bilişim cihazları hakkında hangisi mantıklı bir varsayım olamaz?", options: ["A) İşlem kapasiteleri artacaktır", "B) Donanımlar daha az enerji tüketecektir", "C) Teknolojik cihazlar tekrar oda büyüklüğüne dönüp tek merkezden yönetilecektir", "D) Nesnelerin İnterneti yaygınlaşacaktır"], answer: 2, sampleAnswer: "C) Teknolojik cihazlar tekrar oda büyüklüğüne dönüp tek bir merkezden yönetilecektir." },
+        { id: 23, type: 'mc', q: "Gelecekte karşılaşacağımız olası bilişim teknolojilerinden biri değildir?", options: ["A) Bilgilerin sadece kâğıt baskı ve fiziksel kütüphanelerde saklanması", "B) Akıllı şehirler", "C) Kuantum bilgisayarlar", "D) Beyin-bilgisayar arayüzleri"], answer: 0, sampleAnswer: "A) Bilgilerin sadece kâğıt baskı ve fiziksel kütüphanelerde saklanması." },
+        { id: 24, type: 'mc', q: "Zeynep'e gelen 'yeni model akıllı telefon kazandınız, şifrenizi girin' mesajı ve davranışıyla ilgili hangisi doğrudur?", options: ["A) Doğru karar vermiştir", "B) Mesaj güvenlidir", "C) Oltalama (phishing) tuzağına düşmüştür, kişisel bilgilerini paylaşmamalıydı", "D) Sadece şifresini girmeliydi"], answer: 2, sampleAnswer: "C) Oltalama (phishing) tuzağına düşmüştür; gelen kaynağı belirsiz bağlantılara tıklamamalı ve kişisel bilgilerini paylaşmamalıydı." },
+        { id: 25, type: 'mc', q: "Satır ve sütunlardan oluşan, sayısal verileri düzenleyen ve grafik oluşturan yazılımlara ne ad verilir?", options: ["A) Tablolama Programları", "B) Sunum Programları", "C) Görsel İşleme Programları", "D) Kelime İşlemci Programları"], answer: 0, sampleAnswer: "A) Tablolama Programları" },
+        { id: 26, type: 'mc', q: "Ses kaydetmek, sesleri kesmek ve efekt eklemek için kullanılan yazılımlara ne ad verilir?", options: ["A) Tablolama Programları", "B) Sunum Programları", "C) Ses Düzenleme Programları", "D) Kelime İşlemci Programları"], answer: 2, sampleAnswer: "C) Ses Düzenleme Programları" },
+        { id: 27, type: 'mc', q: "Elif fen bilimleri dersi için Güneş Sistemi ile ilgili gezegenlerin renkli görsellerine ihtiyaç duymaktadır. Hangi yapay zekâ aracını seçmelidir?", options: ["A) Ses Dosyası Üretme Aracı", "B) Görsel Üretme Aracı", "C) Kod Hata Ayıklama Aracı", "D) Veri Tabanı Yönetim Aracı"], answer: 1, sampleAnswer: "B) Görsel Üretme Aracı" },
+        { id: 28, type: 'mc', q: "Kerem slaytlar için telifsiz tarihi mekân görselleri oluşturmak istemektedir. Hangi yapay zekâ türünü seçmelidir?", options: ["A) Metinden Görsel Üreten Yapay Zekâ Aracı", "B) Müzik ve Ses Oluşturan", "C) Kod Hata Ayıklama", "D) E-posta Gönderme"], answer: 0, sampleAnswer: "A) Metinden Görsel Üreten Yapay Zekâ Aracı" },
+        { id: 29, type: 'mc', q: "Aşağıdakilerden hangisi Nesnelerin İnterneti (IoT) teknolojisine doğrudan bir örnek oluşturmaz?", options: ["A) Akıllı bilekliğin adım sayısını telefona göndermesi", "B) Akıllı buzdolabının eksik gıdaları tespit etmesi", "C) Akıllı kombinin dışarıdan telefonla açılması", "D) Bir belgenin bilgisayardan kablolu yazıcıya gönderilmesi"], answer: 3, sampleAnswer: "D) Bir belgenin bilgisayardan kablolu bir yazıcıya gönderilerek kâğıda basılması" },
+        { id: 30, type: 'mc', q: "Eş zamanlı (senkron) iletişimle ilgili aşağıdakilerden hangisi söylenebilir?", options: ["A) Alıcı ve verici aynı anda çevrimiçidir", "B) Mesaj gönderilir ve alıcı uygun olduğunda okur", "C) Sadece e-posta ile yapılır", "D) Cevap almak günler sürebilir"], answer: 0, sampleAnswer: "A) Alıcı ve verici aynı anda çevrimiçidir." }
+    ];
+
+    let studentName = "";
+    let activeQuestions = [];
+
+    function startQuiz() {
+        const nameInput = document.getElementById("student-name").value.trim();
+        if (nameInput === "") {
+            alert("Lütfen sınavı çözmeden önce adınızı ve soyadınızı giriniz!");
+            return;
+        }
+        studentName = nameInput;
+        document.getElementById("display-student").innerText = "Öğrenci: " + studentName;
+        
+        // Soruları karıştır (Açık uçlu ve testler ard arda gelmeyecek şekilde harmanlanır)
+        activeQuestions = [...questions];
+        for (let i = activeQuestions.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [activeQuestions[i], activeQuestions[j]] = [activeQuestions[j], activeQuestions[i]];
+        }
+
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("quiz-screen").classList.remove("hidden");
+
+        renderQuestions();
+        window.scrollTo(0, 0);
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById("questions-container");
+        container.innerHTML = "";
+
+        activeQuestions.forEach((q, index) => {
+            let card = document.createElement("div");
+            card.className = "question-card";
+
+            let title = document.createElement("div");
+            title.className = "question-title";
+            title.innerText = (index + 1) + ". " + q.q;
+            card.appendChild(title);
+
+            if (q.type === 'text') {
+                let input = document.createElement("input");
+                input.type = "text";
+                input.id = `q_${q.id}`;
+                input.placeholder = "Cevabınızı buraya yazınız...";
+                card.appendChild(input);
+            } else if (q.type === 'mc') {
+                let optionsDiv = document.createElement("div");
+                optionsDiv.className = "options";
+                q.options.forEach((opt, optIndex) => {
+                    let label = document.createElement("label");
+                    let radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = `q_${q.id}`;
+                    radio.value = optIndex;
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(opt));
+                    optionsDiv.appendChild(label);
+                });
+                card.appendChild(optionsDiv);
+            }
+            container.appendChild(card);
+        });
+    }
+
+    function submitQuiz() {
+        let correctCount = 0;
+        let wrongCount = 0;
+        let wrongReviewHTML = "";
+
+        activeQuestions.forEach((q, index) => {
+            let isCorrect = false;
+            let userAnswerText = "";
+            
+            if (q.type === 'text') {
+                let inputEl = document.getElementById(`q_${q.id}`);
+                let userAns = inputEl ? inputEl.value.trim().toLowerCase() : "";
+                userAnswerText = userAns === "" ? "[Cevap Verilmedi]" : inputEl.value;
+                if (userAns !== "") {
+                    let matched = q.keywords.some(kw => userAns.includes(kw));
+                    if (matched) isCorrect = true;
+                }
+            } else if (q.type === 'mc') {
+                let selectedRadio = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (selectedRadio) {
+                    let selectedVal = parseInt(selectedRadio.value);
+                    userAnswerText = q.options[selectedVal];
+                    if (selectedVal === q.answer) {
+                        isCorrect = true;
+                    }
+                } else {
+                    userAnswerText = "[Boş bırakıldı]";
+                }
+            }
+
+            if (isCorrect) {
+                correctCount++;
+            } else {
+                wrongCount++;
+                wrongReviewHTML += `
+                    <div class="review-item">
+                        <strong>Soru ${index + 1}:</strong> ${q.q}<br>
+                        <strong>Verdiğiniz Cevap:</strong> ${userAnswerText}<br>
+                        <strong>Doğru / Örnek Cevap:</strong> ${q.sampleAnswer}<br>
+                        <strong>Durum:</strong> Yanlış / Eksik
+                    </div>
+                `;
+            }
+        });
+
+        if (wrongCount === 0) {
+            wrongReviewHTML = `<p style="text-align: center; color: var(--success-color); font-weight: bold; font-size: 18px;">Tebrikler! Hiç yanlışınız yok, bütün soruları doğru yaptınız.</p>`;
+        }
+
+        let score = Math.round((correctCount / activeQuestions.length) * 100);
+
+        document.getElementById("res-name").innerText = studentName;
+        document.getElementById("res-score").innerText = score;
+        document.getElementById("res-correct").innerText = correctCount;
+        document.getElementById("res-wrong").innerText = wrongCount;
+        document.getElementById("review-container").innerHTML = wrongReviewHTML;
+
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        window.scrollTo(0, 0);
+    }
+
+    function restartQuiz() {
+        document.getElementById("student-name").value = "";
+        document.getElementById("result-screen").classList.add("hidden");
+        document.getElementById("login-screen").classList.remove("hidden");
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
