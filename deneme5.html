@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilişim Teknolojileri ve Yazılım 5. Sınıf Deneme Sınavı</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #c0392b;
+            --bg-color: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+        .hidden {
+            display: none !important;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .question-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+        .options label {
+            display: block;
+            padding: 8px 12px;
+            background: #f1f2f6;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-weight: normal;
+            transition: background 0.2s;
+        }
+        .options label:hover {
+            background: #dfe4ea;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        .result-box {
+            text-align: center;
+            padding: 20px;
+            background: #eaf2f8;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .result-score {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .review-item {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 5px solid #ccc;
+        }
+        .review-correct {
+            background: #d4edda;
+            border-color: var(--success-color);
+        }
+        .review-wrong {
+            background: #f8d7da;
+            border-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- GİRİŞ EKRANI -->
+    <div id="login-screen">
+        <h1>Bilişim Teknolojileri ve Yazılım</h1>
+        <h2>5. Sınıf Hazırlık Deneme Sınavı</h2>
+        <p style="text-align: center; color: #666;">Toplam 30 soru bulunmaktadır (10 Yazılı, 20 Çoktan Seçmeli).</p>
+        <div class="form-group" style="margin-top: 30px;">
+            <label for="student-name">Adınız ve Soyadınız:</label>
+            <input type="text" id="student-name" placeholder="Adınızı ve soyadınızı giriniz..." required>
+        </div>
+        <button onclick="startQuiz()">Sınava Başla</button>
+    </div>
+
+    <!-- SINAV EKRANI -->
+    <div id="quiz-screen" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            <span id="display-student" style="font-weight: bold; color: var(--primary-color);"></span>
+            <span style="color: #e74c3c; font-weight: bold;">Süre: Serbest</span>
+        </div>
+        <div id="questions-container"></div>
+        <button onclick="submitQuiz()" style="background-color: var(--success-color); margin-top: 20px;">Sınavı Bitir ve Puanı Gör</button>
+    </div>
+
+    <!-- SONUÇ EKRANI -->
+    <div id="result-screen" class="hidden">
+        <h1>Sınav Sonucu</h1>
+        <div class="result-box">
+            <p>Öğrenci: <span id="res-name" style="font-weight: bold;"></span></p>
+            <div class="result-score">Puanınız: <span id="res-score">0</span> / 100</div>
+            <p>Doğru Sayısı: <span id="res-correct" style="color: var(--success-color); font-weight: bold;"></span> | Yanlış/Eksik Sayısı: <span id="res-wrong" style="color: var(--danger-color); font-weight: bold;"></span></p>
+        </div>
+        <h2>Soru Detayları ve Doğru Cevaplar</h2>
+        <div id="review-container"></div>
+        <button onclick="restartQuiz()" style="background-color: var(--primary-color); margin-top: 20px;">Tekrar Sınava Gir</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // --- 10 YAZILI SORU (1. Dosyadan) ---
+        { id: 1, type: 'text', q: "1. Bilgisayar hafıza birimlerini küçükten büyüğe doğru sıralayınız.", keywords: ["bit", "byte", "kilobyte", "megabyte", "gigabyte", "terabyte"], sampleAnswer: "BİT < BYTE < KİLOBYTE < MEGABYTE < GIGABYTE < TERABYTE" },
+        { id: 2, type: 'text', q: "2. E-devlet (www.turkiye.gov.tr) şifresini ilk kez almak isteyen biri nereye başvurmalıdır?", keywords: ["ptt", "işyerleri", "şahsen"], sampleAnswer: "Şahsen yurt içinde PTT işyerlerine." },
+        { id: 3, type: 'text', q: "3. Yapay zekanın ürettiği yanıtlarda gerçekte olmayan, yanlış, mantıksız veya uydurma bilgiler sunmasına ne denir?", keywords: ["halüsinasyon"], sampleAnswer: "Yapay zeka halüsinasyonu (halüsinasyon)" },
+        { id: 4, type: 'text', q: "4. Bilgisayarın elle tutulup gözle görülebilen fiziksel parçalarına ne denir?", keywords: ["donanım"], sampleAnswer: "Donanım" },
+        { id: 5, type: 'text', q: "5. Bilgisayar için iki tane giriş ve iki tane çıkış birimi yazınız.", keywords: ["fare", "klavye", "hoparlör", "yazıcı"], sampleAnswer: "Giriş: Fare, Klavye | Çıkış: Hoparlör, Yazıcı" },
+        { id: 6, type: 'text', q: "6. Bilgiye ulaşılmasını ve bilginin oluşturulmasını sağlayan her türlü görsel, işitsel, basılı ve yazılı araçlara ne ad verilir?", keywords: ["bilişim teknolojileri"], sampleAnswer: "Bilişim Teknolojileri" },
+        { id: 7, type: 'text', q: "7. Masaüstünde veya herhangi bir klasörün içinde yeni bir klasör nasıl oluşturulur?", keywords: ["sağ", "yeni", "klasör"], sampleAnswer: "Boş alana sağ tıkla -> Yeni -> Klasör" },
+        { id: 8, type: 'text', q: "8. Ramazan öğretmen yanlışlıkla sildiği bir klasörü nereden kolayca geri getirebilir?", keywords: ["geri dönüşüm", "kutusu"], sampleAnswer: "Geri Dönüşüm Kutusu" },
+        { id: 9, type: 'text', q: "9. .mp3, .mp4 ve .pdf uzantılı dosyaların türlerini yazınız.", keywords: ["ses", "müzik", "video", "belge", "döküman"], sampleAnswer: "mp3: Ses/Müzik, mp4: Video, pdf: Belge/Döküman" },
+        { id: 10, type: 'text', q: "10. Bilgisayar başında oturuş pozisyonuyla ilgili yapılan yanlışlardan birini yazınız.", keywords: ["kambur", "sırt", "bel", "eğmek", "uzak"], sampleAnswer: "Sırtı ve beli eğmek (kambur oturmak)" },
+
+        // --- 20 ÇOKTAN SEÇMELİ SORU (2. Dosyadan) ---
+        { id: 11, type: 'mc', q: "11. Bir konu ya da iş konusunda öğrenilen ya da öğretilen şeylere ne ad verilir?", options: ["A) Bilgi", "B) İletişim", "C) Bilişim", "D) Teknoloji"], answer: 0, sampleAnswer: "A) Bilgi" },
+        { id: 12, type: 'mc', q: "12. Aşağıda verilen örneklerden hangisi bilgiye örnek olamaz?", options: ["A) Şifrelerin en az 8 karakter olması gerektiğini bilmek", "B) Donanım ve yazılımın tanımını öğrenmek", "C) WhatsApp uygulaması üzerinden canlı grup görüşmesi yapmak", "D) İnternet paylaşımlarının iz bıraktığını bilmek"], answer: 2, sampleAnswer: "C) WhatsApp uygulaması üzerinden canlı olarak grup görüşmelerine katılarak ses ve görüntü aracılığıyla bilgi paylaşmak." },
+        { id: 13, type: 'mc', q: "13. Duygu, düşünce ya da bilgilerin; ses, yazı ya da sembollerle paylaşılması işlemine ne ad verilir?", options: ["A) Bilgi", "B) İletişim", "C) Bilişim", "D) Teknoloji"], answer: 1, sampleAnswer: "B) İletişim" },
+        { id: 14, type: 'mc', q: "14. Aşağıda verilen örneklerden hangisi iletişime örnek olabilir?", options: ["A) Şifre kurallarını öğrenmek", "B) Donanım ve yazılımı ayırt etmek", "C) WhatsApp üzerinden ses ve görüntü paylaşmak", "D) İnternet izlerini bilmek"], answer: 2, sampleAnswer: "C) WhatsApp uygulaması üzerinden canlı olarak grup görüşmelerine katılarak ses ve görüntü aracılığıyla bilgi paylaşmak." },
+        { id: 15, type: 'mc', q: "15. Aşağıda verilen örneklerden hangisi iletişime örnek olamaz?", options: ["A) Sınıf gruplarında haberleşmek", "B) Donanım ve yazılım parçalarını öğrenmek", "C) WhatsApp ile görüşme yapmak", "D) Okul duyurularını takip etmek"], answer: 1, sampleAnswer: "B) Ekran, klavye gibi elle tutulan parçaların donanım; İşletim sistemi ve oyun gibi programların ise yazılım olduğunu öğrenmek." },
+        { id: 16, type: 'mc', q: "16. Hayatımızı kolaylaştıran ve daha iyi hale getiren yeniliklerin bütününe ne ad verilir?", options: ["A) Bilgi", "B) İletişim", "C) Etkileşim", "D) Teknoloji"], answer: 3, sampleAnswer: "D) Teknoloji" },
+        { id: 17, type: 'mc', q: "17. Geçmişteki ilk bilgisayarlar ile günümüz akıllı telefonlarının ortak işlevlerinden biridir?", options: ["A) Verileri işleme, depolama ve sonuç üretme", "B) Cepte taşınabilir boyutlarda olma", "C) Kablosuz iletişim sağlama", "D) Dokunmatik ekran arayüzü kullanma"], answer: 0, sampleAnswer: "A) Verileri işleme, depolama ve sonuç üretme" },
+        { id: 18, type: 'mc', q: "18. İnsan hayatını kolaylaştırmak amacıyla üretilip kullanılan tüm araç-gereçlere ne ad verilir?", options: ["A) Bilgi", "B) Teknoloji", "C) Bilişim", "D) Teknolojik Alet"], answer: 1, sampleAnswer: "B) Teknoloji" },
+        { id: 19, type: 'mc', q: "19. Sümbül, Bilişim dersi için iklim tipleri hakkında güvenilir bilgiye ulaşmak istemektedir. Hangi uzantıyı tercih etmelidir?", options: ["A) .com uzantılı kişisel blog siteleri", "B) Popüler sosyal medya hesapları", "C) .gov.tr veya .edu.tr uzantılı resmi ve akademik siteler", "D) Herkesin düzenleme yapabildiği forum sayfaları"], answer: 2, sampleAnswer: "C) .gov.tr veya .edu.tr uzantılı resmi ve akademik siteler." },
+        { id: 20, type: 'mc', q: "20. Bilginin toplanması, işlenmesi, saklanması ve iletilmesini sağlayan her türlü teknolojiye ne ad verilir?", options: ["A) Bilgi", "B) Bilişim Teknolojileri", "C) İletişim", "D) Teknoloji"], answer: 1, sampleAnswer: "B) Bilişim Teknolojileri" },
+        { id: 21, type: 'mc', q: "21. İnternette iz bırakılmasıyla ilgili, hangi bilişim teknolojisi kullanımı olumsuz bir durum oluşturabilir?", options: ["A) EBA'da ödevleri zamanında tamamlamak", "B) Alışverişte kart bilgilerini güvenli olmayan sitelere kaydetmek", "C) Arkadaşlarla eğitim materyali paylaşmak", "D) Resmi belgelere hızlıca ulaşmak"], answer: 1, sampleAnswer: "B) İnternetten alışveriş yaparken kart bilgilerini güvenli olmayan sitelere kaydetmek." },
+        { id: 22, type: 'mc', q: "22. Bir dosyayı masaüstünden tamamen kaldırıp başka bir klasöre aktarmak için hangi komut çifti kullanılır?", options: ["A) Kopyala - Yapıştır", "B) Kes - Yapıştır", "C) Sil - Geri Yükle", "D) Kopyala - Geri Yükle"], answer: 1, sampleAnswer: "B) Kes - Yapıştır" },
+        { id: 23, type: 'mc', q: "23. Aşağıdaki uygulamalardan hangisi yapay zekâ teknolojisine örnek oluşturmaz?", options: ["A) Sadece önceden yazılmış metni kağıda basan standart yazıcılar", "B) Sesimizi tanıyan akıllı asistanlar", "C) Film ve müzik öneren dijital platformlar", "D) Yüz tanıma ile ekran kilidi açan telefonlar"], answer: 0, sampleAnswer: "A) Bir tuşa basıldığında sadece önceden yazılmış metni kağıda basan standart yazıcılar." },
+        { id: 24, type: 'mc', q: "24. Aşağıda verilen eşleştirmelerden hangisi doğru bir donanım-yazılım gruplamasıdır?", options: ["A) Klavye -> Yazılım | İşletim Sistemi -> Donanım", "B) Ekran -> Yazılım | Oyun -> Donanım", "C) Fare -> Donanım | WhatsApp Programı -> Yazılım", "D) Sabit Disk -> Yazılım | Web Tarayıcı -> Donanım"], answer: 2, sampleAnswer: "C) Fare -> Donanım | WhatsApp Programı -> Yazılım" },
+        { id: 25, type: 'mc', q: "25. Geçmişte kil tabletler kullanılırken günümüzde USB ve bulut depolama kullanılmaktadır. Bu durum hangi benzerliği açıklar?", options: ["A) Cihazların aynı boyutta olduğunu", "B) Geçmişin daha hızlı olduğunu", "C) Araçlar değişse de bilginin depolanması ve kalıcı hale getirilmesi amacının korunduğunu", "D) Sadece internet üzerinden yapıldığını"], answer: 2, sampleAnswer: "C) Araçlar değişse de bilginin depolanması ve kalıcı hale getirilmesi amacının korunduğunu." },
+        { id: 26, type: 'mc', q: "26. Mektup yerine e-posta ile saniyeler içinde mesaj iletilmesi neyi gösterir?", options: ["A) Mektubun daha hızlı olduğunu", "B) İhtiyacın bittiğini", "C) Yazılı iletişimin kullanılmadığını", "D) Veri iletim ve iletişim hızının büyük ölçüde arttığını"], answer: 3, sampleAnswer: "D) Veri iletim ve iletişim hızının büyük ölçüde arttığını." },
+        { id: 27, type: 'mc', q: "27. Bilişim teknolojilerini kullanırken alınması gereken fiziksel güvenlik önlemlerinden biridir?", options: ["A) Tanımadık e-postaları açmamak", "B) Ekran şifresini paylaşmamak", "C) Şifreleri güçlü yapmak", "D) Elektrik kablolarını dağınıklıktan koruyup kablo kanallarıyla düzenlemek"], answer: 3, sampleAnswer: "D) Elektrik kablolarını dağınıklıktan koruyup kablo kanallarıyla düzenlemek ve açıkta prize izin vermemek." },
+        { id: 28, type: 'mc', q: "28. Aşağıdakilerden hangisi bir bilgisayar ağının kurulma amaçlarından biri olamaz?", options: ["A) Bilgisayarın işlemci hızını ve fiziki ekran boyutunu otomatik olarak büyütmek", "B) Ortak yazıcı kullanmak", "C) İnternet bağlantısını paylaşmak", "D) Hızlı ve güvenli dosya paylaşımı yapmak"], answer: 0, sampleAnswer: "A) Bilgisayarın işlemci hızını ve fiziki ekran boyutunu otomatik olarak büyütmek." },
+        { id: 29, type: 'mc', q: "29. Teknoloji ile ilgili aşağıdakilerden hangisi söylenebilir?", options: ["A) Sadece bilgisayarlardan ibarettir", "B) Hayatımızı kolaylaştıran yenilikler bütünüdür", "C) Sadece geçmişte kalmıştır", "D) İletişimle hiçbir ilgisi yoktur"], answer: 1, sampleAnswer: "B) Hayatımızı kolaylaştıran yeniliklerin bütünüdür." },
+        { id: 30, type: 'mc', q: "30. Bilgisayarın donanım birimleri ile ilgili aşağıdakilerden hangisi doğrudur?", options: ["A) Elle tutulup gözle görülebilen fiziksel parçalardır", "B) Bilgisayar içinde çalışan oyun ve programlardır", "C) Sadece internete bağlanmayı sağlar", "D) Elle tutulamayan kodlar bütünüdür"], answer: 0, sampleAnswer: "A) Elle tutulup gözle görülebilen fiziksel parçalardır." }
+    ];
+
+    let studentName = "";
+
+    function startQuiz() {
+        const nameInput = document.getElementById("student-name").value.trim();
+        if (nameInput === "") {
+            alert("Lütfen sınavı çözmeden önce adınızı ve soyadınızı giriniz!");
+            return;
+        }
+        studentName = nameInput;
+        document.getElementById("display-student").innerText = "Öğrenci: " + studentName;
+        
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("quiz-screen").classList.remove("hidden");
+
+        renderQuestions();
+        window.scrollTo(0, 0);
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById("questions-container");
+        container.innerHTML = "";
+
+        questions.forEach((q, index) => {
+            let card = document.createElement("div");
+            card.className = "question-card";
+
+            let title = document.createElement("div");
+            title.className = "question-title";
+            title.innerText = q.q;
+            card.appendChild(title);
+
+            if (q.type === 'text') {
+                let input = document.createElement("input");
+                input.type = "text";
+                input.id = `q_${q.id}`;
+                input.placeholder = "Cevabınızı buraya yazınız...";
+                card.appendChild(input);
+            } else if (q.type === 'mc') {
+                let optionsDiv = document.createElement("div");
+                optionsDiv.className = "options";
+                q.options.forEach((opt, optIndex) => {
+                    let label = document.createElement("label");
+                    let radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = `q_${q.id}`;
+                    radio.value = optIndex;
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(opt));
+                    optionsDiv.appendChild(label);
+                });
+                card.appendChild(optionsDiv);
+            }
+            container.appendChild(card);
+        });
+    }
+
+    function submitQuiz() {
+        let correctCount = 0;
+        let reviewHTML = "";
+
+        questions.forEach((q, index) => {
+            let isCorrect = false;
+            let userAnswerText = "";
+            
+            if (q.type === 'text') {
+                let userAns = document.getElementById(`q_${q.id}`).value.trim().toLowerCase();
+                userAnswerText = userAns === "" ? "[Cevap Verilmedi]" : document.getElementById(`q_${q.id}`).value;
+                if (userAns !== "") {
+                    // Anahtar kelime kontrolü
+                    let matched = q.keywords.some(kw => userAns.includes(kw));
+                    if (matched) isCorrect = true;
+                }
+            } else if (q.type === 'mc') {
+                let selectedRadio = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (selectedRadio) {
+                    let selectedVal = parseInt(selectedRadio.value);
+                    userAnswerText = q.options[selectedVal];
+                    if (selectedVal === q.answer) {
+                        isCorrect = true;
+                    }
+                } else {
+                    userAnswerText = "[Boş bırakıldı]";
+                }
+            }
+
+            if (isCorrect) correctCount++;
+
+            let reviewClass = isCorrect ? "review-correct" : "review-wrong";
+            let statusText = isCorrect ? "Doğru" : "Yanlış / Eksik";
+
+            reviewHTML += `
+                <div class="review-item ${reviewClass}">
+                    <strong>Soru ${index + 1}:</strong> ${q.q}<br>
+                    <strong>Verdiğiniz Cevap:</strong> ${userAnswerText}<br>
+                    <strong>Doğru / Örnek Cevap:</strong> ${q.sampleAnswer}<br>
+                    <strong>Durum:</strong> ${statusText}
+                </div>
+            `;
+        });
+
+        let score = Math.round((correctCount / questions.length) * 100);
+        let wrongCount = questions.length - correctCount;
+
+        document.getElementById("res-name").innerText = studentName;
+        document.getElementById("res-score").innerText = score;
+        document.getElementById("res-correct").innerText = correctCount;
+        document.getElementById("res-wrong").innerText = wrongCount;
+        document.getElementById("review-container").innerHTML = reviewHTML;
+
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        window.scrollTo(0, 0);
+    }
+
+    function restartQuiz() {
+        document.getElementById("student-name").value = "";
+        document.getElementById("result-screen").classList.add("hidden");
+        document.getElementById("login-screen").classList.remove("hidden");
+        window.scrollTo(0, 0);
+    }
+</script>
+
+</body>
+</html>
