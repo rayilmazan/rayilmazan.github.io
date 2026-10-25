@@ -571,7 +571,7 @@
             font-weight: 700;
         }
     </style>
-<script src="/_aistudio-iframe.js?v=6634132a"></script></head>
+</head>
 <body>
 
 <div class="container">
@@ -587,7 +587,7 @@
         <div id="countdownBox"></div>
     </div>
 
-    <!-- 1. İSTEK: Açılır Kapanır Üstte Kapalı Duran Öğrenme Çıktıları (BTY 5, BTY 6, Kültür & Medeniyet, Rehberlik) -->
+    <!-- Açılır Kapanır Öğrenme Çıktıları -->
     <div class="outcomes-collapsible-wrapper">
         <button class="outcomes-toggle-header" onclick="toggleOutcomes()" aria-expanded="false" id="outcomesToggleBtn">
             <span>📚 Haftalık Öğrenme Çıktıları (Bilişim 5-6, Kültür & Medeniyet, Rehberlik)</span>
@@ -613,7 +613,7 @@
         </div>
     </div>
 
-    <!-- 2. İSTEK: Ders Tablosu (Gün görünümünde aktif sınıf çıktısı hemen yanında; Haftalık program aynen kalır) -->
+    <!-- Ders Tablosu -->
     <div class="table-responsive">
         <table id="scheduleTable" class="single-day-table">
             <thead id="scheduleHeader">
@@ -700,11 +700,11 @@ const times = [
 ];
 
 const schedule = {
-    1: { 1: "6-D KL.TR", 2: "6-D BLŞM", 4: "5-C BLŞM", 5: "6-C BLŞM", 6: "6-A BLŞM", 7: "6-B BLŞM" },
+    1: { 1: "6-B BLŞM", 2: "6-D KL.TR", 3: "6-C BLŞM", 4: "5-C BLŞM", 5: "6-D BLŞM", 6: "6-A BLŞM", 7: "5-A BLŞM" },
     2: {},
-    3: { 1: "5-A BLŞM", 2: "6-D BLŞM", 4: "5-B BLŞM", 5: "5-D BLŞM", 6: "6-B BLŞM", 7: "5-B RVY" },
+    3: { 1: "5-D BLŞM", 2: "5-B BLŞM", 3: "5-A BLŞM", 4: "5-B RVY", 5: "5-C BLŞM", 6: "6-A BLŞM", 7: "6-D BLŞM" },
     4: {},
-    5: { 1: "6-A BLŞM", 2: "6-D KL.TR", 3: "6-C BLŞM", 4: "5-D BLŞM", 5: "5-C BLŞM", 6: "5-A BLŞM", 7: "5-B BLŞM" }
+    5: { 3: "6-D KL.TR", 4: "6-C BLŞM", 5: "5-D BLŞM", 6: "6-B BLŞM", 7: "5-B BLŞM" }
 };
 
 let currentDate = new Date();
@@ -802,12 +802,10 @@ function formatCountdown(totalSeconds) {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
-// Ders türünü, etiketini ve ilgili çıktıyı belirleyen fonksiyon
 function getLessonDetails(lesson, activeOutcome) {
     if (!lesson) return null;
     const lUpper = lesson.toUpperCase();
 
-    // 1. Kültür ve Medeniyet (KL.TR)
     if (lUpper.includes("KL.TR") || lUpper.includes("KÜLTÜR") || lUpper.includes("MEDENİYET")) {
         return {
             type: "kultur",
@@ -819,7 +817,6 @@ function getLessonDetails(lesson, activeOutcome) {
         };
     }
 
-    // 2. Rehberlik ve Yönlendirme (RVY)
     if (lUpper.includes("RVY") || lUpper.includes("REHBERLİK")) {
         return {
             type: "rehberlik",
@@ -831,7 +828,6 @@ function getLessonDetails(lesson, activeOutcome) {
         };
     }
 
-    // 3. 5. Sınıf Bilişim (5-... BLŞM)
     if (lesson.startsWith("5-") || lesson.includes("5.")) {
         return {
             type: "grade5",
@@ -843,7 +839,6 @@ function getLessonDetails(lesson, activeOutcome) {
         };
     }
 
-    // 4. 6. Sınıf Bilişim (6-... BLŞM)
     if (lesson.startsWith("6-") || lesson.includes("6.")) {
         return {
             type: "grade6",
@@ -969,7 +964,6 @@ function render() {
         
         statusText.innerHTML = `🔔 <strong>${activePeriod}. Ders:</strong> <span style="color: #14532d; font-weight: 800; font-size: 1rem;">${currentLesson}</span> ${gradeBadge}`;
         
-        // BÜYÜTÜLMÜŞ BİTİŞ SAATİ VE GERİ SAYIM
         countdownBox.innerHTML = `
             <div class="countdown-badge-large">
                 <span style="font-size: 0.72rem; color: #bbf7d0; text-transform: uppercase;">DERS BİTİŞİ</span>
@@ -995,7 +989,6 @@ function render() {
         statusText.innerHTML = "🏠 Günlük ders programı tamamlandı";
     }
 
-    // Tablo Başlığı
     const thead = document.getElementById('scheduleHeader');
     let headerHTML = '<tr><th class="sticky-col">Saat</th>';
 
@@ -1013,7 +1006,6 @@ function render() {
     headerHTML += '</tr>';
     thead.innerHTML = headerHTML;
 
-    // Tablo Gövdesi
     const tbody = document.getElementById('scheduleBody');
     tbody.innerHTML = '';
 
@@ -1038,7 +1030,6 @@ function render() {
             const isCellCurrentlyActive = isCurrentPeriodActive && currentDay === day;
 
             if (isFullWeekView) {
-                // HAFTALIK PROGRAM AYNEN KALIR
                 if (lesson) {
                     td.innerText = lesson;
                     td.className = "lesson-slot";
@@ -1051,14 +1042,12 @@ function render() {
                     td.classList.add('active-cell');
                 }
             } else {
-                // GÜN GÖRÜNÜMÜ:
                 if (!lesson) {
                     td.innerHTML = `<span class="empty-slot">- Boş Ders -</span>`;
                 } else {
                     const details = getLessonDetails(lesson, activeOutcome);
 
                     if (isCellCurrentlyActive) {
-                        // AKTİF OLAN DERS: Kültür ve Medeniyet, Rehberlik veya Bilişim çıktısı hemen yanında gözükür!
                         td.innerHTML = `
                             <div class="day-active-cell-layout">
                                 <div class="day-active-left">
@@ -1076,7 +1065,6 @@ function render() {
                             </div>
                         `;
                     } else {
-                        // Gün görünümünde diğer dersler
                         const gradeBadge = details ? `<span class="day-grade-tag ${details.badgeClass}">${details.badgeText}</span>` : "";
                         td.innerHTML = `
                             <div class="day-normal-cell-layout">
