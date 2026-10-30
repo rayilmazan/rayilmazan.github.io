@@ -11,64 +11,75 @@
         .aspect-eokul { aspect-ratio: 3 / 4; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans overflow-hidden">
 
     <!-- Üst Başlık -->
-    <header class="bg-slate-800 border-b border-slate-700 py-2.5 px-4 text-center shadow-md">
-        <h1 class="text-sm font-bold tracking-wide flex items-center justify-center gap-2">
+    <header class="bg-slate-800 border-b border-slate-700 py-2 px-4 text-center shadow-md shrink-0">
+        <h1 class="text-xs font-bold tracking-wide flex items-center justify-center gap-2">
             <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Hızlı Fotoğraf Çekim Asistanı
         </h1>
     </header>
 
-    <!-- Ana Ekran (Tek Sayfa / Kaydırmasız Düzen) -->
-    <main class="flex-1 max-w-md w-full mx-auto p-3 flex flex-col justify-center gap-3">
+    <!-- Ana Ekran (Tek Sayfa / Kompakt Düzen) -->
+    <main class="flex-1 max-w-sm w-full mx-auto p-2.5 flex flex-col justify-center gap-2">
         
-        <!-- Canlı Kamera Kutusu ve Kılavuz -->
-        <div class="relative w-full aspect-eokul bg-black rounded-xl overflow-hidden border-2 border-slate-700 shadow-xl flex items-center justify-center">
+        <!-- Küçültülmüş Canlı Kamera Kutusu ve Kılavuz -->
+        <div class="relative w-36 aspect-eokul bg-black rounded-lg overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
             <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
             
-            <!-- e-Okul Baş/Omuz Kadraj Rehberi -->
-            <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
-                <div class="w-40 h-56 border-2 border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-2xl">
-                    <span class="absolute -top-6 bg-black/70 text-amber-300 text-[9px] px-2 py-0.5 rounded border border-amber-500/30 font-mono">e-Okul Kadraj</span>
-                    <div class="w-2.5 h-2.5 border-t-2 border-l-2 border-amber-400/90 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+            <!-- e-Okul Kadraj Rehberi -->
+            <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-2">
+                <div class="w-24 h-32 border-2 border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-xl">
+                    <span class="absolute -top-5 bg-black/70 text-amber-300 text-[8px] px-1.5 py-0.2 rounded border border-amber-500/30 font-mono">e-Okul</span>
+                    <div class="w-2 h-2 border-t-2 border-l-2 border-amber-400/90 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
                 </div>
             </div>
 
             <!-- Kamera Kapalı Durumu -->
-            <div id="cameraOffMessage" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 text-center p-4">
-                <i class="fa-solid fa-spinner fa-spin text-3xl mb-2 text-indigo-500"></i>
-                <p class="text-xs font-medium">Kamera açılıyor...</p>
+            <div id="cameraOffMessage" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 text-center p-2">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-1 text-indigo-500"></i>
+                <p class="text-[10px] font-medium">Açılıyor...</p>
             </div>
         </div>
 
-        <!-- Kamera Altı Bilgi Girişleri ve Çekim Kontrolleri -->
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-3.5 shadow-lg space-y-2.5">
+        <!-- Bilgi Girişleri ve Çekim Kontrolleri -->
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 shadow-lg space-y-2 shrink-0">
             
+            <!-- Klasör Seçim Alanı -->
+            <div>
+                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">1. Kayıt Klasörünü Seç</label>
+                <div class="flex gap-1.5">
+                    <button onclick="selectTargetDirectory()" id="dirSelectBtn" 
+                        class="flex-1 bg-slate-700 hover:bg-slate-600 text-indigo-300 border border-indigo-500/30 py-1.5 px-2.5 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 truncate">
+                        <i class="fa-solid fa-folder-open"></i> <span id="dirNameLabel">Klasör Seçilmedi</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Sınıf ve Numara (Yanyana) -->
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="block text-[11px] font-medium text-slate-300 mb-1">Sınıf</label>
+                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">2. Sınıf Adı</label>
                     <input type="text" id="classNameInput" placeholder="Örn: 5-A" 
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-medium text-slate-300 mb-1">Öğrenci No</label>
+                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">3. Öğrenci No</label>
                     <input type="text" id="studentNoInput" placeholder="Örn: 105" 
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
                 </div>
             </div>
 
             <!-- Ad Soyad -->
             <div>
-                <label class="block text-[11px] font-medium text-slate-300 mb-1">Öğrenci Adı Soyadı</label>
+                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">4. Öğrenci Adı Soyadı</label>
                 <input type="text" id="studentNameInput" placeholder="Örn: Ahmet YILMAZ" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
             </div>
 
             <!-- Çek Butonu -->
             <button onclick="capturePhoto()" id="captureBtn" disabled
-                class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white py-2.5 rounded-lg font-bold transition flex items-center justify-center gap-2 shadow-md text-sm mt-1">
+                class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 shadow-md text-xs mt-0.5">
                 <i class="fa-solid fa-camera"></i> FOTOĞRAFI ÇEK & KAYDET
             </button>
         </div>
@@ -80,6 +91,7 @@
 
     <script>
         let stream = null;
+        let rootDirectoryHandle = null;
         const videoElement = document.getElementById('videoElement');
         const captureBtn = document.getElementById('captureBtn');
         const cameraOffMessage = document.getElementById('cameraOffMessage');
@@ -103,7 +115,6 @@
                 try {
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (e) {
-                    // Cihaz 'exact' desteklemiyorsa genel arka kamera moduna geç
                     stream = await navigator.mediaDevices.getUserMedia({
                         video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
                     });
@@ -118,17 +129,32 @@
             }
         }
 
-        // Fotoğraf Çekme ve Max 120 KB Kalite Zorlama Algoritması
-        function capturePhoto() {
+        // Cihazda Ana Klasör Seçme (File System Access API)
+        async function selectTargetDirectory() {
+            try {
+                if (!window.showDirectoryPicker) {
+                    alert("Tarayıcınız doğrudan klasör oluşturma özelliğini (File System API) desteklemiyor. Fotoğraflar otomatik indirilenler klasörüne inecek.");
+                    return;
+                }
+                rootDirectoryHandle = await window.showDirectoryPicker();
+                document.getElementById('dirNameLabel').textContent = rootDirectoryHandle.name + " (Seçildi)";
+                document.getElementById('dirSelectBtn').className = "flex-1 bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 py-1.5 px-2.5 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 truncate";
+            } catch (err) {
+                console.log("Klasör seçimi iptal edildi veya hata oluştu:", err);
+            }
+        }
+
+        // Fotoğraf Çekme, Sınıf Klasörü Oluşturma ve Kaydetme
+        async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
                 return;
             }
-            const className = document.getElementById('classNameInput').value.trim();
+            const classNameInput = document.getElementById('classNameInput').value.trim();
             const studentNo = document.getElementById('studentNoInput').value.trim();
             const studentName = document.getElementById('studentNameInput').value.trim();
 
-            if (!className) {
+            if (!classNameInput) {
                 alert("Lütfen sınıf adını giriniz (Örn: 5-A)");
                 document.getElementById('classNameInput').focus();
                 return;
@@ -138,6 +164,8 @@
                 document.getElementById('studentNoInput').focus();
                 return;
             }
+
+            const className = classNameInput.replace(/[\s\/\\:*?"<>|]/g, "_");
 
             const ctx = processingCanvas.getContext('2d');
             const vWidth = videoElement.videoWidth;
@@ -169,18 +197,37 @@
             const sanitizedName = studentName.replace(/[\s\/\\:*?"<>|]/g, "_");
             const filename = `${studentNo} ${sanitizedName}.jpg`;
 
-            // Otomatik İndirme
+            // Eğer kullanıcı klasör seçtiyse doğrudan o klasörün içinde sınıf adıyla klasör açıp kaydet
+            if (rootDirectoryHandle) {
+                try {
+                    // Sınıf adında alt klasör oluştur veya varsa aç
+                    const classDirHandle = await rootDirectoryHandle.getDirectoryHandle(className, { create: true });
+                    const fileHandle = await classDirHandle.getFileHandle(filename, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                } catch (err) {
+                    console.error("Klasöre yazma hatası, indiriliyor:", err);
+                    fallbackDownload(dataUrl, filename);
+                }
+            } else {
+                // Klasör seçilmediyse standart indirme yöntemi
+                fallbackDownload(dataUrl, filename);
+            }
+
+            // Sonraki öğrenci için formu temizle (Sınıf adı aynı kalır)
+            document.getElementById('studentNoInput').value = "";
+            document.getElementById('studentNameInput').value = "";
+            document.getElementById('studentNoInput').focus();
+        }
+
+        function fallbackDownload(dataUrl, filename) {
             const a = document.createElement('a');
             a.href = dataUrl;
             a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-
-            // Formu sonraki öğrenci için temizle (Sınıf sabit kalır, numara/ad temizlenir)
-            document.getElementById('studentNoInput').value = "";
-            document.getElementById('studentNameInput').value = "";
-            document.getElementById('studentNoInput').focus();
         }
 
         function dataURItoBlob(dataURI) {
