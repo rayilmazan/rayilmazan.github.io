@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .aspect-eokul { aspect-ratio: 3 / 4; }
+        .capitalize-words { text-transform: capitalize; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans overflow-hidden">
@@ -20,32 +21,16 @@
         </h1>
     </header>
 
-    <!-- Ana Ekran (Tek Sayfa / Ultra Kompakt Düzen) -->
-    <main class="flex-1 max-w-sm w-full mx-auto p-2 flex flex-col justify-center gap-2">
+    <!-- ANA İÇERİK (SAYFA GEÇİŞLERİ) -->
+    <main class="flex-1 max-w-sm w-full mx-auto p-3 flex flex-col justify-center">
         
-        <!-- Küçültülmüş Canlı Kamera Kutusu ve Kılavuz -->
-        <div class="relative w-20 aspect-eokul bg-black rounded-md overflow-hidden border border-slate-700 shadow-lg mx-auto flex items-center justify-center shrink-0">
-            <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
-            
-            <!-- e-Okul Kadraj Rehberi -->
-            <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-1">
-                <div class="w-14 h-20 border border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-md">
-                    <span class="absolute -top-3 bg-black/80 text-amber-300 text-[5px] px-1 py-0 rounded font-mono">e-Okul</span>
-                    <div class="w-1 h-1 border-t border-l border-amber-400/90 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-                </div>
+        <!-- ================= 1. SAYFA: BİLGİ GİRİŞ EKRANI ================= -->
+        <div id="infoScreen" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-lg space-y-3">
+            <div class="text-center pb-1 border-b border-slate-700">
+                <h2 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">1. Öğrenci Bilgileri</h2>
             </div>
 
-            <!-- Kamera Kapalı Durumu -->
-            <div id="cameraOffMessage" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 text-center p-1">
-                <i class="fa-solid fa-spinner fa-spin text-lg mb-0.5 text-indigo-500"></i>
-                <p class="text-[8px] font-medium">Açılıyor...</p>
-            </div>
-        </div>
-
-        <!-- Bilgi Girişleri ve Çekim Kontrolleri -->
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-2.5 shadow-lg space-y-2 shrink-0">
-            
-            <!-- Sınıf Adı ve Klasör Oluştur Butonu Yanyana -->
+            <!-- Sınıf Adı ve Klasör Oluştur -->
             <div>
                 <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Sınıf Adı ve Klasör</label>
                 <div class="flex gap-1.5">
@@ -58,25 +43,67 @@
                 </div>
             </div>
 
-            <!-- Öğrenci No ve Ad Soyad -->
-            <div class="grid grid-cols-3 gap-1.5">
-                <div class="col-span-1">
-                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Öğrenci No</label>
-                    <input type="text" id="studentNoInput" placeholder="105" 
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+            <!-- Öğrenci No (Sadece Rakam Klavyesi) -->
+            <div>
+                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Öğrenci Numarası</label>
+                <input type="text" id="studentNoInput" inputmode="numeric" pattern="[0-9]*" placeholder="Örn: 105" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <!-- Öğrenci Ad Soyad (İlk Harfler Büyük) -->
+            <div>
+                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Öğrenci Adı Soyadı</label>
+                <input type="text" id="studentNameInput" autocapitalize="words" placeholder="Örn: Ahmet Yılmaz" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 capitalize-words">
+            </div>
+
+            <!-- Kamera Ekranına Geçiş Butonu -->
+            <button onclick="goToCameraScreen()" 
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 shadow-md text-xs mt-2">
+                <i class="fa-solid fa-arrow-right"></i> KAMERA EKRANINA GEÇ
+            </button>
+        </div>
+
+
+        <!-- ================= 2. SAYFA: KAMERA VE ÇEKİM EKRANI ================= -->
+        <div id="cameraScreen" class="hidden flex flex-col items-center gap-3">
+            
+            <!-- Aktif Öğrenci Bilgi Özeti -->
+            <div class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-center text-xs shadow">
+                <span class="text-indigo-400 font-semibold" id="displayClassInfo">-</span> | 
+                <span class="text-emerald-300 font-bold" id="displayStudentInfo">-</span>
+            </div>
+
+            <!-- Küçültülmüş Canlı Kamera Kutusu ve Kılavuz -->
+            <div class="relative w-24 aspect-eokul bg-black rounded-md overflow-hidden border border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
+                <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
+                
+                <!-- e-Okul Kadraj Rehberi -->
+                <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-1">
+                    <div class="w-16 h-22 border border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-md">
+                        <span class="absolute -top-3 bg-black/80 text-amber-300 text-[5px] px-1 py-0 rounded font-mono">e-Okul</span>
+                        <div class="w-1 h-1 border-t border-l border-amber-400/90 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                    </div>
                 </div>
-                <div class="col-span-2">
-                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Öğrenci Adı Soyadı</label>
-                    <input type="text" id="studentNameInput" placeholder="Ahmet YILMAZ" 
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+
+                <!-- Kamera Kapalı Durumu -->
+                <div id="cameraOffMessage" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 text-center p-1">
+                    <i class="fa-solid fa-spinner fa-spin text-lg mb-0.5 text-indigo-500"></i>
+                    <p class="text-[8px] font-medium">Açılıyor...</p>
                 </div>
             </div>
 
-            <!-- Çek Butonu -->
-            <button onclick="capturePhoto()" id="captureBtn" disabled
-                class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white py-2 rounded-lg font-bold transition flex items-center justify-center gap-1.5 shadow-md text-xs mt-0.5">
-                <i class="fa-solid fa-camera"></i> FOTOĞRAFI ÇEK & KAYDET
-            </button>
+            <!-- Çekim ve Geri Dönüş Kontrolleri -->
+            <div class="w-full space-y-2">
+                <button onclick="capturePhoto()" id="captureBtn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-lg font-bold transition flex items-center justify-center gap-1.5 shadow-md text-xs">
+                    <i class="fa-solid fa-camera"></i> FOTOĞRAFI ÇEK & KAYDET
+                </button>
+                <button onclick="backToInfoScreen()" 
+                    class="w-full bg-slate-700 hover:bg-slate-600 text-slate-300 py-1.5 rounded-lg font-medium transition flex items-center justify-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-arrow-left"></i> Bilgi Ekranına Geri Dön
+                </button>
+            </div>
         </div>
 
     </main>
@@ -89,18 +116,19 @@
         let rootDirectoryHandle = null;
         let activeClassDirHandle = null;
         let activeClassName = "";
+        let currentStudentNo = "";
+        let currentStudentName = "";
 
         const videoElement = document.getElementById('videoElement');
-        const captureBtn = document.getElementById('captureBtn');
         const cameraOffMessage = document.getElementById('cameraOffMessage');
         const processingCanvas = document.getElementById('processingCanvas');
 
-        // Sayfa açıldığı an arka kamerayı otomatik başlat
+        // Sayfa açıldığında arka kamerayı arka planda hazırla
         window.addEventListener('DOMContentLoaded', () => {
-            startBackCamera();
+            initCamera();
         });
 
-        async function startBackCamera() {
+        async function initCamera() {
             try {
                 const constraints = {
                     video: {
@@ -109,7 +137,6 @@
                         facingMode: { exact: 'environment' }
                     }
                 };
-
                 try {
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (e) {
@@ -117,13 +144,10 @@
                         video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
                     });
                 }
-
                 videoElement.srcObject = stream;
                 cameraOffMessage.style.display = 'none';
-                captureBtn.disabled = false;
             } catch (err) {
                 console.error("Kamera hatası:", err);
-                alert("Arka kamera açılamadı. Lütfen tarayıcı kamera izinlerini kontrol edin.");
             }
         }
 
@@ -145,21 +169,18 @@
                     return;
                 }
 
-                // İlk kez klasör oluşturuluyorsa ana kayıt klasörü seçtirilir
                 if (!rootDirectoryHandle) {
                     alert("Fotoğrafların toplanacağı ANA KLASÖRÜ seçin (Sınıf klasörü bunun altında açılacak).");
                     rootDirectoryHandle = await window.showDirectoryPicker();
                 }
 
-                // Seçilen ana klasör altında sınıf adıyla alt klasör oluştur
                 activeClassDirHandle = await rootDirectoryHandle.getDirectoryHandle(className, { create: true });
                 activeClassName = className;
                 updateFolderButtonState(className, true);
-                alert(`"${className}" sınıf klasörü başarıyla oluşturuldu! Tüm çekimler bu klasöre kaydedilecek.`);
+                alert(`"${className}" sınıf klasörü başarıyla oluşturuldu!`);
 
             } catch (err) {
-                console.error("Klasör oluşturma hatası:", err);
-                alert("Klasör oluşturma iptal edildi veya hata oluştu.");
+                console.error("Klasör hatası:", err);
             }
         }
 
@@ -171,34 +192,61 @@
             }
         }
 
-        // Fotoğraf Çekme ve Sınıf Klasörüne Kaydetme
-        async function capturePhoto() {
-            if (!stream) {
-                alert("Kamera aktif değil!");
-                return;
-            }
-
+        // Bilgi Ekranından Kamera Ekranına Geçiş
+        async function goToCameraScreen() {
             const inputVal = document.getElementById('classNameInput').value.trim();
+            const studentNo = document.getElementById('studentNoInput').value.trim();
+            const studentName = document.getElementById('studentNameInput').value.trim();
+
             if (!inputVal) {
                 alert("Lütfen sınıf adını giriniz!");
                 document.getElementById('classNameInput').focus();
                 return;
             }
-
-            const className = inputVal.replace(/[\s\/\\:*?"<>|]/g, "_");
-            
-            // Sınıf ismi yazılıp klasör oluşturulmadıysa otomatik oluştur
-            if (className !== activeClassName || !activeClassDirHandle) {
-                document.getElementById('classNameInput').value = className;
-                await createClassFolder();
-            }
-
-            const studentNo = document.getElementById('studentNoInput').value.trim();
-            const studentName = document.getElementById('studentNameInput').value.trim();
-
             if (!studentNo || !studentName) {
                 alert("Lütfen öğrenci numarasını ve adını soyadını giriniz!");
                 document.getElementById('studentNoInput').focus();
+                return;
+            }
+
+            const className = inputVal.replace(/[\s\/\\:*?"<>|]/g, "_");
+            
+            // Sınıf klasörü henüz oluşturulmadıysa otomatik oluştur/bağlan
+            if (className !== activeClassName || !activeClassDirHandle) {
+                activeClassName = className;
+                if (window.showDirectoryPicker && rootDirectoryHandle) {
+                    try {
+                        activeClassDirHandle = await rootDirectoryHandle.getDirectoryHandle(className, { create: true });
+                    } catch(e) {}
+                }
+            }
+
+            currentStudentNo = studentNo;
+            currentStudentName = studentName;
+
+            // Üst bilgi özetini güncelle
+            document.getElementById('displayClassInfo').textContent = `Sınıf: ${activeClassName}`;
+            document.getElementById('displayStudentInfo').textContent = `${studentNo} - ${studentName}`;
+
+            // Ekranları değiştir
+            document.getElementById('infoScreen').classList.add('hidden');
+            document.getElementById('cameraScreen').classList.remove('hidden');
+        }
+
+        // Kamera Ekranından Bilgi Ekranına Geri Dönüş
+        function backToInfoScreen() {
+            document.getElementById('cameraScreen').classList.add('hidden');
+            document.getElementById('infoScreen').classList.remove('hidden');
+            // Numara ve adı temizle, sonraki öğrenci için numaraya odaklan
+            document.getElementById('studentNoInput').value = "";
+            document.getElementById('studentNameInput').value = "";
+            document.getElementById('studentNoInput').focus();
+        }
+
+        // Fotoğraf Çekme ve Klasöre Kaydetme
+        async function capturePhoto() {
+            if (!stream) {
+                alert("Kamera aktif değil!");
                 return;
             }
 
@@ -229,10 +277,10 @@
                 blob = dataURItoBlob(dataUrl);
             }
 
-            const sanitizedName = studentName.replace(/[\s\/\\:*?"<>|]/g, "_");
-            const filename = `${studentNo} ${sanitizedName}.jpg`;
+            const sanitizedName = currentStudentName.replace(/[\s\/\\:*?"<>|]/g, "_");
+            const filename = `${currentStudentNo} ${sanitizedName}.jpg`;
 
-            // Doğrudan sınıf klasörüne kaydet
+            // Kayıt İşlemi
             if (activeClassDirHandle) {
                 try {
                     const fileHandle = await activeClassDirHandle.getFileHandle(filename, { create: true });
@@ -240,17 +288,14 @@
                     await writable.write(blob);
                     await writable.close();
                 } catch (err) {
-                    console.error("Klasöre yazma hatası, indiriliyor:", err);
                     fallbackDownload(dataUrl, filename);
                 }
             } else {
                 fallbackDownload(dataUrl, filename);
             }
 
-            // Sınıf ve klasör sabit kalır, sonraki öğrenci için numara ve ad temizlenir
-            document.getElementById('studentNoInput').value = "";
-            document.getElementById('studentNameInput').value = "";
-            document.getElementById('studentNoInput').focus();
+            // ÇEKİM BAŞARIYLA TAMAMLANDI -> OTOMATİK BİLGİ EKRANINA DÖN
+            backToInfoScreen();
         }
 
         function fallbackDownload(dataUrl, filename) {
