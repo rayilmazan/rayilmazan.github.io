@@ -21,65 +21,60 @@
     </header>
 
     <!-- Ana Ekran (Tek Sayfa / Kompakt Düzen) -->
-    <main class="flex-1 max-w-sm w-full mx-auto p-2.5 flex flex-col justify-center gap-2">
+    <main class="flex-1 max-w-sm w-full mx-auto p-2 flex flex-col justify-center gap-1.5">
         
-        <!-- Küçültülmüş Canlı Kamera Kutusu ve Kılavuz -->
-        <div class="relative w-36 aspect-eokul bg-black rounded-lg overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
+        <!-- Daha Küçük Canlı Kamera Kutusu ve Kılavuz -->
+        <div class="relative w-28 aspect-eokul bg-black rounded-lg overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
             <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
             
             <!-- e-Okul Kadraj Rehberi -->
-            <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-2">
-                <div class="w-24 h-32 border-2 border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-xl">
-                    <span class="absolute -top-5 bg-black/70 text-amber-300 text-[8px] px-1.5 py-0.2 rounded border border-amber-500/30 font-mono">e-Okul</span>
+            <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-1.5">
+                <div class="w-20 h-28 border-2 border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-xl">
+                    <span class="absolute -top-4 bg-black/70 text-amber-300 text-[7px] px-1 py-0.2 rounded border border-amber-500/30 font-mono">e-Okul</span>
                     <div class="w-2 h-2 border-t-2 border-l-2 border-amber-400/90 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
                 </div>
             </div>
 
             <!-- Kamera Kapalı Durumu -->
             <div id="cameraOffMessage" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 text-center p-2">
-                <i class="fa-solid fa-spinner fa-spin text-2xl mb-1 text-indigo-500"></i>
-                <p class="text-[10px] font-medium">Açılıyor...</p>
+                <i class="fa-solid fa-spinner fa-spin text-xl mb-1 text-indigo-500"></i>
+                <p class="text-[9px] font-medium">Açılıyor...</p>
             </div>
         </div>
 
         <!-- Bilgi Girişleri ve Çekim Kontrolleri -->
-        <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 shadow-lg space-y-2 shrink-0">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-2.5 shadow-lg space-y-2 shrink-0">
             
-            <!-- Klasör Seçim Alanı -->
+            <!-- Sınıf Adı ve Klasör Oluştur Butonu Yanyana -->
             <div>
-                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">1. Kayıt Klasörünü Seç</label>
+                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Sınıf Adı ve Klasör</label>
                 <div class="flex gap-1.5">
-                    <button onclick="selectTargetDirectory()" id="dirSelectBtn" 
-                        class="flex-1 bg-slate-700 hover:bg-slate-600 text-indigo-300 border border-indigo-500/30 py-1.5 px-2.5 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 truncate">
-                        <i class="fa-solid fa-folder-open"></i> <span id="dirNameLabel">Klasör Seçilmedi</span>
+                    <input type="text" id="classNameInput" placeholder="Örn: 5-A" 
+                        class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+                    <button onclick="createClassFolder()" id="folderBtn" 
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0 flex items-center gap-1 shadow">
+                        <i class="fa-solid fa-folder-plus"></i> Klasör Oluştur
                     </button>
                 </div>
             </div>
 
-            <!-- Sınıf ve Numara (Yanyana) -->
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">2. Sınıf Adı</label>
-                    <input type="text" id="classNameInput" placeholder="Örn: 5-A" 
+            <!-- Öğrenci No ve Ad Soyad (Düzenli Yerleşim) -->
+            <div class="grid grid-cols-3 gap-1.5">
+                <div class="col-span-1">
+                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Öğrenci No</label>
+                    <input type="text" id="studentNoInput" placeholder="105" 
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">Öğrenci Adı Soyadı</label>
+                    <input type="text" id="studentNameInput" placeholder="Ahmet YILMAZ" 
                         class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
                 </div>
-                <div>
-                    <label class="block text-[10px] font-medium text-slate-300 mb-0.5">3. Öğrenci No</label>
-                    <input type="text" id="studentNoInput" placeholder="Örn: 105" 
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
-                </div>
-            </div>
-
-            <!-- Ad Soyad -->
-            <div>
-                <label class="block text-[10px] font-medium text-slate-300 mb-0.5">4. Öğrenci Adı Soyadı</label>
-                <input type="text" id="studentNameInput" placeholder="Örn: Ahmet YILMAZ" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500">
             </div>
 
             <!-- Çek Butonu -->
             <button onclick="capturePhoto()" id="captureBtn" disabled
-                class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 shadow-md text-xs mt-0.5">
+                class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white py-2 rounded-lg font-bold transition flex items-center justify-center gap-2 shadow-md text-xs mt-0.5">
                 <i class="fa-solid fa-camera"></i> FOTOĞRAFI ÇEK & KAYDET
             </button>
         </div>
@@ -92,6 +87,9 @@
     <script>
         let stream = null;
         let rootDirectoryHandle = null;
+        let activeClassDirHandle = null;
+        let activeClassName = "";
+
         const videoElement = document.getElementById('videoElement');
         const captureBtn = document.getElementById('captureBtn');
         const cameraOffMessage = document.getElementById('cameraOffMessage');
@@ -129,43 +127,80 @@
             }
         }
 
-        // Cihazda Ana Klasör Seçme (File System Access API)
-        async function selectTargetDirectory() {
+        // Sınıf Klasörünü Oluşturma / Seçme
+        async function createClassFolder() {
+            const inputVal = document.getElementById('classNameInput').value.trim();
+            if (!inputVal) {
+                alert("Lütfen sınıf adını giriniz (Örn: 5-A)");
+                document.getElementById('classNameInput').focus();
+                return;
+            }
+            const className = inputVal.replace(/[\s\/\\:*?"<>|]/g, "_");
+
             try {
                 if (!window.showDirectoryPicker) {
-                    alert("Tarayıcınız doğrudan klasör oluşturma özelliğini (File System API) desteklemiyor. Fotoğraflar otomatik indirilenler klasörüne inecek.");
+                    alert("Tarayıcınız doğrudan klasör oluşturma özelliğini desteklemiyor. Fotoğraflar indirilenler klasörüne inecek.");
+                    activeClassName = className;
+                    updateFolderButtonState(className, true);
                     return;
                 }
-                rootDirectoryHandle = await window.showDirectoryPicker();
-                document.getElementById('dirNameLabel').textContent = rootDirectoryHandle.name + " (Seçildi)";
-                document.getElementById('dirSelectBtn').className = "flex-1 bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 py-1.5 px-2.5 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 truncate";
+
+                // İlk kez klasör oluşturuluyorsa ana kayıt klasörü seçtirilir
+                if (!rootDirectoryHandle) {
+                    alert("Fotoğrafların kaydedileceği bir ANA KLASÖR seçmeniz istenecektir (Örn: 'eOkul_Fotograflari').");
+                    rootDirectoryHandle = await window.showDirectoryPicker();
+                }
+
+                // Seçilen ana klasör altında sınıf adıyla alt klasör oluştur
+                activeClassDirHandle = await rootDirectoryHandle.getDirectoryHandle(className, { create: true });
+                activeClassName = className;
+                updateFolderButtonState(className, true);
+
             } catch (err) {
-                console.log("Klasör seçimi iptal edildi veya hata oluştu:", err);
+                console.error("Klasör oluşturma hatası:", err);
+                alert("Klasör oluşturma iptal edildi veya hata oluştu.");
             }
         }
 
-        // Fotoğraf Çekme, Sınıf Klasörü Oluşturma ve Kaydetme
+        function updateFolderButtonState(className, isReady) {
+            const btn = document.getElementById('folderBtn');
+            if (isReady) {
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> ${className} Hazır`;
+                btn.className = "bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shrink-0 flex items-center gap-1 shadow";
+            }
+        }
+
+        // Fotoğraf Çekme ve Klasöre Kaydetme
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
                 return;
             }
-            const classNameInput = document.getElementById('classNameInput').value.trim();
-            const studentNo = document.getElementById('studentNoInput').value.trim();
-            const studentName = document.getElementById('studentNameInput').value.trim();
 
-            if (!classNameInput) {
-                alert("Lütfen sınıf adını giriniz (Örn: 5-A)");
+            // Eğer kullanıcı sınıf yazıp klasör butonuna basmayı unuttuysa otomatik tetikle
+            const inputVal = document.getElementById('classNameInput').value.trim();
+            if (!inputVal) {
+                alert("Lütfen sınıf adını giriniz!");
                 document.getElementById('classNameInput').focus();
                 return;
             }
+
+            const className = inputVal.replace(/[\s\/\\:*?"<>|]/g, "_");
+            
+            // Sınıf adı değiştirilmişse ve henüz klasörü oluşturulmadıysa anında oluştur
+            if (className !== activeClassName || !activeClassDirHandle) {
+                document.getElementById('classNameInput').value = className;
+                await createClassFolder();
+            }
+
+            const studentNo = document.getElementById('studentNoInput').value.trim();
+            const studentName = document.getElementById('studentNameInput').value.trim();
+
             if (!studentNo || !studentName) {
                 alert("Lütfen öğrenci numarasını ve adını soyadını giriniz!");
                 document.getElementById('studentNoInput').focus();
                 return;
             }
-
-            const className = classNameInput.replace(/[\s\/\\:*?"<>|]/g, "_");
 
             const ctx = processingCanvas.getContext('2d');
             const vWidth = videoElement.videoWidth;
@@ -197,12 +232,10 @@
             const sanitizedName = studentName.replace(/[\s\/\\:*?"<>|]/g, "_");
             const filename = `${studentNo} ${sanitizedName}.jpg`;
 
-            // Eğer kullanıcı klasör seçtiyse doğrudan o klasörün içinde sınıf adıyla klasör açıp kaydet
-            if (rootDirectoryHandle) {
+            // Doğrudan aktif sınıf klasörüne kaydet
+            if (activeClassDirHandle) {
                 try {
-                    // Sınıf adında alt klasör oluştur veya varsa aç
-                    const classDirHandle = await rootDirectoryHandle.getDirectoryHandle(className, { create: true });
-                    const fileHandle = await classDirHandle.getFileHandle(filename, { create: true });
+                    const fileHandle = await activeClassDirHandle.getFileHandle(filename, { create: true });
                     const writable = await fileHandle.createWritable();
                     await writable.write(blob);
                     await writable.close();
@@ -211,11 +244,10 @@
                     fallbackDownload(dataUrl, filename);
                 }
             } else {
-                // Klasör seçilmediyse standart indirme yöntemi
                 fallbackDownload(dataUrl, filename);
             }
 
-            // Sonraki öğrenci için formu temizle (Sınıf adı aynı kalır)
+            // Sınıf ve klasör sabit kalır, sadece öğrenci numara ve adı sıfırlanır
             document.getElementById('studentNoInput').value = "";
             document.getElementById('studentNameInput').value = "";
             document.getElementById('studentNoInput').focus();
