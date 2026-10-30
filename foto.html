@@ -1,1 +1,438 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Okul Standart Fotoğraf Çekim Asistanı</title>
+    <!-- Tailwind CSS ve FontAwesome / JSZip CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        .aspect-eokul {
+            aspect-ratio: 3 / 4;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
 
+    <!-- Üst Bilgi Çubuğu -->
+    <header class="bg-slate-800 border-b border-slate-700 py-3 px-6 shadow-md flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg">
+                <i class="fa-solid fa-camera-retro text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-wide">e-Okul Fotoğraf Çekim Asistanı</h1>
+                <p class="text-xs text-slate-400">Standart: 133x171 px | 3:4 Oran | 20-120 KB</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span id="activeClassBadge" class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-medium">
+                <i class="fa-solid fa-folder-open mr-1"></i> Sınıf Seçilmedi
+            </span>
+            <span id="photoCountBadge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1 rounded-full text-xs font-medium">
+                <i class="fa-solid fa-images mr-1"></i> Çekilen: 0
+            </span>
+        </div>
+    </header>
+
+    <!-- Ana İçerik (Tek Ekran Yerleşimi) -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Sol Panel: Sınıf & Öğrenci Bilgileri / Kontroller (5 Sütun) -->
+        <div class="lg:col-span-5 space-y-5">
+            
+            <!-- 1. Sınıf Klasör Ayarı -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider mb-3">
+                    <i class="fa-solid fa-school mr-2"></i>1. Sınıf Klasör Tanımlama
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Sınıf Adı / Şubesi</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="classNameInput" placeholder="Örn: 5-A, 6-B" 
+                                class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                            <button onclick="setClassName()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition shadow">
+                                <i class="fa-solid fa-check"></i> Ayarla
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Öğrenci Bilgileri -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider mb-3">
+                    <i class="fa-solid fa-user-graduate mr-2"></i>2. Öğrenci Bilgileri
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Öğrenci Numarası</label>
+                        <input type="text" id="studentNoInput" placeholder="Örn: 1453" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Adı Soyadı</label>
+                        <input type="text" id="studentNameInput" placeholder="Örn: Ahmet YILMAZ" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Kamera Kontrolleri & Çekim Butonu -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg space-y-4">
+                <h2 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-video mr-2"></i>3. Kamera ve Çekim
+                </h2>
+                <div class="flex gap-2">
+                    <button onclick="startCamera()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 px-4 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow">
+                        <i class="fa-solid fa-power-off"></i> Kamerayı Aç
+                    </button>
+                    <button onclick="switchCamera()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2.5 px-4 rounded-xl text-sm font-medium transition" title="Kamera Değiştir">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+                <button onclick="capturePhoto()" id="captureBtn" disabled
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-lg text-base">
+                    <i class="fa-solid fa-camera"></i> FOTOĞRAFI ÇEK & KAYDET
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Sağ Panel: Canlı Kamera ve Kılavuz Çerçeve (7 Sütun) -->
+        <div class="lg:col-span-7 space-y-5">
+            
+            <!-- Canlı Kamera Önizleme Kutusu -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg flex flex-col items-center">
+                <div class="w-full flex justify-between items-center mb-3">
+                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                        <i class="fa-solid fa-eye mr-1 text-indigo-400"></i> Canlı Kamera & Kılavuz Kadraj
+                    </span>
+                    <span class="text-xs text-slate-400">Baş ve omuzları kılavuz içine ortalayınız</span>
+                </div>
+
+                <!-- Video Görüntüleme Alanı ve Kılavuz Overlay -->
+                <div id="cameraContainer" class="relative w-full max-w-md aspect-eokul bg-black rounded-xl overflow-hidden border-2 border-slate-700 shadow-inner flex items-center justify-center">
+                    <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
+                    
+                    <!-- e-Okul Kadraj Kılavuzu (SVG Rehber) -->
+                    <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
+                        <div class="w-48 h-64 border-2 border-dashed border-amber-400/80 rounded-full flex flex-col items-center justify-center relative shadow-lg">
+                            <span class="absolute -top-6 bg-black/60 text-amber-300 text-[10px] px-2 py-0.5 rounded font-mono">e-Okul Kadraj Sınırı</span>
+                            <!-- Merkez Artı İşareti -->
+                            <div class="w-2 h-2 border-t border-l border-amber-400/80 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Kamera Kapalı Durumu -->
+                    <div id="cameraOffMessage" class="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center text-slate-400 text-center p-6">
+                        <i class="fa-solid fa-video-slash text-4xl mb-3 text-slate-500"></i>
+                        <p class="text-sm font-medium">Kamera kapalı. Başlamak için "Kamerayı Aç" butonuna tıklayın.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Son Çekilen Fotoğraf & Sonuç Önizlemesi -->
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+                <h2 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider mb-3">
+                    <i class="fa-solid fa-check-circle mr-2"></i>Son Çekilen Fotoğraf (133x171 px)
+                </h2>
+                <div class="flex flex-col sm:flex-row items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                    <div class="w-24 h-32 bg-slate-800 rounded-lg overflow-hidden border border-slate-700 flex items-center justify-center relative shrink-0">
+                        <canvas id="previewCanvas" class="w-full h-full object-cover hidden"></canvas>
+                        <span id="previewPlaceholder" class="text-[10px] text-slate-500 text-center px-1">Fotoğraf Yok</span>
+                    </div>
+                    <div class="flex-1 space-y-2 text-sm w-full">
+                        <div class="flex justify-between border-b border-slate-800 pb-1">
+                            <span class="text-slate-400 text-xs">Dosya Adı:</span>
+                            <span id="infoFilename" class="font-mono text-xs text-indigo-300">-</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800 pb-1">
+                            <span class="text-slate-400 text-xs">Boyut / Çözünürlük:</span>
+                            <span id="infoMeta" class="font-mono text-xs text-slate-300">-</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-1">
+                            <span class="text-slate-400 text-xs">e-Okul Durum:</span>
+                            <span id="infoStatus" class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-400">Bekliyor</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Alt Oturum Galerisi ve Toplu İndir -->
+    <section class="max-w-7xl w-full mx-auto px-4 md:px-6 pb-10">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 shadow-lg">
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <h2 class="text-sm font-semibold text-indigo-400 uppercase tracking-wider">
+                    <i class="fa-solid fa-folder-tree mr-2"></i>Oturumda Çekilen Fotoğraflar
+                </h2>
+                <button onclick="downloadAllAsZip()" id="zipBtn" disabled
+                    class="bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-file-zipper"></i> Tüm Sınıfı ZIP Olarak İndir
+                </button>
+            </div>
+            
+            <!-- Galeri Listesi -->
+            <div id="galleryContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 min-h-[100px] bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                <div class="col-span-full flex flex-col items-center justify-center text-slate-500 py-6 text-xs">
+                    <i class="fa-solid fa-images text-2xl mb-2 opacity-50"></i>
+                    Henüz bu oturumda fotoğraf çekilmedi.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gizli İşlem Canvası (133x171 e-Okul Standart) -->
+    <canvas id="processingCanvas" width="133" height="171" class="hidden"></canvas>
+
+    <!-- JavaScript Mantığı -->
+    <script>
+        let stream = null;
+        let currentClassName = "";
+        let capturedPhotos = [];
+        let useFrontCamera = true;
+
+        const videoElement = document.getElementById('videoElement');
+        const captureBtn = document.getElementById('captureBtn');
+        const cameraOffMessage = document.getElementById('cameraOffMessage');
+        const processingCanvas = document.getElementById('processingCanvas');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+
+        // Sınıf Adı Belirleme
+        function setClassName() {
+            const input = document.getElementById('classNameInput').value.trim();
+            if (!input) {
+                alert("Lütfen geçerli bir sınıf adı giriniz (Örn: 5-A).");
+                return;
+            }
+            currentClassName = input.replace(/[\s\/\\:*?"<>|]/g, "_");
+            document.getElementById('activeClassBadgeinnerHTML', `<i class="fa-solid fa-folder-open mr-1"></i> Sınıf: ${currentClassName}`);
+            document.getElementById('activeClassBadge').innerHTML = `<i class="fa-solid fa-folder-open mr-1"></i> Sınıf: ${currentClassName}`;
+            checkReadyState();
+        }
+
+        // Kamerayı Başlat
+        async function startCamera() {
+            try {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: useFrontCamera ? 'user' : 'environment'
+                    }
+                };
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                videoElement.srcObject = stream;
+                cameraOffMessage.style.display = 'none';
+                captureBtn.disabled = false;
+            } catch (err) {
+                console.error("Kamera hatası:", err);
+                alert("Kamera başlatılamadı. Lütfen tarayıcı kamera izinlerini kontrol edin.");
+            }
+        }
+
+        // Kamera Değiştir (Ön/Arka)
+        function switchCamera() {
+            useFrontCamera = !useFrontCamera;
+            if (stream) {
+                startCamera();
+            }
+        }
+
+        // Hazırlık Durumu Kontrolü
+        function checkReadyState() {
+            // İsterseniz burada ekstra kontroller yapabilirsiniz
+        }
+
+        // Fotoğraf Çekme ve İşleme (133x171 px, 3:4 Oran, 20-120 KB Sıkıştırma)
+        function capturePhoto() {
+            if (!stream) {
+                alert("Önce kamerayı açmalısınız!");
+                return;
+            }
+            const studentNo = document.getElementById('studentNoInput').value.trim();
+            const studentName = document.getElementById('studentNameInput').value.trim();
+
+            if (!studentNo || !studentName) {
+                alert("Lütfen öğrenci numarasını ve adını soyadını giriniz!");
+                return;
+            }
+            if (!currentClassName) {
+                alert("Lütfen önce sınıf adını ayarlayınız!");
+                document.getElementById('classNameInput').focus();
+                return;
+            }
+
+            const ctx = processingCanvas.getContext('2d');
+            
+            // Video boyutları
+            const vWidth = videoElement.videoWidth;
+            const vHeight = videoElement.videoHeight;
+
+            // Kılavuz çerçeve oranına (3:4) göre video ortasından kırpma (Crop) hesaplama
+            // Rehber kutu 3:4 oranında.
+            let cropWidth = vHeight * (3 / 4);
+            let cropHeight = vHeight;
+            if (cropWidth > vWidth) {
+                cropWidth = vWidth;
+                cropHeight = vWidth * (4 / 3);
+            }
+            const startX = (vWidth - cropWidth) / 2;
+            const startY = (vHeight - cropHeight) / 2;
+
+            // 133x171 piksel e-Okul tuvaline çiz
+            ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 133, 171);
+
+            // e-Okul JPEG Boyut Optimizasyonu (20KB - 120KB hedefi)
+            let quality = 0.85;
+            let dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
+            let blob = dataURItoBlob(dataUrl);
+
+            // Boyut kontrol döngüsü
+            let attempts = 0;
+            while (blob.size > 120 * 1024 && quality > 0.3 && attempts < 5) {
+                quality -= 0.15;
+                dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
+                blob = dataURItoBlob(dataUrl);
+                attempts++;
+            }
+
+            const fileSizeKB = Math.round(blob.size / 1024);
+            const sanitizedName = studentName.replace(/[\s\/\\:*?"<>|]/g, "_");
+            const filename = `${currentClassName}_${studentNo}_${sanitizedName}.jpg`;
+
+            // Listeye ekle
+            const photoRecord = {
+                filename: filename,
+                dataUrl: dataUrl,
+                blob: blob,
+                sizeKB: fileSizeKB,
+                studentNo: studentNo,
+                name: studentName
+            };
+
+            capturedPhotos.push(photoRecord);
+            updateGalleryAndPreview(photoRecord);
+
+            // Formu sonraki öğrenci için temizle (Numara hariç artırılabilir veya boşaltılabilir)
+            document.getElementById('studentNoInput').value = "";
+            document.getElementById('studentNameInput').value = "";
+            document.getElementById('studentNoInput').focus();
+        }
+
+        // DataURL -> Blob dönüşümü
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        // Önizleme ve Galeriyi Güncelle
+        function updateGalleryAndPreview(latest) {
+            // Önizleme alanı
+            previewCanvas.style.display = 'block';
+            previewPlaceholder.style.display = 'none';
+            const pCtx = previewCanvas.getContext('2d');
+            const img = new Image();
+            img.onload = () => {
+                pCtx.clearRect(0, 0, 133, 171);
+                pCtx.drawImage(img, 0, 0, 133, 171);
+            };
+            img.src = latest.dataUrl;
+
+            document.getElementById('infoFilename').textContent = latest.filename;
+            document.getElementById('infoMeta').textContent = `${latest.sizeKB} KB | 133x171 px`;
+            
+            const statusBadge = document.getElementById('infoStatus');
+            if (latest.sizeKB >= 20 && latest.sizeKB <= 120) {
+                statusBadge.textContent = "Uyumlu (e-Okul Onaylı)";
+                statusBadge.className = "text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+            } else {
+                statusBadge.textContent = `Boyut Uyarısı (${latest.sizeKB} KB)`;
+                statusBadge.className = "text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+            }
+
+            // Sayaç ve Butonlar
+            document.getElementById('photoCountBadge').innerHTML = `<i class="fa-solid fa-images mr-1"></i> Çekilen: ${capturedPhotos.length}`;
+            document.getElementById('zipBtn').disabled = false;
+
+            // Galeri Grid Güncelle
+            renderGallery();
+
+            // Otomatik Tekil İndirme (Tarayıcı İndirilenler klasörüne)
+            downloadSinglePhoto(latest);
+        }
+
+        function downloadSinglePhoto(photo) {
+            const a = document.createElement('a');
+            a.href = photo.dataUrl;
+            a.download = photo.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Galeriyi Yeniden Çiz
+        function renderGallery() {
+            const container = document.getElementById('galleryContainer');
+            if (capturedPhotos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center text-slate-500 py-6 text-xs">
+                        <i class="fa-solid fa-images text-2xl mb-2 opacity-50"></i>
+                        Henüz bu oturumda fotoğraf çekilmedi.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = "";
+            capturedPhotos.forEach((photo, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 border border-slate-700 rounded-xl p-2 flex flex-col items-center gap-1.5 shadow";
+                card.innerHTML = `
+                    <div class="w-16 h-20 bg-black rounded overflow-hidden border border-slate-700">
+                        <img src="${photo.dataUrl}" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[11px] font-medium text-slate-200 truncate w-full text-center" title="${photo.name}">${photo.studentNo} - ${photo.name}</span>
+                    <span class="text-[9px] text-slate-400 font-mono">${photo.sizeKB} KB</span>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Tüm Sınıfı ZIP Olarak İndir
+        function downloadAllAsZip() {
+            if (capturedPhotos.length === 0) return;
+
+            const zip = new JSZip();
+            const folderName = currentClassName || "eOkul_Fotograflari";
+            const folder = zip.folder(folderName);
+
+            capturedPhotos.forEach(photo => {
+                folder.file(photo.filename, photo.blob);
+            });
+
+            zip.generateAsync({ type: "blob" }).then(function(content) {
+                saveAs(content, `${folderName}_eOkul_Fotograflari.zip`);
+            });
+        }
+    </script>
+</body>
+</html>
