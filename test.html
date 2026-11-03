@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BTY Test – 5. ve 6. Sınıf</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--tx:#1d2433;--mu:#667;--pr:#3b5bdb;--ok:#2b8a3e;--okb:#d3f9d8;--no:#c92a2a;--nob:#ffe3e3;--bd:#d9deea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1c212c;--tx:#e8ebf2;--mu:#98a0b3;--pr:#748ffc;--ok:#69db7c;--okb:#173a21;--no:#ff8787;--nob:#451c1c;--bd:#2f3646}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.w{max-width:680px;margin:0 auto;padding:20px 16px}
+h1{font-size:1.5rem;text-align:center;margin:10px 0}
+.sub{text-align:center;color:var(--mu);margin-bottom:24px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px}
+.grades{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+button{font:inherit;color:inherit;cursor:pointer}
+.g{background:var(--card);border:2px solid var(--bd);border-radius:14px;padding:28px 10px;font-size:1.3rem;font-weight:700}
+.g:hover{border-color:var(--pr)}
+.g small{display:block;font-weight:400;color:var(--mu);font-size:.85rem;margin-top:4px}
+.top{display:flex;justify-content:space-between;color:var(--mu);font-size:.9rem;margin-bottom:8px}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--pr);transition:width .3s}
+.wk{display:inline-block;background:var(--bd);border-radius:20px;padding:2px 12px;font-size:.8rem;margin-bottom:10px}
+.q{font-size:1.1rem;font-weight:600;margin:0 0 14px}
+.o{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--bd);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.o:hover:not(:disabled){border-color:var(--pr)}
+.o.ok{background:var(--okb);border-color:var(--ok)}
+.o.no{background:var(--nob);border-color:var(--no)}
+.o:disabled{cursor:default}
+.fb{margin-top:6px;padding:12px;border-radius:10px;font-weight:600}
+.fb.ok{background:var(--okb);color:var(--ok)}
+.fb.no{background:var(--nob);color:var(--no)}
+.nx{margin-top:14px;background:var(--pr);color:#fff;border:0;border-radius:10px;padding:12px 22px;font-weight:600;float:right}
+.ghost{background:none;border:0;color:var(--mu);text-decoration:underline;padding:0}
+.big{font-size:3rem;font-weight:800;text-align:center;color:var(--pr)}
+.c{text-align:center}
+.hide{display:none}
+.hero{display:flex;justify-content:center;gap:18px;font-size:3.2rem;padding:16px 8px;border-radius:12px;margin-bottom:14px;color:#fff;animation:pop .4s}
+.hero span{filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));animation:bob 2.4s ease-in-out infinite}
+.hero span:nth-child(2){animation-delay:.3s}.hero span:nth-child(3){animation-delay:.6s}
+.big2{font-size:4rem;text-align:center;margin:6px 0}
+.home{background:linear-gradient(135deg,#4c6ef5,#9775fa);font-size:2.4rem;gap:12px;flex-wrap:wrap}
+.g .ic{display:block;font-size:3rem;margin-bottom:6px}
+#g5{background:linear-gradient(160deg,#e7f5ff,var(--card))}#g6{background:linear-gradient(160deg,#f3f0ff,var(--card))}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #g5,:root:not([data-theme="light"]) #g6{background:var(--card)}}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.o:hover:not(:disabled){transform:translateX(3px)}
+</style></head><body><div class="w">
+<h1>📘 Bilişim Teknolojileri Testi</h1>
+<div id="home"><div class="hero home"><span>💻</span><span>🎨</span><span>🎬</span><span>🤖</span><span>🌐</span></div><p class="sub">Sınıfını seç, 40 soruluk teste başla.</p>
+<div class="grades"><button class="g" id="g5" data-g="5"><span class="ic">🖼️📝📊</span>5. Sınıf<small>Görsel, Word, Sunum, Ağlar</small></button><button class="g" id="g6" data-g="6"><span class="ic">🎬🔐🤖</span>6. Sınıf<small>Video, Güvenlik, Yapay Zekâ</small></button></div></div>
+<div id="quiz" class="card hide">
+<div class="top"><span id="cnt"></span><span id="sc"></span></div>
+<div class="bar"><i id="pb"></i></div>
+<div class="hero" id="hero"></div><span class="wk" id="wk"></span>
+<p class="q" id="qt"></p><div id="opts"></div><div id="fb"></div>
+<button class="nx hide" id="nx">Sonraki →</button><div style="clear:both"></div>
+</div>
+<div id="end" class="card c hide"><div class="big2" id="trophy">🏆</div><p>Test bitti!</p><div class="big" id="res"></div><p id="msg"></p>
+<button class="nx" style="float:none" id="again">Yeniden Başla</button><br><br><button class="ghost" id="back">Sınıf seçimine dön</button></div>
+</div>
+<script>
+const D={"8":"2–6 Kasım","9":"9–13 Kasım","10":"23–27 Kasım","11":"30 Kasım–4 Aralık","12":"7–11 Aralık","13":"14–18 Aralık","14":"21–25 Aralık","15":"28 Aralık–1 Ocak","16":"4–8 Ocak","17":"11–15 Ocak"};
+const Q5=[
+[8,"Birbiriyle ilişkili dosyaları düzenli saklamak için ne kullanılır?",["Klasör","Fare","Hoparlör"],0],
+[8,"Bir dosyanın adını değiştirmek için hangi işlem yapılır?",["Kopyala","Yeniden adlandır","Yapıştır"],1],
+[8,"Dosyayı bulunduğu yerden alıp başka yere taşımak için hangi işlem çifti kullanılır?",["Kopyala – Yapıştır","Sil – Geri Yükle","Kes – Yapıştır"],2],
+[8,"Silinen dosyalar ilk olarak nereye gider?",["Masaüstü","Geri Dönüşüm Kutusu","Belgelerim"],1],
+[9,"Hangisi bir görsel düzenleme programıdır?",["Not Defteri","Paint","Hesap Makinesi"],1],
+[9,"Görselin istenmeyen kısımlarını kesmek için hangi araç kullanılır?",["Kırp","Döndür","Kaydet"],0],
+[9,"Görsel için kurgu oluşturmadan önce ne yapılmalıdır?",["Dosya silinmeli","Bilgisayar kapatılmalı","Fikir ve plan yapılmalı"],2],
+[9,"Görseli yan çevirmek için hangi araç kullanılır?",["Döndür","Yazdır","Sil"],0],
+[10,"Bir görsel dosyasını geliştirmek için ne yapılabilir?",["Dosyayı silmek","Renk, parlaklık ve efekt ayarlamak","Dosya adını kısaltmak"],1],
+[10,"JPG uzantılı dosya hangi türdendir?",["Ses","Video","Görsel"],2],
+[10,"Görsele yazı eklemek için hangi araç kullanılır?",["Metin aracı","Silgi","Boya kovası"],0],
+[10,"Yapılan son değişikliği geri almak için hangi kısayol kullanılır?",["Ctrl+C","Ctrl+V","Ctrl+Z"],2],
+[11,"Hangisi bir kelime işlemci programıdır?",["Excel","Word","PowerPoint"],1],
+[11,"Metni kalın yapmak için hangi biçimlendirme seçilir?",["Kalın","İtalik","Altı çizili"],0],
+[11,"Yazı tipi ve yazı boyutu ayarları neyi değiştirir?",["Dosyayı siler","Yazının görünümünü","Yazıcıyı"],1],
+[11,"Word dosyalarının uzantısı hangisidir?",["mp3",".jpg",".docx"],2],
+[12,"Başlığı sayfanın ortasına yerleştirmek için hangi hizalama kullanılır?",["Sola yasla","Ortala","Sağa yasla"],1],
+[12,"Belgeye resim eklemek için hangi sekme kullanılır?",["Gözden Geçir","Görünüm","Ekle"],2],
+[12,"Yazım hatalarını bulmak için hangi özellik kullanılır?",["Yazım denetimi","Yazdır","Farklı kaydet"],0],
+[12,"Kelime işlemci dosyasını geliştirmek için hangisi yapılabilir?",["Fareyi değiştirmek","Başlık, tablo ve resim ekleyerek düzenlemek","Bilgisayarı yeniden başlatmak"],1],
+[13,"Hangisi bir sunum programıdır?",["Word","Paint","PowerPoint"],2],
+[13,"Sunumdaki her bir sayfaya ne denir?",["Slayt","Paragraf","Hücre"],0],
+[13,"Geçiş efekti neyi sağlar?",["Yazı tipini değiştirir","Slaytlar arasında animasyonlu geçiş","Dosya adını değiştirir"],1],
+[13,"PowerPoint dosyasının uzantısı hangisidir?",[".docx",".pptx",".xlsx"],1],
+[14,"İyi bir sunumda hangisi tercih edilmelidir?",["Uzun paragraflar","Kısa maddeler ve görseller","Çok fazla yazı"],1],
+[14,"Slayt gösterisini başlatmak için hangi sekme kullanılır?",["Ekle","Yazım","Slayt Gösterisi"],2],
+[14,"Sunuda animasyon eklemenin amacı nedir?",["Nesnelere hareket kazandırmak","Dosyayı sıkıştırmak","Yazıyı silmek"],0],
+[14,"Arka plan ve yazı rengi nasıl seçilmelidir?",["Aynı renk","Okunabilir, zıt renkler","Rastgele"],1],
+[15,"Bilgisayar ağı nedir?",["Tek bir bilgisayar","Elektrik tesisatı","Birbirine bağlı cihazların oluşturduğu yapı"],2],
+[15,"Hangisi bir ağ bileşenidir?",["Klavye","Hoparlör","Modem"],2],
+[15,"Yönlendirici (router) ne işe yarar?",["Ağdaki cihazlar arasında veriyi yönlendirir","Çıktı alır","Ses kaydeder"],0],
+[15,"Bilgisayar ağlarının temel amacı nedir?",["Ekran parlaklığını artırmak","Kaynak ve bilgi paylaşımı","Oyun silmek"],1],
+[16,"Ev veya okul gibi küçük alandaki ağa ne denir?",["WAN","LAN","HDMI"],1],
+[16,"Dünya çapında geniş alana yayılan ağ hangisidir?",["LAN","HDMI","WAN"],2],
+[16,"Hangisi kablolu bağlantı yöntemidir?",["Ethernet kablosu","Wi-Fi","Bluetooth"],0],
+[16,"Hangisi kablosuz bağlantı yöntemidir?",["Ethernet","Wi-Fi","HDMI"],1],
+[17,"Web sayfalarını görüntülemek için hangi program kullanılır?",["Paint","Tarayıcı","Word"],1],
+[17,"Hangisi bir arama motorudur?",["Google","Windows","Excel"],0],
+[17,"İnternette güvenilir bilgiye nasıl ulaşılır?",["Tanımadık sitelerden","Reklam bağlantılarından","Resmî ve güvenilir kaynaklardan"],2],
+[17,"Şifreni internette nasıl korumalısın?",["Sosyal medyada paylaşırım","Arkadaşlarıma söylerim","Kimseyle paylaşmam"],2]];
+const Q6=[
+[8,"Hangisi bir video düzenleme uygulamasıdır?",["Excel","CapCut","Paint"],1],
+[8,"Video kurgusu nedir?",["Çekilen görüntüleri keserek sıralayıp birleştirmek","Videoyu silmek","Fotoğraf çekmek"],0],
+[8,"Zaman çizelgesi (timeline) ne işe yarar?",["Dosya silmeye","Yazdırmaya","Klip ve sesleri sıraya dizmeye"],2],
+[8,"Videonun gereksiz bölümünü çıkarmak için ne yapılır?",["Kırpma / bölme","Yazdırma","Kopyalama"],0],
+[9,"Kurgudan önce hazırlanan plana ne ad verilir?",["Lisans","Senaryo / storyboard","Şifre"],1],
+[9,"Videoya arka plan müziği hangi öğe olarak eklenir?",["Slayt","Hücre","Ses parçası"],2],
+[9,"Klipler arasındaki yumuşak geçişi ne sağlar?",["Geçiş efekti","Filigran","Başlık"],0],
+[9,"Kurgusu biten projeyi video dosyası yapmak için ne yapılır?",["Sil","Dışa aktar","Kes"],1],
+[10,"Videoyu geliştirmek için hangisi yapılabilir?",["Altyazı ve renk düzeltme eklemek","Dosyayı silmek","Yazıcıyı açmak"],0],
+[10,"MP4 nedir?",["Görsel biçimi","Metin biçimi","Video biçimi"],2],
+[10,"URL nedir?",["Şifre","Web adresi","Dosya türü"],1],
+[10,"Web sayfalarına girmeyi sağlayan program hangisidir?",["Tarayıcı","Slayt","Klasör"],0],
+[11,"Arama motorunda tam ifadeyi aramak için ne kullanılır?",["Yıldız","Tırnak işareti","Nokta"],1],
+[11,"Hangisi eşzamanlı (anlık) iletişim aracıdır?",["E-posta","Forum","Görüntülü görüşme"],2],
+[11,"Hangisi eşzamansız iletişime örnektir?",["E-posta","Canlı görüşme","Telefon görüşmesi"],0],
+[11,"Hangisi bir iletişim teknolojisi değildir?",["E-posta","Mesajlaşma uygulaması","Hesap makinesi"],2],
+[12,"E-postada Bilgi (CC) alanı ne için kullanılır?",["Dosya silmek","Mesajın kopyasını başkasına göndermek","Şifre belirlemek"],1],
+[12,"Çevrim içi toplantı için hangisi kullanılır?",["Kelime işlemci","Ağ kablosu","Görüntülü toplantı uygulaması"],2],
+[12,"Hangisi güçlü bir şifredir?",["Harf, rakam ve sembol içeren uzun şifre","123456","Doğum tarihi"],0],
+[12,"Bilişim etiği nedir?",["Bir bilgisayar parçası","Teknoloji kullanırken uyulan ahlaki kurallar","Bir program"],1],
+[13,"Telif hakkı nedir?",["Eser sahibine ait haklar","Ücretsiz indirme izni","Bir şifre türü"],0],
+[13,"Kaynak göstermeden başkasının eserini kullanmaya ne denir?",["Lisans","Yedekleme","İntihal"],2],
+[13,"Oltalama (phishing) nedir?",["Bilgisayarı hızlandırma","Sahte mesajlarla bilgi çalma","Dosya temizleme"],1],
+[13,"Hangisi siber güvenlik önlemidir?",["Her bağlantıya tıklamak","Şifreyi paylaşmak","Antivirüs kullanıp güncellemek"],2],
+[14,"Creative Commons nedir?",["Eserin kullanım izinlerini belirleyen lisans","Bir virüs","Bir ağ türü"],0],
+[14,"Açık kaynak yazılımın özelliği nedir?",["Kaynak kodu kapalıdır","Kaynak kodu herkese açıktır","Hiç kullanılamaz"],1],
+[14,"Ticari lisanslı yazılım için ne gerekir?",["Hiçbir şey","Kodu değiştirmek","Kullanım için ücret ödemek"],2],
+[14,"Yapay zekâ sistemlerinin öğrenmesi için temel girdi nedir?",["Veri","Fare","Monitör"],0],
+[15,"Yapay zekâ nedir?",["Sadece bir oyun","İnsan zekâsı gerektiren görevleri yapabilen sistemler","Bir internet kablosu"],1],
+[15,"Hangisi yapay zekâ girdisi olabilir?",["Yalnızca kablo","Yalnızca elektrik","Metin, görsel ve ses verisi"],2],
+[15,"Sensör ne yapar?",["Çevreden veri toplar","Dosya siler","Şifre oluşturur"],0],
+[15,"Yanlış veriyle eğitilen yapay zekâya ne olur?",["Daha doğru çalışır","Hatalı sonuçlar üretir","Hiç etkilenmez"],1],
+[16,"Hangisi sesli asistan örneğidir?",["Paint","Excel","Google Asistan"],2],
+[16,"Hangisi yapay zekâ uygulamasıdır?",["Yüz tanıma","Cetvel","Takvim kâğıdı"],0],
+[16,"Makine öğrenmesi nedir?",["Makineyi söküp takmak","Verilerden örüntü öğrenerek karar vermek","Dosya taşımak"],1],
+[16,"Yapay zekâ çıktılarını kullanırken ne yapmalıyız?",["Körü körüne güvenmek","Hiç bakmamak","Doğruluğunu kontrol etmek"],2],
+[17,"Model geliştirmede ilk adım nedir?",["Veri toplamak","Modeli silmek","Sonucu yazdırmak"],0],
+[17,"Eğitim verisi nedir?",["Bir şifre","Modelin öğrenmesi için kullanılan örnekler","Bir ağ kablosu"],1],
+[17,"Teachable Machine ile ne yapılır?",["Video silinir","Ağ kurulur","Kodsuz basit bir model eğitilir"],2],
+[17,"Model test edilirken ne ölçülür?",["Doğruluğu","Ekran boyutu","Dosya adı"],0]];
+const S5={8:"🗂️📁🗑️",9:"🖼️🎨✂️",10:"🌈🖌️📷",11:"📝⌨️🔤",12:"📄🔍✅",13:"📊🖥️🎞️",14:"✨🎬💡",15:"🌐🖧📡",16:"📶🔌💻",17:"🔎🌍🔒"};
+const S6={8:"🎬🎞️✂️",9:"📋🎵🎥",10:"⚙️📽️🌍",11:"🔍💬📧",12:"📧👥🔐",13:"©️🎣🛡️",14:"📜🔓🤖",15:"🤖🧠📷",16:"🗣️👁️📚",17:"🧪🏋️✅"};
+const CL=["#4dabf7,#3b5bdb","#f783ac,#d6336c","#ffa94d,#e8590c","#69db7c,#2b8a3e","#9775fa,#6741d9","#22b8cf,#0b7285","#ff8787,#c92a2a","#74c0fc,#1864ab","#63e6be,#087f5b","#ffd43b,#e67700"];
+const $=id=>document.getElementById(id);
+let qs,i,score,done;
+document.querySelectorAll(".g").forEach(b=>b.onclick=()=>{qs=b.dataset.g=="5"?Q5:Q6;start()});
+function show(h,q,e){$("home").classList.toggle("hide",!h);$("quiz").classList.toggle("hide",!q);$("end").classList.toggle("hide",!e)}
+function start(){i=0;score=0;show(0,1,0);render()}
+function render(){
+const [w,t,o,a]=qs[i];done=false;
+$("cnt").textContent="Soru "+(i+1)+" / "+qs.length;$("sc").textContent="Puan: "+score;
+$("pb").style.width=(i/qs.length*100)+"%";
+$("wk").textContent="Hafta "+w+" · "+D[w];
+{const h=$("hero");h.innerHTML=[...new Intl.Segmenter("tr",{granularity:"grapheme"}).segment((qs===Q5?S5:S6)[w])].map(s=>"<span>"+s.segment+"</span>").join("");h.style.background="linear-gradient(135deg,"+CL[w-8]+")";h.style.animation="none";void h.offsetWidth;h.style.animation=""}$("qt").textContent=t;
+$("fb").innerHTML="";$("nx").classList.add("hide");
+$("nx").textContent=i==qs.length-1?"Sonucu Gör":"Sonraki →";
+$("opts").innerHTML="";
+o.forEach((x,k)=>{const b=document.createElement("button");b.className="o";b.textContent=String.fromCharCode(65+k)+") "+x;b.onclick=()=>pick(k);$("opts").appendChild(b)})}
+function pick(k){
+if(done)return;done=true;
+const [w,t,o,a]=qs[i];const bs=$("opts").children;
+for(const b of bs)b.disabled=true;
+bs[a].classList.add("ok");
+if(k==a){score++;$("fb").innerHTML='<div class="fb ok">✅ Doğru!</div>'}
+else{bs[k].classList.add("no");$("fb").innerHTML='<div class="fb no">❌ Yanlış. Doğru cevap: '+String.fromCharCode(65+a)+") "+o[a]+'</div>'}
+$("sc").textContent="Puan: "+score;$("nx").classList.remove("hide")}
+$("nx").onclick=()=>{i++;if(i<qs.length)render();else{
+show(0,0,1);$("res").textContent=score+" / "+qs.length;$("trophy").textContent=score>=34?"🏆":score>=24?"🎉":"💪";
+$("msg").textContent=score>=34?"Harikasın! 🌟":score>=24?"Güzel iş, biraz daha tekrar! 👍":"Konuları tekrar edip yeniden dene. 💪"}};
+$("again").onclick=start;$("back").onclick=()=>show(1,0,0);
+</script></body></html>
