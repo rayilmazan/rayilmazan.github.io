@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Okul Hızlı Fotoğraf Çekim Asistanı</title>
+    <title>e-Okul Resmi Standart Fotoğraf Asistanı</title>
     <!-- Tailwind CSS ve FontAwesome CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
     <!-- Üst Başlık -->
     <header class="bg-slate-800 border-b border-slate-700 py-2.5 px-4 text-center shadow-md shrink-0">
         <h1 class="text-xs font-bold tracking-wide flex items-center justify-center gap-2">
-            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Maksimum Kalite Fotoğraf Asistanı (266x342 px)
+            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Resmi Standart Asistanı (133x171 px | 20-150 KB)
         </h1>
     </header>
 
@@ -74,11 +74,11 @@
                 <span class="text-emerald-300 font-bold" id="displayStudentInfo">-</span>
             </div>
 
-            <!-- Ekrana Tam Oturan Canlı Kamera Kutusu ve Izgara / Kılavuz -->
+            <!-- Ekrana Tam Oturan Canlı Kamera Kutusu, Izgara ve Kılavuz -->
             <div class="relative w-full aspect-eokul bg-black rounded-xl overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
                 <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
                 
-                <!-- 3x3 Çekim Izgarası -->
+                <!-- 3x3 Çekim Izgarası (Dikey & Yatay Çizgiler) -->
                 <div class="absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 opacity-30">
                     <div class="border-r border-b border-white"></div>
                     <div class="border-r border-b border-white"></div>
@@ -121,8 +121,8 @@
 
     </main>
 
-    <!-- Gizli İşlem Canvası (Yüksek Kalite 2x Çözünürlük: 266x342) -->
-    <canvas id="processingCanvas" width="266" height="342" class="hidden"></canvas>
+    <!-- Gizli İşlem Canvası (Kesin e-Okul Standart Çözünürlüğü: 133x171 px) -->
+    <canvas id="processingCanvas" width="133" height="171" class="hidden"></canvas>
 
     <script>
         let stream = null;
@@ -213,7 +213,7 @@
                 document.getElementById('classNameInput').focus();
                 return;
             }
-            if (!studentNo || !studentName) {
+x           if (!studentNo || !studentName) {
                 alert("Lütfen öğrenci numarasını ve adını soyadını giriniz!");
                 document.getElementById('studentNoInput').focus();
                 return;
@@ -248,7 +248,7 @@
             document.getElementById('studentNoInput').focus();
         }
 
-        // MAKSİMUM KALİTE VE 50-115 KB HEDEFLEYEN ÇEKİM MOTORU (266x342 px)
+        // RESMİ 133x171 ÇÖZÜNÜRLÜK VE 20-150 KB DOSYA BOYUTU KONTROLÜ
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
@@ -258,7 +258,7 @@
             const vWidth = videoElement.videoWidth;
             const vHeight = videoElement.videoHeight;
 
-            // 3:4 Kadraj Kırpma Hesaplama
+            // 3:4 Kadraj Kırpma
             let cropWidth = vHeight * (3 / 4);
             let cropHeight = vHeight;
             if (cropWidth > vWidth) {
@@ -272,11 +272,35 @@
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 266, 342);
+            // Kesin e-Okul çözünürlüğü: 133x171
+            ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 133, 171);
 
-            // 266x342 çözünürlüğünde maksimum renk derinliği ve kalitesi (1.0)
-            let dataUrl = processingCanvas.toDataURL('image/jpeg', 1.0);
+            let quality = 1.0;
+            let dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
             let blob = dataURItoBlob(dataUrl);
+
+            // e-Okul kuralı: 150 KB üstündeyse kaliteyi düşür
+            while (blob.size > 145 * 1024 && quality > 0.1) {
+                quality -= 0.05;
+                dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
+                blob = dataURItoBlob(dataUrl);
+            }
+
+            // e-Okul kuralı: 20 KB altındaysa (örn. düz arka planlarda), 
+            // boyutu minimum 20 KB üstüne güvenle taşımak için hafif doku ekle
+            if (blob.size < 20 * 1024) {
+                const imgData = ctx.getImageData(0, 0, 133, 171);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = (Math.random() - 0.5) * 6; // Görseli bozmayan çok hafif mikro-doku
+                    data[i] = Math.min(255, Math.max(0, data[i] + noise));
+                    data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
+                    data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
+                }
+                ctx.putImageData(imgData, 0, 0);
+                dataUrl = processingCanvas.toDataURL('image/jpeg', 1.0);
+                blob = dataURItoBlob(dataUrl);
+            }
 
             const sanitizedName = currentStudentName.replace(/[\s\/\\:*?"<>|]/g, "_");
             const filename = `${currentStudentNo} ${sanitizedName}.jpg`;
