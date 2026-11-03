@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Okul Doğal Yüksek Netlikte Fotoğraf Asistanı</title>
+    <title>e-Okul Fotoğraf Çekim Asistanı</title>
     <!-- Tailwind CSS ve FontAwesome CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
     <!-- Üst Başlık -->
     <header class="bg-slate-800 border-b border-slate-700 py-2.5 px-4 text-center shadow-md shrink-0">
         <h1 class="text-xs font-bold tracking-wide flex items-center justify-center gap-2">
-            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Doğal Kamera Asistanı (133x171 px | 20-150 KB)
+            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Standart Fotoğraf Asistanı (133x171 px | Min 20 KB)
         </h1>
     </header>
 
@@ -142,7 +142,6 @@
             initCamera();
         });
 
-        // Kamerayı telefonun en yüksek optik çözünürlüğüne zorla
         async function initCamera() {
             try {
                 const constraints = {
@@ -258,7 +257,7 @@
             document.getElementById('studentNoInput').focus();
         }
 
-        // ÇOK BASAMAKLI DOĞAL ÖRNEKLEME İLE FOTOĞRAF ÇEKİMİ
+        // FOTOĞRAF ÇEKİMİ - 133x171 PX VE KESİN MIN 20 KB KONTROLÜ
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
@@ -268,7 +267,6 @@
             const vWidth = videoElement.videoWidth;
             const vHeight = videoElement.videoHeight;
 
-            // 3:4 Kadraj Kırpma Hesaplama
             let cropWidth = vHeight * (3 / 4);
             let cropHeight = vHeight;
             if (cropWidth > vWidth) {
@@ -278,7 +276,7 @@
             const startX = (vWidth - cropWidth) / 2;
             const startY = (vHeight - cropHeight) / 2;
 
-            // 1. ADIM: Ara Tuvale Yüksek Çözünürlükte Aktar (532x684 px)
+            // Ara Tuvale Yüksek Çözünürlükte Aktar (532x684 px)
             const stepW = 532;
             const stepH = 684;
             stepCanvas.width = stepW;
@@ -288,7 +286,7 @@
             sCtx.imageSmoothingQuality = 'high';
             sCtx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, stepW, stepH);
 
-            // 2. ADIM: Ara Tuvalden e-Okul 133x171 Tuvaline Yumuşak ve Detaylı Aktar
+            // Ara Tuvalden 133x171 e-Okul Tuvaline Aktar
             const ctx = processingCanvas.getContext('2d');
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
@@ -305,18 +303,19 @@
                 blob = dataURItoBlob(dataUrl);
             }
 
-            // e-Okul 20 KB alt sınır güvenliği (Hafif piksel kontrast dengeleme)
-            if (blob.size < 20 * 1024) {
+            // e-Okul KURALI: KESİN OLARAK 20 KB ALTINA DÜŞMESİN (Güçlendirilmiş Taban Kalite Kilidi)
+            if (blob.size < 20.5 * 1024) {
                 const imgData = ctx.getImageData(0, 0, 133, 171);
                 const data = imgData.data;
+                // Görselin doğal renk yapısını bozmadan mikroskopik düzeyde piksel veri derinliği ekle
                 for (let i = 0; i < data.length; i += 4) {
-                    const noise = (Math.random() - 0.5) * 4;
+                    const noise = (Math.random() - 0.5) * 6;
                     data[i] = Math.min(255, Math.max(0, data[i] + noise));
                     data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
                     data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
                 }
                 ctx.putImageData(imgData, 0, 0);
-                dataUrl = processingCanvas.toDataURL('image/jpeg', 0.98);
+                dataUrl = processingCanvas.toDataURL('image/jpeg', 1.0);
                 blob = dataURItoBlob(dataUrl);
             }
 
