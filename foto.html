@@ -78,7 +78,7 @@
             <div class="relative w-full aspect-eokul bg-black rounded-xl overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
                 <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
                 
-                <!-- 3x3 Çekim Izgarası (Dikey & Yatay Çizgiler) -->
+                <!-- 3x3 Çekim Izgarası -->
                 <div class="absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 opacity-30">
                     <div class="border-r border-b border-white"></div>
                     <div class="border-r border-b border-white"></div>
@@ -213,7 +213,7 @@
                 document.getElementById('classNameInput').focus();
                 return;
             }
-x           if (!studentNo || !studentName) {
+            if (!studentNo || !studentName) {
                 alert("Lütfen öğrenci numarasını ve adını soyadını giriniz!");
                 document.getElementById('studentNoInput').focus();
                 return;
@@ -248,7 +248,6 @@ x           if (!studentNo || !studentName) {
             document.getElementById('studentNoInput').focus();
         }
 
-        // RESMİ 133x171 ÇÖZÜNÜRLÜK VE 20-150 KB DOSYA BOYUTU KONTROLÜ
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
@@ -258,7 +257,6 @@ x           if (!studentNo || !studentName) {
             const vWidth = videoElement.videoWidth;
             const vHeight = videoElement.videoHeight;
 
-            // 3:4 Kadraj Kırpma
             let cropWidth = vHeight * (3 / 4);
             let cropHeight = vHeight;
             if (cropWidth > vWidth) {
@@ -272,27 +270,23 @@ x           if (!studentNo || !studentName) {
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            // Kesin e-Okul çözünürlüğü: 133x171
             ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 133, 171);
 
             let quality = 1.0;
             let dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
             let blob = dataURItoBlob(dataUrl);
 
-            // e-Okul kuralı: 150 KB üstündeyse kaliteyi düşür
             while (blob.size > 145 * 1024 && quality > 0.1) {
                 quality -= 0.05;
                 dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
                 blob = dataURItoBlob(dataUrl);
             }
 
-            // e-Okul kuralı: 20 KB altındaysa (örn. düz arka planlarda), 
-            // boyutu minimum 20 KB üstüne güvenle taşımak için hafif doku ekle
             if (blob.size < 20 * 1024) {
                 const imgData = ctx.getImageData(0, 0, 133, 171);
                 const data = imgData.data;
                 for (let i = 0; i < data.length; i += 4) {
-                    const noise = (Math.random() - 0.5) * 6; // Görseli bozmayan çok hafif mikro-doku
+                    const noise = (Math.random() - 0.5) * 6;
                     data[i] = Math.min(255, Math.max(0, data[i] + noise));
                     data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
                     data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
