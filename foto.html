@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>e-Okul Fotoğraf Asistanı Rayılmazan</title>
+    <title>e-Okul Doğal Yüksek Netlikte Fotoğraf Asistanı</title>
     <!-- Tailwind CSS ve FontAwesome CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,7 @@
     <!-- Üst Başlık -->
     <header class="bg-slate-800 border-b border-slate-700 py-2.5 px-4 text-center shadow-md shrink-0">
         <h1 class="text-xs font-bold tracking-wide flex items-center justify-center gap-2">
-            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Fotoğraf Rayılmazan (133x171 px | 20-150 KB)
+            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Doğal Kamera Asistanı (133x171 px | 20-150 KB)
         </h1>
     </header>
 
@@ -121,7 +121,8 @@
 
     </main>
 
-    <!-- Gizli İşlem Canvası (Kesin e-Okul Standart Çözünürlüğü: 133x171 px) -->
+    <!-- Gizli İşlem Canvasları -->
+    <canvas id="stepCanvas" class="hidden"></canvas>
     <canvas id="processingCanvas" width="133" height="171" class="hidden"></canvas>
 
     <script>
@@ -135,17 +136,19 @@
         const videoElement = document.getElementById('videoElement');
         const cameraOffMessage = document.getElementById('cameraOffMessage');
         const processingCanvas = document.getElementById('processingCanvas');
+        const stepCanvas = document.getElementById('stepCanvas');
 
         window.addEventListener('DOMContentLoaded', () => {
             initCamera();
         });
 
+        // Kamerayı telefonun en yüksek optik çözünürlüğüne zorla
         async function initCamera() {
             try {
                 const constraints = {
                     video: {
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 },
+                        width: { ideal: 3840, min: 1920 },
+                        height: { ideal: 2160, min: 1080 },
                         facingMode: { exact: 'environment' }
                     }
                 };
@@ -153,13 +156,20 @@
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                 } catch (e) {
                     stream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+                        video: { width: { ideal: 1920 }, height: { ideal: 1080 }, facingMode: 'environment' }
                     });
                 }
                 videoElement.srcObject = stream;
                 cameraOffMessage.style.display = 'none';
             } catch (err) {
                 console.error("Kamera hatası:", err);
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    videoElement.srcObject = stream;
+                    cameraOffMessage.style.display = 'none';
+                } catch(e2) {
+                    alert("Kamera başlatılamadı. İzinleri kontrol edin.");
+                }
             }
         }
 
@@ -248,7 +258,7 @@
             document.getElementById('studentNoInput').focus();
         }
 
-        // KESİN 133x171 ÇÖZÜNÜRLÜK, 20-150 KB LİMİT KONTROLÜ VE YÜKSEK NETLEŞTİRME FİLTRESİ
+        // ÇOK BASAMAKLI DOĞAL ÖRNEKLEME İLE FOTOĞRAF ÇEKİMİ
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
@@ -258,6 +268,7 @@
             const vWidth = videoElement.videoWidth;
             const vHeight = videoElement.videoHeight;
 
+            // 3:4 Kadraj Kırpma Hesaplama
             let cropWidth = vHeight * (3 / 4);
             let cropHeight = vHeight;
             if (cropWidth > vWidth) {
@@ -267,39 +278,45 @@
             const startX = (vWidth - cropWidth) / 2;
             const startY = (vHeight - cropHeight) / 2;
 
+            // 1. ADIM: Ara Tuvale Yüksek Çözünürlükte Aktar (532x684 px)
+            const stepW = 532;
+            const stepH = 684;
+            stepCanvas.width = stepW;
+            stepCanvas.height = stepH;
+            const sCtx = stepCanvas.getContext('2d');
+            sCtx.imageSmoothingEnabled = true;
+            sCtx.imageSmoothingQuality = 'high';
+            sCtx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, stepW, stepH);
+
+            // 2. ADIM: Ara Tuvalden e-Okul 133x171 Tuvaline Yumuşak ve Detaylı Aktar
             const ctx = processingCanvas.getContext('2d');
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(stepCanvas, 0, 0, stepW, stepH, 0, 0, 133, 171);
 
-            // 1. Adım: Resmi tam 133x171 piksel olarak tuvale çiz
-            ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 133, 171);
-
-            // 2. Adım: Keskinlik filtresi (Sharpening Convolution Matrix) uygulayarak yüzü netleştir
-            applySharpenFilter(ctx, 133, 171);
-
-            let quality = 1.0;
+            let quality = 0.98;
             let dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
             let blob = dataURItoBlob(dataUrl);
 
-            // e-Okul 150 KB sınırını aşmaması için gerekirse kaliteyi optimize et
+            // e-Okul 150 KB üst sınır kontrolü
             while (blob.size > 145 * 1024 && quality > 0.1) {
                 quality -= 0.05;
                 dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
                 blob = dataURItoBlob(dataUrl);
             }
 
-            // e-Okul 20 KB alt sınır koruması
+            // e-Okul 20 KB alt sınır güvenliği (Hafif piksel kontrast dengeleme)
             if (blob.size < 20 * 1024) {
                 const imgData = ctx.getImageData(0, 0, 133, 171);
                 const data = imgData.data;
                 for (let i = 0; i < data.length; i += 4) {
-                    const noise = (Math.random() - 0.5) * 5;
+                    const noise = (Math.random() - 0.5) * 4;
                     data[i] = Math.min(255, Math.max(0, data[i] + noise));
                     data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
                     data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
                 }
                 ctx.putImageData(imgData, 0, 0);
-                dataUrl = processingCanvas.toDataURL('image/jpeg', 1.0);
+                dataUrl = processingCanvas.toDataURL('image/jpeg', 0.98);
                 blob = dataURItoBlob(dataUrl);
             }
 
@@ -320,41 +337,6 @@
             }
 
             backToInfoScreen();
-        }
-
-        // Yüz detaylarını ve kenarları netleştiren filtre fonksiyonu
-        function applySharpenFilter(ctx, width, height) {
-            const imageData = ctx.getImageData(0, 0, width, height);
-            const src = imageData.data;
-            const output = ctx.createImageData(width, height);
-            const dst = output.data;
-            const w = width;
-            const h = height;
-
-            // Sharpen matrisi
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
-                    const idx = (y * w + x) * 4;
-                    if (y === 0 || y === h - 1 || x === 0 || x === w - 1) {
-                        dst[idx] = src[idx];
-                        dst[idx+1] = src[idx+1];
-                        dst[idx+2] = src[idx+2];
-                        dst[idx+3] = src[idx+3];
-                        continue;
-                    }
-                    for (let c = 0; c < 3; c++) {
-                        let val = 
-                            5 * src[idx + c] -
-                            src[((y - 1) * w + x) * 4 + c] -
-                            src[((y + 1) * w + x) * 4 + c] -
-                            src[(y * w + (x - 1)) * 4 + c] -
-                            src[(y * w + (x + 1)) * 4 + c];
-                        dst[idx + c] = Math.min(255, Math.max(0, val));
-                    }
-                    dst[idx + 3] = src[idx + 3];
-                }
-            }
-            ctx.putImageData(output, 0, 0);
         }
 
         function fallbackDownload(dataUrl, filename) {
