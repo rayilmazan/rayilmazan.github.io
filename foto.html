@@ -17,7 +17,7 @@
     <!-- Üst Başlık -->
     <header class="bg-slate-800 border-b border-slate-700 py-2.5 px-4 text-center shadow-md shrink-0">
         <h1 class="text-xs font-bold tracking-wide flex items-center justify-center gap-2">
-            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Fotoğraf Çekim Asistanı (133x171 px)
+            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Yüksek Kalite Fotoğraf Asistanı (133x171 px)
         </h1>
     </header>
 
@@ -74,10 +74,23 @@
                 <span class="text-emerald-300 font-bold" id="displayStudentInfo">-</span>
             </div>
 
-            <!-- Ekrana Tam Oturan Büyük Canlı Kamera Kutusu ve Kılavuz -->
+            <!-- Ekrana Tam Oturan Canlı Kamera Kutusu ve Izgara / Kılavuz -->
             <div class="relative w-full aspect-eokul bg-black rounded-xl overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
                 <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
                 
+                <!-- 3x3 Çekim Izgarası (Dikey & Yatay Izgara Çizgileri) -->
+                <div class="absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 opacity-30">
+                    <div class="border-r border-b border-white"></div>
+                    <div class="border-r border-b border-white"></div>
+                    <div class="border-b border-white"></div>
+                    <div class="border-r border-b border-white"></div>
+                    <div class="border-r border-b border-white"></div>
+                    <div class="border-b border-white"></div>
+                    <div class="border-r border-white"></div>
+                    <div class="border-r border-white"></div>
+                    <div></div>
+                </div>
+
                 <!-- e-Okul Kadraj Rehberi -->
                 <div class="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-3">
                     <div class="w-48 h-64 border-2 border-dashed border-amber-400/90 rounded-full flex flex-col items-center justify-center relative shadow-lg">
@@ -242,7 +255,7 @@
             document.getElementById('studentNoInput').focus();
         }
 
-        // Fotoğraf Çekme ve Klasöre Kaydetme
+        // Fotoğraf Çekme ve 120 KB Max Kaliteye Optimize Etme
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
@@ -265,13 +278,14 @@
 
             ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 133, 171);
 
-            // 120 KB Sınırını Zorlayan Kalite Optimizasyonu
-            let quality = 0.95;
+            // MAKSİMUM KALİTE ALGORİTMASI (120 KB sınırını aşmadan en yüksek detay)
+            let quality = 0.99;
             let dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
             let blob = dataURItoBlob(dataUrl);
 
+            // Eğer dosya 120 KB üstündeyse, 120 KB altına inene kadar kaliteyi yavaşça düşür
             while (blob.size > 120 * 1024 && quality > 0.1) {
-                quality -= 0.02;
+                quality -= 0.01;
                 dataUrl = processingCanvas.toDataURL('image/jpeg', quality);
                 blob = dataURItoBlob(dataUrl);
             }
