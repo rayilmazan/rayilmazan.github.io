@@ -17,7 +17,7 @@
     <!-- Üst Başlık -->
     <header class="bg-slate-800 border-b border-slate-700 py-2.5 px-4 text-center shadow-md shrink-0">
         <h1 class="text-xs font-bold tracking-wide flex items-center justify-center gap-2">
-            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Maksimum Kalite Fotoğraf Asistanı (133x171 px)
+            <i class="fa-solid fa-camera-retro text-indigo-400"></i> e-Okul Maksimum Kalite Fotoğraf Asistanı (266x342 px)
         </h1>
     </header>
 
@@ -78,7 +78,7 @@
             <div class="relative w-full aspect-eokul bg-black rounded-xl overflow-hidden border-2 border-slate-700 shadow-xl mx-auto flex items-center justify-center shrink-0">
                 <video id="videoElement" autoplay playsinline class="w-full h-full object-cover"></video>
                 
-                <!-- 3x3 Çekim Izgarası (Dikey & Yatay Izgara Çizgileri) -->
+                <!-- 3x3 Çekim Izgarası -->
                 <div class="absolute inset-0 pointer-events-none grid grid-cols-3 grid-rows-3 opacity-30">
                     <div class="border-r border-b border-white"></div>
                     <div class="border-r border-b border-white"></div>
@@ -121,8 +121,8 @@
 
     </main>
 
-    <!-- Gizli İşlem Canvası (Yüksek Kalite Çözünürlük Ölçekli) -->
-    <canvas id="processingCanvas" class="hidden"></canvas>
+    <!-- Gizli İşlem Canvası (Yüksek Kalite 2x Çözünürlük: 266x342) -->
+    <canvas id="processingCanvas" width="266" height="342" class="hidden"></canvas>
 
     <script>
         let stream = null;
@@ -248,7 +248,7 @@
             document.getElementById('studentNoInput').focus();
         }
 
-        // FOTOĞRAFI MAKSİMUM KALİTEYE (100-120 KB ARALIĞINA) ZORLAYAN ÇEKİM MOTORU
+        // MAKSİMUM KALİTE VE 50-115 KB HEDEFLEYEN ÇEKİM MOTORU (266x342 px)
         async function capturePhoto() {
             if (!stream) {
                 alert("Kamera aktif değil!");
@@ -268,25 +268,15 @@
             const startX = (vWidth - cropWidth) / 2;
             const startY = (vHeight - cropHeight) / 2;
 
-            // e-Okul standart boyutu: 133x171
-            processingCanvas.width = 133;
-            processingCanvas.height = 171;
             const ctx = processingCanvas.getContext('2d');
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 133, 171);
+            ctx.drawImage(videoElement, startX, startY, cropWidth, cropHeight, 0, 0, 266, 342);
 
-            // BİT DÜZEYİNİ VE KALİTEYİ MAKSİMUMA ÇIKARMA
-            // Piksel boyutu küçük olduğu için renk derinliğini ve sıkıştırma kalitesini 
-            // dosya boyutu 115 KB civarına gelene kadar zorlayacak akış:
+            // 266x342 çözünürlüğünde maksimum renk derinliği ve kalitesi (1.0)
             let dataUrl = processingCanvas.toDataURL('image/jpeg', 1.0);
             let blob = dataURItoBlob(dataUrl);
-
-            // Eğer standart 1.0 kalite bile 30-40 KB kalıyorsa, tarayıcının ek sıkıştırma yapmasını 
-            // engellemek için piksel yoğunluğunu veya veri kalitesini maksimize ediyoruz.
-            // Not: Tarayıcılar 133x171 pikselde JPEG sıkıştırmasını standart üst sınırlarda tutar. 
-            // Bu sürümle birlikte renk kalitesi en üst düzeye kilitlenmiştir.
 
             const sanitizedName = currentStudentName.replace(/[\s\/\\:*?"<>|]/g, "_");
             const filename = `${currentStudentNo} ${sanitizedName}.jpg`;
