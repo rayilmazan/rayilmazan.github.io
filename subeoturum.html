@@ -10,6 +10,7 @@
             --card-bg: #ffffff;
             --primary: #2b3a4a;
             --accent: #3b82f6;
+            --success: #10b981;
             --girl-color: #ec4899;
             --boy-color: #0284c7;
             --empty-color: #cbd5e1;
@@ -41,6 +42,17 @@
         .subtitle {
             color: #64748b;
             font-size: 14px;
+        }
+
+        .date-badge {
+            margin-top: 8px;
+            display: inline-block;
+            background: #e2e8f0;
+            color: #334155;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
         }
 
         .input-section {
@@ -75,24 +87,37 @@
         }
 
         .btn-container {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
             margin-bottom: 30px;
         }
 
         button {
-            background-color: var(--accent);
             color: white;
             border: none;
             padding: 12px 28px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
             transition: background 0.2s;
         }
 
-        button:hover {
+        .btn-generate {
+            background-color: var(--accent);
+        }
+
+        .btn-generate:hover {
             background-color: #1d4ed8;
+        }
+
+        .btn-pdf {
+            background-color: var(--success);
+        }
+
+        .btn-pdf:hover {
+            background-color: #059669;
         }
 
         .teacher-desk {
@@ -194,16 +219,25 @@
             font-size: 13px;
         }
 
+        /* PDF / Baskı Stilleri */
         @media print {
-            .input-section, .btn-container {
-                display: none;
+            .input-section, .btn-container, footer {
+                display: none !important;
             }
             body {
                 background: white;
                 padding: 0;
             }
+            .container {
+                max-width: 100%;
+            }
             .classroom {
                 box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+            .seat {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
         }
     </style>
@@ -214,6 +248,7 @@
     <header>
         <h1>🪑 Sınıf Oturma Düzeni Planlayıcı</h1>
         <div class="subtitle">rayılmazan • Çevrimdışı Sınıf Yerleşim Aracı</div>
+        <div class="date-badge" id="dateDisplay">Tarih: Henüz Oluşturulmadı</div>
     </header>
     
     <div class="input-section">
@@ -228,7 +263,8 @@
     </div>
 
     <div class="btn-container">
-        <button onclick="generateSeating()">Oturma Düzeni Oluştur (Rastgele Karıştır)</button>
+        <button class="btn-generate" onclick="generateSeating()">Oturma Düzeni Oluştur (Rastgele)</button>
+        <button class="btn-pdf" onclick="exportPDF()">PDF Olarak İndir / Yazdır</button>
     </div>
 
     <div class="teacher-desk">ÖĞRETMEN MASASI</div>
@@ -259,21 +295,33 @@ function shuffleArray(array) {
     }
 }
 
+// Güncel tarih ve hafta bilgisini formatlama
+function getCurrentDateString() {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}.${month}.${year}`;
+}
+
 function generateSeating() {
-    // 1. Verileri Okuma ve Temizleme
+    // Tarihi güncelle
+    document.getElementById('dateDisplay').innerText = `Oluşturulma Tarihi: ${getCurrentDateString()}`;
+
+    // Verileri okuma ve temizleme
     const girlsRaw = document.getElementById('girls').value.split('\n');
     const boysRaw = document.getElementById('boys').value.split('\n');
 
     let girls = girlsRaw.map(s => s.trim()).filter(s => s.length > 0);
     let boys = boysRaw.map(s => s.trim()).filter(s => s.length > 0);
 
-    // Her buton basışında listeleri rastgele karıştır
+    // Listeleri rastgele karıştır
     shuffleArray(girls);
     shuffleArray(boys);
 
     let desks = [];
 
-    // 2. Kızları Gruplar Halinde İkili Masalara Yerleştirme
+    // Kızları ikili masalara yerleştirme (blok/arka arkaya)
     for (let i = 0; i < girls.length; i += 2) {
         if (i + 1 < girls.length) {
             desks.push([
@@ -288,7 +336,7 @@ function generateSeating() {
         }
     }
 
-    // 3. Erkekleri İkili Masalara Yerleştirme
+    // Erkekleri ikili masalara yerleştirme
     for (let i = 0; i < boys.length; i += 2) {
         if (i + 1 < boys.length) {
             desks.push([
@@ -303,7 +351,7 @@ function generateSeating() {
         }
     }
 
-    // 4. Sütun Elementlerini Seçme ve Sıfırlama
+    // Sütun elementlerini temizleme
     const col1 = document.getElementById('col-1');
     const col2 = document.getElementById('col-2');
     const col3 = document.getElementById('col-3');
@@ -316,7 +364,7 @@ function generateSeating() {
     const totalDesks = desks.length;
     const desksPerCol = Math.ceil(totalDesks / 3);
 
-    // 5. Masaları 3 Sütuna Dağıtma
+    // 3 Sütuna dağıtma
     desks.forEach((deskData, index) => {
         let colIndex = Math.floor(index / desksPerCol);
         if (colIndex > 2) colIndex = 2;
@@ -339,6 +387,14 @@ function generateSeating() {
         columns[colIndex].appendChild(deskEl);
     });
 }
+
+// PDF Çıktısı Alma / Yazdırma Fonksiyonu
+function exportPDF() {
+    window.print();
+}
+
+// Sayfa açıldığında varsayılan tarihi yazdır
+document.getElementById('dateDisplay').innerText = `Tarih: ${getCurrentDateString()}`;
 </script>
 
 </body>
