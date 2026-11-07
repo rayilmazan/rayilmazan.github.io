@@ -110,7 +110,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* 3 Sütunlu Sınıf Yapısı */
         .classroom {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -229,20 +228,20 @@
     </div>
 
     <div class="btn-container">
-        <button onclick="generateSeating()">Oturma Düzeni Oluştur</button>
+        <button onclick="generateSeating()">Oturma Düzeni Oluştur (Rastgele Karıştır)</button>
     </div>
 
     <div class="teacher-desk">ÖĞRETMEN MASASI</div>
 
     <div class="classroom">
         <div class="column" id="col-1">
-            <div class="column-header">1. SÜTUN (PENCERE)</div>
+            <div class="column-header">1. SÜTUN (KAPI)</div>
         </div>
         <div class="column" id="col-2">
             <div class="column-header">2. SÜTUN (ORTA)</div>
         </div>
         <div class="column" id="col-3">
-            <div class="column-header">3. SÜTUN (KAPI)</div>
+            <div class="column-header">3. SÜTUN (PENCERE)</div>
         </div>
     </div>
 
@@ -252,349 +251,25 @@
 </div>
 
 <script>
-function generateSeating() {
-    // 1. Verileri Okuma ve Temizleme
-    const girlsRaw = document.getElementById('girls').value.split('\n');
-    const boysRaw = document.getElementById('boys').value.split('\n');
-
-    const girls = girlsRaw.map(s => s.trim()).filter(s => s.length > 0);
-    const boys = boysRaw.map(s => s.trim()).filter(s => s.length > 0);
-
-    let desks = [];
-
-    // 2. Kızları Gruplar Halinde İkili Masalara Yerleştirme
-    for (let i = 0; i < girls.length; i += 2) {
-        if (i + 1 < girls.length) {
-            desks.push([
-                { name: girls[i], gender: 'girl' },
-                { name: girls[i+1], gender: 'girl' }
-            ]);
-        } else {
-            // Tek kalan kız öğrenci için boş koltuk eşleştirmesi
-            desks.push([
-                { name: girls[i], gender: 'girl' },
-                { name: 'Boş Koltuk', gender: 'empty' }
-            ]);
-        }
+// Diziyi rastgele karıştırma (Fisher-Yates shuffle)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-
-    // 3. Erkekleri İkili Masalara Yerleştirme
-    for (let i = 0; i < boys.length; i += 2) {
-        if (i + 1 < boys.length) {
-            desks.push([
-                { name: boys[i], gender: 'boy' },
-                { name: boys[i+1], gender: 'boy' }
-            ]);
-        } else {
-            // Tek kalan erkek öğrenci için boş koltuk eşleştirmesi
-            desks.push([
-                { name: boys[i], gender: 'boy' },
-                { name: 'Boş Koltuk', gender: 'empty' }
-            ]);
-        }
-    }
-
-    // 4. Sütun Elementlerini Seçme
-    const col1 = document.getElementById('col-1');
-    const col2 = document.getElementById('col-2');
-    const col3 = document.getElementById('col-3');
-
-    // Başlıkları koruyarak içeriği sıfırlama
-    col1.innerHTML = '<div class="column-header">1. SÜTUN (PENCERE)</div>';
-    col2.innerHTML = '<div class="column-header">2. SÜTUN (ORTA)</div>';
-    col3.innerHTML = '<div class="column-header">3. SÜTUN (KAPI)</div>';
-
-    const columns = [col1, col2, col3];
-    const totalDesks = desks.length;
-    const desksPerCol = Math.ceil(totalDesks / 3);
-
-    // 5. Masaları 3 Sütuna Dengeli Dağıtma (Önden arkaya doğru akış)
-    desks.forEach((deskData, index) => {
-        let colIndex = Math.floor(index / desksPerCol);
-        if (colIndex > 2) colIndex = 2; // Güvenlik sınırı
-
-        const deskEl = document.createElement('div');
-        deskEl.className = 'desk';
-        
-        const deskNum = document.createElement('div');
-        deskNum.className = 'desk-number';
-        deskNum.innerText = (index + 1) + '. Sıra';
-        deskEl.appendChild(deskNum);
-
-        deskData.forEach(student => {
-            const seatEl = document.createElement('div');
-            seatEl.className = `seat ${student.gender}`;
-            seatEl.innerText = student.name;
-            deskEl.appendChild(seatEl);
-        });
-
-        columns[colIndex].appendChild(deskEl);
-    });
 }
-</script>
 
-</body>
-</html><!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sınıf Oturma Düzeni Planlayıcı - rayılmazan</title>
-    <style>
-        :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --primary: #2b3a4a;
-            --accent: #3b82f6;
-            --girl-color: #ec4899;
-            --boy-color: #0284c7;
-            --empty-color: #cbd5e1;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        h1 {
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .input-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #475569;
-        }
-
-        textarea {
-            height: 120px;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .btn-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        button {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background-color: #1d4ed8;
-        }
-
-        .teacher-desk {
-            width: 240px;
-            height: 45px;
-            background: #ab5e22;
-            color: white;
-            margin: 0 auto 30px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 6px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* 3 Sütunlu Sınıf Yapısı */
-        .classroom {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        .column {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .column-header {
-            text-align: center;
-            font-weight: bold;
-            color: #64748b;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .desk {
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 8px;
-            background: #f8fafc;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            position: relative;
-        }
-
-        .desk-number {
-            position: absolute;
-            top: -10px;
-            left: 10px;
-            background: #e2e8f0;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: #475569;
-            font-weight: bold;
-        }
-
-        .seat {
-            padding: 12px 6px;
-            border-radius: 6px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            color: white;
-            min-height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            word-break: break-word;
-        }
-
-        .seat.girl {
-            background-color: var(--girl-color);
-        }
-
-        .seat.boy {
-            background-color: var(--boy-color);
-        }
-
-        .seat.empty {
-            background-color: var(--empty-color);
-            color: #475569;
-            font-weight: normal;
-            font-style: italic;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        @media print {
-            .input-section, .btn-container {
-                display: none;
-            }
-            body {
-                background: white;
-                padding: 0;
-            }
-            .classroom {
-                box-shadow: none;
-            }
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <header>
-        <h1>🪑 Sınıf Oturma Düzeni Planlayıcı</h1>
-        <div class="subtitle">rayılmazan • Çevrimdışı Sınıf Yerleşim Aracı</div>
-    </header>
-    
-    <div class="input-section">
-        <div class="input-group">
-            <label for="girls">Kız Öğrenci Listesi (Her satıra bir isim):</label>
-            <textarea id="girls" placeholder="Ayşe Yılmaz&#10;Fatma Demir&#10;Zeynep Kaya&#10;Elif Çelik"></textarea>
-        </div>
-        <div class="input-group">
-            <label for="boys">Erkek Öğrenci Listesi (Her satıra bir isim):</label>
-            <textarea id="boys" placeholder="Ahmet Şahin&#10;Mehmet Öztürk&#10;Ali Yıldız&#10;Can Korkmaz"></textarea>
-        </div>
-    </div>
-
-    <div class="btn-container">
-        <button onclick="generateSeating()">Oturma Düzeni Oluştur</button>
-    </div>
-
-    <div class="teacher-desk">ÖĞRETMEN MASASI</div>
-
-    <div class="classroom">
-        <div class="column" id="col-1">
-            <div class="column-header">1. SÜTUN (PENCERE)</div>
-        </div>
-        <div class="column" id="col-2">
-            <div class="column-header">2. SÜTUN (ORTA)</div>
-        </div>
-        <div class="column" id="col-3">
-            <div class="column-header">3. SÜTUN (KAPI)</div>
-        </div>
-    </div>
-
-    <footer>
-        Geliştirici: rayılmazan | İnternet bağlantısı olmadan tamamen yerel çalışır.
-    </footer>
-</div>
-
-<script>
 function generateSeating() {
     // 1. Verileri Okuma ve Temizleme
     const girlsRaw = document.getElementById('girls').value.split('\n');
     const boysRaw = document.getElementById('boys').value.split('\n');
 
-    const girls = girlsRaw.map(s => s.trim()).filter(s => s.length > 0);
-    const boys = boysRaw.map(s => s.trim()).filter(s => s.length > 0);
+    let girls = girlsRaw.map(s => s.trim()).filter(s => s.length > 0);
+    let boys = boysRaw.map(s => s.trim()).filter(s => s.length > 0);
+
+    // Her buton basışında listeleri rastgele karıştır
+    shuffleArray(girls);
+    shuffleArray(boys);
 
     let desks = [];
 
@@ -606,7 +281,6 @@ function generateSeating() {
                 { name: girls[i+1], gender: 'girl' }
             ]);
         } else {
-            // Tek kalan kız öğrenci için boş koltuk eşleştirmesi
             desks.push([
                 { name: girls[i], gender: 'girl' },
                 { name: 'Boş Koltuk', gender: 'empty' }
@@ -622,7 +296,6 @@ function generateSeating() {
                 { name: boys[i+1], gender: 'boy' }
             ]);
         } else {
-            // Tek kalan erkek öğrenci için boş koltuk eşleştirmesi
             desks.push([
                 { name: boys[i], gender: 'boy' },
                 { name: 'Boş Koltuk', gender: 'empty' }
@@ -630,24 +303,23 @@ function generateSeating() {
         }
     }
 
-    // 4. Sütun Elementlerini Seçme
+    // 4. Sütun Elementlerini Seçme ve Sıfırlama
     const col1 = document.getElementById('col-1');
     const col2 = document.getElementById('col-2');
     const col3 = document.getElementById('col-3');
 
-    // Başlıkları koruyarak içeriği sıfırlama
-    col1.innerHTML = '<div class="column-header">1. SÜTUN (PENCERE)</div>';
+    col1.innerHTML = '<div class="column-header">1. SÜTUN (KAPI)</div>';
     col2.innerHTML = '<div class="column-header">2. SÜTUN (ORTA)</div>';
-    col3.innerHTML = '<div class="column-header">3. SÜTUN (KAPI)</div>';
+    col3.innerHTML = '<div class="column-header">3. SÜTUN (PENCERE)</div>';
 
     const columns = [col1, col2, col3];
     const totalDesks = desks.length;
     const desksPerCol = Math.ceil(totalDesks / 3);
 
-    // 5. Masaları 3 Sütuna Dengeli Dağıtma (Önden arkaya doğru akış)
+    // 5. Masaları 3 Sütuna Dağıtma
     desks.forEach((deskData, index) => {
         let colIndex = Math.floor(index / desksPerCol);
-        if (colIndex > 2) colIndex = 2; // Güvenlik sınırı
+        if (colIndex > 2) colIndex = 2;
 
         const deskEl = document.createElement('div');
         deskEl.className = 'desk';
