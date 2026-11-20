@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofis ve Multimedya Uygulama Atölyesi</title>
+    <style>
+        /* ==========================================================================
+           1. TEMEL TASARIM DEĞİŞKENLERİ VE SIFIRLAMA (100% ÇEVRİMDIŞI / SIFIR BAĞIMLILIK)
+           ========================================================================== */
+        :root {
+            --bg-app: #eef2f6;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f8fafc;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+
+            /* Modül Tema Renkleri */
+            --office-primary: #2563eb;
+            --office-dark: #1d4ed8;
+            --office-bg: #eff6ff;
+            --office-border: #bfdbfe;
+
+            --img-primary: #059669;
+            --img-dark: #047857;
+            --img-bg: #ecfdf5;
+            --img-border: #a7f3d0;
+
+            --audio-primary: #7c3aed;
+            --audio-dark: #6d28d9;
+            --audio-bg: #f5f3ff;
+            --audio-border: #ddd6fe;
+
+            --video-primary: #ea580c;
+            --video-dark: #c2410c;
+            --video-bg: #fff7ed;
+            --video-border: #fed7aa;
+
+            /* Durum Renkleri */
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --success-border: #86efac;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+
+            --radius-xl: 18px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 7px;
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            line-height: 1.55;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ==========================================================================
+           2. ÜST NAVİGASYON VE İLERLEME ÇUBUĞU
+           ========================================================================== */
+        .top-navbar {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, var(--office-primary), var(--img-primary), var(--audio-primary), var(--video-primary));
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.15rem;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .brand-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .scoreboard {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .score-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .score-badge.points {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: #e2e8f0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--office-primary), var(--img-primary), var(--audio-primary), var(--video-primary));
+            transition: width 0.35s ease;
+        }
+
+        /* ==========================================================================
+           3. MODÜL SEÇİCİ SEKMELERİ (5 BAŞLIK)
+           ========================================================================== */
+        .main-container {
+            max-width: 1120px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px 16px 48px 16px;
+            flex: 1;
+        }
+
+        .module-tabs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 900px) {
+            .module-tabs {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .module-tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .tab-btn {
+            background: var(--bg-surface);
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 11px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            text-align: left;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab-left {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .tab-count {
+            font-size: 0.76rem;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        .tab-btn.active-all {
+            border-color: #1e293b;
+            background: #1e293b;
+            color: #ffffff;
+        }
+        .tab-btn.active-all .tab-count {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: transparent;
+            color: #ffffff;
+        }
+
+        .tab-btn.active-office {
+            border-color: var(--office-primary);
+            background: var(--office-bg);
+            color: var(--office-dark);
+        }
+
+        .tab-btn.active-image {
+            border-color: var(--img-primary);
+            background: var(--img-bg);
+            color: var(--img-dark);
+        }
+
+        .tab-btn.active-audio {
+            border-color: var(--audio-primary);
+            background: var(--audio-bg);
+            color: var(--audio-dark);
+        }
+
+        .tab-btn.active-video {
+            border-color: var(--video-primary);
+            background: var(--video-bg);
+            color: var(--video-dark);
+        }
+
+        /* ==========================================================================
+           4. SORU NAVİGASYON ŞERİDİ
+           ========================================================================== */
+        .question-pills-bar {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .pills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            max-height: 82px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .q-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            border: 1.5px solid var(--border-medium);
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .q-pill:hover {
+            border-color: var(--text-main);
+        }
+
+        .q-pill.solved {
+            background: var(--success-bg);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .q-pill.current {
+            background: var(--text-main);
+            border-color: var(--text-main);
+            color: #ffffff;
+            transform: scale(1.06);
+        }
+
+        .q-pill.solved.current {
+            background: var(--success);
+            border-color: var(--success);
+            color: #ffffff;
+        }
+
+        /* ==========================================================================
+           5. GÖREV KARTI VE SİMÜLASYON PENCERESİ
+           ========================================================================== */
+        .workspace-card {
+            background: var(--bg-surface);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .task-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .task-header.theme-office { background: linear-gradient(to right, var(--office-bg), #ffffff); }
+        .task-header.theme-image { background: linear-gradient(to right, var(--img-bg), #ffffff); }
+        .task-header.theme-audio { background: linear-gradient(to right, var(--audio-bg), #ffffff); }
+        .task-header.theme-video { background: linear-gradient(to right, var(--video-bg), #ffffff); }
+
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 8px;
+        }
+
+        .chip-office { background: #dbeafe; color: var(--office-dark); }
+        .chip-image { background: #d1fae5; color: var(--img-dark); }
+        .chip-audio { background: #ede9fe; color: var(--audio-dark); }
+        .chip-video { background: #ffedd5; color: var(--video-dark); }
+
+        .task-title {
+            font-size: 1.22rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .task-instruction {
+            font-size: 0.98rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .task-instruction strong {
+            color: var(--text-main);
+            background: #fef08a;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .task-points-pill {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid #fde68a;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.86rem;
+            white-space: nowrap;
+        }
+
+        .office-simulator {
+            padding: 20px 24px;
+            background: #f1f5f9;
+        }
+
+        .sim-window {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .window-titlebar {
+            padding: 8px 14px;
+            color: #ffffff;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .titlebar-office { background: var(--office-dark); }
+        .titlebar-image { background: var(--img-dark); }
+        .titlebar-audio { background: var(--audio-dark); }
+        .titlebar-video { background: var(--video-dark); }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .window-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        .sim-toolbar {
+            background: #f8fafc;
+            border-bottom: 1.5px solid #e2e8f0;
+            padding: 10px 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tb-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding-right: 10px;
+            border-right: 1px solid #cbd5e1;
+            flex-wrap: wrap;
+        }
+        .tb-group:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .tb-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid transparent;
+            background: #ffffff;
+            color: #1e293b;
+            font-family: inherit;
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease;
+        }
+
+        .tb-btn:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .tb-btn.active-office {
+            background: var(--office-bg);
+            border-color: var(--office-primary);
+            color: var(--office-dark);
+        }
+        .tb-btn.active-image {
+            background: var(--img-bg);
+            border-color: var(--img-primary);
+            color: var(--img-dark);
+        }
+        .tb-btn.active-audio {
+            background: var(--audio-bg);
+            border-color: var(--audio-primary);
+            color: var(--audio-dark);
+        }
+        .tb-btn.active-video {
+            background: var(--video-bg);
+            border-color: var(--video-primary);
+            color: var(--video-dark);
+        }
+
+        /* ==========================================================================
+           6. OFİS SİMÜLASYON STİLLERİ (KELİME, TABLO, SUNU)
+           ========================================================================== */
+        .word-canvas-area {
+            padding: 24px 18px;
+            background: #e2e8f0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .word-paper {
+            background: #ffffff;
+            width: 100%;
+            max-width: 640px;
+            min-height: 170px;
+            padding: 24px 28px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 1.02rem;
+        }
+
+        .selected-highlight {
+            background-color: #dbeafe;
+            border-bottom: 2px dashed #2563eb;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .doc-bold { font-weight: 800; }
+        .doc-italic { font-style: italic; }
+        .doc-underline { text-decoration: underline; text-decoration-thickness: 2px; }
+        .doc-align-left { text-align: left; }
+        .doc-align-center { text-align: center; }
+        .doc-align-right { text-align: right; }
+        .doc-color-red { color: #dc2626 !important; }
+        .doc-highlight-yellow { background-color: #fef08a !important; border-bottom: none; }
+        .doc-highlight-green { background-color: #bbf7d0 !important; border-bottom: none; }
+
+        .word-list-box {
+            margin-top: 8px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1.5px dashed #93c5fd;
+            border-radius: 8px;
+        }
+        .word-list-box.bulleted ul { list-style-type: disc; padding-left: 22px; }
+        .word-list-box.numbered ol { list-style-type: decimal; padding-left: 22px; }
+
+        .calc-formula-bar {
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            gap: 10px;
+            font-size: 0.88rem;
+        }
+
+        .name-box {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: 800;
+            min-width: 54px;
+            text-align: center;
+        }
+
+        .formula-display {
+            flex: 1;
+            font-family: Consolas, monospace;
+            background: #f8fafc;
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sheet-wrapper {
+            padding: 18px;
+            overflow-x: auto;
+            background: #ffffff;
+        }
+
+        .spreadsheet-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            font-size: 0.94rem;
+        }
+
+        .spreadsheet-table th {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            padding: 7px 10px;
+            text-align: center;
+        }
+
+        .spreadsheet-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .spreadsheet-table td:hover { background: #eff6ff; }
+        .spreadsheet-table td.cell-selected {
+            outline: 2.5px solid var(--office-primary);
+            outline-offset: -2px;
+            background: #eff6ff;
+            font-weight: 700;
+        }
+        .spreadsheet-table td.cell-range { background: #dbeafe; }
+        .spreadsheet-table.thick-borders td.data-cell { border: 2px solid #0f172a !important; }
+
+        .chart-preview-box {
+            margin: 14px auto 0 auto;
+            max-width: 600px;
+            background: #f8fafc;
+            border: 1.5px solid #93c5fd;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 7px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .bar-lbl { width: 85px; }
+        .bar-trk { flex: 1; background: #e2e8f0; height: 20px; border-radius: 5px; overflow: hidden; }
+        .bar-fl { height: 100%; background: linear-gradient(90deg, #2563eb, #3b82f6); color: #fff; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.76rem; }
+
+        .pres-workspace {
+            display: grid;
+            grid-template-columns: 145px 1fr;
+            min-height: 230px;
+            background: #f1f5f9;
+        }
+        @media (max-width: 600px) {
+            .pres-workspace { grid-template-columns: 1fr; }
+        }
+
+        .slide-thumbs {
+            background: #e2e8f0;
+            border-right: 1px solid #cbd5e1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .thumb-box {
+            background: #ffffff;
+            border: 2px solid #94a3b8;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .thumb-box.active { border-color: var(--office-primary); background: var(--office-bg); }
+
+        .slide-stage {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-canvas {
+            background: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            min-height: 180px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .slide-canvas.two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            text-align: left;
+        }
+
+        .col-card {
+            background: #eff6ff;
+            border: 1.5px dashed #60a5fa;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.85rem;
+        }
+
+        .anim-fade { animation: fadeAnim 0.7s ease; }
+        @keyframes fadeAnim {
+            0% { opacity: 0.15; transform: scale(0.94); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ==========================================================================
+           7. GÖRSEL DÜZENLEME (PAINT / KATMAN / VEKTÖR) SİMÜLASYON STİLLERİ
+           ========================================================================== */
+        .img-editor-body {
+            display: grid;
+            grid-template-columns: 1fr 185px;
+            background: #e2e8f0;
+            min-height: 250px;
+        }
+        @media (max-width: 720px) {
+            .img-editor-body { grid-template-columns: 1fr; }
+        }
+
+        .img-canvas-stage {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .paint-board {
+            background: #ffffff;
+            width: 340px;
+            max-width: 100%;
+            height: 210px;
+            border: 2px solid #94a3b8;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: crosshair;
+            overflow: hidden;
+            transition: transform 0.25s ease, background-color 0.25s ease, opacity 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .layers-panel {
+            background: #f8fafc;
+            border-left: 1px solid #cbd5e1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        @media (max-width: 720px) {
+            .layers-panel { border-left: none; border-top: 1px solid #cbd5e1; }
+        }
+
+        .layers-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #475569;
+            letter-spacing: 0.04em;
+        }
+
+        .layer-item {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 7px 9px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .layer-item.active-layer {
+            border-color: var(--img-primary);
+            background: var(--img-bg);
+            color: var(--img-dark);
+        }
+
+        /* ==========================================================================
+           8. SES DÜZENLEME (DALGA FORMU / WAVEFORM) SİMÜLASYON STİLLERİ
+           ========================================================================== */
+        .audio-stage {
+            padding: 20px;
+            background: #1e1b4b;
+            color: #f5f3ff;
+        }
+
+        .audio-meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: #c4b5fd;
+            margin-bottom: 12px;
+            font-family: Consolas, monospace;
+        }
+
+        .waveform-track {
+            background: #0f172a;
+            border: 1.5px solid #4c1d95;
+            border-radius: 10px;
+            padding: 18px 14px;
+            position: relative;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 3px;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .wave-bar {
+            flex: 1;
+            background: #a78bfa;
+            border-radius: 3px;
+            transition: height 0.25s ease, background-color 0.2s ease, opacity 0.25s ease;
+        }
+
+        .wave-bar.in-selection {
+            background: #38bdf8;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+        }
+
+        .wave-bar.noisy {
+            background: #fb7185;
+        }
+
+        .wave-bar.clean {
+            background: #34d399;
+        }
+
+        .audio-status-line {
+            margin-top: 12px;
+            font-size: 0.86rem;
+            color: #ddd6fe;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        /* ==========================================================================
+           9. VİDEO DÜZENLEME (ZAMAN ÇİZELGESİ / TIMELINE) SİMÜLASYON STİLLERİ
+           ========================================================================== */
+        .video-editor-stage {
+            padding: 18px;
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .video-monitor-row {
+            display: grid;
+            grid-template-columns: 1fr 220px;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 720px) {
+            .video-monitor-row { grid-template-columns: 1fr; }
+        }
+
+        .video-preview-screen {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            min-height: 145px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .subtitle-overlay {
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.82);
+            color: #fde047;
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-size: 0.86rem;
+            font-weight: 700;
+            border: 1px solid rgba(253, 224, 71, 0.4);
+        }
+
+        .video-inspector {
+            background: #1e293b;
+            border: 1.5px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .timeline-box {
+            background: #1e293b;
+            border: 1.5px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .timeline-label {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .timeline-track {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #0f172a;
+            padding: 8px;
+            border-radius: 7px;
+            margin-bottom: 10px;
+            overflow-x: auto;
+        }
+        .timeline-track:last-child { margin-bottom: 0; }
+
+        .v-clip {
+            background: #ea580c;
+            color: #ffffff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            white-space: nowrap;
+            border: 2px solid #fb923c;
+            transition: all 0.2s ease;
+        }
+
+        .v-clip.split-part {
+            background: #c2410c;
+            border-style: dashed;
+        }
+
+        .v-clip.audio-clip {
+            background: #0284c7;
+            border-color: #38bdf8;
+        }
+
+        .v-clip.audio-clip.muted-low {
+            opacity: 0.55;
+            background: #0369a1;
+        }
+
+        .trans-badge {
+            background: #facc15;
+            color: #0f172a;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        /* ==========================================================================
+           10. GERİ BİLDİRİM, İPUCU VE GEZİNME BUTONLARI
+           ========================================================================== */
+        .feedback-section {
+            padding: 0 24px 20px 24px;
+            background: #f1f5f9;
+        }
+
+        .feedback-box {
+            border-radius: var(--radius-md);
+            padding: 15px 18px;
+            font-size: 0.94rem;
+            animation: popIn 0.25s ease;
+        }
+
+        .feedback-box.success {
+            background: var(--success-bg);
+            border: 2px solid var(--success);
+            color: #14532d;
+        }
+
+        .feedback-box.hint {
+            background: var(--warning-bg);
+            border: 1.5px solid #f59e0b;
+            color: #78350f;
+        }
+
+        .feedback-title {
+            font-weight: 800;
+            font-size: 0.98rem;
+            margin-bottom: 5px;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .card-footer-actions {
+            padding: 15px 24px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-hint {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border-color: #fde68a;
+        }
+        .btn-hint:hover { background: #fef3c7; }
+
+        .btn-reset-q {
+            background: var(--bg-subtle);
+            color: var(--text-secondary);
+            border-color: var(--border-medium);
+        }
+        .btn-reset-q:hover { background: #e2e8f0; }
+
+        .btn-nav {
+            background: #1e293b;
+            color: #ffffff;
+        }
+        .btn-nav:hover { background: #0f172a; }
+        .btn-nav:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-next-primary {
+            background: var(--office-primary);
+            color: #ffffff;
+        }
+        .btn-next-primary:hover { background: var(--office-dark); }
+
+        /* ==========================================================================
+           11. KUTLAMA EKRANI VE ALT BİLGİ (FOOTER)
+           ========================================================================== */
+        .celebration-banner {
+            margin-top: 22px;
+            background: linear-gradient(135deg, #16a34a, #059669);
+            color: #ffffff;
+            border-radius: var(--radius-xl);
+            padding: 26px 22px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            animation: popIn 0.35s ease;
+        }
+
+        .celebration-banner h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .btn-restart-all {
+            margin-top: 14px;
+            background: #ffffff;
+            color: #047857;
+            border: none;
+            padding: 11px 22px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 0.94rem;
+            cursor: pointer;
+        }
+
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -15px;
+            z-index: 999;
+            pointer-events: none;
+            animation: confettiFall 2.5s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+        }
+
+        .app-footer {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-light);
+            padding: 18px 16px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .app-footer p {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .app-footer span {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--office-primary);
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ÜST SABİT ÇUBUK -->
+    <header class="top-navbar">
+        <div class="navbar-inner">
+            <div class="brand-area">
+                <div class="brand-logo" aria-hidden="true">🎛️</div>
+                <div>
+                    <div class="brand-title">Ofis ve Multimedya Uygulama Atölyesi</div>
+                    <div class="brand-sub">44 Etkileşimli Simülasyon Görevi • Çevrimdışı Öğrenme Materyali</div>
+                </div>
+            </div>
+
+            <div class="scoreboard">
+                <div class="score-badge">
+                    <span>Tamamlanan:</span>
+                    <strong id="completed-count">0</strong> / <span id="total-count">44</span>
+                </div>
+                <div class="score-badge points">
+                    <span>★ Puan:</span>
+                    <strong id="total-points">0</strong> / 440
+                </div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+    </header>
+
+    <!-- ANA İÇERİK -->
+    <main class="main-container">
+
+        <!-- BAŞLIKLARA GÖRE SEÇİLEBİLİR 5 SEKME -->
+        <nav class="module-tabs" aria-label="Yazılım Türü Başlıkları">
+            <button type="button" id="tab-all" class="tab-btn active-all" onclick="selectModule('all')">
+                <span class="tab-left"><span>🗂️</span><span>Tümü</span></span>
+                <span class="tab-count" id="count-all">0/44</span>
+            </button>
+            <button type="button" id="tab-office" class="tab-btn" onclick="selectModule('office')">
+                <span class="tab-left"><span>📝</span><span>Ofis Yazılımları</span></span>
+                <span class="tab-count" id="count-office">0/12</span>
+            </button>
+            <button type="button" id="tab-image" class="tab-btn" onclick="selectModule('image')">
+                <span class="tab-left"><span>🎨</span><span>Görsel Düzenleme</span></span>
+                <span class="tab-count" id="count-image">0/12</span>
+            </button>
+            <button type="button" id="tab-audio" class="tab-btn" onclick="selectModule('audio')">
+                <span class="tab-left"><span>🎵</span><span>Ses Düzenleme</span></span>
+                <span class="tab-count" id="count-audio">0/10</span>
+            </button>
+            <button type="button" id="tab-video" class="tab-btn" onclick="selectModule('video')">
+                <span class="tab-left"><span>🎬</span><span>Video Düzenleme</span></span>
+                <span class="tab-count" id="count-video">0/10</span>
+            </button>
+        </nav>
+
+        <!-- SORU NUMARALARI HIZLI GEÇİŞ ŞERİDİ -->
+        <div class="question-pills-bar">
+            <div class="pills-list" id="question-pills"></div>
+            <div style="font-size: 0.84rem; font-weight: 700; color: var(--text-muted);" id="step-indicator">
+                Görev 1 / 44
+            </div>
+        </div>
+
+        <!-- AKTİF ETKİLEŞİMLİ GÖREV KARTI -->
+        <section id="workspace-container" class="workspace-card"></section>
+
+        <!-- TÜM 44 GÖREV TAMAMLANDIĞINDA KUTLAMA KARTI -->
+        <section id="celebration-box" class="celebration-banner hidden">
+            <h2>🏆 Harika! Tüm 44 Ofis ve Multimedya Görevini Tamamladın!</h2>
+            <p>Ofis, Görsel, Ses ve Video düzenleme araçlarının temel mantığını başarıyla uyguladın. Toplam Puanın: <strong id="final-score-text">440</strong></p>
+            <button type="button" class="btn-restart-all" onclick="resetAllTasks()">Atölyeyi Baştan Başlat</button>
+        </section>
+
+    </main>
+
+    <!-- ALT BİLGİ (FOOTER) -->
+    <footer class="app-footer">
+        <p>Hazırlayan: Ramazan YILMAZ</p>
+        <span>Bilgisayar ve Öğretim Teknolojileri Öğretmeni</span>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           44 ETKİLEŞİMLİ GÖREV VERİ BANKASI
+           - Ofis Yazılımları: 1..12 (12 soru)
+           - Görsel Düzenleme: 13..24 (12 soru)
+           - Ses Düzenleme: 25..34 (10 soru)
+           - Video Düzenleme: 35..44 (10 soru)
+           ========================================================================== */
+        const TASKS = [
+            // ================= 1. OFİS YAZILIMLARI (1 - 12) =================
+            {
+                id: 1, module: "office", subType: "word", moduleLabel: "Ofis Yazılımları • Kelime İşlemci", points: 10,
+                title: "Görev 1: Kalın ve Altı Çizili Başlık",
+                instruction: "Seçili başlığı hem <strong>Kalın (K)</strong> hem de <strong>Altı Çizili (A̲)</strong> yapmak için araç çubuğundaki ilgili iki düğmeye tıkla.",
+                hint: "Araç çubuğundaki 'K (Kalın)' ve 'A̲ (Altı Çizili)' düğmelerinin ikisini de aktif hale getirmelisin.",
+                explanation: "Harika! Kelime işlemcilerde <strong>Kalın (K)</strong> metni koyulaştırır, <strong>Altı Çizili (A̲)</strong> ise başlıkların altını çizer."
+            },
+            {
+                id: 2, module: "office", subType: "word", moduleLabel: "Ofis Yazılımları • Kelime İşlemci", points: 10,
+                title: "Görev 2: Metni Ortala",
+                instruction: "Belgedeki şiir kıtasını sayfanın ortasına hizalamak için araç çubuğundan <strong>Ortala</strong> düğmesine tıkla.",
+                hint: "Hizalama düğmeleri arasından 'Ortala' butonuna tıkla.",
+                explanation: "Doğru! Başlıkları ve şiir dizelerini sayfada ortalamak için <strong>Ortala</strong> hizalama aracı kullanılır."
+            },
+            {
+                id: 3, module: "office", subType: "word", moduleLabel: "Ofis Yazılımları • Kelime İşlemci", points: 10,
+                title: "Görev 3: Madde İşaretli Liste",
+                instruction: "Sırasız eşya listesini madde işaretli göstermek için <strong>• Madde İşaretleri</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '• Madde İşaretleri' düğmesine bas.",
+                explanation: "Tebrikler! Sırasız listeler oluştururken <strong>Madde İşaretleri</strong> düğmesi kullanılır."
+            },
+            {
+                id: 4, module: "office", subType: "word", moduleLabel: "Ofis Yazılımları • Kelime İşlemci", points: 10,
+                title: "Görev 4: Fosforlu Sarı Vurgulama",
+                instruction: "Metindeki önemli kavramı öne çıkarmak için <strong>Sarı Vurgu</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki 'Sarı Vurgu' düğmesine tıklamalısın.",
+                explanation: "Mükemmel! <strong>Metin Vurgulama</strong> aracı metnin arka planını fosforlu kalem gibi boyar."
+            },
+            {
+                id: 5, module: "office", subType: "word", moduleLabel: "Ofis Yazılımları • Kelime İşlemci", points: 10,
+                title: "Görev 5: İtalik (Eğik) Yazı Biçimi",
+                instruction: "Yabancı kaynaklı terimi eğik göstermek için araç çubuğundan <strong>İtalik (T)</strong> düğmesine tıkla.",
+                hint: "Eğik harf simgeli 'T (İtalik)' düğmesine tıkla.",
+                explanation: "Doğru! <strong>İtalik</strong> biçimi metni sağa doğru eğik yazarak vurgu sağlar."
+            },
+            {
+                id: 6, module: "office", subType: "word", moduleLabel: "Ofis Yazılımları • Kelime İşlemci", points: 10,
+                title: "Görev 6: Yazı Rengini Kırmızı Yapma",
+                instruction: "Uyarı ifadesinin harflerini kırmızı yapmak için <strong>Kırmızı Yazı</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki 'Kırmızı Yazı' düğmesine bas.",
+                explanation: "Harika! Yazı tipi rengi aracı seçili karakterlerin rengini değiştirir."
+            },
+            {
+                id: 7, module: "office", subType: "calc", moduleLabel: "Ofis Yazılımları • Elektronik Tablo", points: 10,
+                title: "Görev 7: B3 Hücresini Seçme",
+                instruction: "Tabloda <strong>B</strong> sütunu ve <strong>3</strong>. satırın kesiştiği <strong>B3 hücresine</strong> tıkla.",
+                hint: "'B' sütunu ve '3' numaralı satırın kesişimindeki hücreye tıklamalısın.",
+                explanation: "Doğru! Hücre adları önce sütun harfi, sonra satır numarası şeklinde yazılır (<strong>B3</strong>)."
+            },
+            {
+                id: 8, module: "office", subType: "calc", moduleLabel: "Ofis Yazılımları • Elektronik Tablo", points: 10,
+                title: "Görev 8: Otomatik Toplam (Σ)",
+                instruction: "B2:B5 aralığındaki sayıların toplamını hesaplamak için <strong>Σ Otomatik Toplam</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki 'Σ Otomatik Toplam' butonuna tıkla.",
+                explanation: "Mükemmel! <strong>Σ Otomatik Toplam</strong> düğmesi <code>=TOPLA(...)</code> formülüyle toplamı hızlıca bulur."
+            },
+            {
+                id: 9, module: "office", subType: "calc", moduleLabel: "Ofis Yazılımları • Elektronik Tablo", points: 10,
+                title: "Görev 9: Para Birimi (₺) Biçimi",
+                instruction: "Fiyat sütununa Türk Lirası simgesi eklemek için <strong>₺ Para Birimi</strong> düğmesine tıkla.",
+                hint: "Sayı biçimlendirme grubundaki '₺ Para Birimi' düğmesine bas.",
+                explanation: "Harika! Para birimi biçimi sayısal değerleri para birimi formatında gösterir."
+            },
+            {
+                id: 10, module: "office", subType: "calc", moduleLabel: "Ofis Yazılımları • Elektronik Tablo", points: 10,
+                title: "Görev 10: Sütun Grafik Ekleme",
+                instruction: "Tablodaki verileri görselleştirmek için <strong>📊 Sütun Grafik</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '📊 Sütun Grafik' düğmesine tıklamalısın.",
+                explanation: "Tebrikler! Grafik araçları sayısal tabloları görsel grafiklere dönüştürür."
+            },
+            {
+                id: 11, module: "office", subType: "pres", moduleLabel: "Ofis Yazılımları • Sunu Programı", points: 10,
+                title: "Görev 11: Yeni Slayt ve İki İçerikli Düzen",
+                instruction: "Önce <strong>➕ Yeni Slayt</strong> düğmesine, ardından <strong>◫ İki İçerikli Düzen</strong> düğmesine tıkla.",
+                hint: "Önce yeni slayt ekle, sonra 'İki İçerikli Düzen' butonuna tıkla.",
+                explanation: "Harika! Sunumlarda yeni sayfa eklemek için <em>Yeni Slayt</em>, yerleşimi değiştirmek için <em>Slayt Düzeni</em> kullanılır."
+            },
+            {
+                id: 12, module: "office", subType: "pres", moduleLabel: "Ofis Yazılımları • Sunu Programı", points: 10,
+                title: "Görev 12: Slayt Geçişi ve Gösteri",
+                instruction: "Slayta geçiş efekti uygulamak için <strong>✨ Geçiş Efekti</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '✨ Geçiş Efekti' düğmesine tıkla.",
+                explanation: "Doğru! Slayt geçiş efektleri slaytlar arası geçişlere görsel akıcılık katar."
+            },
+
+            // ================= 2. GÖRSEL DÜZENLEME (13 - 24) =================
+            {
+                id: 13, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 13: Fırça Aracı ile Çizim",
+                instruction: "Tuval üzerinde serbest çizim yapmak için araç çubuğundan <strong>🖌️ Fırça</strong> aracını seç ve tuvale tıkla.",
+                hint: "Önce '🖌️ Fırça' aracına tıkla, ardından beyaz tuvale tıklayarak fırça darbesi bırak.",
+                explanation: "Harika! <strong>Fırça</strong> aracı serbest elle boyama ve kontur çizimi yapmak için kullanılır."
+            },
+            {
+                id: 14, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 14: Kova Doldurma (Renkle Doldur)",
+                instruction: "Kapalı alanı tek tıkla boyamak için <strong>🪣 Kova Doldur</strong> aracını seç ve tuvale tıkla.",
+                hint: "'🪣 Kova Doldur' aracını seçtikten sonra tuval alanına tıkla.",
+                explanation: "Doğru! <strong>Kova ile Doldur</strong> aracı bitişik pikselleri seçili renkle hızlıca boyar."
+            },
+            {
+                id: 15, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 15: Geometrik Şekil Çizme",
+                instruction: "Tuvale geometrik şekil eklemek için <strong>⬭ Şekil Çiz</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '⬭ Şekil Çiz' düğmesine bas.",
+                explanation: "Mükemmel! Şekil araçları düzgün çember, dikdörtgen ve çokgenler çizmemizi sağlar."
+            },
+            {
+                id: 16, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 16: Görsel Üzerine Metin Ekleme",
+                instruction: "Afiş görseline başlık yazısı eklemek için <strong>🔤 Metin Ekle</strong> düğmesine tıkla.",
+                hint: "'🔤 Metin Ekle' aracına tıklayarak görsel üzerine yazı yerleştir.",
+                explanation: "Harika! Metin aracı görsellere etiket, başlık veya açıklama yazmamızı sağlar."
+            },
+            {
+                id: 17, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 17: Silgi Aracı ile Temizleme",
+                instruction: "Tuvaldeki hatalı karalamayı silmek için <strong>🧽 Silgi</strong> aracını seç ve tuvale tıkla.",
+                hint: "'🧽 Silgi' aracını seçip ardından tuvaldeki karalamaya tıkla.",
+                explanation: "Doğru! <strong>Silgi</strong> aracı istenmeyen çizgileri veya pikselleri temizlemek için kullanılır."
+            },
+            {
+                id: 18, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 18: Döndürme / Çevirme (90°)",
+                instruction: "Görseli saat yönünde döndürmek için <strong>↻ 90° Döndür</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '↻ 90° Döndür' düğmesine bas.",
+                explanation: "Tebrikler! Döndürme aracı görselleri istenen açıda çevirmemizi sağlar."
+            },
+            {
+                id: 19, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 19: Kırpma (Crop) Aracı",
+                instruction: "Görselin fazla kenarlarını kesmek için <strong>✂️ Kırp</strong> düğmesine tıkla.",
+                hint: "'✂️ Kırp' aracına tıklayarak görseli kırp.",
+                explanation: "Mükemmel! <strong>Kırpma</strong> aracı görselin yalnızca istenen kısmını tutar, dışını keser."
+            },
+            {
+                id: 20, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Paint / Piksel", points: 10,
+                title: "Görev 20: Yakınlaştırma (Zoom %150)",
+                instruction: "Detayları daha yakından incelemek için <strong>🔍 Yakınlaştır (%150)</strong> düğmesine tıkla.",
+                hint: "'🔍 Yakınlaştır (%150)' butonuna tıkla.",
+                explanation: "Doğru! Yakınlaştırma (Zoom) piksel veya detay seviyesinde hassas çalışma imkânı verir."
+            },
+            {
+                id: 21, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Katmanlar", points: 10,
+                title: "Görev 21: Üst Katmanı Seçme",
+                instruction: "Sağdaki Katmanlar panelinden <strong>Katman 2: Güneş</strong> katmanına tıkla.",
+                hint: "Sağ paneldeki 'Katman 2: Güneş' satırına tıkla.",
+                explanation: "Harika! Katmanlı görsel düzenlemede her nesne ayrı katmanda bağımsız yönetilebilir."
+            },
+            {
+                id: 22, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Katmanlar", points: 10,
+                title: "Görev 22: Katman Opaklığını %50 Yapma",
+                instruction: "Yarı saydam görünüm elde etmek için <strong>🌗 Opaklık %50</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '🌗 Opaklık %50' düğmesine bas.",
+                explanation: "Tebrikler! Opaklık ayarı katmanın saydamlık (şeffaflık) düzeyini belirler."
+            },
+            {
+                id: 23, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Katmanlar", points: 10,
+                title: "Görev 23: Katman Görünürlüğünü Açma/Kapatma",
+                instruction: "Katman görünürlüğünü değiştirmek için <strong>👁️ Görünürlük</strong> düğmesine tıkla.",
+                hint: "'👁️ Görünürlük' düğmesine tıklayarak katmanı gizle veya göster.",
+                explanation: "Doğru! Görünürlük (göz) simgesi katmanı silmeden geçici olarak gizler veya gösterir."
+            },
+            {
+                id: 24, module: "image", subType: "paint", moduleLabel: "Görsel Düzenleme • Dışa Aktarma", points: 10,
+                title: "Görev 24: Görseli PNG Olarak Kaydetme",
+                instruction: "Şeffaf arka planı koruyarak görseli dışa aktarmak için <strong>💾 PNG Kaydet</strong> düğmesine tıkla.",
+                hint: "'💾 PNG Kaydet' düğmesine tıkla.",
+                explanation: "Harika! <strong>PNG</strong> formatı kayıpsız sıkıştırma ve şeffaf arka plan desteği sunar."
+            },
+
+            // ================= 3. SES DÜZENLEME (25 - 34) =================
+            {
+                id: 25, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Dalga Formu", points: 10,
+                title: "Görev 25: Ses Kaydını Başlatma (Kayıt / Record)",
+                instruction: "Mikrofondan yeni ses kaydı başlatmak için taşıma çubuğundan <strong>🔴 Kaydet</strong> düğmesine tıkla.",
+                hint: "Sol üstteki kırmızı '🔴 Kaydet' düğmesine tıkla.",
+                explanation: "Harika! Ses düzenleme yazılımlarında <strong>Kayıt (Record)</strong> düğmesi ses sinyallerini dalga formu olarak kaydeder."
+            },
+            {
+                id: 26, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Dalga Formu", points: 10,
+                title: "Görev 26: Dalga Formunu Oynatma",
+                instruction: "Ses kaydını dinlemek için taşıma çubuğundan <strong>▶️ Oynat</strong> düğmesine tıkla.",
+                hint: "'▶️ Oynat' düğmesine tıklayarak çalma imlecini hareket ettir.",
+                explanation: "Doğru! <strong>Oynat (Play)</strong> düğmesi seçili ses parçasını çalar ve zaman çizgisini ilerletir."
+            },
+            {
+                id: 27, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Dalga Formu", points: 10,
+                title: "Görev 27: Zaman Aralığı Seçme",
+                instruction: "Düzenleme yapmak için dalga formundan <strong>↔️ Bölge Seç</strong> düğmesine tıkla.",
+                hint: "'↔️ Bölge Seç' düğmesine tıklayarak ortadaki dalga bölümünü seç.",
+                explanation: "Mükemmel! Ses düzenlemede efekt veya kesme işlemi önce seçilen zaman aralığına uygulanır."
+            },
+            {
+                id: 28, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Efektler", points: 10,
+                title: "Görev 28: Ses Seviyesini Yükseltme (Amplify)",
+                instruction: "Kısık kaydedilen sesi güçlendirmek için <strong>🔊 Ses Yükselt (+6 dB)</strong> düğmesine tıkla.",
+                hint: "'🔊 Ses Yükselt (+6 dB)' butonuna tıkla.",
+                explanation: "Harika! <strong>Amplify (Ses Yükseltme)</strong> dalga genliğini artırarak sesin daha yüksek duyulmasını sağlar."
+            },
+            {
+                id: 29, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Efektler", points: 10,
+                title: "Görev 29: Arka Plan Gürültüsünü Azaltma",
+                instruction: "Kayittaki dip gürültüsünü temizlemek için <strong>🧹 Gürültü Azalt</strong> düğmesine tıkla.",
+                hint: "'🧹 Gürültü Azalt' düğmesine tıklayarak kırmızı parazitleri temizle.",
+                explanation: "Doğru! <strong>Gürültü Azaltma (Noise Reduction)</strong> uğultu ve tıslama gibi istenmeyen sesleri azaltır."
+            },
+            {
+                id: 30, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Efektler", points: 10,
+                title: "Görev 30: Girişte Yumuşak Açılma (Fade In)",
+                instruction: "Sesin baştan kademeli yükselmesi için <strong>📈 Fade In (Giriş)</strong> düğmesine tıkla.",
+                hint: "'📈 Fade In (Giriş)' düğmesine bas.",
+                explanation: "Tebrikler! <strong>Fade In</strong> sesi sıfırdan normal seviyeye yumuşak bir eğriyle yükseltir."
+            },
+            {
+                id: 31, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Efektler", points: 10,
+                title: "Görev 31: Sonda Yumuşak Kapanma (Fade Out)",
+                instruction: "Sesin sonunda kademeli alçalması için <strong>📉 Fade Out (Çıkış)</strong> düğmesine tıkla.",
+                hint: "'📉 Fade Out (Çıkış)' düğmesine tıkla.",
+                explanation: "Mükemmel! <strong>Fade Out</strong> sesin ani kesilmek yerine yumuşakça azalarak bitmesini sağlar."
+            },
+            {
+                id: 32, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Kırpma", points: 10,
+                title: "Görev 32: Fazla Kısmı Kırpma (Trim)",
+                instruction: "Seçili bölüm dışındaki fazlalıkları atmak için <strong>✂️ Kırp (Trim)</strong> düğmesine tıkla.",
+                hint: "'✂️ Kırp (Trim)' düğmesine tıklayarak seçili alanı koru.",
+                explanation: "Harika! <strong>Trim</strong> işlemi seçili aralık dışındaki ses bölümlerini kırparak kaydı kısaltır."
+            },
+            {
+                id: 33, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Sessizleştirme", points: 10,
+                title: "Görev 33: Seçili Bölümü Sessizleştirme (Mute)",
+                instruction: "Seçili kısımdaki sesi tamamen susturmak için <strong>🔇 Sessizleştir</strong> düğmesine tıkla.",
+                hint: "'🔇 Sessizleştir' düğmesine bas.",
+                explanation: "Doğru! Sessizleştirme (Silence/Mute) seçili zaman aralığının ses genliğini sıfırlar."
+            },
+            {
+                id: 34, module: "audio", subType: "waveform", moduleLabel: "Ses Düzenleme • Dışa Aktarma", points: 10,
+                title: "Görev 34: Ses Dosyasını MP3 / WAV Dışa Aktarma",
+                instruction: "Düzenlenen sesi paylaşılabilir dosya olarak kaydetmek için <strong>💾 MP3 Dışa Aktar</strong> düğmesine tıkla.",
+                hint: "'💾 MP3 Dışa Aktar' düğmesine tıkla.",
+                explanation: "Tebrikler! Dışa aktarma işlemi projeyi <strong>MP3</strong> veya <strong>WAV</strong> gibi ses dosyasına dönüştürür."
+            },
+
+            // ================= 4. VİDEO DÜZENLEME (35 - 44) =================
+            {
+                id: 35, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Zaman Çizelgesi", points: 10,
+                title: "Görev 35: Klibi Bölme / Kesme (Bıçak Aracı)",
+                instruction: "Zaman çizelgesindeki uzun video klibini iki parçaya bölmek için <strong>🔪 Kes / Böl</strong> düğmesine tıkla.",
+                hint: "Araç çubuğundaki '🔪 Kes / Böl' düğmesine tıkla.",
+                explanation: "Harika! <strong>Bıçak / Kes</strong> aracı tek bir video klibi iki ayrı parça haline getirerek istenmeyen kısımları ayırmamızı sağlar."
+            },
+            {
+                id: 36, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Zaman Çizelgesi", points: 10,
+                title: "Görev 36: Kliplerin Sırasını Değiştirme",
+                instruction: "Sahnelerin akışını değiştirmek için <strong>⇄ Sahne Sırası Değiştir</strong> düğmesine tıkla.",
+                hint: "'⇄ Sahne Sırası Değiştir' düğmesine bas.",
+                explanation: "Doğru! Zaman çizelgesinde kliplerin yerini değiştirmek hikâyenin akış sırasını günceller."
+            },
+            {
+                id: 37, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Efekt & Geçiş", points: 10,
+                title: "Görev 37: Klipler Arasına Geçiş Ekleme",
+                instruction: "İki sahne arasına geçiş efekti koymak için <strong>🎞️ Geçiş Ekle</strong> düğmesine tıkla.",
+                hint: "'🎞️ Geçiş Ekle' düğmesine tıklayarak klipler arasına geçiş yerleştir.",
+                explanation: "Mükemmel! Video geçişleri iki klip arasındaki sert kesimi yumuşatır."
+            },
+            {
+                id: 38, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Metin & Altyazı", points: 10,
+                title: "Görev 38: Videoya Altyazı / Başlık Ekleme",
+                instruction: "Önizleme ekranında altyazı göstermek için <strong>💬 Altyazı Ekle</strong> düğmesine tıkla.",
+                hint: "'💬 Altyazı Ekle' düğmesine tıkla.",
+                explanation: "Harika! Altyazı ve başlık katmanları izleyicinin videoyu daha iyi anlamasını sağlar."
+            },
+            {
+                id: 39, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Hız Ayarı", points: 10,
+                title: "Görev 39: Video Hızını Ayarlama (2x Hızlı)",
+                instruction: "Zaman atlamalı (time-lapse) etki için <strong>⏩ 2x Hızlandır</strong> düğmesine tıkla.",
+                hint: "'⏩ 2x Hızlandır' düğmesine bas.",
+                explanation: "Doğru! Hız ayarı klibin süresini kısaltarak (2x) veya uzatarak (0.5x ağır çekim) etki oluşturur."
+            },
+            {
+                id: 40, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Ses Kanalı", points: 10,
+                title: "Görev 40: Arka Plan Müziği Sesini Kısma",
+                instruction: "Konuşmanın net duyulması için ses kanalını <strong>🔉 Sesi Kıs (%25)</strong> düğmesine tıkla.",
+                hint: "'🔉 Sesi Kıs (%25)' düğmesine tıkla.",
+                explanation: "Tebrikler! Ses düzeyini düşürmek (Ducking) anlatım sesinin ön planda kalmasını sağlar."
+            },
+            {
+                id: 41, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Filtre", points: 10,
+                title: "Görev 41: Renk / Canlılık Filtresi Uygulama",
+                instruction: "Görüntü renklerini canlandırmak için <strong>🌈 Canlı Renk Filtresi</strong> düğmesine tıkla.",
+                hint: "'🌈 Canlı Renk Filtresi' düğmesine tıklamalısın.",
+                explanation: "Harika! Renk filtreleri parlaklık, kontrast ve doygunluğu ayarlayarak görüntüyü zenginleştirir."
+            },
+            {
+                id: 42, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Oynatıcı", points: 10,
+                title: "Görev 42: Zaman İmleci ile Önizleme",
+                instruction: "Oynatma kafasını ilerletmek için <strong>⏯️ Önizle / İlerlet</strong> düğmesine tıkla.",
+                hint: "'⏯️ Önizle / İlerlet' düğmesine bas.",
+                explanation: "Doğru! Oynatıcı önizleme alanı kurgunun gerçek zamanlı görünümünü sunar."
+            },
+            {
+                id: 43, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Kırpma", points: 10,
+                title: "Görev 43: Son Fazlalığı Kırpma",
+                instruction: "Klibin sonundaki gereksiz bölümü kesmek için <strong>✂️ Sonu Kırp</strong> düğmesine tıkla.",
+                hint: "'✂️ Sonu Kırp' düğmesine tıkla.",
+                explanation: "Mükemmel! Kırpma işlemi videonun başındaki veya sonundaki fazla kareleri temizler."
+            },
+            {
+                id: 44, module: "video", subType: "timeline", moduleLabel: "Video Düzenleme • Dışa Aktarma", points: 10,
+                title: "Görev 44: Videoyu MP4 Olarak Dışa Aktarma (Render)",
+                instruction: "Kurguyu tamamlayıp video dosyası oluşturmak için <strong>📤 MP4 Dışa Aktar</strong> düğmesine tıkla.",
+                hint: "'📤 MP4 Dışa Aktar' düğmesine tıklayarak projeyi tamamla.",
+                explanation: "Tebrikler! Dışa aktarma (Export / Render) işlemi tüm katman, geçiş ve sesleri birleştirip MP4 videosu üretir."
+            }
+        ];
+
+        /* ==========================================================================
+           UYGULAMA DURUMU (STATE)
+           ========================================================================== */
+        let currentModule = "all";
+        let currentTaskId = 1;
+        let states = {};
+
+        function createInitialTaskState(id) {
+            return {
+                completed: false,
+                showHint: false,
+                // Office
+                bold: false, italic: false, underline: false,
+                align: "left",
+                listType: "plain",
+                textColor: "default", highlight: "none",
+                clickedCell: "A1",
+                sumCalculated: false,
+                currencyApplied: false, borderApplied: false,
+                chartInserted: false,
+                slideCount: 1, slideLayout: "title",
+                transitionApplied: false,
+                // Image
+                activeTool: null,
+                strokes: 0,
+                bgFilled: false,
+                shapeAdded: false,
+                textAdded: false,
+                erased: false,
+                rotation: 0,
+                cropped: false,
+                zoomLevel: 100,
+                activeLayer: 1,
+                opacity50: false,
+                layerVisible: true,
+                exportedPng: false,
+                // Audio
+                recording: false,
+                playing: false,
+                playhead: 15,
+                selectedRange: false,
+                amplified: false,
+                noiseReduced: false,
+                fadeIn: false,
+                fadeOut: false,
+                trimmed: false,
+                muted: false,
+                exportedAudio: false,
+                // Video
+                splitDone: false,
+                reordered: false,
+                videoTransition: false,
+                subtitleAdded: false,
+                speed2x: false,
+                audioLowered: false,
+                filterApplied: false,
+                previewed: false,
+                endTrimmed: false,
+                renderedMp4: false
+            };
+        }
+
+        function initAllStates() {
+            TASKS.forEach(t => {
+                states[t.id] = createInitialTaskState(t.id);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initAllStates();
+            renderAll();
+        });
+
+        function getModuleTasks() {
+            if (currentModule === "all") return TASKS;
+            return TASKS.filter(t => t.module === currentModule);
+        }
+
+        function selectModule(mod) {
+            currentModule = mod;
+            const list = getModuleTasks();
+            if (list.length > 0 && !list.some(t => t.id === currentTaskId)) {
+                currentTaskId = list[0].id;
+            }
+            renderAll();
+        }
+
+        function goToTask(id) {
+            currentTaskId = id;
+            renderAll();
+        }
+
+        function prevTask() {
+            const list = getModuleTasks();
+            const idx = list.findIndex(t => t.id === currentTaskId);
+            if (idx > 0) {
+                currentTaskId = list[idx - 1].id;
+                renderAll();
+            }
+        }
+
+        function nextTask() {
+            const list = getModuleTasks();
+            const idx = list.findIndex(t => t.id === currentTaskId);
+            if (idx !== -1 && idx < list.length - 1) {
+                currentTaskId = list[idx + 1].id;
+                renderAll();
+            } else if (currentModule !== "all") {
+                const nextUnsolved = TASKS.find(t => !states[t.id].completed);
+                if (nextUnsolved) {
+                    currentModule = "all";
+                    currentTaskId = nextUnsolved.id;
+                    renderAll();
+                }
+            }
+        }
+
+        function toggleHint() {
+            states[currentTaskId].showHint = !states[currentTaskId].showHint;
+            renderWorkspace();
+        }
+
+        function resetCurrentTask() {
+            states[currentTaskId] = createInitialTaskState(currentTaskId);
+            renderAll();
+        }
+
+        function resetAllTasks() {
+            initAllStates();
+            currentModule = "all";
+            currentTaskId = 1;
+            document.getElementById("celebration-box").classList.add("hidden");
+            renderAll();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        /* ==========================================================================
+           ETKİLEŞİM VE DOĞRULAMA MANTIĞI (44 GÖREV)
+           ========================================================================== */
+        function act(type, val) {
+            const id = currentTaskId;
+            const st = states[id];
+
+            // --- OFİS (1-12) ---
+            if (id === 1) {
+                if (type === "bold") st.bold = !st.bold;
+                if (type === "italic") st.italic = !st.italic;
+                if (type === "underline") st.underline = !st.underline;
+                if (st.bold && st.underline) completeTask(id);
+            } else if (id === 2) {
+                if (type === "align") {
+                    st.align = val;
+                    if (val === "center") completeTask(id);
+                }
+            } else if (id === 3) {
+                if (type === "list") {
+                    st.listType = val;
+                    if (val === "bulleted") completeTask(id);
+                }
+            } else if (id === 4) {
+                if (type === "color") st.textColor = val;
+                if (type === "highlight") {
+                    st.highlight = val;
+                    if (val === "yellow") completeTask(id);
+                }
+            } else if (id === 5) {
+                if (type === "italic") {
+                    st.italic = !st.italic;
+                    if (st.italic) completeTask(id);
+                }
+            } else if (id === 6) {
+                if (type === "color") {
+                    st.textColor = val;
+                    if (val === "red") completeTask(id);
+                }
+            } else if (id === 7) {
+                if (type === "cell") {
+                    st.clickedCell = val;
+                    if (val === "B3") completeTask(id);
+                }
+            } else if (id === 8) {
+                if (type === "autosum") {
+                    st.sumCalculated = true;
+                    completeTask(id);
+                }
+            } else if (id === 9) {
+                if (type === "currency") {
+                    st.currencyApplied = true;
+                    completeTask(id);
+                } else if (type === "border") {
+                    st.borderApplied = !st.borderApplied;
+                }
+            } else if (id === 10) {
+                if (type === "chart") {
+                    st.chartInserted = true;
+                    completeTask(id);
+                }
+            } else if (id === 11) {
+                if (type === "newSlide") st.slideCount = 2;
+                if (type === "layout") st.slideLayout = val;
+                if (st.slideCount >= 2 && st.slideLayout === "two-col") completeTask(id);
+            } else if (id === 12) {
+                if (type === "transition") {
+                    st.transitionApplied = true;
+                    completeTask(id);
+                }
+            }
+
+            // --- GÖRSEL DÜZENLEME (13-24) ---
+            else if (id === 13) {
+                if (type === "tool") st.activeTool = val;
+                if (type === "canvasClick" && st.activeTool === "brush") {
+                    st.strokes += 1;
+                    completeTask(id);
+                }
+            } else if (id === 14) {
+                if (type === "tool") st.activeTool = val;
+                if (type === "canvasClick" && st.activeTool === "bucket") {
+                    st.bgFilled = true;
+                    completeTask(id);
+                }
+            } else if (id === 15) {
+                if (type === "shape") {
+                    st.shapeAdded = true;
+                    completeTask(id);
+                }
+            } else if (id === 16) {
+                if (type === "text") {
+                    st.textAdded = true;
+                    completeTask(id);
+                }
+            } else if (id === 17) {
+                if (type === "tool") st.activeTool = val;
+                if (type === "canvasClick" && st.activeTool === "eraser") {
+                    st.erased = true;
+                    completeTask(id);
+                }
+            } else if (id === 18) {
+                if (type === "rotate") {
+                    st.rotation = (st.rotation + 90) % 360;
+                    completeTask(id);
+                }
+            } else if (id === 19) {
+                if (type === "crop") {
+                    st.cropped = true;
+                    completeTask(id);
+                }
+            } else if (id === 20) {
+                if (type === "zoom") {
+                    st.zoomLevel = val;
+                    completeTask(id);
+                }
+            } else if (id === 21) {
+                if (type === "layer") {
+                    st.activeLayer = val;
+                    if (val === 2) completeTask(id);
+                }
+            } else if (id === 22) {
+                if (type === "opacity") {
+                    st.opacity50 = !st.opacity50;
+                    if (st.opacity50) completeTask(id);
+                }
+            } else if (id === 23) {
+                if (type === "visibility") {
+                    st.layerVisible = !st.layerVisible;
+                    completeTask(id);
+                }
+            } else if (id === 24) {
+                if (type === "exportPng") {
+                    st.exportedPng = true;
+                    completeTask(id);
+                }
+            }
+
+            // --- SES DÜZENLEME (25-34) ---
+            else if (id === 25) {
+                if (type === "record") {
+                    st.recording = true;
+                    completeTask(id);
+                }
+            } else if (id === 26) {
+                if (type === "play") {
+                    st.playing = true;
+                    st.playhead = 65;
+                    completeTask(id);
+                }
+            } else if (id === 27) {
+                if (type === "selectRange") {
+                    st.selectedRange = true;
+                    completeTask(id);
+                }
+            } else if (id === 28) {
+                if (type === "amplify") {
+                    st.amplified = true;
+                    completeTask(id);
+                }
+            } else if (id === 29) {
+                if (type === "noise") {
+                    st.noiseReduced = true;
+                    completeTask(id);
+                }
+            } else if (id === 30) {
+                if (type === "fadeIn") {
+                    st.fadeIn = true;
+                    completeTask(id);
+                }
+            } else if (id === 31) {
+                if (type === "fadeOut") {
+                    st.fadeOut = true;
+                    completeTask(id);
+                }
+            } else if (id === 32) {
+                if (type === "trim") {
+                    st.trimmed = true;
+                    completeTask(id);
+                }
+            } else if (id === 33) {
+                if (type === "mute") {
+                    st.muted = true;
+                    completeTask(id);
+                }
+            } else if (id === 34) {
+                if (type === "exportAudio") {
+                    st.exportedAudio = true;
+                    completeTask(id);
+                }
+            }
+
+            // --- VİDEO DÜZENLEME (35-44) ---
+            else if (id === 35) {
+                if (type === "split") {
+                    st.splitDone = true;
+                    completeTask(id);
+                }
+            } else if (id === 36) {
+                if (type === "reorder") {
+                    st.reordered = !st.reordered;
+                    completeTask(id);
+                }
+            } else if (id === 37) {
+                if (type === "transition") {
+                    st.videoTransition = true;
+                    completeTask(id);
+                }
+            } else if (id === 38) {
+                if (type === "subtitle") {
+                    st.subtitleAdded = true;
+                    completeTask(id);
+                }
+            } else if (id === 39) {
+                if (type === "speed") {
+                    st.speed2x = true;
+                    completeTask(id);
+                }
+            } else if (id === 40) {
+                if (type === "lowerAudio") {
+                    st.audioLowered = true;
+                    completeTask(id);
+                }
+            } else if (id === 41) {
+                if (type === "filter") {
+                    st.filterApplied = true;
+                    completeTask(id);
+                }
+            } else if (id === 42) {
+                if (type === "preview") {
+                    st.previewed = true;
+                    st.playhead = 80;
+                    completeTask(id);
+                }
+            } else if (id === 43) {
+                if (type === "endTrim") {
+                    st.endTrimmed = true;
+                    completeTask(id);
+                }
+            } else if (id === 44) {
+                if (type === "render") {
+                    st.renderedMp4 = true;
+                    completeTask(id);
+                }
+            }
+
+            renderAll();
+        }
+
+        function completeTask(id) {
+            if (!states[id].completed) {
+                states[id].completed = true;
+                if (TASKS.every(t => states[t.id].completed)) {
+                    const total = TASKS.reduce((acc, t) => acc + t.points, 0);
+                    document.getElementById("final-score-text").textContent = total;
+                    document.getElementById("celebration-box").classList.remove("hidden");
+                    spawnConfetti();
+                }
+            }
+        }
+
+        function spawnConfetti() {
+            const colors = ["#2563eb", "#059669", "#7c3aed", "#ea580c", "#eab308"];
+            for (let i = 0; i < 40; i++) {
+                const el = document.createElement("div");
+                el.className = "confetti-piece";
+                el.style.left = Math.random() * 100 + "vw";
+                el.style.background = colors[i % colors.length];
+                el.style.animationDelay = (Math.random() * 0.7) + "s";
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 3200);
+            }
+        }
+
+        /* ==========================================================================
+           ARAYÜZ ÇİZİMİ
+           ========================================================================== */
+        function renderAll() {
+            updateTopBarAndTabs();
+            renderQuestionPills();
+            renderWorkspace();
+        }
+
+        function updateTopBarAndTabs() {
+            const doneList = TASKS.filter(t => states[t.id].completed);
+            const pts = doneList.reduce((sum, t) => sum + t.points, 0);
+
+            document.getElementById("completed-count").textContent = doneList.length;
+            document.getElementById("total-count").textContent = TASKS.length;
+            document.getElementById("total-points").textContent = pts;
+
+            const pct = Math.round((doneList.length / TASKS.length) * 100);
+            document.getElementById("progress-fill").style.width = pct + "%";
+
+            const counts = {
+                all: doneList.length + "/44",
+                office: TASKS.filter(t => t.module === "office" && states[t.id].completed).length + "/12",
+                image: TASKS.filter(t => t.module === "image" && states[t.id].completed).length + "/12",
+                audio: TASKS.filter(t => t.module === "audio" && states[t.id].completed).length + "/10",
+                video: TASKS.filter(t => t.module === "video" && states[t.id].completed).length + "/10"
+            };
+
+            Object.keys(counts).forEach(k => {
+                document.getElementById("count-" + k).textContent = counts[k];
+                const tabBtn = document.getElementById("tab-" + k);
+                tabBtn.className = "tab-btn" + (currentModule === k ? ` active-${k}` : "");
+            });
+        }
+
+        function renderQuestionPills() {
+            const list = getModuleTasks();
+            const wrap = document.getElementById("question-pills");
+            wrap.innerHTML = "";
+
+            list.forEach((t, idx) => {
+                const b = document.createElement("button");
+                b.type = "button";
+                b.className = "q-pill";
+                if (states[t.id].completed) b.classList.add("solved");
+                if (t.id === currentTaskId) b.classList.add("current");
+                b.textContent = t.id;
+                b.title = t.title;
+                b.onclick = () => goToTask(t.id);
+                wrap.appendChild(b);
+
+                if (t.id === currentTaskId) {
+                    document.getElementById("step-indicator").textContent = `Görev ${idx + 1} / ${list.length}`;
+                }
+            });
+        }
+
+        function renderWorkspace() {
+            const task = TASKS.find(t => t.id === currentTaskId);
+            const st = states[task.id];
+            const list = getModuleTasks();
+            const idx = list.findIndex(t => t.id === task.id);
+
+            const simHtml = renderModuleSimulation(task, st);
+
+            let feedbackHtml = "";
+            if (st.completed) {
+                feedbackHtml = `
+                    <div class="feedback-section">
+                        <div class="feedback-box success">
+                            <div class="feedback-title">✅ Görev Tamamlandı! (+${task.points} Puan)</div>
+                            <div>${task.explanation}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (st.showHint) {
+                feedbackHtml = `
+                    <div class="feedback-section">
+                        <div class="feedback-box hint">
+                            <div class="feedback-title">💡 İpucu</div>
+                            <div>${task.hint}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const hasNext = idx < list.length - 1 || (currentModule !== "all" && TASKS.some(t => !states[t.id].completed));
+
+            document.getElementById("workspace-container").innerHTML = `
+                <div class="task-header theme-${task.module}">
+                    <div>
+                        <div class="category-chip chip-${task.module}">${task.moduleLabel}</div>
+                        <h2 class="task-title">${task.title}</h2>
+                        <p class="task-instruction">${task.instruction}</p>
+                    </div>
+                    <div class="task-points-pill">${st.completed ? "✓ Tamamlandı" : `+${task.points} Puan`}</div>
+                </div>
+
+                <div class="office-simulator">
+                    ${simHtml}
+                </div>
+
+                ${feedbackHtml}
+
+                <div class="card-footer-actions">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn-action btn-hint" onclick="toggleHint()">
+                            <span>💡</span><span>${st.showHint ? "İpucunu Gizle" : "İpucu Göster"}</span>
+                        </button>
+                        <button type="button" class="btn-action btn-reset-q" onclick="resetCurrentTask()">
+                            <span>↺</span><span>Sıfırla</span>
+                        </button>
+                    </div>
+
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" class="btn-action btn-nav" onclick="prevTask()" ${idx === 0 ? "disabled" : ""}>
+                            <span>← Önceki</span>
+                        </button>
+                        <button type="button" class="btn-action btn-next-primary" onclick="nextTask()" ${!hasNext ? "disabled" : ""}>
+                            <span>Sonraki Görev →</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           MODÜL BAZLI SİMÜLASYON İÇERİKLERİ
+           ========================================================================== */
+        function renderModuleSimulation(task, st) {
+            // --- 1. OFİS YAZILIMLARI (1-12) ---
+            if (task.module === "office") {
+                if (task.subType === "word") {
+                    const cls = [
+                        "selected-highlight",
+                        st.bold ? "doc-bold" : "",
+                        st.italic ? "doc-italic" : "",
+                        st.underline ? "doc-underline" : "",
+                        st.textColor === "red" ? "doc-color-red" : "",
+                        st.highlight === "yellow" ? "doc-highlight-yellow" : "",
+                        st.highlight === "green" ? "doc-highlight-green" : ""
+                    ].join(" ");
+
+                    let bodyContent = "";
+                    if (task.id === 3) {
+                        const items = ["Defter", "Kalem", "Silgi"];
+                        const inner = st.listType === "bulleted"
+                            ? `<ul>${items.map(x => `<li>${x}</li>`).join("")}</ul>`
+                            : (st.listType === "numbered" ? `<ol>${items.map(x => `<li>${x}</li>`).join("")}</ol>` : items.map(x => `<div>${x}</div>`).join(""));
+                        bodyContent = `<div class="word-list-box ${st.listType}">${inner}</div>`;
+                    } else if (task.id === 2) {
+                        bodyContent = `
+                            <div class="doc-align-${st.align}" style="padding:10px; background:#f8fafc; border:1px dashed #93c5fd; border-radius:6px;">
+                                <strong>İSTİKLAL MARŞI</strong><br>
+                                Korkma, sönmez bu şafaklarda yüzen al sancak;<br>
+                                Sönmeden yurdumun üstünde tüten en son ocak.
+                            </div>
+                        `;
+                    } else {
+                        const samplePhrase = task.id === 5 ? "Multimedya" : (task.id === 6 ? "DİKKAT: Şifreni paylaşma!" : "Bilişim Teknolojileri Dersi");
+                        bodyContent = `<p style="font-size:1.15rem;"><span class="${cls}">${samplePhrase}</span></p>`;
+                    }
+
+                    return `
+                        <div class="sim-window">
+                            <div class="window-titlebar titlebar-office">
+                                <span>📝 Belge.docx - Kelime İşlemci</span>
+                                <div class="window-dots"><span></span><span></span><span></span></div>
+                            </div>
+                            <div class="sim-toolbar">
+                                <div class="tb-group">
+                                    <button type="button" class="tb-btn ${st.bold ? 'active-office' : ''}" onclick="act('bold')"><strong>K</strong><span>Kalın</span></button>
+                                    <button type="button" class="tb-btn ${st.italic ? 'active-office' : ''}" onclick="act('italic')"><em>T</em><span>İtalik</span></button>
+                                    <button type="button" class="tb-btn ${st.underline ? 'active-office' : ''}" onclick="act('underline')"><span style="text-decoration:underline;">A</span><span>Altı Çizili</span></button>
+                                </div>
+                                <div class="tb-group">
+                                    <button type="button" class="tb-btn ${st.align === 'left' ? 'active-office' : ''}" onclick="act('align','left')">⫷ Sola</button>
+                                    <button type="button" class="tb-btn ${st.align === 'center' ? 'active-office' : ''}" onclick="act('align','center')">☰ Ortala</button>
+                                </div>
+                                <div class="tb-group">
+                                    <button type="button" class="tb-btn ${st.listType === 'bulleted' ? 'active-office' : ''}" onclick="act('list','bulleted')">• Madde İşaretleri</button>
+                                    <button type="button" class="tb-btn ${st.listType === 'numbered' ? 'active-office' : ''}" onclick="act('list','numbered')">1. Numaralı</button>
+                                </div>
+                                <div class="tb-group">
+                                    <button type="button" class="tb-btn ${st.highlight === 'yellow' ? 'active-office' : ''}" onclick="act('highlight','yellow')"><span style="background:#fef08a;padding:0 4px;">ab</span> Sarı Vurgu</button>
+                                    <button type="button" class="tb-btn ${st.textColor === 'red' ? 'active-office' : ''}" onclick="act('color','red')"><span style="color:#dc2626;font-weight:900;">A</span> Kırmızı Yazı</button>
+                                </div>
+                            </div>
+                            <div class="word-canvas-area">
+                                <div class="word-paper">${bodyContent}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (task.subType === "calc") {
+                    const fmt = (n) => st.currencyApplied ? `${n},00 ₺` : `${n}`;
+                    return `
+                        <div class="sim-window">
+                            <div class="window-titlebar titlebar-office">
+                                <span>📊 Tablo.xlsx - Elektronik Tablolama</span>
+                                <div class="window-dots"><span></span><span></span><span></span></div>
+                            </div>
+                            <div class="sim-toolbar">
+                                <div class="tb-group">
+                                    <button type="button" class="tb-btn ${st.sumCalculated ? 'active-office' : ''}" onclick="act('autosum')">Σ Otomatik Toplam</button>
+                                    <button type="button" class="tb-btn ${st.currencyApplied ? 'active-office' : ''}" onclick="act('currency')">₺ Para Birimi</button>
+                                    <button type="button" class="tb-btn ${st.borderApplied ? 'active-office' : ''}" onclick="act('border')">⊞ Kenarlık</button>
+                                    <button type="button" class="tb-btn ${st.chartInserted ? 'active-office' : ''}" onclick="act('chart')">📊 Sütun Grafik</button>
+                                </div>
+                            </div>
+                            <div class="calc-formula-bar">
+                                <div class="name-box">${st.clickedCell}</div>
+                                <span style="font-style:italic;font-weight:700;color:#2563eb;">fx</span>
+                                <div class="formula-display">${st.sumCalculated ? "=TOPLA(B2:B4)" : "Hücre veya araç seç"}</div>
+                            </div>
+                            <div class="sheet-wrapper">
+                                <table class="spreadsheet-table ${st.borderApplied ? 'thick-borders' : ''}">
+                                    <thead><tr><th></th><th>A</th><th>B</th></tr></thead>
+                                    <tbody>
+                                        <tr><th>1</th><td class="data-cell"><strong>Ürün</strong></td><td class="data-cell"><strong>Tutar</strong></td></tr>
+                                        <tr><th>2</th><td class="data-cell">Defter</td><td class="data-cell ${st.sumCalculated ? 'cell-range' : ''}">${fmt(50)}</td></tr>
+                                        <tr><th>3</th><td class="data-cell">Kalemlik</td><td class="data-cell ${st.clickedCell === 'B3' ? 'cell-selected' : ''} ${st.sumCalculated ? 'cell-range' : ''}" onclick="act('cell','B3')">${fmt(80)}</td></tr>
+                                        <tr><th>4</th><td class="data-cell">Çanta</td><td class="data-cell ${st.sumCalculated ? 'cell-range' : ''}">${fmt(220)}</td></tr>
+                                        <tr><th>5</th><td class="data-cell"><strong>Toplam</strong></td><td class="data-cell cell-selected">${st.sumCalculated ? fmt(350) : "?"}</td></tr>
+                                    </tbody>
+                                </table>
+                                ${st.chartInserted ? `
+                                    <div class="chart-preview-box">
+                                        <div class="bar-row"><span class="bar-lbl">Defter</span><div class="bar-trk"><div class="bar-fl" style="width:25%;">50</div></div></div>
+                                        <div class="bar-row"><span class="bar-lbl">Kalemlik</span><div class="bar-trk"><div class="bar-fl" style="width:40%;">80</div></div></div>
+                                        <div class="bar-row"><span class="bar-lbl">Çanta</span><div class="bar-trk"><div class="bar-fl" style="width:100%;">220</div></div></div>
+                                    </div>
+                                ` : ""}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (task.subType === "pres") {
+                    return `
+                        <div class="sim-window">
+                            <div class="window-titlebar titlebar-office">
+                                <span>📽️ Sunum.pptx - Sunu Programı</span>
+                                <div class="window-dots"><span></span><span></span><span></span></div>
+                            </div>
+                            <div class="sim-toolbar">
+                                <div class="tb-group">
+                                    <button type="button" class="tb-btn ${st.slideCount >= 2 ? 'active-office' : ''}" onclick="act('newSlide')">➕ Yeni Slayt</button>
+                                    <button type="button" class="tb-btn ${st.slideLayout === 'two-col' ? 'active-office' : ''}" onclick="act('layout','two-col')">◫ İki İçerikli Düzen</button>
+                                    <button type="button" class="tb-btn ${st.transitionApplied ? 'active-office' : ''}" onclick="act('transition')">✨ Geçiş Efekti</button>
+                                </div>
+                            </div>
+                            <div class="pres-workspace">
+                                <div class="slide-thumbs">
+                                    <div class="thumb-box ${st.slideCount === 1 ? 'active' : ''}">1. Slayt</div>
+                                    ${st.slideCount >= 2 ? `<div class="thumb-box active">2. Slayt</div>` : ""}
+                                </div>
+                                <div class="slide-stage">
+                                    <div class="slide-canvas ${st.slideLayout === 'two-col' ? 'two-col' : ''} ${st.transitionApplied ? 'anim-fade' : ''}">
+                                        ${st.slideLayout === "two-col" ? `
+                                            <div class="col-card"><strong>Sol Sütun</strong><br>Metin alanı</div>
+                                            <div class="col-card"><strong>Sağ Sütun</strong><br>Görsel / Tablo alanı</div>
+                                        ` : `
+                                            <h3 style="font-size:1.2rem;">Sunum Slaytı #${st.slideCount}</h3>
+                                            <p style="color:#64748b;font-size:0.9rem;margin-top:4px;">${st.transitionApplied ? "✨ Geçiş efekti eklendi" : "Araç çubuğunu kullanarak düzenle"}</p>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // --- 2. GÖRSEL DÜZENLEME (13-24) ---
+            if (task.module === "image") {
+                const boardStyle = [
+                    `transform: rotate(${st.rotation}deg) scale(${st.zoomLevel / 100})`,
+                    `background-color: ${st.bgFilled ? "#fef3c7" : "#ffffff"}`,
+                    `opacity: ${st.layerVisible ? (st.opacity50 ? "0.55" : "1") : "0.15"}`
+                ].join("; ");
+
+                return `
+                    <div class="sim-window">
+                        <div class="window-titlebar titlebar-image">
+                            <span>🎨 GörselDüzenleyici.png - Piksel & Katman Atölyesi</span>
+                            <div class="window-dots"><span></span><span></span><span></span></div>
+                        </div>
+                        <div class="sim-toolbar">
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.activeTool === 'brush' ? 'active-image' : ''}" onclick="act('tool','brush')">🖌️ Fırça</button>
+                                <button type="button" class="tb-btn ${st.activeTool === 'bucket' ? 'active-image' : ''}" onclick="act('tool','bucket')">🪣 Kova Doldur</button>
+                                <button type="button" class="tb-btn ${st.activeTool === 'eraser' ? 'active-image' : ''}" onclick="act('tool','eraser')">🧽 Silgi</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.shapeAdded ? 'active-image' : ''}" onclick="act('shape')">⬭ Şekil Çiz</button>
+                                <button type="button" class="tb-btn ${st.textAdded ? 'active-image' : ''}" onclick="act('text')">🔤 Metin Ekle</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn" onclick="act('rotate')">↻ 90° Döndür</button>
+                                <button type="button" class="tb-btn ${st.cropped ? 'active-image' : ''}" onclick="act('crop')">✂️ Kırp</button>
+                                <button type="button" class="tb-btn ${st.zoomLevel === 150 ? 'active-image' : ''}" onclick="act('zoom',150)">🔍 Yakınlaştır (%150)</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.opacity50 ? 'active-image' : ''}" onclick="act('opacity')">🌗 Opaklık %50</button>
+                                <button type="button" class="tb-btn" onclick="act('visibility')">👁️ Görünürlük</button>
+                                <button type="button" class="tb-btn ${st.exportedPng ? 'active-image' : ''}" onclick="act('exportPng')">💾 PNG Kaydet</button>
+                            </div>
+                        </div>
+
+                        <div class="img-editor-body">
+                            <div class="img-canvas-stage">
+                                <div class="paint-board" style="${boardStyle}; ${st.cropped ? 'border:3px dashed #059669; width:250px; height:155px;' : ''}" onclick="act('canvasClick')">
+                                    <div style="text-align:center; pointer-events:none;">
+                                        ${st.shapeAdded ? `<div style="width:64px;height:64px;border-radius:50%;background:#10b981;margin:0 auto 6px;"></div>` : ""}
+                                        ${st.textAdded ? `<div style="font-weight:800;color:#065f46;font-size:1.05rem;">DOĞA & TEKNOLOJİ</div>` : ""}
+                                        ${st.strokes > 0 && !st.erased ? `<div style="color:#047857;font-weight:700;">✒️ Fırça Çizimi (${st.strokes})</div>` : ""}
+                                        ${st.erased ? `<div style="color:#64748b;font-style:italic;">Temizlendi</div>` : ""}
+                                        ${!st.shapeAdded && !st.textAdded && st.strokes === 0 ? `<span style="color:#94a3b8;font-size:0.85rem;">Tuval Alanı (Açı: ${st.rotation}° • Yakınlık: %${st.zoomLevel})</span>` : ""}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <aside class="layers-panel">
+                                <div class="layers-title">Katmanlar</div>
+                                <div class="layer-item ${st.activeLayer === 2 ? 'active-layer' : ''}" onclick="act('layer',2)">
+                                    <span>Katman 2: Güneş</span>
+                                    <span>${st.layerVisible ? "👁️" : "🚫"}</span>
+                                </div>
+                                <div class="layer-item ${st.activeLayer === 1 ? 'active-layer' : ''}" onclick="act('layer',1)">
+                                    <span>Katman 1: Zemin</span>
+                                    <span>${st.layerVisible ? "👁️" : "🚫"}</span>
+                                </div>
+                                <div style="font-size:0.74rem;color:#64748b;margin-top:auto;">
+                                    ${st.exportedPng ? "✅ PNG dışa aktarıldı" : "Format: PNG / JPG"}
+                                </div>
+                            </aside>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- 3. SES DÜZENLEME (25-34) ---
+            if (task.module === "audio") {
+                const heights = [28, 52, 74, 40, 88, 95, 62, 78, 45, 84, 68, 50, 72, 36, 60, 42];
+                const barsHtml = heights.map((h, i) => {
+                    let barH = st.muted ? 6 : h;
+                    if (!st.muted && st.amplified) barH = Math.min(100, Math.round(h * 1.25));
+                    if (!st.muted && st.fadeIn && i < 4) barH = Math.max(12, Math.round(barH * ((i + 1) / 4)));
+                    if (!st.muted && st.fadeOut && i >= heights.length - 4) barH = Math.max(12, Math.round(barH * ((heights.length - i) / 4)));
+
+                    const inSel = st.selectedRange && i >= 5 && i <= 10;
+                    const cls = [
+                        "wave-bar",
+                        inSel ? "in-selection" : "",
+                        !st.noiseReduced && (i === 2 || i === 9) ? "noisy" : "",
+                        st.noiseReduced ? "clean" : ""
+                    ].join(" ");
+
+                    return `<div class="${cls}" style="height:${barH}%;"></div>`;
+                }).join("");
+
+                return `
+                    <div class="sim-window">
+                        <div class="window-titlebar titlebar-audio">
+                            <span>🎵 SesKaydi.wav - Dalga Formu Düzenleyici</span>
+                            <div class="window-dots"><span></span><span></span><span></span></div>
+                        </div>
+                        <div class="sim-toolbar">
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.recording ? 'active-audio' : ''}" onclick="act('record')">🔴 Kaydet</button>
+                                <button type="button" class="tb-btn ${st.playing ? 'active-audio' : ''}" onclick="act('play')">▶️ Oynat</button>
+                                <button type="button" class="tb-btn ${st.selectedRange ? 'active-audio' : ''}" onclick="act('selectRange')">↔️ Bölge Seç</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.amplified ? 'active-audio' : ''}" onclick="act('amplify')">🔊 Ses Yükselt (+6 dB)</button>
+                                <button type="button" class="tb-btn ${st.noiseReduced ? 'active-audio' : ''}" onclick="act('noise')">🧹 Gürültü Azalt</button>
+                                <button type="button" class="tb-btn ${st.fadeIn ? 'active-audio' : ''}" onclick="act('fadeIn')">📈 Fade In (Giriş)</button>
+                                <button type="button" class="tb-btn ${st.fadeOut ? 'active-audio' : ''}" onclick="act('fadeOut')">📉 Fade Out (Çıkış)</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.trimmed ? 'active-audio' : ''}" onclick="act('trim')">✂️ Kırp (Trim)</button>
+                                <button type="button" class="tb-btn ${st.muted ? 'active-audio' : ''}" onclick="act('mute')">🔇 Sessizleştir</button>
+                                <button type="button" class="tb-btn ${st.exportedAudio ? 'active-audio' : ''}" onclick="act('exportAudio')">💾 MP3 Dışa Aktar</button>
+                            </div>
+                        </div>
+
+                        <div class="audio-stage">
+                            <div class="audio-meta-bar">
+                                <span>KANAL 1 • MONO / STEREO (44.1 kHz)</span>
+                                <span>İmleç: 00:0${Math.floor(st.playhead / 10)}.${st.playhead % 10}s</span>
+                            </div>
+                            <div class="waveform-track">
+                                ${barsHtml}
+                            </div>
+                            <div class="audio-status-line">
+                                <span>Durum: ${st.recording ? "🔴 Kayıt alınıyor" : (st.playing ? "▶️ Çalınıyor" : "⏸️ Hazır")}</span>
+                                <span>${st.exportedAudio ? "✅ MP3 dosyası dışa aktarıldı" : (st.trimmed ? "✂️ Seçili kısım kırpıldı" : "Dalga formu aktif")}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- 4. VİDEO DÜZENLEME (35-44) ---
+            if (task.module === "video") {
+                const clipA = st.reordered ? "Sahne 2: Laboratuvar" : "Sahne 1: Giriş";
+                const clipB = st.reordered ? "Sahne 1: Giriş" : "Sahne 2: Laboratuvar";
+
+                return `
+                    <div class="sim-window">
+                        <div class="window-titlebar titlebar-video">
+                            <span>🎬 ProjeVideosu.mp4 - Zaman Çizelgesi & Kurgu</span>
+                            <div class="window-dots"><span></span><span></span><span></span></div>
+                        </div>
+                        <div class="sim-toolbar">
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.splitDone ? 'active-video' : ''}" onclick="act('split')">🔪 Kes / Böl</button>
+                                <button type="button" class="tb-btn ${st.reordered ? 'active-video' : ''}" onclick="act('reorder')">⇄ Sahne Sırası Değiştir</button>
+                                <button type="button" class="tb-btn ${st.videoTransition ? 'active-video' : ''}" onclick="act('transition')">🎞️ Geçiş Ekle</button>
+                                <button type="button" class="tb-btn ${st.endTrimmed ? 'active-video' : ''}" onclick="act('endTrim')">✂️ Sonu Kırp</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.subtitleAdded ? 'active-video' : ''}" onclick="act('subtitle')">💬 Altyazı Ekle</button>
+                                <button type="button" class="tb-btn ${st.speed2x ? 'active-video' : ''}" onclick="act('speed')">⏩ 2x Hızlandır</button>
+                                <button type="button" class="tb-btn ${st.filterApplied ? 'active-video' : ''}" onclick="act('filter')">🌈 Canlı Renk Filtresi</button>
+                            </div>
+                            <div class="tb-group">
+                                <button type="button" class="tb-btn ${st.audioLowered ? 'active-video' : ''}" onclick="act('lowerAudio')">🔉 Sesi Kıs (%25)</button>
+                                <button type="button" class="tb-btn ${st.previewed ? 'active-video' : ''}" onclick="act('preview')">⏯️ Önizle / İlerlet</button>
+                                <button type="button" class="tb-btn ${st.renderedMp4 ? 'active-video' : ''}" onclick="act('render')">📤 MP4 Dışa Aktar</button>
+                            </div>
+                        </div>
+
+                        <div class="video-editor-stage">
+                            <div class="video-monitor-row">
+                                <div class="video-preview-screen" style="${st.filterApplied ? 'background:linear-gradient(135deg,#7c2d12,#ea580c);border-color:#fb923c;' : ''}">
+                                    <div style="font-size:1.15rem;font-weight:800;">🎥 ${clipA}</div>
+                                    <div style="font-size:0.82rem;color:#cbd5e1;margin-top:4px;">
+                                        Hız: ${st.speed2x ? "2.0x (Hızlı)" : "1.0x (Normal)"} • Konum: %${st.playhead}
+                                    </div>
+                                    ${st.subtitleAdded ? `<div class="subtitle-overlay">💬 "Bilişim ile geleceği tasarlıyoruz!"</div>` : ""}
+                                </div>
+
+                                <div class="video-inspector">
+                                    <strong style="color:#fb923c;">Klip Özellikleri</strong>
+                                    <div>• Kesme: ${st.splitDone ? "Bölündü (2 parça)" : "Tek parça"}</div>
+                                    <div>• Geçiş: ${st.videoTransition ? "Eklendi" : "Yok"}</div>
+                                    <div>• Ses Düzeyi: ${st.audioLowered ? "%25 (Kısık)" : "%100"}</div>
+                                    <div>• Çıktı: ${st.renderedMp4 ? "✅ MP4 Hazır" : "Taslak"}</div>
+                                </div>
+                            </div>
+
+                            <div class="timeline-box">
+                                <div class="timeline-label">Video İzi (V1)</div>
+                                <div class="timeline-track">
+                                    <div class="v-clip">${clipA}</div>
+                                    ${st.splitDone ? `<div class="v-clip split-part">${clipA} (Bölüm 2)</div>` : ""}
+                                    ${st.videoTransition ? `<span class="trans-badge">✨ Geçiş</span>` : ""}
+                                    ${!st.endTrimmed ? `<div class="v-clip">${clipB}</div>` : `<div class="v-clip" style="opacity:0.65;">${clipB} (Kırpıldı)</div>`}
+                                </div>
+
+                                <div class="timeline-label">Ses İzi (A1)</div>
+                                <div class="timeline-track">
+                                    <div class="v-clip audio-clip ${st.audioLowered ? 'muted-low' : ''}">
+                                        🎶 Arka Plan Müziği (${st.audioLowered ? "%25" : "%100"})
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return "";
+        }
+    </script>
+</body>
+</html>
